@@ -1,0 +1,54 @@
+{
+  "name": "SL18 Daily Automation",
+  "steps": [
+    {
+      "id": 1,
+      "type": "schedule",
+      "cron": "0 9 * * *",
+      "desc": "Run daily at 09:00 local"
+    },
+    {
+      "id": 2,
+      "type": "airtable.find",
+      "table": "Episodes",
+      "filter": "status='planned' LIMIT 1"
+    },
+    {
+      "id": 3,
+      "type": "gpt.generate",
+      "prompt_file": "prompts/script_template_en.txt"
+    },
+    {
+      "id": 4,
+      "type": "elevenlabs.tts",
+      "voice_id": "{{voice_id}}"
+    },
+    {
+      "id": 5,
+      "type": "mubert.music",
+      "mood": "comedic upbeat"
+    },
+    {
+      "id": 6,
+      "type": "capcut.render",
+      "template": "assets/templates/capcut/sl18_template.ccproj"
+    },
+    {
+      "id": 7,
+      "type": "captions.autogen",
+      "output": "data/captions"
+    },
+    {
+      "id": 8,
+      "type": "youtube.upload",
+      "privacy": "unlisted"
+    },
+    {
+      "id": 9,
+      "type": "airtable.update",
+      "fields": {
+        "status": "rendered"
+      }
+    }
+  ]
+}

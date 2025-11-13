@@ -1,0 +1,7 @@
+/data/
+/assets/templates/capcut/*.mp4
+/node_modules/
+.env
+*.log
+.DS_Store
+Thumbs.db

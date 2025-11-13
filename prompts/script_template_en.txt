@@ -1,0 +1,9 @@
+# SL18 Script Template (English)
+Persona: {{persona_display}}
+Theme: {{theme}}
+Tone: witty, musical, quick cuts
+Length: 25-35 seconds
+
+[HOOK] One-liner that ties culture & comedy.
+[BEAT] 2-3 punchlines as call-and-response.
+[OUTRO] Tagline + call to follow.

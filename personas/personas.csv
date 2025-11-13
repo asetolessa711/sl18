@@ -1,0 +1,4 @@
+persona_code,display_name,language,voice_id,style_notes
+AA_EN,Addis Analyst,en,elevenlabs_voice_x,"observational, playful"
+AA_OM,Obbo Lami,om,elevenlabs_voice_y,"deadpan, rural-urban mashup"
+AA_IT,Milan Maker,it,elevenlabs_voice_z,"sarcastic, lyrical"

@@ -1,0 +1,46 @@
+# azure-pipelines.yml - SL18
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: CONFIG_ENV
+    value: "prod"
+
+stages:
+- stage: Validate
+  displayName: Validate Scaffold
+  jobs:
+  - job: lint
+    steps:
+    - script: echo "Validating scaffold and placeholders..."
+      displayName: 'Echo validate'
+    - script: |
+        python --version || true
+        node --version || true
+      displayName: 'Check runtimes'
+
+- stage: MVP
+  displayName: MVP Dry Run
+  dependsOn: Validate
+  jobs:
+  - job: mvp
+    steps:
+    - checkout: self
+    - task: Bash@3
+      displayName: "List repo"
+      inputs:
+        targetType: 'inline'
+        script: |
+          ls -R
+    - task: PowerShell@2
+      displayName: "Prepare local folders (dry-run)"
+      inputs:
+        targetType: 'filePath'
+        filePath: 'scripts\setup.ps1'
+        arguments: '-DryRun'
+      condition: always()

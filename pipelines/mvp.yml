@@ -1,0 +1,10 @@
+# pipelines/mvp.yml
+parameters:
+  - name: persona
+    default: "Addis Analyst"
+  - name: language
+    default: "en"
+
+steps:
+  - script: echo "MVP pipeline running for ${{ parameters.persona }} in ${{ parameters.language }}"
+    displayName: "Persona/Language Echo"
