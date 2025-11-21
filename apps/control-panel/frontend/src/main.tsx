@@ -73,7 +73,7 @@ const statusLabels: Record<string, string> = {
   published: 'Published'
 };
 
-const credentialOrder = ['youtube', 'meta'];
+const credentialOrder = ['youtube', 'meta', 'tiktok'];
 
 function getFieldValue(record: AirtableRecord, keys: string[]) {
   if (!record?.fields) {
@@ -308,7 +308,7 @@ const Dashboard = () => {
   ]), []);
   const [franchiseId, setFranchiseId] = React.useState<string>(() => {
     try {
-      const ids = new Set(franchises.map((f: Franchise) => f.id));
+  const ids = new Set(franchises.map((f: Franchise) => f.id));
       const fromUrl = new URLSearchParams(window.location.search).get('franchise');
       if (fromUrl && ids.has(fromUrl)) return fromUrl;
       const fromStorage = typeof window !== 'undefined' ? window.localStorage.getItem('sl18.selectedFranchise') : null;
@@ -471,6 +471,7 @@ const SettingsView: React.FC = () => {
     setAdminToken(token.trim() || null);
     setSaved('Saved. This is session-only and used for protected actions.');
     setTimeout(() => setSaved(''), 3000);
+    void checkStatus();
     void checkStatus();
   }, [token, checkStatus]);
   const clear = React.useCallback(() => {
@@ -899,6 +900,7 @@ const Upload = () => {
   const providerLabel = React.useCallback((id: string) => {
     if (id === 'youtube') return 'YouTube';
     if (id === 'meta') return 'Meta Reels';
+  if (id === 'tiktok') return 'TikTok';
     if (id === 'capcut') return 'CapCut';
     return id;
   }, []);

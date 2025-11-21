@@ -32,7 +32,6 @@ Run a test generation:
 ```
 node -r dotenv/config automation/audio/mubert_generator.js
 ```
-
 Compare providers (run both when enabled):
 ```
 # Mubert (requires MUBERT_* vars)
@@ -42,7 +41,6 @@ node -r dotenv/config automation/audio/mubert_generator.js
 node -r dotenv/config automation/audio/udio_smoke.js
 ```
 The CI pipeline will parse `logs/audio_generation.json` and report separate OK/ERR lines for Mubert and UDIO so you can compare reliability at a glance.
-
 Run UDIO minimal smoke (when enabled):
 ```
 node -r dotenv/config automation/audio/udio_smoke.js
