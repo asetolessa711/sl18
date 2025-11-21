@@ -1,0 +1,42 @@
+#!/bin/sh
+# SL18 pre-push secret scan
+# Mirrors patterns from pre-commit; blocks pushes containing obvious secrets.
+# Bypass: export SKIP_SECRET_SCAN=1 (only for verified false positives).
+
+test "$SKIP_SECRET_SCAN" = "1" && echo "[pre-push] Secret scan skipped (SKIP_SECRET_SCAN=1)" && exit 0
+
+echo "[pre-push] Running secret scan before push..."
+PATTERN='(\.apps\.googleusercontent\.com|GOCSPX-|ya29\.|1//[A-Za-z0-9_-]{20,}|-----BEGIN (RSA|EC|DSA|OPENSSH|PGP) PRIVATE KEY-----|-----BEGIN PRIVATE KEY-----|"private_key":|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36,}|\b[0-9a-f]{40}\b|xox[baprs]-[A-Za-z0-9-]{10,}|sk_live_[A-Za-z0-9]{24,}|EA[A-Za-z0-9]{10,})'
+EXIT=0
+
+# Determine comparison base (origin/main if exists)
+BASE="origin/main"
+if ! git rev-parse --verify $BASE >/dev/null 2>&1; then
+  BASE="HEAD~10" # fallback: scan last ~10 commits
+fi
+
+FILES=$(git diff --name-only $BASE..HEAD | sort -u)
+
+scan_file() {
+  f="$1"
+  case "$f" in
+    *.js|*.ts|*.mjs|*.json|*.md|*.py|*.ps1)
+      if [ -f "$f" ]; then
+        if grep -Eiq "$PATTERN" "$f"; then
+          echo "[pre-push] Potential secret in $f"
+          grep -Ein "$PATTERN" "$f" | head -n 5
+          EXIT=1
+        fi
+      fi
+      ;;
+  esac
+}
+
+for f in $FILES; do
+  scan_file "$f"
+done
+
+if [ $EXIT -ne 0 ]; then
+  echo "\n[pre-push] Push blocked. Redact secrets or set SKIP_SECRET_SCAN=1 temporarily."
+fi
+exit $EXIT

@@ -15,6 +15,14 @@ import type {
   CredentialAlert
 } from './types';
 import { marked } from 'marked';
+// Local data interfaces (frontend only)
+interface Franchise {
+  id: string;
+  name: string;
+  status: string;
+  lastEpisode: string;
+  revenue: number;
+}
 import './styles.css';
 
 // Admin token helpers (session-scoped)
@@ -163,7 +171,8 @@ type CredentialStatusContextValue = {
 
 const CredentialStatusContext = React.createContext<CredentialStatusContextValue | undefined>(undefined);
 
-const CredentialStatusProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface CredentialStatusProviderProps { children: React.ReactNode }
+const CredentialStatusProvider: React.FC<CredentialStatusProviderProps> = ({ children }) => {
   const [status, setStatus] = React.useState<CredentialStatusResponse | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -292,14 +301,14 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const selectedFranchiseId = useSelectedFranchiseId();
-  const franchises = React.useMemo(() => ([
+  const franchises = React.useMemo<Franchise[]>(() => ([
     { id: 'global-remix', name: 'Global Remix', status: 'Assets Ready', lastEpisode: 'Nov 17', revenue: 1240 },
     { id: 'urban-pulse', name: 'Urban Pulse', status: 'Needs Cover Art', lastEpisode: 'Nov 16', revenue: 980 },
     { id: 'tech-sparks', name: 'Tech Sparks', status: 'In Production', lastEpisode: 'Nov 18', revenue: 620 }
   ]), []);
   const [franchiseId, setFranchiseId] = React.useState<string>(() => {
     try {
-      const ids = new Set(franchises.map(f => f.id));
+      const ids = new Set(franchises.map((f: Franchise) => f.id));
       const fromUrl = new URLSearchParams(window.location.search).get('franchise');
       if (fromUrl && ids.has(fromUrl)) return fromUrl;
       const fromStorage = typeof window !== 'undefined' ? window.localStorage.getItem('sl18.selectedFranchise') : null;
@@ -309,7 +318,7 @@ const Dashboard = () => {
     }
     return franchises[0].id;
   });
-  const currentFranchise = React.useMemo(() => franchises.find(f => f.id === franchiseId)!, [franchiseId, franchises]);
+  const currentFranchise = React.useMemo(() => franchises.find((f: Franchise) => f.id === franchiseId)!, [franchiseId, franchises]);
 
   const applyFranchiseSelection = React.useCallback((nextId: string) => {
     setFranchiseId(nextId);

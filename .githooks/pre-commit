@@ -1,0 +1,62 @@
+#!/bin/sh
+# SL18 pre-commit secret scan (simplified, POSIX-safe)
+# Scans only staged content (index) for secret patterns.
+# Whitelist entries: .secret-scan-ignore (one path/glob per line). README.md auto-whitelisted.
+# Bypass: export SKIP_SECRET_SCAN=1
+
+PATTERN='(\.apps\.googleusercontent\.com|GOCSPX-|ya29\.|1//[A-Za-z0-9_-]{20,}|-----BEGIN (RSA|EC|DSA|OPENSSH|PGP) PRIVATE KEY-----|-----BEGIN PRIVATE KEY-----|"private_key":|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36,}|\b[0-9a-f]{40}\b|xox[baprs]-[A-Za-z0-9-]{10,}|sk_live_[A-Za-z0-9]{24,}|EA[A-Za-z0-9]{10,})'
+EXT_FILTER='*.js *.ts *.mjs *.json *.md *.py *.ps1'
+IGNORE_FILE='.secret-scan-ignore'
+
+if [ "$SKIP_SECRET_SCAN" = "1" ]; then
+  echo "[secret-scan] Skipped (SKIP_SECRET_SCAN=1)"; exit 0
+fi
+
+echo "[secret-scan] Scanning staged diff for secrets..."
+EXIT=0
+WHITELIST="README.md"
+
+if [ -f "$IGNORE_FILE" ]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    # skip empty or comment lines
+    [ -z "$line" ] && continue
+    case "$line" in
+      \#*) continue ;;
+      *) WHITELIST="$WHITELIST $line" ;;
+    esac
+  done < "$IGNORE_FILE"
+fi
+
+is_whitelisted() {
+  f="$1"
+  for w in $WHITELIST; do
+    case "$f" in
+      $w) return 0 ;;
+    esac
+  done
+  return 1
+}
+
+for path in $(git diff --cached --name-only); do
+  [ -f "$path" ] || continue
+  is_whitelisted "$path" && continue
+  MATCH_EXT=0
+  for e in $EXT_FILTER; do
+    case "$path" in
+      $e) MATCH_EXT=1 ;;
+    esac
+  done
+  [ $MATCH_EXT -eq 1 ] || continue
+
+  CONTENT=$(git show ":$path" 2>/dev/null)
+  printf '%s' "$CONTENT" | grep -Eiq "$PATTERN" || continue
+  echo "[secret-scan] Potential secret in $path"
+  printf '%s' "$CONTENT" | grep -Ein "$PATTERN" | head -n 5
+  EXIT=1
+done
+
+if [ $EXIT -ne 0 ]; then
+  echo "\n[secret-scan] Commit blocked. Redact or move secrets."
+  echo "[secret-scan] Whitelist file: $IGNORE_FILE"
+fi
+exit $EXIT

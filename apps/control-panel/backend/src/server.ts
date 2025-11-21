@@ -1,5 +1,4 @@
-import express from 'express';
-import type { Request } from 'express';
+import express, { type Request, type Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { spawn } from 'child_process';
@@ -76,11 +75,11 @@ interface AlertRecord {
   notes?: AlertNote[];
 }
 
-app.get('/healthz', (_req, res) => {
+app.get('/healthz', (_req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.get('/api/dashboard', async (_req, res) => {
+app.get('/api/dashboard', async (_req: Request, res: Response) => {
   if (!airtableBase) {
     res.status(500).json({ error: 'Missing AIRTABLE API credentials' });
     return;
@@ -109,7 +108,7 @@ app.get('/api/dashboard', async (_req, res) => {
   }
 });
 
-app.get('/api/upload/queue', async (req: Request, res) => {
+app.get('/api/upload/queue', async (req: Request, res: Response) => {
   if (!airtableBase) {
     res.status(500).json({ error: 'Missing AIRTABLE API credentials' });
     return;
@@ -138,7 +137,7 @@ app.get('/api/upload/queue', async (req: Request, res) => {
   }
 });
 
-app.get('/api/upload/stats', async (req: Request, res) => {
+app.get('/api/upload/stats', async (req: Request, res: Response) => {
   if (!airtableBase) {
     res.status(500).json({ error: 'Missing AIRTABLE API credentials' });
     return;
@@ -160,7 +159,7 @@ app.get('/api/upload/stats', async (req: Request, res) => {
   }
 });
 
-app.post('/api/validate', (req, res) => {
+app.post('/api/validate', (req: Request, res: Response) => {
   const { service } = req.body ?? {};
   const scriptPath = path.resolve(repoRoot, 'scripts', 'diagnostics', 'validate-env.ps1');
   const args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath];
@@ -171,20 +170,20 @@ app.post('/api/validate', (req, res) => {
   const ps = spawn('powershell', args, { cwd: repoRoot });
   res.setHeader('Content-Type', 'text/plain');
 
-  ps.stdout.on('data', chunk => {
+  ps.stdout.on('data', (chunk: Buffer | string) => {
     res.write(chunk);
   });
 
-  ps.stderr.on('data', chunk => {
+  ps.stderr.on('data', (chunk: Buffer | string) => {
     res.write(chunk);
   });
 
-  ps.on('close', code => {
+  ps.on('close', (code: number | null) => {
     res.end(`\n[INFO] validate-env.ps1 exited with code ${code}\n`);
   });
 });
 
-app.post('/api/upload/update', async (req, res) => {
+app.post('/api/upload/update', async (req: Request, res: Response) => {
   if (!airtableBase) {
     res.status(500).json({ error: 'Missing AIRTABLE API credentials' });
     return;
@@ -290,7 +289,7 @@ app.post('/api/upload/update', async (req, res) => {
   }
 });
 
-app.get('/api/upload/activity', async (req, res) => {
+app.get('/api/upload/activity', async (req: Request, res: Response) => {
   try {
     const recordId = normalizeQueryString(req.query?.recordId);
     const entries = await readUploadActivity(recordId ?? undefined);
@@ -301,7 +300,7 @@ app.get('/api/upload/activity', async (req, res) => {
   }
 });
 
-app.get('/api/credentials/status', (_req, res) => {
+app.get('/api/credentials/status', (_req: Request, res: Response) => {
   try {
     const credentials = getPublishingCredentialPreview();
     const alerts = Object.values(credentials)
@@ -324,7 +323,7 @@ app.get('/api/credentials/status', (_req, res) => {
 });
 
 // Alerts lifecycle API (MVP)
-app.get('/api/alerts', async (req, res) => {
+app.get('/api/alerts', async (req: Request, res: Response) => {
   try {
     const stateFilterRaw = normalizeQueryString(req.query?.state);
     const now = new Date();
@@ -390,7 +389,7 @@ app.get('/api/alerts', async (req, res) => {
   }
 });
 
-app.post('/api/alerts/ack', express.json(), async (req, res) => {
+app.post('/api/alerts/ack', express.json(), async (req: Request, res: Response) => {
   const { id, actor } = req.body ?? {};
   if (typeof id !== 'string' || !id.trim()) {
     res.status(400).json({ error: 'id is required' });
@@ -407,7 +406,7 @@ app.post('/api/alerts/ack', express.json(), async (req, res) => {
   res.json(rec);
 });
 
-app.post('/api/alerts/resolve', express.json(), async (req, res) => {
+app.post('/api/alerts/resolve', express.json(), async (req: Request, res: Response) => {
   const { id, actor, note } = req.body ?? {};
   if (typeof id !== 'string' || !id.trim()) {
     res.status(400).json({ error: 'id is required' });
@@ -424,7 +423,7 @@ app.post('/api/alerts/resolve', express.json(), async (req, res) => {
   res.json(rec);
 });
 
-app.post('/api/alerts/note', express.json(), async (req, res) => {
+app.post('/api/alerts/note', express.json(), async (req: Request, res: Response) => {
   const { id, actor, text } = req.body ?? {};
   if (typeof id !== 'string' || !id.trim() || typeof text !== 'string' || !text.trim()) {
     res.status(400).json({ error: 'id and text are required' });
@@ -441,7 +440,7 @@ app.post('/api/alerts/note', express.json(), async (req, res) => {
   res.json(rec);
 });
 
-app.get('/api/docs', async (_req, res) => {
+app.get('/api/docs', async (_req: Request, res: Response) => {
   try {
     const files = await readDocsDirectory();
     res.json({ files, fetchedAt: new Date().toISOString() });
@@ -451,7 +450,7 @@ app.get('/api/docs', async (_req, res) => {
   }
 });
 
-app.get('/api/docs/content', async (req: Request, res) => {
+app.get('/api/docs/content', async (req: Request, res: Response) => {
   try {
     const id = normalizeQueryString(req.query?.file);
     if (!id) {
@@ -750,7 +749,7 @@ function listCounts(list: AlertRecord[]) {
 }
 
 // Apply fallback credentials for a provider when available
-app.post('/api/alerts/fallback', express.json(), async (req, res) => {
+app.post('/api/alerts/fallback', express.json(), async (req: Request, res: Response) => {
   const { id, actor } = req.body ?? {};
   if (typeof id !== 'string' || !id.startsWith('credential:')) {
     res.status(400).json({ error: 'valid credential alert id is required' });
