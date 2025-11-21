@@ -85,6 +85,7 @@
 
 ## Next Actions
 - Decide on the primary dashboard platform (Airtable Interfaces vs external BI).
-- Update Airtable schema to include the checklist, release monitoring, and revenue fields.
-- Prototype both a global operations dashboard and a franchise-scoped dashboard filtered by `franchise_id` and `language`.
-- Integrate dashboard links into the human review workspace, franchise onboarding SOP, and partner communications.
+- Update Airtable schema to include onboarding checklist, release monitoring, and revenue fields.
+- Prototype: (1) Global ops dashboard; (2) Franchise-scoped dashboard filtered by `franchise_id` and `language`.
+- Build onboarding interface using existing core franchise data to validate field coverage.
+- Integrate dashboard links into the human review workspace, onboarding SOP, and partner communications.
