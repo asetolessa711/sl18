@@ -1,9 +1,31 @@
-# SL18 Script Template (English)
-Persona: {{persona_display}}
-Theme: {{theme}}
-Tone: witty, musical, quick cuts
-Length: 25-35 seconds
+# SL18 Daily Script Prompt (English)
+Persona: {{ persona_display }} ({{ persona_code }})
+Language: {{ language }}
+Theme: {{ theme }}
+Hook Idea: {{ hook }}
+Tone Notes: {{ style_notes }}
+Length Target: 28 seconds (95-110 words)
 
-[HOOK] One-liner that ties culture & comedy.
-[BEAT] 2-3 punchlines as call-and-response.
-[OUTRO] Tagline + call to follow.
+Instructions for the model:
+- Write in {{ language }} unless specific bilingual flourishes are requested.
+- Open with a culturally resonant hook that reflects the theme and persona.
+- Use rhythmic, witty delivery cues; mark quick cuts or beat changes with `(CUT)`.
+- Keep segments short (≤2 sentences) to match fast edit pacing.
+- Highlight any call-and-response beats with `(CALL)` / `(RESP)` labels.
+- End with the persona's signature sign-off: {{ sign_off }} + CTA to follow/subscribe.
+- Avoid taboo topics flagged in the persona notes; keep it PG-13.
+
+Output format:
+[HOOK]
+Line 1…
+
+[SETUP]
+- Bullet punchline 1
+- Bullet punchline 2
+- Bullet punchline 3
+
+[OUTRO]
+CTA sentence including platform-agnostic follow request.
+
+Include stage directions in parentheses for CapCut subtitles (e.g., `(beat drop)`), but do not exceed five total.
+

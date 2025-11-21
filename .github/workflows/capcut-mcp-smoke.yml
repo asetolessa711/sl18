@@ -1,0 +1,42 @@
+name: CapCut MCP Smoke Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  capcut-mcp-smoke:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: CapCutAPI
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: CapCutAPI/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Run MCP tools smoke test
+        env:
+          CAPCUT_API_KEY: ${{ secrets.CAPCUT_API_KEY || 'dummy' }}
+          CAPCUT_TEAM_ID: ${{ secrets.CAPCUT_TEAM_ID || 'editor80559511' }}
+          CAPCUT_TEMPLATE_ID: ${{ secrets.CAPCUT_TEMPLATE_ID || '' }}
+        run: |
+          npm run test:tools

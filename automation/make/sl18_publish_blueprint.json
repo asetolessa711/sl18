@@ -1,0 +1,158 @@
+{
+  "name": "SL18 Video Publish Fanout",
+  "description": "Distribute rendered video to Shorts, Reels, and TikTok once CapCut output is ready",
+  "modules": [
+    {
+      "id": 1,
+      "type": "schedule",
+      "name": "Hourly Trigger",
+      "settings": {
+        "cron": "0 * * * *",
+        "timezone": "Africa/Addis_Ababa"
+      },
+      "outputs": [2]
+    },
+    {
+      "id": 2,
+      "type": "airtable_list_records",
+      "name": "Find Render Ready Episode",
+      "settings": {
+        "baseId": "{{AIRTABLE_BASE_ID}}",
+        "tableId": "Episodes",
+        "filterByFormula": "{status}='render_ready'",
+        "sort": [{"field": "date", "direction": "asc"}],
+        "maxRecords": 1
+      },
+      "outputs": [3],
+      "onEmpty": 11
+    },
+    {
+      "id": 3,
+      "type": "airtable_list_records",
+      "name": "Lookup Persona",
+      "settings": {
+        "baseId": "{{AIRTABLE_BASE_ID}}",
+        "tableId": "Personas",
+        "filterByFormula": "{persona_code}='{{2.records[1].fields.persona_code}}'",
+        "maxRecords": 1
+      },
+      "outputs": [4],
+      "onError": 12
+    },
+    {
+      "id": 4,
+      "type": "google_drive_download",
+      "name": "Download Video",
+      "settings": {
+        "fileId": "{{2.records[1].fields.video_file[1].id}}"
+      },
+      "outputs": [5],
+      "onError": 12
+    },
+    {
+      "id": 5,
+      "type": "google_drive_download",
+      "name": "Download Captions",
+      "settings": {
+        "fileId": "{{2.records[1].fields.caption_file[1].id}}"
+      },
+      "outputs": [6],
+      "onError": 12
+    },
+    {
+      "id": 6,
+      "type": "youtube_upload_short",
+      "name": "Publish YouTube Short",
+      "settings": {
+        "apiKey": "{{YOUTUBE_API_KEY}}",
+        "title": "{{2.records[1].fields.theme}} | {{3.records[1].fields.display_name}}",
+        "description": "{{2.records[1].fields.hook}}\n\n{{2.records[1].fields.notes}}",
+        "videoBinary": "{{4.binary}}",
+        "privacyStatus": "public",
+        "captionFile": "{{5.binary}}",
+        "tags": ["SL18", "Addis"]
+      },
+      "outputs": [7],
+      "onError": 12
+    },
+    {
+      "id": 7,
+      "type": "meta_publish_reel",
+      "name": "Publish IG/FB Reel",
+      "settings": {
+        "accessToken": "{{META_CREATOR_STUDIO_TOKEN}}",
+        "instagramAccountId": "{{META_IG_ACCOUNT_ID}}",
+        "facebookPageId": "{{META_FB_PAGE_ID}}",
+        "caption": "{{2.records[1].fields.hook}}",
+        "videoBinary": "{{4.binary}}"
+      },
+      "outputs": [8],
+      "onError": 12
+    },
+    {
+      "id": 8,
+      "type": "tiktok_upload",
+      "name": "Publish TikTok",
+      "settings": {
+        "sessionCookie": "{{TIKTOK_SESSION_COOKIE}}",
+        "caption": "{{2.records[1].fields.hook}} #SL18",
+        "videoBinary": "{{4.binary}}",
+        "coverTimestamp": 1.5
+      },
+      "outputs": [9],
+      "onError": 12
+    },
+    {
+      "id": 9,
+      "type": "airtable_update_record",
+      "name": "Update Airtable",
+      "settings": {
+        "baseId": "{{AIRTABLE_BASE_ID}}",
+        "tableId": "Episodes",
+        "recordId": "{{2.records[1].id}}",
+        "fields": {
+          "publish_url": "{{6.videoUrl}}",
+          "youtube_video_id": "{{6.videoId}}",
+          "meta_ig_media_id": "{{7.instagramMediaId}}",
+          "meta_fb_post_id": "{{7.facebookPostId}}",
+          "tiktok_video_id": "{{8.videoId}}",
+          "yt_views": 0,
+          "meta_plays": 0,
+          "tiktok_views": 0,
+          "last_metrics_sync": "",
+          "status": "published"
+        }
+      },
+      "outputs": [10],
+      "onError": 12
+    },
+    {
+      "id": 10,
+      "type": "notification_email",
+      "name": "Notify Success",
+      "settings": {
+        "to": "{{if(empty(2.records[1].fields.franchise_owner_email); \"ops@sl18.local\"; concat(\"ops@sl18.local;\", 2.records[1].fields.franchise_owner_email))}}",
+        "subject": "SL18 Episode Published {{2.records[1].fields.date}} ({{if(empty(2.records[1].fields.franchise_id); DEFAULT_FRANCHISE_ID; 2.records[1].fields.franchise_id)}})",
+        "body": "Franchise {{if(empty(2.records[1].fields.franchise_id); DEFAULT_FRANCHISE_ID; 2.records[1].fields.franchise_id)}} is live on all channels. YouTube: {{6.videoUrl}}. IG/FB Job: {{7.jobId}}. TikTok: {{8.jobId}}."
+      }
+    },
+    {
+      "id": 11,
+      "type": "notification_email",
+      "name": "Publish Waiting",
+      "settings": {
+        "to": "ops@sl18.local",
+        "subject": "SL18 No Render Ready Episodes",
+        "body": "Hourly check found no episodes flagged render_ready for franchise {{DEFAULT_FRANCHISE_ID}}. Verify Airtable status or hook up router filters." }
+    },
+    {
+      "id": 12,
+      "type": "notification_email",
+      "name": "Publish Failure",
+      "settings": {
+        "to": "{{if(empty(2.records[1].fields.franchise_owner_email); \"ops@sl18.local\"; concat(\"ops@sl18.local;\", 2.records[1].fields.franchise_owner_email))}}",
+        "subject": "SL18 Publishing Failed {{now}}",
+        "body": "Automation stopped during platform upload for franchise {{if(empty(2.records[1].fields.franchise_id); DEFAULT_FRANCHISE_ID; 2.records[1].fields.franchise_id)}}. Check Make log, post manually, and set Airtable status to fallback." }
+    }
+  ]
+}

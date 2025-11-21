@@ -1,2 +1,2 @@
-date,persona_code,theme,hook,script_prompt,status,yt,tok,ig,fb
-2025-11-14,AA_EN,AI vs Aunties,When your auntie meets GPT...,Use script_template_en with persona AA_EN.,planned,1,1,1,1
+episode_id,date,persona_code,franchise_id,theme,hook,melody_reference,script_file,tts_file,music_file,video_file,caption_file,publish_url,youtube_video_id,meta_ig_media_id,meta_fb_post_id,tiktok_video_id,drive_scripts_id,drive_audio_id,drive_music_id,drive_video_id,drive_captions_id,franchise_owner_email,yt_views,meta_plays,tiktok_views,last_metrics_sync,status,notes
+core-2025-11-15,2025-11-15,AA_EN,core,AI vs Aunties,"When your auntie's WhatsApp rumors get fact-checked by AI","Classic masinqo wedding loop","","","","","","","","","","","","","","","","ops@sl18.local","0","0","0","","planned","Daily pilot clip"

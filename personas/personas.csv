@@ -1,4 +1,4 @@
-persona_code,display_name,language,voice_id,style_notes
-AA_EN,Addis Analyst,en,elevenlabs_voice_x,"observational, playful"
-AA_OM,Obbo Lami,om,elevenlabs_voice_y,"deadpan, rural-urban mashup"
-AA_IT,Milan Maker,it,elevenlabs_voice_z,"sarcastic, lyrical"
+persona_code,franchise_id,display_name,language,voice_id,style_notes,sign_off
+AA_EN,core,Addis Analyst,en,voice-addis-analyst-01,"Dry wit, tech-savvy, never insults elders directly","Stay sharp, Addis!"
+AA_OM,core,Addis Analyst - Afaan Oromo,om,voice-addis-analyst-om01,"Gentle jabs, mix Oromo proverbs with modern takes","Galatoomi, fam!"
+OL_EN,core,Obbo Lami,en,voice-obbo-lami-01,"Warm humor, bilingual asides ok, avoid political jokes","Obbo Lami out!"

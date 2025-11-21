@@ -1,53 +1,216 @@
 {
-  "name": "SL18 Daily Automation",
-  "steps": [
+  "name": "SL18 Script, TTS, Music & Video Handoff",
+  "description": "Make.com scenario that prepares script, persona voiceover, music stem, and CapCut render for SL18 daily clip production",
+  "modules": [
     {
       "id": 1,
       "type": "schedule",
-      "cron": "0 9 * * *",
-      "desc": "Run daily at 09:00 local"
+      "name": "Daily Trigger",
+      "settings": {
+        "cron": "0 9 * * *",
+        "timezone": "Africa/Addis_Ababa"
+      },
+      "outputs": [2]
     },
     {
       "id": 2,
-      "type": "airtable.find",
-      "table": "Episodes",
-      "filter": "status='planned' LIMIT 1"
+      "type": "airtable_list_records",
+      "name": "Fetch Planned Episode",
+      "settings": {
+        "baseId": "{{AIRTABLE_BASE_ID}}",
+        "tableId": "Episodes",
+        "filterByFormula": "{status}='planned'",
+        "sort": [{"field": "date", "direction": "asc"}],
+        "maxRecords": 1
+      },
+      "outputs": [3]
     },
     {
       "id": 3,
-      "type": "gpt.generate",
-      "prompt_file": "prompts/script_template_en.txt"
+      "type": "airtable_list_records",
+      "name": "Fetch Persona",
+      "settings": {
+        "baseId": "{{AIRTABLE_BASE_ID}}",
+        "tableId": "Personas",
+        "filterByFormula": "{persona_code}='{{2.records[1].fields.persona_code}}'",
+        "maxRecords": 1
+      },
+      "outputs": [4]
     },
     {
       "id": 4,
-      "type": "elevenlabs.tts",
-      "voice_id": "{{voice_id}}"
+      "type": "openai_chat_completion",
+      "name": "Generate Script",
+      "settings": {
+        "model": "{{OPENAI_MODEL}}",
+        "promptFileId": "Drive:/SL18/02_prompts/script_template_en.txt",
+        "variables": {
+          "persona_display": "{{3.records[1].fields.display_name}}",
+          "persona_code": "{{3.records[1].fields.persona_code}}",
+          "language": "{{3.records[1].fields.language}}",
+          "theme": "{{2.records[1].fields.theme}}",
+          "hook": "{{2.records[1].fields.hook}}",
+          "style_notes": "{{3.records[1].fields.style_notes}}",
+          "sign_off": "{{3.records[1].fields.sign_off}}"
+        },
+        "outputFormat": "text"
+      },
+      "outputs": [5],
+      "onError": 16
     },
     {
       "id": 5,
-      "type": "mubert.music",
-      "mood": "comedic upbeat"
+      "type": "google_drive_upload",
+      "name": "Save Script to Drive",
+      "settings": {
+        "parentId": "{{if(empty(2.records[1].fields.drive_scripts_id); GOOGLE_DRIVE_SCRIPTS_ID; 2.records[1].fields.drive_scripts_id)}}",
+        "fileName": "{{2.records[1].fields.date}}_{{if(empty(2.records[1].fields.franchise_id); DEFAULT_FRANCHISE_ID; 2.records[1].fields.franchise_id)}}_{{3.records[1].fields.persona_code}}.txt",
+        "content": "{{4.text}}",
+        "mimeType": "text/plain"
+      },
+      "outputs": [6],
+      "onError": 16
     },
     {
       "id": 6,
-      "type": "capcut.render",
-      "template": "assets/templates/capcut/sl18_template.ccproj"
+      "type": "elevenlabs_tts",
+      "name": "Generate Voiceover",
+      "settings": {
+        "voiceId": "{{3.records[1].fields.voice_id}}",
+        "text": "{{4.text}}",
+        "stability": 0.6,
+        "similarityBoost": 0.75
+      },
+      "outputs": [7],
+      "onError": 16
     },
     {
       "id": 7,
-      "type": "captions.autogen",
-      "output": "data/captions"
+      "type": "google_drive_upload",
+      "name": "Save Voiceover",
+      "settings": {
+        "parentId": "{{if(empty(2.records[1].fields.drive_audio_id); GOOGLE_DRIVE_AUDIO_ID; 2.records[1].fields.drive_audio_id)}}",
+        "fileName": "{{2.records[1].fields.date}}_{{if(empty(2.records[1].fields.franchise_id); DEFAULT_FRANCHISE_ID; 2.records[1].fields.franchise_id)}}_{{3.records[1].fields.persona_code}}.mp3",
+        "content": "{{6.binary}}",
+        "mimeType": "audio/mpeg"
+      },
+      "outputs": [8],
+      "onError": 16
     },
     {
       "id": 8,
-      "type": "youtube.upload",
-      "privacy": "unlisted"
+      "type": "mubert_generate",
+      "name": "Generate Music Stem",
+      "settings": {
+        "prompt": "{{3.records[1].fields.display_name}} {{2.records[1].fields.theme}} {{2.records[1].fields.melody_reference}} 30s viral clip",
+        "duration": 30,
+        "mood": "upbeat"
+      },
+      "outputs": [9],
+      "onError": 16
     },
     {
       "id": 9,
-      "type": "airtable.update",
-      "fields": {
-        "status": "rendered"
+      "type": "google_drive_upload",
+      "name": "Save Music Stem",
+      "settings": {
+        "parentId": "{{if(empty(2.records[1].fields.drive_music_id); GOOGLE_DRIVE_MUSIC_ID; 2.records[1].fields.drive_music_id)}}",
+        "fileName": "{{2.records[1].fields.date}}_{{if(empty(2.records[1].fields.franchise_id); DEFAULT_FRANCHISE_ID; 2.records[1].fields.franchise_id)}}_{{3.records[1].fields.persona_code}}_music.mp3",
+        "content": "{{8.binary}}",
+        "mimeType": "audio/mpeg"
+      },
+      "outputs": [10],
+      "onError": 16
+    },
+    {
+      "id": 10,
+      "type": "capcut_automation",
+      "name": "Render CapCut Draft",
+      "settings": {
+        "templateId": "{{CAPCUT_TEMPLATE_ID}}",
+        "teamId": "{{CAPCUT_TEAM_ID}}",
+        "scriptFileId": "{{5.fileId}}",
+        "voiceFileUrl": "{{7.url}}",
+        "musicFileUrl": "{{9.url}}",
+        "captions": true
+      },
+      "outputs": [11],
+      "onError": 16
+    },
+    {
+      "id": 11,
+      "type": "capcut_export_captions",
+      "name": "Export Video & Captions",
+      "settings": {
+        "projectId": "{{10.projectId}}"
+      },
+      "outputs": [12],
+      "onError": 16
+    },
+    {
+      "id": 12,
+      "type": "google_drive_upload",
+      "name": "Store Video",
+      "settings": {
+        "parentId": "{{if(empty(2.records[1].fields.drive_video_id); GOOGLE_DRIVE_VIDEO_ID; 2.records[1].fields.drive_video_id)}}",
+        "fileName": "{{2.records[1].fields.date}}_{{if(empty(2.records[1].fields.franchise_id); DEFAULT_FRANCHISE_ID; 2.records[1].fields.franchise_id)}}_{{3.records[1].fields.persona_code}}.mp4",
+        "contentUrl": "{{11.videoUrl}}",
+        "mimeType": "video/mp4"
+      },
+      "outputs": [13],
+      "onError": 16
+    },
+    {
+      "id": 13,
+      "type": "google_drive_upload",
+      "name": "Store Captions",
+      "settings": {
+        "parentId": "{{if(empty(2.records[1].fields.drive_captions_id); GOOGLE_DRIVE_CAPTIONS_ID; 2.records[1].fields.drive_captions_id)}}",
+        "fileName": "{{2.records[1].fields.date}}_{{if(empty(2.records[1].fields.franchise_id); DEFAULT_FRANCHISE_ID; 2.records[1].fields.franchise_id)}}_{{3.records[1].fields.persona_code}}.srt",
+        "contentUrl": "{{11.captionUrl}}",
+        "mimeType": "text/plain"
+      },
+      "outputs": [14],
+      "onError": 16
+    },
+    {
+      "id": 14,
+      "type": "airtable_update_record",
+      "name": "Update Airtable",
+      "settings": {
+        "baseId": "{{AIRTABLE_BASE_ID}}",
+        "tableId": "Episodes",
+        "recordId": "{{2.records[1].id}}",
+        "fields": {
+          "script_file": "{{5.fileId}}",
+          "tts_file": "{{7.fileId}}",
+          "music_file": "{{9.fileId}}",
+          "video_file": "{{12.fileId}}",
+          "caption_file": "{{13.fileId}}",
+          "status": "render_ready"
+        }
+      },
+      "outputs": [15],
+      "onError": 16
+    },
+    {
+      "id": 15,
+      "type": "notification_email",
+      "name": "Send Daily Summary",
+      "settings": {
+        "to": "{{if(empty(2.records[1].fields.franchise_owner_email); \"ops@sl18.local\"; concat(\"ops@sl18.local;\", 2.records[1].fields.franchise_owner_email))}}",
+        "subject": "SL18 Assets Ready {{2.records[1].fields.date}}",
+        "body": "Script, voiceover, music stem, and CapCut render are ready for franchise {{if(empty(2.records[1].fields.franchise_id); DEFAULT_FRANCHISE_ID; 2.records[1].fields.franchise_id)}}. Review video here: {{12.fileUrl}}."
+      }
+    },
+    {
+      "id": 16,
+      "type": "notification_email",
+      "name": "Manual Intervention Needed",
+      "settings": {
+        "to": "{{if(empty(2.records[1].fields.franchise_owner_email); \"ops@sl18.local\"; concat(\"ops@sl18.local;\", 2.records[1].fields.franchise_owner_email))}}",
+        "subject": "SL18 Automation Issue {{now}}",
+        "body": "Automation stopped before video handoff for franchise {{if(empty(2.records[1].fields.franchise_id); DEFAULT_FRANCHISE_ID; 2.records[1].fields.franchise_id)}}. Please draft or render manually, update Airtable, and note the issue in /SL18/06_logs."
       }
     }
   ]

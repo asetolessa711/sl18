@@ -1,7 +1,29 @@
-/data/
-/assets/templates/capcut/*.mp4
-/node_modules/
+# SL18 automation workspace ignores
 .env
+config/*.json
+credentials/*.json
+*.env.local
 *.log
+*.tmp
 .DS_Store
 Thumbs.db
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Node modules or vendor bundles (if added later)
+node_modules/
+vendor/
+
+# Rendered assets
+assets/tmp/
+data/
+SL18_backup/
+logs/
+/SL18/06_logs/
+publishing/youtube/token.json
+
+# IDE settings
+.vscode/
+.idea/

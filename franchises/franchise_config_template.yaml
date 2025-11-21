@@ -1,0 +1,56 @@
+# SL18 Franchise Configuration Template
+# Duplicate this file per partner and commit as franchises/<franchise_id>/config.yaml
+
+franchise_id: core
+franchise_name: "SL18 Core"
+country: "Ethiopia"
+timezone: "Africa/Addis_Ababa"
+owner_contact:
+  name: "Central Ops"
+  email: "ops@sl18.africa"
+  phone: "+251-000-0000"
+revenue_split:
+  partner_share: 0.35  # 35%
+  central_share: 0.65
+
+drive_folders:
+  scripts: "{{GOOGLE_DRIVE_SCRIPTS_ID}}"
+  audio: "{{GOOGLE_DRIVE_AUDIO_ID}}"
+  music: "{{GOOGLE_DRIVE_MUSIC_ID}}"
+  video: "{{GOOGLE_DRIVE_VIDEO_ID}}"
+  captions: "{{GOOGLE_DRIVE_CAPTIONS_ID}}"
+
+capcut:
+  template_id: "CAPCUT_TEMPLATE_ID"
+  team_id: "CAPCUT_TEAM_ID"
+
+make:
+  router_filter: "franchise_id = 'core'"
+  webhook_secret: ""
+
+personas:
+  default_language: "en"
+  prompt_variant: "prompts/script_template_en.txt"
+  additional_notes: []
+
+publishing:
+  youtube:
+    api_key: "YOUTUBE_API_KEY"
+  meta:
+    creator_studio_token: "META_CREATOR_STUDIO_TOKEN"
+    instagram_account_id: "META_IG_ACCOUNT_ID"
+    facebook_page_id: "META_FB_PAGE_ID"
+  tiktok:
+    session_cookie: "TIKTOK_SESSION_COOKIE"
+
+analytics:
+  sync_window_hours: 6
+  alert_threshold_views: 1000
+
+sla:
+  automation_failure_response_minutes: 60
+  manual_publish_backup_hours: 4
+
+notes:
+  - "Update personas/personas.csv with franchise-specific personas."
+  - "Ensure Drive folders are shared with partner email."

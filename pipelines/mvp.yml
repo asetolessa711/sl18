@@ -8,3 +8,251 @@ parameters:
 steps:
   - script: echo "MVP pipeline running for ${{ parameters.persona }} in ${{ parameters.language }}"
     displayName: "Persona/Language Echo"
+
+  # Validate centralized setup script executes in DryRun on CI agents
+  - task: PowerShell@2
+    displayName: "Setup scaffold DryRun"
+    inputs:
+      targetType: 'filePath'
+      filePath: 'scripts/setup/setup-sl18.ps1'
+      arguments: '-BasePath "$(Build.SourcesDirectory)" -DryRun'
+      pwsh: true
+
+  - task: PowerShell@2
+    displayName: "Setup scaffold summary"
+    inputs:
+      targetType: 'inline'
+      script: |
+        $base = "$(Build.SourcesDirectory)"
+        $envPath = Join-Path $base "apps/control-panel/backend/.env"
+        if (Test-Path -LiteralPath $envPath) {
+          Write-Host "Setup summary: env=present mode=DryRun"
+        } else {
+          Write-Host "Setup summary: env=absent mode=DryRun"
+        }
+      pwsh: true
+
+  # Credential preflight (skip if no .env is present in repo)
+  - task: PowerShell@2
+    displayName: "Credential preflight (YouTube/Meta/TikTok)"
+    inputs:
+      targetType: 'inline'
+      script: |
+        $base = "$(Build.SourcesDirectory)"
+        $envPath = Join-Path $base ".env"
+        $logDir = Join-Path $base "logs/ci"
+        New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+        $credLog = Join-Path $logDir "credentials_ping.log"
+        if (Test-Path -LiteralPath $envPath) {
+          & (Join-Path $base 'scripts/helpers/load-env.ps1') | Out-Null
+          & (Join-Path $base 'scripts/smoke_tests/credentials_ping.ps1') -AllowOffline 2>&1 | Tee-Object -FilePath $credLog
+
+          # Surface WARN/ERR lines in Azure DevOps logs
+          if (Test-Path -LiteralPath $credLog) {
+            Get-Content -LiteralPath $credLog | ForEach-Object {
+              if ($_ -like 'WARN •*') { Write-Host ("##vso[task.logissue type=warning]" + $_) }
+              elseif ($_ -like 'ERR •*') { Write-Host ("##vso[task.logissue type=error]" + $_) }
+            }
+          }
+
+          if ($LASTEXITCODE -ne 0) { throw "Credential preflight failed" }
+        } else {
+          Write-Host "Credential preflight skipped (no .env)"
+        }
+      pwsh: true
+
+  # Airtable preflight (skip if no .env is present)
+  - task: PowerShell@2
+    displayName: "Airtable preflight"
+    inputs:
+      targetType: 'inline'
+      script: |
+        $base = "$(Build.SourcesDirectory)"
+        $envPath = Join-Path $base ".env"
+        $logDir = Join-Path $base "logs/ci"
+        New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+        $airLog = Join-Path $logDir "airtable_ping.log"
+        if (Test-Path -LiteralPath $envPath) {
+          & (Join-Path $base 'scripts/helpers/load-env.ps1') | Out-Null
+          & (Join-Path $base 'scripts/smoke_tests/airtable_ping.ps1') -UseEpisodes 2>&1 | Tee-Object -FilePath $airLog
+
+          # Surface WARN/ERR lines in Azure DevOps logs
+          if (Test-Path -LiteralPath $airLog) {
+            Get-Content -LiteralPath $airLog | ForEach-Object {
+              if ($_ -like 'WARN •*') { Write-Host ("##vso[task.logissue type=warning]" + $_) }
+              elseif ($_ -like 'ERR •*') { Write-Host ("##vso[task.logissue type=error]" + $_) }
+            }
+          }
+
+          if ($LASTEXITCODE -ne 0) { throw "Airtable preflight failed" }
+        } else {
+          Write-Host "Airtable preflight skipped (no .env)"
+        }
+      pwsh: true
+
+  # Node is required for the audio generator smoke test
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.x'
+    displayName: 'Use Node.js 20.x'
+
+  # Install minimal deps locally without changing package.json
+  - script: |
+      npm install axios dotenv
+    displayName: "Install audio deps (axios, dotenv)"
+    condition: and(succeeded(), ne(variables['MUBERT_COMPANY_ID'], ''), ne(variables['MUBERT_LICENSE_TOKEN'], ''))
+
+  # Run Mubert generator smoke test only if secrets are present
+  - script: |
+      node -v
+      node -r dotenv/config automation/audio/mubert_generator.js
+    displayName: "Audio generation smoke test (Mubert)"
+    env:
+      MUBERT_COMPANY_ID: $(MUBERT_COMPANY_ID)
+      MUBERT_LICENSE_TOKEN: $(MUBERT_LICENSE_TOKEN)
+      UDIO_API_KEY: $(UDIO_API_KEY)
+      TEST_MOOD: uplifting
+      TEST_GENRE: cinematic
+      TEST_DURATION: '45'
+    condition: and(succeeded(), ne(variables['MUBERT_COMPANY_ID'], ''), ne(variables['MUBERT_LICENSE_TOKEN'], ''))
+
+  # Run UDIO minimal smoke when UDIO is available and Mubert is not configured
+  - script: |
+      node -v
+      node -r dotenv/config automation/audio/udio_smoke.js
+    displayName: "Audio generation smoke test (UDIO minimal)"
+    env:
+      UDIO_API_KEY: $(UDIO_API_KEY)
+      TEST_MOOD: uplifting
+      TEST_GENRE: cinematic
+      TEST_DURATION: '45'
+    condition: and(succeeded(), ne(variables['UDIO_API_KEY'], ''))
+
+  # YouTube OAuth smoke (optional; runs only if credentials are provided)
+  - task: PowerShell@2
+    displayName: "YouTube OAuth smoke (mine=true)"
+    inputs:
+      targetType: 'inline'
+      script: |
+        $base = "$(Build.SourcesDirectory)"
+        $logDir = Join-Path $base "logs/ci"
+        New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+        $ytLog = Join-Path $logDir "youtube_oauth.log"
+        node -v
+        node -r dotenv/config scripts/smoke_tests/youtube_oauth_ping.mjs 2>&1 | Tee-Object -FilePath $ytLog
+        if (Test-Path -LiteralPath $ytLog) {
+          Get-Content -LiteralPath $ytLog | ForEach-Object {
+            if ($_ -like 'WARN •*') { Write-Host ("##vso[task.logissue type=warning]" + $_) }
+            elseif ($_ -like 'ERR •*') { Write-Host ("##vso[task.logissue type=error]" + $_) }
+          }
+        }
+    env:
+      YOUTUBE_CLIENT_ID: $(YOUTUBE_CLIENT_ID)
+      YOUTUBE_CLIENT_SECRET: $(YOUTUBE_CLIENT_SECRET)
+      YOUTUBE_REFRESH_TOKEN: $(YOUTUBE_REFRESH_TOKEN)
+    condition: and(succeeded(), ne(variables['YOUTUBE_CLIENT_ID'], ''), ne(variables['YOUTUBE_CLIENT_SECRET'], ''), ne(variables['YOUTUBE_REFRESH_TOKEN'], ''))
+
+  # Always run: summarize outcome without leaking secrets/URLs
+  - script: |
+      node -e "const fs=require('fs');const p='logs/audio_generation.json';if(fs.existsSync(p)){try{const j=JSON.parse(fs.readFileSync(p,'utf8')||'[]');const last=j[j.length-1]||{};const provider=last.provider||'unknown';const ok=last.success===true?'success':'fallback_or_fail';console.log(`Audio summary: provider=${provider} result=${ok}`);}catch(e){console.log('Audio summary: could not parse log');}}else{console.log('Audio summary: no log file (smoke test skipped)');}"
+    displayName: "Audio smoke summary (no secrets)"
+
+  # Parse audio smoke results and emit CI log markers; always runs
+  - task: PowerShell@2
+    displayName: "Audio smoke CI markers"
+    inputs:
+      targetType: 'inline'
+      script: |
+        $base = "$(Build.SourcesDirectory)"
+        $logDir = Join-Path $base "logs/ci"
+        $genPath = Join-Path $base "logs/audio_generation.json"
+        $audioLog = Join-Path $logDir "audio_smoke.log"
+        New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+
+        $lines = @()
+        if (Test-Path -LiteralPath $genPath) {
+          try {
+            $json = Get-Content -LiteralPath $genPath -Raw | ConvertFrom-Json
+            if ($null -eq $json) { $json = @() }
+            if (-not ($json -is [System.Array])) { $json = @($json) }
+
+            $providers = @('mubert','udio')
+            foreach ($p in $providers) {
+              $entries = $json | Where-Object { $_.provider -eq $p }
+              if ($entries -and $entries.Count -gt 0) {
+                $last = $entries | Select-Object -Last 1
+                $success = $false
+                if ($last.PSObject.Properties.Name -contains 'success') { $success = [bool]$last.success }
+                $msText = ''
+                if ($last.PSObject.Properties.Name -contains 'ms') { try { $msText = " ms=$([int]$last.ms)" } catch { $msText = '' } }
+                if ($success) { $lines += "OK • Audio smoke • provider=$p$msText result=success" }
+                else { $lines += "ERR • Audio smoke • provider=$p$msText result=failure" }
+              } else {
+                $lines += "WARN • Audio smoke • provider=$p not_run"
+              }
+            }
+          } catch {
+            $lines += "WARN • Audio smoke • could not parse log"
+          }
+        } else {
+          $lines += "WARN • Audio smoke • skipped (no secrets or test not run)"
+        }
+
+        foreach ($l in $lines) {
+          $l | Out-File -FilePath $audioLog -Encoding utf8 -Append
+          if ($l -like 'WARN •*') { Write-Host ("##vso[task.logissue type=warning]" + $l) }
+          elseif ($l -like 'ERR •*') { Write-Host ("##vso[task.logissue type=error]" + $l) }
+        }
+    pwsh: true
+
+  # Publish a markdown summary aggregating smoke test outputs
+  - task: PowerShell@2
+    displayName: "Publish smoke test summary"
+    inputs:
+      targetType: 'inline'
+      script: |
+        $base = "$(Build.SourcesDirectory)"
+        $logDir = Join-Path $base "logs/ci"
+        $summary = Join-Path $logDir "smoke_summary.md"
+        New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+
+        $lines = @()
+        if (Test-Path -LiteralPath (Join-Path $logDir 'credentials_ping.log')) {
+          $lines += (Get-Content -LiteralPath (Join-Path $logDir 'credentials_ping.log') | ForEach-Object { "[credentials] $_" })
+        }
+        if (Test-Path -LiteralPath (Join-Path $logDir 'airtable_ping.log')) {
+          $lines += (Get-Content -LiteralPath (Join-Path $logDir 'airtable_ping.log') | ForEach-Object { "[airtable] $_" })
+        }
+        if (Test-Path -LiteralPath (Join-Path $logDir 'audio_smoke.log')) {
+          $lines += (Get-Content -LiteralPath (Join-Path $logDir 'audio_smoke.log') | ForEach-Object { "[audio] $_" })
+        }
+        if (Test-Path -LiteralPath (Join-Path $logDir 'youtube_oauth.log')) {
+          $lines += (Get-Content -LiteralPath (Join-Path $logDir 'youtube_oauth.log') | ForEach-Object { "[youtube_oauth] $_" })
+        }
+
+        $ok = @($lines | Where-Object { $_ -match '^\[.*\]\sOK •' })
+        $warn = @($lines | Where-Object { $_ -match '^\[.*\]\sWARN •' })
+        $err = @($lines | Where-Object { $_ -match '^\[.*\]\sERR •' })
+
+        @(
+          '# SL18 CI Preflight Summary'
+          ''
+          "- OK: $($ok.Count)"
+          "- WARN: $($warn.Count)"
+          "- ERR: $($err.Count)"
+          ''
+          '## Details'
+          ''
+          '### Warnings'
+          if ($warn.Count -gt 0) { $warn } else { '- None' }
+          ''
+          '### Errors'
+          if ($err.Count -gt 0) { $err } else { '- None' }
+        ) | Out-File -FilePath $summary -Encoding utf8
+
+        if (Test-Path -LiteralPath $summary) {
+          Write-Host "##vso[task.uploadsummary]$summary"
+        } else {
+          Write-Host "No smoke test logs found to summarize."
+        }
+    pwsh: true

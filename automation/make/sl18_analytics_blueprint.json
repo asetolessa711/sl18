@@ -1,0 +1,112 @@
+{
+  "name": "SL18 Analytics Sync",
+  "description": "Pull cross-platform view metrics for published SL18 episodes and update Airtable",
+  "modules": [
+    {
+      "id": 1,
+      "type": "schedule",
+      "name": "Daily Trigger",
+      "settings": {
+        "cron": "30 6 * * *",
+        "timezone": "Africa/Addis_Ababa"
+      },
+      "outputs": [2]
+    },
+    {
+      "id": 2,
+      "type": "airtable_list_records",
+      "name": "Find Episode Needing Metrics",
+      "settings": {
+        "baseId": "{{AIRTABLE_BASE_ID}}",
+        "tableId": "Episodes",
+        "filterByFormula": "AND({status}='published', OR({last_metrics_sync}='', DATETIME_DIFF(NOW(), {last_metrics_sync}, 'hours')>6))",
+        "sort": [{"field": "last_metrics_sync", "direction": "asc"}],
+        "maxRecords": 1
+      },
+      "outputs": [3],
+      "onEmpty": 8
+    },
+    {
+      "id": 3,
+      "type": "youtube_get_video_stats",
+      "name": "Fetch YouTube Stats",
+      "settings": {
+        "apiKey": "{{YOUTUBE_API_KEY}}",
+        "videoId": "{{2.records[1].fields.youtube_video_id}}"
+      },
+      "outputs": [4],
+      "onError": 9
+    },
+    {
+      "id": 4,
+      "type": "meta_get_reel_insights",
+      "name": "Fetch Meta Reel Insights",
+      "settings": {
+        "accessToken": "{{META_CREATOR_STUDIO_TOKEN}}",
+        "instagramMediaId": "{{2.records[1].fields.meta_ig_media_id}}",
+        "facebookPostId": "{{2.records[1].fields.meta_fb_post_id}}"
+      },
+      "outputs": [5],
+      "onError": 9
+    },
+    {
+      "id": 5,
+      "type": "tiktok_get_video_stats",
+      "name": "Fetch TikTok Stats",
+      "settings": {
+        "sessionCookie": "{{TIKTOK_SESSION_COOKIE}}",
+        "videoId": "{{2.records[1].fields.tiktok_video_id}}"
+      },
+      "outputs": [6],
+      "onError": 9
+    },
+    {
+      "id": 6,
+      "type": "airtable_update_record",
+      "name": "Update Airtable Metrics",
+      "settings": {
+        "baseId": "{{AIRTABLE_BASE_ID}}",
+        "tableId": "Episodes",
+        "recordId": "{{2.records[1].id}}",
+        "fields": {
+          "yt_views": "{{3.statistics.viewCount}}",
+          "meta_plays": "{{4.metrics.totalPlays}}",
+          "tiktok_views": "{{5.statistics.playCount}}",
+          "last_metrics_sync": "{{now}}"
+        }
+      },
+      "outputs": [7],
+      "onError": 9
+    },
+    {
+      "id": 7,
+      "type": "notification_email",
+      "name": "Metrics Summary",
+      "settings": {
+        "to": "ops@sl18.local",
+        "subject": "SL18 Metrics Sync {{2.records[1].fields.date}}",
+        "body": "YouTube views: {{3.statistics.viewCount}} | Meta plays: {{4.metrics.totalPlays}} | TikTok views: {{5.statistics.playCount}}"
+      }
+    },
+    {
+      "id": 8,
+      "type": "notification_email",
+      "name": "No Metrics Queue",
+      "settings": {
+        "to": "ops@sl18.local",
+        "subject": "SL18 Metrics Queue Empty",
+        "body": "No published episodes require analytics sync at this time."
+      }
+    },
+    {
+      "id": 9,
+      "type": "notification_email",
+      "name": "Metrics Failure",
+      "settings": {
+        "to": "ops@sl18.local",
+        "subject": "SL18 Metrics Sync Failed {{now}}",
+        "body": "Automation failed during analytics retrieval. Check API credentials and update Airtable manually."
+      }
+    }
+  ]
+}

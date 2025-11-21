@@ -3,17 +3,16 @@ param(
     [switch]$DryRun
 )
 
-# Wrapper delegating to centralized setup script
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+# Determine repo root and central script path
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 if (-not $BasePath) { $BasePath = $repoRoot }
 $central = Join-Path $repoRoot 'scripts\setup\setup-sl18.ps1'
-
-Write-Host "[Deprecated] scripts/setup.ps1 is now a wrapper. Use scripts/setup/setup-sl18.ps1 directly." -ForegroundColor Yellow
 
 if (-not (Test-Path -LiteralPath $central)) {
     Write-Error "Central setup script not found at $central"
     exit 1
 }
 
+Write-Host "Delegating to central setup: $central" -ForegroundColor Cyan
 & $central -BasePath $BasePath -DryRun:$DryRun
 exit $LASTEXITCODE

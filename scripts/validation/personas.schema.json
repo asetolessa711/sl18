@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Personas",
+  "type": "object",
+  "properties": {
+    "persona_code": {"type": "string", "minLength": 2},
+    "franchise_id": {"type": "string", "minLength": 2},
+    "display_name": {"type": "string", "minLength": 2},
+    "language": {"type": "string", "pattern": "^[a-z]{2}$"},
+    "voice_id": {"type": "string", "minLength": 3},
+    "style_notes": {"type": "string"},
+    "sign_off": {"type": "string", "minLength": 2}
+  },
+  "required": [
+    "persona_code",
+    "franchise_id",
+    "display_name",
+    "language",
+    "voice_id",
+    "style_notes",
+    "sign_off"
+  ],
+  "additionalProperties": false
+}

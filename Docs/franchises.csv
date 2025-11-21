@@ -1,0 +1,2 @@
+franchise_id,display_name,country,owner_name,owner_contact,drive_scripts_id,drive_audio_id,drive_music_id,drive_video_id,drive_captions_id,make_webhook_secret,revenue_split,status,notes
+core,SL18 Core,Ethiopia,Central Ops,ops@sl18.africa,1SCRIPT_CORE,1AUDIO_CORE,1MUSIC_CORE,1VIDEO_CORE,1CAPTIONS_CORE,,0.35,active,"Starter row for automations"
