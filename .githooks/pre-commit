@@ -29,11 +29,10 @@ fi
 
 is_whitelisted() {
   f="$1"
-  for w in $WHITELIST; do
-    case "$f" in
-      $w) return 0 ;;
-    esac
-  done
+  # exact path match against whitelist entries
+  if printf '%s\n' $WHITELIST | grep -Fqx -- "$f"; then
+    return 0
+  fi
   return 1
 }
 

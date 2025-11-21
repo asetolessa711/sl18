@@ -17,6 +17,15 @@ fi
 
 FILES=$(git diff --name-only $BASE..HEAD | sort -u)
 
+# Apply ignore list if present
+IGNORE_FILE=".secret-scan-ignore"
+if [ -f "$IGNORE_FILE" ]; then
+  TMPFILE=$(mktemp)
+  printf "%s\n" "$FILES" | grep -v -F -f "$IGNORE_FILE" > "$TMPFILE" || true
+  FILES=$(cat "$TMPFILE")
+  rm -f "$TMPFILE"
+fi
+
 scan_file() {
   f="$1"
   case "$f" in
