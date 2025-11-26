@@ -308,6 +308,7 @@ export class TikTokAdapter implements PublishingAdapter {
         const data = await response.json() as {
           data?: {
             status?: string;
+            // Note: TikTok API uses 'publicaly_available_post_id' (their typo, not ours)
             publicaly_available_post_id?: string[];
             fail_reason?: string;
           };
