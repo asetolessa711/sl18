@@ -4,7 +4,7 @@
  */
 
 /** Supported publishing platforms */
-export type PublishingPlatform = 'youtube' | 'meta' | 'tiktok';
+export type PublishingPlatform = 'youtube' | 'meta' | 'facebook' | 'instagram' | 'tiktok';
 
 /** Publishing job status */
 export type PublishingJobStatus = 

@@ -8,6 +8,9 @@ import path from 'path';
 import { publishingQueue, PublishingQueue } from './publishing-queue.js';
 import { youtubeAdapter, YouTubeAdapter } from './youtube-adapter.js';
 import { metaAdapter, MetaAdapter } from './meta-adapter.js';
+import { facebookAdapter, FacebookAdapter } from './facebook-adapter.js';
+import { instagramAdapter, InstagramAdapter } from './instagram-adapter.js';
+import { tiktokAdapter, TikTokAdapter } from './tiktok-adapter.js';
 import type {
   PublishingJob,
   PublishingJobRequest,
@@ -35,7 +38,9 @@ export class PublishingManager {
     // Register adapters
     this.adapters.set('youtube', youtubeAdapter);
     this.adapters.set('meta', metaAdapter);
-    // TikTok is export-only for now
+    this.adapters.set('facebook', facebookAdapter);
+    this.adapters.set('instagram', instagramAdapter);
+    this.adapters.set('tiktok', tiktokAdapter);
 
     // Set up logging
     const logsDir = path.join(process.cwd(), 'logs');
@@ -67,7 +72,9 @@ export class PublishingManager {
     return {
       youtube: this.isConfigured('youtube'),
       meta: this.isConfigured('meta'),
-      tiktok: false // Export-only
+      facebook: this.isConfigured('facebook'),
+      instagram: this.isConfigured('instagram'),
+      tiktok: this.isConfigured('tiktok')
     };
   }
 
@@ -181,11 +188,6 @@ export class PublishingManager {
 
     // Create job for each platform
     for (const platform of request.platforms) {
-      if (platform === 'tiktok') {
-        errors.push('TikTok: Export-only, manual upload required');
-        continue;
-      }
-
       if (!this.isConfigured(platform)) {
         errors.push(`${platform}: Not configured`);
         continue;
@@ -376,7 +378,7 @@ export class PublishingManager {
     const statuses: SecretsRotationStatus[] = [];
 
     // Check each platform's secrets
-    const platforms: PublishingPlatform[] = ['youtube', 'meta'];
+    const platforms: PublishingPlatform[] = ['youtube', 'meta', 'facebook', 'instagram', 'tiktok'];
     
     for (const platform of platforms) {
       const envVar = `${platform.toUpperCase()}_SECRETS_LAST_ROTATED`;

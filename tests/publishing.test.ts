@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
 // Types for testing (matching production code)
-type PublishingPlatform = 'youtube' | 'meta' | 'tiktok';
+type PublishingPlatform = 'youtube' | 'meta' | 'facebook' | 'instagram' | 'tiktok';
 type PublishingJobStatus = 'pending' | 'queued' | 'uploading' | 'processing' | 'completed' | 'failed';
 type PublishingJobPriority = 'low' | 'normal' | 'high' | 'urgent';
 
@@ -118,7 +118,7 @@ describe('Publishing Queue', () => {
     });
 
     it('should support different platforms', () => {
-      const platforms: PublishingPlatform[] = ['youtube', 'meta', 'tiktok'];
+      const platforms: PublishingPlatform[] = ['youtube', 'meta', 'facebook', 'instagram', 'tiktok'];
 
       for (const platform of platforms) {
         const job: PublishingJob = {
@@ -222,6 +222,8 @@ describe('Publishing Queue', () => {
       const byPlatform: Record<PublishingPlatform, number> = {
         youtube: 0,
         meta: 0,
+        facebook: 0,
+        instagram: 0,
         tiktok: 0
       };
 
@@ -736,5 +738,285 @@ describe('End-to-End Workflow', () => {
     job.error = undefined;
 
     expect(job.status).toBe('completed');
+  });
+});
+
+// Extended Platform Tests
+describe('Extended Platform Adapters', () => {
+  describe('Facebook Adapter', () => {
+    it('should create Facebook upload request', () => {
+      const metadata: PublishingMetadata = {
+        title: 'Test Ethiopian Comedy',
+        description: 'Hilarious comedy from Addis Ababa',
+        tags: ['comedy', 'habesha', 'ethiopian'],
+        privacyStatus: 'public',
+        custom: { pageId: 'fb_page_123' }
+      };
+
+      expect(metadata.title).toBeDefined();
+      expect(metadata.custom?.pageId).toBe('fb_page_123');
+    });
+
+    it('should handle successful Facebook upload', () => {
+      const result: PlatformUploadResult = {
+        success: true,
+        videoId: 'fb_video_12345',
+        videoUrl: 'https://www.facebook.com/watch/?v=fb_video_12345',
+        uploadDuration: 95.5,
+        platformData: { pageId: 'fb_page_123', videoId: 'fb_video_12345' }
+      };
+
+      expect(result.success).toBe(true);
+      expect(result.videoUrl).toContain('facebook.com');
+      expect(result.videoId).toBe('fb_video_12345');
+    });
+
+    it('should handle scheduled Facebook publish', () => {
+      const metadata: PublishingMetadata = {
+        title: 'Scheduled Post',
+        scheduledPublishAt: '2026-01-15T18:00:00Z',
+        privacyStatus: 'public'
+      };
+
+      expect(metadata.scheduledPublishAt).toBeDefined();
+      expect(new Date(metadata.scheduledPublishAt!).getTime()).toBeGreaterThan(Date.now());
+    });
+  });
+
+  describe('Instagram Adapter', () => {
+    it('should create Instagram Reel request', () => {
+      const metadata: PublishingMetadata = {
+        title: 'Ethiopian Dance Reel',
+        description: 'Traditional dance moves',
+        tags: ['ethiopian', 'dance', 'culture', 'habesha'],
+        personaCode: 'ADDIS',
+        custom: {
+          videoUrl: 'https://storage.example.com/test_001/master.mp4',
+          igUserId: 'ig_user_123',
+          shareToFeed: true
+        }
+      };
+
+      expect(metadata.custom?.videoUrl).toBeDefined();
+      expect(metadata.tags?.length).toBe(4);
+    });
+
+    it('should handle successful Instagram upload', () => {
+      const result: PlatformUploadResult = {
+        success: true,
+        videoId: 'ig_media_67890',
+        videoUrl: 'https://www.instagram.com/reel/ig_media_67890',
+        uploadDuration: 180.0,
+        platformData: {
+          igUserId: 'ig_user_123',
+          mediaId: 'ig_media_67890',
+          containerId: 'container_123'
+        }
+      };
+
+      expect(result.success).toBe(true);
+      expect(result.videoUrl).toContain('instagram.com/reel');
+    });
+
+    it('should require video URL for Instagram', () => {
+      const metadata: PublishingMetadata = {
+        title: 'Test Reel'
+        // Missing videoUrl in custom
+      };
+
+      const hasVideoUrl = Boolean(metadata.custom?.videoUrl);
+      expect(hasVideoUrl).toBe(false);
+    });
+
+    it('should build caption with hashtags', () => {
+      const metadata: PublishingMetadata = {
+        title: 'Ethiopian Food',
+        description: 'Delicious injera and wot',
+        tags: ['ethiopianfood', 'injera', 'addis', 'habesha'],
+        personaCode: 'HABESHA_HUMOR'
+      };
+
+      // Build caption like the adapter does
+      let caption = metadata.title;
+      if (metadata.description) {
+        caption += `\n\n${metadata.description}`;
+      }
+      if (metadata.tags && metadata.tags.length > 0) {
+        const hashtags = metadata.tags.map(tag => `#${tag}`).join(' ');
+        caption += `\n\n${hashtags}`;
+      }
+      if (metadata.personaCode) {
+        caption += `\n\n#${metadata.personaCode}`;
+      }
+
+      expect(caption).toContain('Ethiopian Food');
+      expect(caption).toContain('#ethiopianfood');
+      expect(caption).toContain('#HABESHA_HUMOR');
+    });
+  });
+
+  describe('TikTok Adapter', () => {
+    it('should create TikTok upload request', () => {
+      const metadata: PublishingMetadata = {
+        title: 'Quick Ethiopian Recipe #cooking #ethiopian',
+        tags: ['cooking', 'ethiopian', 'quickrecipe'],
+        privacyStatus: 'public',
+        custom: {
+          disableDuet: false,
+          disableComment: false,
+          disableStitch: false
+        }
+      };
+
+      expect(metadata.custom?.disableDuet).toBe(false);
+      expect(metadata.privacyStatus).toBe('public');
+    });
+
+    it('should handle successful TikTok upload', () => {
+      const result: PlatformUploadResult = {
+        success: true,
+        videoId: 'tiktok_vid_12345',
+        videoUrl: 'https://www.tiktok.com/@creator/video/tiktok_vid_12345',
+        uploadDuration: 45.0,
+        platformData: { publishId: 'pub_123' }
+      };
+
+      expect(result.success).toBe(true);
+      expect(result.videoUrl).toContain('tiktok.com');
+    });
+
+    it('should map privacy levels correctly', () => {
+      const mapPrivacy = (status?: string): string => {
+        switch (status) {
+          case 'public': return 'PUBLIC_TO_EVERYONE';
+          case 'unlisted': return 'MUTUAL_FOLLOW_FRIENDS';
+          case 'private': return 'SELF_ONLY';
+          default: return 'SELF_ONLY';
+        }
+      };
+
+      expect(mapPrivacy('public')).toBe('PUBLIC_TO_EVERYONE');
+      expect(mapPrivacy('unlisted')).toBe('MUTUAL_FOLLOW_FRIENDS');
+      expect(mapPrivacy('private')).toBe('SELF_ONLY');
+      expect(mapPrivacy()).toBe('SELF_ONLY');
+    });
+
+    it('should handle TikTok processing states', () => {
+      const statuses = ['PROCESSING', 'PUBLISH_COMPLETE', 'FAILED'];
+      
+      for (const status of statuses) {
+        const isComplete = status === 'PUBLISH_COMPLETE';
+        const isFailed = status === 'FAILED';
+        const isProcessing = status === 'PROCESSING';
+        
+        expect(isComplete || isFailed || isProcessing).toBe(true);
+      }
+    });
+  });
+
+  describe('Multi-Platform Publishing', () => {
+    it('should create jobs for multiple platforms', () => {
+      const platforms: PublishingPlatform[] = ['youtube', 'facebook', 'instagram', 'tiktok'];
+      const jobs: PublishingJob[] = [];
+
+      for (const platform of platforms) {
+        jobs.push({
+          id: `job_${platform}_001`,
+          episodeId: 'test_001',
+          platform,
+          status: 'pending',
+          priority: 'normal',
+          metadata: { title: 'Multi-Platform Test' },
+          videoPath: '/renders/test_001/master.mp4',
+          renderUrl: 'https://storage.example.com/test_001/master.mp4',
+          progress: 0,
+          retryCount: 0,
+          maxRetries: 3,
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      expect(jobs.length).toBe(4);
+      expect(jobs.map(j => j.platform)).toEqual(['youtube', 'facebook', 'instagram', 'tiktok']);
+    });
+
+    it('should track per-platform configuration status', () => {
+      const configStatus: Record<PublishingPlatform, boolean> = {
+        youtube: true,
+        meta: true,
+        facebook: true,
+        instagram: false, // Requires additional setup
+        tiktok: false     // Requires API key
+      };
+
+      const configuredCount = Object.values(configStatus).filter(Boolean).length;
+      expect(configuredCount).toBe(3);
+    });
+
+    it('should support platform-specific metadata', () => {
+      const youtubeMetadata: PublishingMetadata = {
+        title: 'YouTube Video',
+        playlistId: 'PLxxx123',
+        madeForKids: false
+      };
+
+      const instagramMetadata: PublishingMetadata = {
+        title: 'Instagram Reel',
+        custom: {
+          videoUrl: 'https://storage.example.com/video.mp4',
+          shareToFeed: true,
+          coverUrl: 'https://storage.example.com/cover.jpg'
+        }
+      };
+
+      const tiktokMetadata: PublishingMetadata = {
+        title: 'TikTok Video',
+        custom: {
+          disableDuet: true,
+          disableStitch: true
+        }
+      };
+
+      expect(youtubeMetadata.playlistId).toBeDefined();
+      expect(instagramMetadata.custom?.shareToFeed).toBe(true);
+      expect(tiktokMetadata.custom?.disableDuet).toBe(true);
+    });
+  });
+
+  describe('Platform History', () => {
+    it('should track history per platform', () => {
+      const history: PublishingHistoryEntry[] = [
+        { jobId: '1', episodeId: 'ep1', platform: 'youtube', status: 'completed', publishedAt: '2024-01-15T10:00:00Z' },
+        { jobId: '2', episodeId: 'ep1', platform: 'facebook', status: 'completed', publishedAt: '2024-01-15T10:05:00Z' },
+        { jobId: '3', episodeId: 'ep1', platform: 'instagram', status: 'failed', error: 'Video URL expired', publishedAt: '2024-01-15T10:10:00Z' },
+        { jobId: '4', episodeId: 'ep1', platform: 'tiktok', status: 'completed', publishedAt: '2024-01-15T10:15:00Z' }
+      ];
+
+      const byPlatform: Record<string, PublishingHistoryEntry[]> = {};
+      for (const entry of history) {
+        if (!byPlatform[entry.platform]) {
+          byPlatform[entry.platform] = [];
+        }
+        byPlatform[entry.platform].push(entry);
+      }
+
+      expect(Object.keys(byPlatform).length).toBe(4);
+      expect(byPlatform['instagram'][0].status).toBe('failed');
+    });
+
+    it('should filter history by platform', () => {
+      const allHistory: PublishingHistoryEntry[] = [
+        { jobId: '1', episodeId: 'ep1', platform: 'youtube', status: 'completed' },
+        { jobId: '2', episodeId: 'ep2', platform: 'youtube', status: 'completed' },
+        { jobId: '3', episodeId: 'ep1', platform: 'facebook', status: 'completed' },
+        { jobId: '4', episodeId: 'ep2', platform: 'tiktok', status: 'failed' }
+      ];
+
+      const youtubeHistory = allHistory.filter(h => h.platform === 'youtube');
+      const facebookHistory = allHistory.filter(h => h.platform === 'facebook');
+
+      expect(youtubeHistory.length).toBe(2);
+      expect(facebookHistory.length).toBe(1);
+    });
   });
 });

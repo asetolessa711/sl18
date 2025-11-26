@@ -1,11 +1,11 @@
 # Publishing Automation Guide
 
-This document describes the automated publishing system in the SL18 Render Stack, which handles distribution of approved episodes to external platforms (YouTube, Meta/Facebook/Instagram).
+This document describes the automated publishing system in the SL18 Render Stack, which handles distribution of approved episodes to external platforms (YouTube, Facebook, Instagram, TikTok).
 
 ## Overview
 
 The publishing automation system provides:
-- **Multi-platform support**: YouTube and Meta (Facebook/Instagram)
+- **Multi-platform support**: YouTube, Facebook, Instagram, TikTok
 - **QC gating**: Only publish approved episodes
 - **Job queue**: Retry support, priority ordering
 - **Secrets management**: Token rotation tracking
@@ -21,8 +21,8 @@ The publishing automation system provides:
                                │                       │
                                ▼                       ▼
                         ┌─────────────────┐     ┌─────────────────┐
-                        │  History        │     │  YouTube/Meta   │
-                        │  Logging        │     │  APIs           │
+                        │  History        │     │  YouTube/Meta/  │
+                        │  Logging        │     │  FB/IG/TikTok   │
                         └─────────────────┘     └─────────────────┘
 ```
 
@@ -35,7 +35,7 @@ POST /api/publish/:episodeId
 
 Request Body:
 {
-  "platforms": ["youtube", "meta"],
+  "platforms": ["youtube", "facebook", "instagram", "tiktok"],
   "metadata": {
     "title": "Episode Title",
     "description": "Video description",
@@ -160,11 +160,117 @@ Response:
       "configured": true,
       "rotation": {...}
     },
+    "facebook": {
+      "configured": true,
+      "rotation": {...}
+    },
+    "instagram": {
+      "configured": true,
+      "rotation": {...}
+    },
     "tiktok": {
       "configured": false,
-      "note": "TikTok is export-only (manual upload required)"
+      "rotation": {...}
     }
   }
+}
+```
+
+### Platform-Specific Publishing
+
+#### Facebook
+
+```
+POST /api/publish/facebook/:episodeId
+
+Request Body:
+{
+  "metadata": {
+    "title": "Episode Title",
+    "description": "Video description",
+    "privacyStatus": "public",
+    "custom": {
+      "pageId": "optional_page_id"
+    }
+  }
+}
+```
+
+#### Instagram
+
+```
+POST /api/publish/instagram/:episodeId
+
+Request Body:
+{
+  "metadata": {
+    "title": "Reel Title",
+    "description": "Caption text",
+    "tags": ["hashtag1", "hashtag2"],
+    "custom": {
+      "videoUrl": "https://storage.example.com/video.mp4",  // Required!
+      "coverUrl": "https://storage.example.com/cover.jpg",
+      "shareToFeed": true
+    }
+  }
+}
+```
+
+**Note**: Instagram requires a publicly accessible video URL. Upload to storage first.
+
+#### TikTok
+
+```
+POST /api/publish/tiktok/:episodeId
+
+Request Body:
+{
+  "metadata": {
+    "title": "Video title with #hashtags",
+    "tags": ["trend1", "trend2"],
+    "privacyStatus": "public",
+    "custom": {
+      "disableDuet": false,
+      "disableComment": false,
+      "disableStitch": false
+    }
+  }
+}
+```
+
+### Get Platform-Specific Status
+
+```
+GET /api/publish/:platform/:episodeId/status
+
+Example: GET /api/publish/instagram/test_001/status
+
+Response:
+{
+  "episodeId": "test_001",
+  "platform": "instagram",
+  "current": {
+    "id": "job_001",
+    "status": "completed",
+    "platformVideoId": "ig_123",
+    "platformUrl": "https://www.instagram.com/reel/ig_123"
+  },
+  "history": [...]
+}
+```
+
+### Get Platform-Specific History
+
+```
+GET /api/publish/:platform/history?limit=50
+
+Example: GET /api/publish/tiktok/history
+
+Response:
+{
+  "platform": "tiktok",
+  "history": [...],
+  "count": 10
 }
 ```
 
@@ -241,9 +347,45 @@ META_IG_USER_ID=your_instagram_user_id
 META_SECRETS_LAST_ROTATED=2024-01-01T00:00:00Z
 ```
 
-### TikTok
+### TikTok Setup
 
-TikTok is currently **export-only** due to API limitations. Videos are rendered and stored, but must be manually uploaded via the TikTok Creator Portal or mobile app.
+1. **Create TikTok Developer App** at developers.tiktok.com
+2. **Request required scopes**:
+   - `video.upload`
+   - `video.publish`
+3. **Configure environment variables**:
+
+```env
+TIKTOK_CLIENT_KEY=your_client_key
+TIKTOK_CLIENT_SECRET=your_client_secret
+TIKTOK_ACCESS_TOKEN=your_access_token
+TIKTOK_USERNAME=your_username
+TIKTOK_SECRETS_LAST_ROTATED=2024-01-01T00:00:00Z
+```
+
+### Facebook Setup (Standalone)
+
+If using Facebook separately from Meta adapter:
+
+```env
+FACEBOOK_ACCESS_TOKEN=your_page_access_token
+FACEBOOK_PAGE_ID=your_page_id
+FACEBOOK_APP_ID=your_app_id
+FACEBOOK_SECRETS_LAST_ROTATED=2024-01-01T00:00:00Z
+```
+
+### Instagram Setup (Standalone)
+
+If using Instagram separately:
+
+```env
+INSTAGRAM_ACCESS_TOKEN=your_access_token
+INSTAGRAM_USER_ID=your_ig_user_id
+INSTAGRAM_APP_ID=your_app_id
+INSTAGRAM_SECRETS_LAST_ROTATED=2024-01-01T00:00:00Z
+```
+
+**Note**: Instagram requires a Business or Creator account linked to a Facebook Page.
 
 ## QC Gating
 

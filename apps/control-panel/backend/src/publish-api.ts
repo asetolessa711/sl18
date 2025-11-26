@@ -85,7 +85,7 @@ publishRouter.post('/:episodeId', async (req: Request, res: Response) => {
     const platforms = body.platforms || ['youtube'];
 
     // Validate platforms
-    const validPlatforms = ['youtube', 'meta', 'tiktok'];
+    const validPlatforms = ['youtube', 'meta', 'facebook', 'instagram', 'tiktok'];
     for (const platform of platforms) {
       if (!validPlatforms.includes(platform)) {
         res.status(400).json({ error: `Invalid platform: ${platform}` });
@@ -310,9 +310,17 @@ publishRouter.get('/config', async (_req: Request, res: Response) => {
           configured: configStatus.meta,
           rotation: rotationStatus.find((s: any) => s.platform === 'meta')
         },
+        facebook: {
+          configured: configStatus.facebook,
+          rotation: rotationStatus.find((s: any) => s.platform === 'facebook')
+        },
+        instagram: {
+          configured: configStatus.instagram,
+          rotation: rotationStatus.find((s: any) => s.platform === 'instagram')
+        },
         tiktok: {
-          configured: false,
-          note: 'TikTok is export-only (manual upload required)'
+          configured: configStatus.tiktok,
+          rotation: rotationStatus.find((s: any) => s.platform === 'tiktok')
         }
       },
       fetchedAt: new Date().toISOString()
@@ -494,5 +502,281 @@ publishRouter.get('/health', async (_req: Request, res: Response) => {
       status: 'error',
       error: 'Publishing service unavailable'
     });
+  }
+});
+
+/**
+ * POST /api/publish/facebook/:episodeId
+ * Publish to Facebook specifically
+ */
+publishRouter.post('/facebook/:episodeId', async (req: Request, res: Response) => {
+  try {
+    const { episodeId } = req.params;
+    const body = req.body as PublishRequest;
+
+    const metadata = {
+      title: body.metadata?.title || `Episode ${episodeId}`,
+      description: body.metadata?.description || '',
+      tags: body.metadata?.tags || [],
+      privacyStatus: body.metadata?.privacyStatus || 'private',
+      custom: { ...body.metadata?.custom, target: 'facebook' }
+    };
+
+    const manager = await getPublishingManager();
+    if (!manager) {
+      res.status(503).json({ error: 'Publishing manager not available' });
+      return;
+    }
+
+    const result = await manager.createPublishingJobs({
+      episodeId,
+      platforms: ['facebook'],
+      metadata,
+      force: body.force,
+      actor: body.actor || 'api'
+    });
+
+    if (!result.success) {
+      res.status(400).json({
+        success: false,
+        errors: result.errors,
+        message: 'Failed to create Facebook publishing job'
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      episodeId,
+      platform: 'facebook',
+      jobs: result.jobs.map((job: any) => ({
+        id: job.id,
+        platform: job.platform,
+        status: job.status,
+        createdAt: job.createdAt
+      })),
+      message: 'Facebook publishing job created'
+    });
+
+  } catch (error) {
+    console.error('[publish-api] Error creating Facebook job:', error);
+    res.status(500).json({ error: 'Failed to create Facebook publishing job' });
+  }
+});
+
+/**
+ * POST /api/publish/instagram/:episodeId
+ * Publish to Instagram specifically
+ */
+publishRouter.post('/instagram/:episodeId', async (req: Request, res: Response) => {
+  try {
+    const { episodeId } = req.params;
+    const body = req.body as PublishRequest;
+
+    // Instagram requires a video URL
+    if (!body.metadata?.custom?.videoUrl) {
+      res.status(400).json({
+        error: 'Instagram requires a publicly accessible video URL. Pass via metadata.custom.videoUrl'
+      });
+      return;
+    }
+
+    const metadata = {
+      title: body.metadata?.title || `Episode ${episodeId}`,
+      description: body.metadata?.description || '',
+      tags: body.metadata?.tags || [],
+      privacyStatus: body.metadata?.privacyStatus || 'private',
+      custom: { ...body.metadata?.custom, target: 'instagram' }
+    };
+
+    const manager = await getPublishingManager();
+    if (!manager) {
+      res.status(503).json({ error: 'Publishing manager not available' });
+      return;
+    }
+
+    const result = await manager.createPublishingJobs({
+      episodeId,
+      platforms: ['instagram'],
+      metadata,
+      force: body.force,
+      actor: body.actor || 'api'
+    });
+
+    if (!result.success) {
+      res.status(400).json({
+        success: false,
+        errors: result.errors,
+        message: 'Failed to create Instagram publishing job'
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      episodeId,
+      platform: 'instagram',
+      jobs: result.jobs.map((job: any) => ({
+        id: job.id,
+        platform: job.platform,
+        status: job.status,
+        createdAt: job.createdAt
+      })),
+      message: 'Instagram publishing job created'
+    });
+
+  } catch (error) {
+    console.error('[publish-api] Error creating Instagram job:', error);
+    res.status(500).json({ error: 'Failed to create Instagram publishing job' });
+  }
+});
+
+/**
+ * POST /api/publish/tiktok/:episodeId
+ * Publish to TikTok specifically
+ */
+publishRouter.post('/tiktok/:episodeId', async (req: Request, res: Response) => {
+  try {
+    const { episodeId } = req.params;
+    const body = req.body as PublishRequest;
+
+    const metadata = {
+      title: body.metadata?.title || `Episode ${episodeId}`,
+      description: body.metadata?.description || '',
+      tags: body.metadata?.tags || [],
+      privacyStatus: body.metadata?.privacyStatus || 'private',
+      custom: body.metadata?.custom
+    };
+
+    const manager = await getPublishingManager();
+    if (!manager) {
+      res.status(503).json({ error: 'Publishing manager not available' });
+      return;
+    }
+
+    const result = await manager.createPublishingJobs({
+      episodeId,
+      platforms: ['tiktok'],
+      metadata,
+      force: body.force,
+      actor: body.actor || 'api'
+    });
+
+    if (!result.success) {
+      res.status(400).json({
+        success: false,
+        errors: result.errors,
+        message: 'Failed to create TikTok publishing job'
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      episodeId,
+      platform: 'tiktok',
+      jobs: result.jobs.map((job: any) => ({
+        id: job.id,
+        platform: job.platform,
+        status: job.status,
+        createdAt: job.createdAt
+      })),
+      message: 'TikTok publishing job created'
+    });
+
+  } catch (error) {
+    console.error('[publish-api] Error creating TikTok job:', error);
+    res.status(500).json({ error: 'Failed to create TikTok publishing job' });
+  }
+});
+
+/**
+ * GET /api/publish/:platform/:episodeId/status
+ * Get publishing status for a specific platform
+ */
+publishRouter.get('/:platform/:episodeId/status', async (req: Request, res: Response) => {
+  try {
+    const { platform, episodeId } = req.params;
+
+    // Validate platform
+    const validPlatforms = ['youtube', 'meta', 'facebook', 'instagram', 'tiktok'];
+    if (!validPlatforms.includes(platform)) {
+      res.status(400).json({ error: `Invalid platform: ${platform}` });
+      return;
+    }
+
+    const queue = await getPublishingQueue();
+    if (!queue) {
+      res.status(503).json({ error: 'Publishing queue not available' });
+      return;
+    }
+
+    const jobs = queue.getJobsByEpisode(episodeId);
+    const history = queue.getHistoryByEpisode(episodeId);
+
+    // Filter by platform
+    const platformJobs = jobs.filter((j: any) => j.platform === platform);
+    const platformHistory = history.filter((h: any) => h.platform === platform);
+
+    const currentJob = platformJobs[0];
+
+    res.json({
+      episodeId,
+      platform,
+      current: currentJob ? {
+        id: currentJob.id,
+        status: currentJob.status,
+        progress: currentJob.progress,
+        platformVideoId: currentJob.platformVideoId,
+        platformUrl: currentJob.platformUrl,
+        error: currentJob.error,
+        createdAt: currentJob.createdAt,
+        completedAt: currentJob.completedAt
+      } : null,
+      history: platformHistory,
+      fetchedAt: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('[publish-api] Error getting platform status:', error);
+    res.status(500).json({ error: 'Failed to get publishing status' });
+  }
+});
+
+/**
+ * GET /api/publish/:platform/history
+ * Get publishing history for a specific platform
+ */
+publishRouter.get('/:platform/history', async (req: Request, res: Response) => {
+  try {
+    const { platform } = req.params;
+    const { limit = '50' } = req.query;
+
+    // Validate platform
+    const validPlatforms = ['youtube', 'meta', 'facebook', 'instagram', 'tiktok'];
+    if (!validPlatforms.includes(platform)) {
+      res.status(400).json({ error: `Invalid platform: ${platform}` });
+      return;
+    }
+
+    const manager = await getPublishingManager();
+    if (!manager) {
+      res.status(503).json({ error: 'Publishing manager not available' });
+      return;
+    }
+
+    const allHistory = manager.getHistory(parseInt(limit as string, 10) * 2 || 100);
+    const platformHistory = allHistory.filter((entry: any) => entry.platform === platform);
+
+    res.json({
+      platform,
+      history: platformHistory.slice(0, parseInt(limit as string, 10) || 50),
+      count: platformHistory.length,
+      fetchedAt: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('[publish-api] Error getting platform history:', error);
+    res.status(500).json({ error: 'Failed to get publishing history' });
   }
 });
