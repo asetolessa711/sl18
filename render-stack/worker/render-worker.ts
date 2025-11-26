@@ -17,6 +17,20 @@ import type {
 } from './render-job.types.js';
 import { renderQueue } from './render-queue.js';
 
+// Lazy import storage manager to avoid circular dependencies
+let storageManager: any = null;
+async function getStorageManager() {
+  if (!storageManager) {
+    try {
+      const module = await import('../storage/storage-manager.js');
+      storageManager = module.storageManager;
+    } catch (e) {
+      console.warn('[render-worker] Storage manager not available:', e);
+    }
+  }
+  return storageManager;
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const repoRoot = join(__dirname, '../..');
@@ -178,8 +192,23 @@ export class RenderWorker {
       // Execute ffmpeg
       await this.executeFFmpeg(ffmpegOptions, job.id);
 
+      // Upload to storage if storage manager is available
+      let renderUrl = `file://${outputPath}`;
+      const storage = await getStorageManager();
+      if (storage) {
+        try {
+          const uploadResult = await storage.uploadRender(outputPath, job.episodeId, {
+            verifyChecksum: true,
+            contentType: 'video/mp4'
+          });
+          renderUrl = uploadResult.url;
+          console.log(`[render-worker] Uploaded to storage: ${renderUrl}`);
+        } catch (uploadError: any) {
+          console.warn(`[render-worker] Storage upload failed, using local path:`, uploadError.message);
+        }
+      }
+
       // Complete job
-      const renderUrl = `file://${outputPath}`;
       renderQueue.completeJob(job.id, outputPath, renderUrl);
       console.log(`[render-worker] Completed job ${job.id}: ${outputPath}`);
 

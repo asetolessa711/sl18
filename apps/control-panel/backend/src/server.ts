@@ -7,6 +7,7 @@ import { existsSync, promises as fs } from 'fs';
 import Airtable, { type FieldSet, type SelectOptions } from 'airtable';
 import { fileURLToPath } from 'url';
 import { renderRouter } from './render-api.js';
+import { storageRouter, createStorageFileMiddleware } from './storage-api.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,6 +29,12 @@ app.use(express.json());
 
 // Mount render API routes
 app.use('/api/render', renderRouter);
+
+// Mount storage API routes
+app.use('/api/storage', storageRouter);
+
+// Mount storage file serving middleware
+app.use('/storage', createStorageFileMiddleware());
 
 const PORT = process.env.SL18_PANEL_PORT ? Number(process.env.SL18_PANEL_PORT) : 5178;
 
