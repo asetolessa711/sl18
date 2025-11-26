@@ -18,6 +18,9 @@ import type {
   DEFAULT_PUBLISHING_CONFIG
 } from './publishing.types.js';
 
+// Secrets rotation period in days (90 days is standard)
+const SECRETS_ROTATION_PERIOD_DAYS = 90;
+
 /**
  * Publishing Manager
  * Handles QC gating, queue management, and multi-platform publishing.
@@ -370,7 +373,6 @@ export class PublishingManager {
    * Get secrets rotation status
    */
   getSecretsRotationStatus(): SecretsRotationStatus[] {
-    const rotationPeriodDays = 90;
     const statuses: SecretsRotationStatus[] = [];
 
     // Check each platform's secrets
@@ -389,7 +391,7 @@ export class PublishingManager {
         lastRotatedAt = lastRotatedStr;
         const lastRotated = new Date(lastRotatedStr);
         const rotationDue = new Date(lastRotated);
-        rotationDue.setDate(rotationDue.getDate() + rotationPeriodDays);
+        rotationDue.setDate(rotationDue.getDate() + SECRETS_ROTATION_PERIOD_DAYS);
         rotationDueAt = rotationDue.toISOString();
         
         const now = new Date();

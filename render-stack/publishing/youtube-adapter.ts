@@ -3,7 +3,7 @@
  * Handles video uploads to YouTube via the YouTube Data API v3.
  */
 
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import path from 'path';
 import type {
   PublishingAdapter,
@@ -11,6 +11,15 @@ import type {
   PublishingMetadata,
   PlatformAdapterConfig
 } from './publishing.types.js';
+
+// Default YouTube category IDs
+const YOUTUBE_CATEGORIES = {
+  PEOPLE_BLOGS: '22',
+  ENTERTAINMENT: '24',
+  COMEDY: '23',
+  MUSIC: '10',
+  EDUCATION: '27'
+};
 
 // Default config
 const DEFAULT_CONFIG: PlatformAdapterConfig = {
@@ -80,8 +89,7 @@ export class YouTubeAdapter implements PublishingAdapter {
     try {
       const dir = path.dirname(this.tokensPath);
       if (!existsSync(dir)) {
-        const fs = require('fs');
-        fs.mkdirSync(dir, { recursive: true });
+        mkdirSync(dir, { recursive: true });
       }
       
       const existingTokens = existsSync(this.tokensPath) 
@@ -173,7 +181,7 @@ export class YouTubeAdapter implements PublishingAdapter {
           title: metadata.title,
           description: metadata.description || '',
           tags: metadata.tags || [],
-          categoryId: metadata.categoryId || '22' // People & Blogs
+          categoryId: metadata.categoryId || YOUTUBE_CATEGORIES.PEOPLE_BLOGS
         },
         status: {
           privacyStatus: metadata.privacyStatus || 'private',

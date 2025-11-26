@@ -11,6 +11,9 @@ import type {
   PlatformAdapterConfig
 } from './publishing.types.js';
 
+// Default Meta Graph API version
+const DEFAULT_GRAPH_API_VERSION = 'v18.0';
+
 // Default config
 const DEFAULT_CONFIG: PlatformAdapterConfig = {
   credentials: {},
@@ -27,10 +30,11 @@ const DEFAULT_CONFIG: PlatformAdapterConfig = {
 export class MetaAdapter implements PublishingAdapter {
   readonly platform = 'meta' as const;
   private config: PlatformAdapterConfig;
-  private graphApiVersion = 'v18.0';
+  private graphApiVersion: string;
 
   constructor(config?: Partial<PlatformAdapterConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+    this.graphApiVersion = (config as any)?.graphApiVersion || process.env.META_GRAPH_API_VERSION || DEFAULT_GRAPH_API_VERSION;
     
     // Load credentials from environment
     this.config.credentials = {

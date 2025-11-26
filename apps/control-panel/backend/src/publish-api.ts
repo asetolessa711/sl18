@@ -449,6 +449,11 @@ publishRouter.post('/:jobId/approve', async (req: Request, res: Response) => {
       approvedBy: approvedBy || 'Operator'
     });
 
+    if (!updatedJob) {
+      res.status(500).json({ error: 'Failed to queue job for approval' });
+      return;
+    }
+
     res.json({
       success: true,
       job: {
