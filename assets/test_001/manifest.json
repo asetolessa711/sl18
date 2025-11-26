@@ -1,0 +1,62 @@
+{
+  "manifestVersion": "1.0.0",
+  "episode": {
+    "episodeId": "test_001",
+    "title": "Test Episode - AI vs Aunties",
+    "personaCode": "ADDIS",
+    "franchiseId": "SL18_CORE",
+    "language": "en",
+    "hook": "When your auntie discovers ChatGPT...",
+    "targetDuration": 45,
+    "date": "2024-01-15"
+  },
+  "generation": {
+    "scriptSource": "gpt-4",
+    "ttsProvider": "elevenlabs",
+    "voiceId": "voice_addis_001",
+    "musicSource": "mubert",
+    "generatedAt": "2024-01-15T10:30:00Z"
+  },
+  "assets": [
+    {
+      "id": "voice_main",
+      "type": "voice",
+      "path": "voice.mp3",
+      "format": "mp3",
+      "duration": 42.5,
+      "sampleRate": 44100,
+      "channels": 1
+    },
+    {
+      "id": "music_bg",
+      "type": "music",
+      "path": "music.mp3",
+      "format": "mp3",
+      "duration": 60,
+      "sampleRate": 44100,
+      "channels": 2
+    },
+    {
+      "id": "bg_gradient",
+      "type": "background",
+      "path": "background.png",
+      "format": "png",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "id": "transcript_main",
+      "type": "transcript",
+      "path": "transcript.srt",
+      "format": "srt"
+    },
+    {
+      "id": "script_original",
+      "type": "script",
+      "path": "script.txt",
+      "format": "txt"
+    }
+  ],
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
+}

@@ -24,6 +24,10 @@ logs/
 /SL18/06_logs/
 publishing/youtube/token.json
 
+# Render pipeline outputs (keep timelines for tracking)
+renders/
+storage/
+
 # IDE settings
 .vscode/
 .idea/
