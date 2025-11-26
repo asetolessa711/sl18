@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import { renderRouter } from './render-api.js';
 import { storageRouter, createStorageFileMiddleware } from './storage-api.js';
 import { qcRouter } from './qc-api.js';
+import { controlPanelRouter } from './control-panel-api.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,9 @@ app.use('/api/storage', storageRouter);
 
 // Mount QC API routes
 app.use('/api/qc', qcRouter);
+
+// Mount Control Panel API routes
+app.use('/api/control-panel', controlPanelRouter);
 
 // Mount storage file serving middleware
 app.use('/storage', createStorageFileMiddleware());
