@@ -13,6 +13,7 @@ import { controlPanelRouter } from './control-panel-api.js';
 import { publishRouter } from './publish-api.js';
 import { systemRouter } from './system-api.js';
 import { workspaceRouter } from './workspace-api.js';
+import { aiRouter } from './ai-api.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +53,9 @@ app.use('/api/system', systemRouter);
 
 // Mount Workspace API routes (Phase 9: Creative Workspaces)
 app.use('/api/workspace', workspaceRouter);
+
+// Mount AI API routes (Phase 10: AI Integration)
+app.use('/api/ai', aiRouter);
 
 // Mount storage file serving middleware
 app.use('/storage', createStorageFileMiddleware());
