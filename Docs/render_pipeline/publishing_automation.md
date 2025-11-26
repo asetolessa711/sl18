@@ -389,3 +389,29 @@ Check the error message for root cause:
 4. **Keep thumbnails** under 2MB for YouTube
 5. **Test with `privacyStatus: "private"`** before going public
 6. **Log actor names** for audit trail
+
+## Security Considerations
+
+### Rate Limiting
+
+For production deployments, consider adding rate limiting to the publish API endpoints to prevent abuse:
+
+```typescript
+// Example with express-rate-limit
+import rateLimit from 'express-rate-limit';
+
+const publishLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Max 10 publish requests per window
+  message: 'Too many publish requests, please try again later'
+});
+
+app.use('/api/publish', publishLimiter, publishRouter);
+```
+
+### API Key Security
+
+- Store API credentials in environment variables, never in code
+- Use `.env.local` for local development (ignored by git)
+- Use Azure Key Vault or AWS Secrets Manager for production
+- Rotate credentials every 90 days
