@@ -1,0 +1,131 @@
+# SL18 Render Stack - Prometheus Alert Rules
+# Phase 8: Scaling & Deployment
+
+groups:
+  - name: sl18-render-alerts
+    rules:
+      # High render queue depth
+      - alert: RenderQueueHigh
+        expr: sl18_render_queue_depth > 50
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High render queue depth"
+          description: "Render queue depth is {{ $value }} (threshold: 50)"
+
+      # Critical render queue depth
+      - alert: RenderQueueCritical
+        expr: sl18_render_queue_depth > 100
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical render queue depth"
+          description: "Render queue depth is {{ $value }} (threshold: 100)"
+
+      # High render failure rate
+      - alert: RenderFailureRateHigh
+        expr: rate(sl18_render_failed_total[5m]) / rate(sl18_render_completed_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High render failure rate"
+          description: "Render failure rate is above 10%"
+
+      # Slow average render time
+      - alert: RenderTimeHigh
+        expr: sl18_render_avg_time_seconds > 300
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High average render time"
+          description: "Average render time is {{ $value }}s (threshold: 300s)"
+
+  - name: sl18-publish-alerts
+    rules:
+      # High publish queue depth
+      - alert: PublishQueueHigh
+        expr: sl18_publish_queue_depth > 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High publish queue depth"
+          description: "Publish queue depth is {{ $value }} (threshold: 20)"
+
+      # Publish failures
+      - alert: PublishFailureRateHigh
+        expr: rate(sl18_publish_failed_total[5m]) > 0.5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High publish failure rate"
+          description: "Publishing is failing frequently"
+
+  - name: sl18-qc-alerts
+    rules:
+      # Many episodes pending review
+      - alert: QCBacklogHigh
+        expr: sl18_qc_pending_review > 25
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High QC backlog"
+          description: "{{ $value }} episodes pending QC review"
+
+      # High content flagging rate
+      - alert: ContentFlaggingHigh
+        expr: sl18_qc_flagged_content > 10
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High content flagging rate"
+          description: "{{ $value }} episodes flagged for content issues"
+
+  - name: sl18-system-alerts
+    rules:
+      # High memory usage
+      - alert: MemoryUsageHigh
+        expr: sl18_memory_usage_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}%"
+
+      # Critical memory usage
+      - alert: MemoryUsageCritical
+        expr: sl18_memory_usage_percent > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical memory usage"
+          description: "Memory usage is {{ $value }}%"
+
+      # High CPU usage
+      - alert: CPUUsageHigh
+        expr: sl18_cpu_usage_percent > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%"
+
+      # Service down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "{{ $labels.job }} is not responding"

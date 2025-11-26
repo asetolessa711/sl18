@@ -1,0 +1,120 @@
+# SL18 Render Stack - Publishing Manager Deployment
+# Phase 8: Scaling & Deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: publishing-manager
+  namespace: sl18
+  labels:
+    app: sl18
+    component: publishing-manager
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sl18
+      component: publishing-manager
+  template:
+    metadata:
+      labels:
+        app: sl18
+        component: publishing-manager
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3002"
+    spec:
+      containers:
+        - name: publishing-manager
+          image: sl18/publishing-manager:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3002
+              name: http
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PUBLISH_WORKER_PORT
+              value: "3002"
+            - name: CONTROL_PANEL_URL
+              value: "http://control-panel:5178"
+            - name: YOUTUBE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sl18-secrets
+                  key: youtube-api-key
+            - name: FACEBOOK_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: sl18-secrets
+                  key: facebook-access-token
+            - name: FACEBOOK_PAGE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: sl18-secrets
+                  key: facebook-page-id
+            - name: INSTAGRAM_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: sl18-secrets
+                  key: instagram-access-token
+            - name: INSTAGRAM_USER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: sl18-secrets
+                  key: instagram-user-id
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3002
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: exports
+              mountPath: /app/exports
+            - name: logs
+              mountPath: /app/logs
+            - name: storage
+              mountPath: /app/storage
+      volumes:
+        - name: exports
+          persistentVolumeClaim:
+            claimName: sl18-exports-pvc
+        - name: logs
+          persistentVolumeClaim:
+            claimName: sl18-logs-pvc
+        - name: storage
+          persistentVolumeClaim:
+            claimName: sl18-storage-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: publishing-manager
+  namespace: sl18
+  labels:
+    app: sl18
+    component: publishing-manager
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3002
+      targetPort: 3002
+      name: http
+  selector:
+    app: sl18
+    component: publishing-manager

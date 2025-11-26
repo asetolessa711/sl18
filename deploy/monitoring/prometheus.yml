@@ -1,0 +1,71 @@
+# SL18 Render Stack - Prometheus Configuration
+# Phase 8: Scaling & Deployment
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files:
+  - /etc/prometheus/alerts/*.yml
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Control Panel metrics
+  - job_name: 'control-panel'
+    static_configs:
+      - targets: ['control-panel:5178']
+    metrics_path: /api/system/metrics/prometheus
+    scrape_interval: 30s
+
+  # Render Worker metrics
+  - job_name: 'render-worker'
+    static_configs:
+      - targets: ['render-worker:3001']
+    metrics_path: /api/system/metrics/prometheus
+    scrape_interval: 30s
+
+  # Publishing Manager metrics
+  - job_name: 'publishing-manager'
+    static_configs:
+      - targets: ['publishing-manager:3002']
+    metrics_path: /api/system/metrics/prometheus
+    scrape_interval: 30s
+
+  # Kubernetes service discovery (for dynamic scaling)
+  - job_name: 'kubernetes-pods'
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - sl18
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_pod_label_component]
+        action: replace
+        target_label: component

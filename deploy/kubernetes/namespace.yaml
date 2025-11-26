@@ -1,0 +1,10 @@
+# SL18 Render Stack - Kubernetes Namespace
+# Phase 8: Scaling & Deployment
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sl18
+  labels:
+    app: sl18
+    environment: production
