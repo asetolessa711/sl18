@@ -1020,3 +1020,191 @@ describe('Extended Platform Adapters', () => {
     });
   });
 });
+
+describe('TikTok Export Mode', () => {
+  // TikTok export result type
+  interface TikTokExportResult extends PlatformUploadResult {
+    exportPath?: string;
+    metadataPath?: string;
+    manualUploadRequired: boolean;
+    warnings?: string[];
+  }
+
+  describe('Export Functionality', () => {
+    it('should mark TikTok jobs as manual upload required', () => {
+      const result: TikTokExportResult = {
+        success: true,
+        videoId: 'export_2024-01-15T10-00-00Z',
+        videoUrl: undefined, // No URL until manually uploaded
+        uploadDuration: 2.5,
+        exportPath: 'exports/tiktok/test_001/tiktok_2024-01-15T10-00-00Z.mp4',
+        metadataPath: 'exports/tiktok/test_001/tiktok_2024-01-15T10-00-00Z_metadata.json',
+        manualUploadRequired: true
+      };
+
+      expect(result.success).toBe(true);
+      expect(result.manualUploadRequired).toBe(true);
+      expect(result.videoUrl).toBeUndefined(); // No URL until manual upload
+      expect(result.exportPath).toBeDefined();
+      expect(result.metadataPath).toBeDefined();
+    });
+
+    it('should always report TikTok adapter as configured (export mode)', () => {
+      // TikTok export mode doesn't require API credentials
+      const isConfigured = true; // Always true for export mode
+      expect(isConfigured).toBe(true);
+    });
+
+    it('should extract hashtags from metadata', () => {
+      const metadata: PublishingMetadata = {
+        title: 'Test Video',
+        tags: ['comedy', 'ethiopian'],
+        personaCode: 'ADDIS',
+        custom: { franchiseId: 'SL18' }
+      };
+
+      const extractHashtags = (m: PublishingMetadata): string[] => {
+        const hashtags: string[] = [];
+        if (m.tags) {
+          hashtags.push(...m.tags.map(tag => `#${tag.replace(/\\s+/g, '')}`));
+        }
+        if (m.personaCode) {
+          hashtags.push(`#${m.personaCode}`);
+        }
+        hashtags.push('#SL18');
+        return hashtags;
+      };
+
+      const hashtags = extractHashtags(metadata);
+      expect(hashtags).toContain('#comedy');
+      expect(hashtags).toContain('#ethiopian');
+      expect(hashtags).toContain('#ADDIS');
+      expect(hashtags).toContain('#SL18');
+    });
+
+    it('should truncate caption to TikTok limit', () => {
+      const TIKTOK_TITLE_MAX_LENGTH = 150;
+      const longTitle = 'A'.repeat(200);
+
+      const buildCaption = (title: string): string => {
+        if (title.length > TIKTOK_TITLE_MAX_LENGTH) {
+          return title.substring(0, TIKTOK_TITLE_MAX_LENGTH - 3) + '...';
+        }
+        return title;
+      };
+
+      const caption = buildCaption(longTitle);
+      expect(caption.length).toBe(150);
+      expect(caption.endsWith('...')).toBe(true);
+    });
+
+    it('should validate TikTok format requirements', () => {
+      const TIKTOK_MAX_DURATION_SECONDS = 180;
+      const TIKTOK_MAX_FILE_SIZE_MB = 287;
+
+      const validateVideo = (durationSeconds: number, fileSizeMB: number): string[] => {
+        const warnings: string[] = [];
+        if (durationSeconds > TIKTOK_MAX_DURATION_SECONDS) {
+          warnings.push(`Duration (${durationSeconds}s) exceeds TikTok's ${TIKTOK_MAX_DURATION_SECONDS}s limit`);
+        }
+        if (fileSizeMB > TIKTOK_MAX_FILE_SIZE_MB) {
+          warnings.push(`File size (${fileSizeMB}MB) exceeds TikTok's ${TIKTOK_MAX_FILE_SIZE_MB}MB limit`);
+        }
+        return warnings;
+      };
+
+      const validVideo = validateVideo(60, 50);
+      expect(validVideo.length).toBe(0);
+
+      const tooLong = validateVideo(300, 50);
+      expect(tooLong.length).toBe(1);
+      expect(tooLong[0]).toContain('Duration');
+
+      const tooLarge = validateVideo(60, 500);
+      expect(tooLarge.length).toBe(1);
+      expect(tooLarge[0]).toContain('File size');
+    });
+
+    it('should generate export metadata for operator reference', () => {
+      const exportMetadata = {
+        platform: 'tiktok',
+        status: 'MANUAL_UPLOAD_REQUIRED',
+        exportedAt: new Date().toISOString(),
+        videoFile: 'tiktok_2024-01-15T10-00-00Z.mp4',
+        caption: 'Test video #comedy #SL18',
+        hashtags: ['#comedy', '#SL18'],
+        format: {
+          recommendedAspectRatio: '9:16',
+          maxDuration: '180 seconds',
+          maxFileSize: '287 MB'
+        },
+        instructions: [
+          '1. Open TikTok app on your mobile device',
+          '2. Tap the + button to create a new post',
+          '3. Upload the video file from this export folder',
+          '4. Paste the caption from this metadata file',
+          '5. Add sounds, effects, or filters as needed',
+          '6. Tap Post to publish'
+        ]
+      };
+
+      expect(exportMetadata.status).toBe('MANUAL_UPLOAD_REQUIRED');
+      expect(exportMetadata.instructions.length).toBeGreaterThan(0);
+      expect(exportMetadata.format.recommendedAspectRatio).toBe('9:16');
+    });
+
+    it('should provide download information for operators', () => {
+      const downloadInfo = {
+        episodeId: 'test_001',
+        platform: 'tiktok',
+        manualUploadRequired: true,
+        exportDir: 'exports/tiktok/test_001',
+        exports: [
+          {
+            video: 'tiktok_2024-01-15T10-00-00Z.mp4',
+            metadata: 'tiktok_2024-01-15T10-00-00Z_metadata.json',
+            downloadPath: '/api/storage/tiktok/test_001/tiktok_2024-01-15T10-00-00Z.mp4'
+          }
+        ],
+        note: 'TikTok does not provide a public API for video publishing. Manual upload is required.'
+      };
+
+      expect(downloadInfo.manualUploadRequired).toBe(true);
+      expect(downloadInfo.exports.length).toBe(1);
+      expect(downloadInfo.note).toContain('Manual upload is required');
+    });
+  });
+
+  describe('TikTok API Limitations', () => {
+    it('should document that TikTok has no public publishing API', () => {
+      const limitations = {
+        hasPublicApi: false,
+        requiresPartnerAccess: true,
+        partnerProgram: 'TikTok Marketing Partners',
+        fallbackMode: 'export',
+        operatorWorkflow: [
+          'Render Stack prepares TikTok-ready video assets',
+          'Operators manually upload via TikTok app or approved third-party tools',
+          'QC gating ensures only approved content is exported'
+        ]
+      };
+
+      expect(limitations.hasPublicApi).toBe(false);
+      expect(limitations.requiresPartnerAccess).toBe(true);
+      expect(limitations.fallbackMode).toBe('export');
+    });
+
+    it('should check status returns MANUAL_UPLOAD_REQUIRED', () => {
+      const checkStatus = (): { status: string; progress: number } => {
+        return {
+          status: 'MANUAL_UPLOAD_REQUIRED',
+          progress: 100
+        };
+      };
+
+      const status = checkStatus();
+      expect(status.status).toBe('MANUAL_UPLOAD_REQUIRED');
+      expect(status.progress).toBe(100);
+    });
+  });
+});

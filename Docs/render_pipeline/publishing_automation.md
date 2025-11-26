@@ -5,11 +5,13 @@ This document describes the automated publishing system in the SL18 Render Stack
 ## Overview
 
 The publishing automation system provides:
-- **Multi-platform support**: YouTube, Facebook, Instagram, TikTok
+- **Multi-platform support**: YouTube, Facebook, Instagram (direct publishing), TikTok (export for manual upload)
 - **QC gating**: Only publish approved episodes
 - **Job queue**: Retry support, priority ordering
 - **Secrets management**: Token rotation tracking
 - **Audit trail**: Full publishing history
+
+> ⚠️ **TikTok Note**: TikTok does not provide a public API for video publishing. The TikTok adapter prepares export files for manual upload by operators.
 
 ## Architecture
 
@@ -218,7 +220,9 @@ Request Body:
 
 **Note**: Instagram requires a publicly accessible video URL. Upload to storage first.
 
-#### TikTok
+#### TikTok (Export Only - Manual Upload Required)
+
+⚠️ TikTok does not provide a public publishing API. This endpoint prepares export files for manual upload.
 
 ```
 POST /api/publish/tiktok/:episodeId
@@ -227,14 +231,46 @@ Request Body:
 {
   "metadata": {
     "title": "Video title with #hashtags",
-    "tags": ["trend1", "trend2"],
-    "privacyStatus": "public",
-    "custom": {
-      "disableDuet": false,
-      "disableComment": false,
-      "disableStitch": false
-    }
+    "tags": ["trend1", "trend2"]
   }
+}
+
+Response:
+{
+  "success": true,
+  "episodeId": "test_001",
+  "platform": "tiktok",
+  "manualUploadRequired": true,
+  "jobs": [...],
+  "message": "⚠️ TikTok export prepared - MANUAL UPLOAD REQUIRED",
+  "instructions": [
+    "1. Wait for the export job to complete",
+    "2. Download the TikTok-ready video from the exports folder",
+    "3. Use the metadata file for captions and hashtags",
+    "4. Upload manually via TikTok app"
+  ]
+}
+```
+
+#### Get TikTok Download Info
+
+```
+GET /api/publish/tiktok/:episodeId/download
+
+Response:
+{
+  "episodeId": "test_001",
+  "platform": "tiktok",
+  "manualUploadRequired": true,
+  "exportDir": "exports/tiktok/test_001",
+  "exports": [
+    {
+      "video": "tiktok_2024-01-15T12-00-00Z.mp4",
+      "metadata": "tiktok_2024-01-15T12-00-00Z_metadata.json",
+      "downloadPath": "/api/storage/tiktok/test_001/tiktok_2024-01-15T12-00-00Z.mp4"
+    }
+  ],
+  "note": "TikTok does not provide a public API for video publishing. Manual upload is required."
 }
 ```
 
@@ -347,21 +383,54 @@ META_IG_USER_ID=your_instagram_user_id
 META_SECRETS_LAST_ROTATED=2024-01-01T00:00:00Z
 ```
 
-### TikTok Setup
+### TikTok Setup (Export Only)
 
-1. **Create TikTok Developer App** at developers.tiktok.com
-2. **Request required scopes**:
-   - `video.upload`
-   - `video.publish`
-3. **Configure environment variables**:
+⚠️ **IMPORTANT**: TikTok does not provide a general public API for video publishing. Only approved Marketing Partners have access to TikTok's Content API.
+
+Instead of direct publishing, SL18 prepares TikTok-ready assets for **manual upload**:
+
+1. **No API credentials required** - Export mode doesn't need TikTok API access
+2. **Optional export directory**:
 
 ```env
-TIKTOK_CLIENT_KEY=your_client_key
-TIKTOK_CLIENT_SECRET=your_client_secret
-TIKTOK_ACCESS_TOKEN=your_access_token
-TIKTOK_USERNAME=your_username
-TIKTOK_SECRETS_LAST_ROTATED=2024-01-01T00:00:00Z
+TIKTOK_EXPORT_DIR=exports/tiktok
 ```
+
+#### TikTok Operator Workflow
+
+1. Request TikTok export via API: `POST /api/publish/tiktok/:episodeId`
+2. Wait for export job to complete
+3. Get download info: `GET /api/publish/tiktok/:episodeId/download`
+4. Download the TikTok-ready video file
+5. Review the metadata file for captions and hashtags
+6. Upload manually via TikTok app or approved third-party tools
+7. QC gating ensures only approved content is exported
+
+#### TikTok Export Response
+
+```json
+{
+  "success": true,
+  "episodeId": "test_001",
+  "platform": "tiktok",
+  "manualUploadRequired": true,
+  "jobs": [...],
+  "message": "⚠️ TikTok export prepared - MANUAL UPLOAD REQUIRED",
+  "instructions": [
+    "1. Wait for the export job to complete",
+    "2. Download the TikTok-ready video from the exports folder",
+    "3. Use the metadata file for captions and hashtags",
+    "4. Upload manually via TikTok app"
+  ]
+}
+```
+
+#### TikTok Format Requirements
+
+- **Aspect Ratio**: 9:16 (vertical)
+- **Max Duration**: 3 minutes
+- **Max File Size**: 287 MB
+- **Captions**: Max 150 characters
 
 ### Facebook Setup (Standalone)
 

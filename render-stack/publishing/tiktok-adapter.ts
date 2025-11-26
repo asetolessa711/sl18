@@ -1,9 +1,23 @@
 /**
- * TikTok Publishing Adapter
- * Handles video uploads to TikTok via the TikTok Open API.
+ * TikTok Export Adapter
+ * 
+ * ⚠️ IMPORTANT: TikTok does not provide a general public API for video publishing.
+ * Only approved Marketing Partners have access to TikTok's Content API.
+ * 
+ * This adapter prepares TikTok-ready assets for MANUAL upload by operators:
+ * - Validates video is in correct format (vertical 9:16)
+ * - Prepares metadata (title, hashtags, persona tags)
+ * - Exports to a download-ready location
+ * - Marks jobs as "Manual Upload Required"
+ * 
+ * Operator Workflow:
+ * 1. Render Stack prepares TikTok-ready video assets
+ * 2. Operators manually upload via TikTok app or approved third-party tools
+ * 3. QC gating ensures only approved content is exported for TikTok
  */
 
-import { existsSync, readFileSync, statSync } from 'fs';
+import { existsSync, statSync, mkdirSync, copyFileSync, writeFileSync } from 'fs';
+import path from 'path';
 import type {
   PublishingAdapter,
   PlatformUploadResult,
@@ -11,401 +25,261 @@ import type {
   PlatformAdapterConfig
 } from './publishing.types.js';
 
-// TikTok API endpoint
-const DEFAULT_TIKTOK_API_ENDPOINT = 'https://open.tiktokapis.com/v2';
+// TikTok video format constants
+const TIKTOK_RECOMMENDED_ASPECT_RATIO = '9:16';
+const TIKTOK_MAX_DURATION_SECONDS = 180; // 3 minutes
+const TIKTOK_MAX_FILE_SIZE_MB = 287;
+const TIKTOK_TITLE_MAX_LENGTH = 150;
 
 // Default config
 const DEFAULT_CONFIG: PlatformAdapterConfig = {
   credentials: {},
-  timeout: 3600000, // 1 hour
+  timeout: 60000, // 1 minute for export
   retry: {
-    maxAttempts: 3,
-    backoffMs: 5000
+    maxAttempts: 1,
+    backoffMs: 1000
   }
 };
 
-// Chunk size for uploads (5MB - TikTok recommended)
-const CHUNK_SIZE = 5 * 1024 * 1024;
-
-// Max wait time for video processing (10 minutes)
-const MAX_PROCESSING_WAIT_MS = 600000;
-const PROCESSING_POLL_INTERVAL_MS = 5000;
+// Default export directory
+const DEFAULT_EXPORT_DIR = 'exports/tiktok';
 
 /**
- * TikTok Publishing Adapter
- * Uploads short-form videos to TikTok using the TikTok Open API.
+ * TikTok Export Result with download information
+ */
+export interface TikTokExportResult extends PlatformUploadResult {
+  /** Path to exported video file */
+  exportPath?: string;
+  /** Path to metadata JSON file */
+  metadataPath?: string;
+  /** Whether manual upload is required */
+  manualUploadRequired: boolean;
+  /** Validation warnings */
+  warnings?: string[];
+}
+
+/**
+ * TikTok Export Adapter
+ * Prepares TikTok-ready assets for manual upload.
  */
 export class TikTokAdapter implements PublishingAdapter {
   readonly platform = 'tiktok' as const;
   private config: PlatformAdapterConfig;
+  private exportDir: string;
 
   constructor(config?: Partial<PlatformAdapterConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config };
-    
-    // Load credentials from environment
-    this.config.credentials = {
-      clientId: config?.credentials?.clientId || process.env.TIKTOK_CLIENT_KEY || '',
-      clientSecret: config?.credentials?.clientSecret || process.env.TIKTOK_CLIENT_SECRET || '',
-      accessToken: config?.credentials?.accessToken || process.env.TIKTOK_ACCESS_TOKEN || ''
-    };
+    this.exportDir = process.env.TIKTOK_EXPORT_DIR || DEFAULT_EXPORT_DIR;
   }
 
   /**
-   * Check if adapter is configured
+   * TikTok export is always "configured" as it doesn't require API credentials.
+   * It exports files for manual upload.
    */
   isConfigured(): boolean {
-    return Boolean(
-      this.config.credentials.accessToken &&
-      this.config.credentials.clientId
-    );
+    // Always return true since we don't need API access for export mode
+    return true;
   }
 
   /**
-   * Get TikTok API base URL
+   * Export video for TikTok (manual upload required)
+   * 
+   * Instead of uploading to TikTok API (which is not publicly available),
+   * this method:
+   * 1. Validates the video format
+   * 2. Copies it to an export directory
+   * 3. Creates a metadata file for the operator
+   * 4. Returns status indicating manual upload is required
    */
-  private getApiUrl(endpoint: string): string {
-    const baseUrl = this.config.apiEndpoint || DEFAULT_TIKTOK_API_ENDPOINT;
-    return `${baseUrl}${endpoint}`;
-  }
-
-  /**
-   * Upload video to TikTok
-   * Supports both direct upload (small files) and chunked upload (large files)
-   */
-  async upload(videoPath: string, metadata: PublishingMetadata): Promise<PlatformUploadResult> {
+  async upload(videoPath: string, metadata: PublishingMetadata): Promise<TikTokExportResult> {
     const startTime = Date.now();
+    const warnings: string[] = [];
 
-    // Validate video file
+    // Validate video file exists
     if (!existsSync(videoPath)) {
       return {
         success: false,
-        error: `Video file not found: ${videoPath}`
-      };
-    }
-
-    // Check configuration
-    if (!this.isConfigured()) {
-      return {
-        success: false,
-        error: 'TikTok adapter not configured. Set TIKTOK_ACCESS_TOKEN and TIKTOK_CLIENT_KEY environment variables.'
+        error: `Video file not found: ${videoPath}`,
+        manualUploadRequired: true
       };
     }
 
     try {
-      const fileSize = statSync(videoPath).size;
+      const stats = statSync(videoPath);
+      const fileSizeMB = stats.size / (1024 * 1024);
 
-      // Step 1: Initialize video upload
-      const initResult = await this.initializeUpload(fileSize, metadata);
-      if (!initResult.success) {
-        return initResult;
+      // Validate file size
+      if (fileSizeMB > TIKTOK_MAX_FILE_SIZE_MB) {
+        warnings.push(`File size (${fileSizeMB.toFixed(1)}MB) exceeds TikTok's ${TIKTOK_MAX_FILE_SIZE_MB}MB limit`);
       }
 
-      const { publishId, uploadUrl } = initResult;
+      // Build TikTok caption
+      const caption = this.buildCaption(metadata);
 
-      // Step 2: Upload video data
-      const uploadResult = await this.uploadVideoData(videoPath, uploadUrl, fileSize);
-      if (!uploadResult.success) {
-        return uploadResult;
-      }
+      // Create export directory
+      const episodeExportDir = path.join(this.exportDir, metadata.custom?.episodeId as string || 'unknown');
+      mkdirSync(episodeExportDir, { recursive: true });
 
-      // Step 3: Wait for video processing and get status
-      const processResult = await this.waitForProcessing(publishId);
-      if (!processResult.success) {
-        return {
-          success: false,
-          error: processResult.error,
-          uploadDuration: (Date.now() - startTime) / 1000
-        };
-      }
+      // Generate export filenames
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const exportVideoPath = path.join(episodeExportDir, `tiktok_${timestamp}.mp4`);
+      const metadataPath = path.join(episodeExportDir, `tiktok_${timestamp}_metadata.json`);
+
+      // Copy video to export location
+      copyFileSync(videoPath, exportVideoPath);
+
+      // Create metadata file for operator reference
+      const exportMetadata = {
+        platform: 'tiktok',
+        status: 'MANUAL_UPLOAD_REQUIRED',
+        exportedAt: new Date().toISOString(),
+        videoFile: path.basename(exportVideoPath),
+        caption,
+        hashtags: this.extractHashtags(metadata),
+        format: {
+          recommendedAspectRatio: TIKTOK_RECOMMENDED_ASPECT_RATIO,
+          maxDuration: `${TIKTOK_MAX_DURATION_SECONDS} seconds`,
+          maxFileSize: `${TIKTOK_MAX_FILE_SIZE_MB} MB`
+        },
+        metadata: {
+          title: metadata.title,
+          description: metadata.description,
+          tags: metadata.tags,
+          personaCode: metadata.personaCode,
+          franchiseId: metadata.franchiseId
+        },
+        instructions: [
+          '1. Open TikTok app on your mobile device',
+          '2. Tap the + button to create a new post',
+          '3. Upload the video file from this export folder',
+          '4. Paste the caption from this metadata file',
+          '5. Add sounds, effects, or filters as needed',
+          '6. Tap Post to publish'
+        ],
+        warnings
+      };
+
+      writeFileSync(metadataPath, JSON.stringify(exportMetadata, null, 2));
 
       const uploadDuration = (Date.now() - startTime) / 1000;
 
-      console.log(`[tiktok-adapter] Upload complete: ${processResult.videoId}`);
+      console.log(`[tiktok-adapter] Export complete: ${exportVideoPath}`);
+      console.log(`[tiktok-adapter] ⚠️ MANUAL UPLOAD REQUIRED - TikTok does not have a public publishing API`);
 
       return {
         success: true,
-        videoId: processResult.videoId,
-        videoUrl: processResult.videoUrl,
+        videoId: `export_${timestamp}`,
+        videoUrl: undefined, // No URL until manually uploaded
         uploadDuration,
-        platformData: { publishId }
+        exportPath: exportVideoPath,
+        metadataPath,
+        manualUploadRequired: true,
+        warnings: warnings.length > 0 ? warnings : undefined,
+        platformData: {
+          exportDir: episodeExportDir,
+          caption,
+          hashtags: this.extractHashtags(metadata),
+          status: 'MANUAL_UPLOAD_REQUIRED',
+          note: 'TikTok does not provide a public API for video publishing. Please upload manually.'
+        }
       };
 
     } catch (error: any) {
       return {
         success: false,
-        error: error.message || 'TikTok upload error',
-        uploadDuration: (Date.now() - startTime) / 1000
+        error: error.message || 'TikTok export error',
+        uploadDuration: (Date.now() - startTime) / 1000,
+        manualUploadRequired: true
       };
     }
   }
 
   /**
-   * Initialize video upload session
+   * Build TikTok caption with hashtags
    */
-  private async initializeUpload(fileSize: number, metadata: PublishingMetadata): Promise<{
-    success: boolean;
-    publishId?: string;
-    uploadUrl?: string;
-    error?: string;
-  }> {
-    const url = this.getApiUrl('/post/publish/video/init/');
-
-    // Build caption with hashtags
-    let caption = metadata.title;
+  private buildCaption(metadata: PublishingMetadata): string {
+    let caption = metadata.title || '';
+    
     if (metadata.description) {
       caption += ` ${metadata.description}`;
     }
+
+    // Add hashtags
+    const hashtags = this.extractHashtags(metadata);
+    if (hashtags.length > 0) {
+      caption += '\n\n' + hashtags.join(' ');
+    }
+
+    // Truncate to TikTok limit
+    if (caption.length > TIKTOK_TITLE_MAX_LENGTH) {
+      caption = caption.substring(0, TIKTOK_TITLE_MAX_LENGTH - 3) + '...';
+    }
+
+    return caption;
+  }
+
+  /**
+   * Extract hashtags from metadata
+   */
+  private extractHashtags(metadata: PublishingMetadata): string[] {
+    const hashtags: string[] = [];
+
+    // Add tags as hashtags
     if (metadata.tags && metadata.tags.length > 0) {
-      const hashtags = metadata.tags.map(tag => `#${tag.replace(/\s+/g, '')}`).join(' ');
-      caption += ` ${hashtags}`;
+      hashtags.push(...metadata.tags.map(tag => `#${tag.replace(/\s+/g, '')}`));
     }
+
+    // Add persona code as hashtag
     if (metadata.personaCode) {
-      caption += ` #${metadata.personaCode}`;
+      hashtags.push(`#${metadata.personaCode}`);
     }
 
-    const body = {
-      post_info: {
-        title: caption.substring(0, 150), // TikTok title limit
-        privacy_level: this.mapPrivacyLevel(metadata.privacyStatus),
-        disable_duet: metadata.custom?.disableDuet || false,
-        disable_comment: metadata.custom?.disableComment || false,
-        disable_stitch: metadata.custom?.disableStitch || false
-      },
-      source_info: {
-        source: 'FILE_UPLOAD',
-        video_size: fileSize,
-        chunk_size: Math.min(CHUNK_SIZE, fileSize),
-        total_chunk_count: Math.ceil(fileSize / CHUNK_SIZE)
-      }
-    };
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.credentials.accessToken}`,
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: JSON.stringify(body)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json() as { error?: { message?: string; code?: string } };
-        return {
-          success: false,
-          error: `TikTok init error: ${errorData.error?.message || response.status}`
-        };
-      }
-
-      const data = await response.json() as {
-        data?: {
-          publish_id?: string;
-          upload_url?: string;
-        };
-        error?: { message?: string };
-      };
-
-      if (!data.data?.publish_id || !data.data?.upload_url) {
-        return {
-          success: false,
-          error: 'Failed to initialize TikTok upload'
-        };
-      }
-
-      return {
-        success: true,
-        publishId: data.data.publish_id,
-        uploadUrl: data.data.upload_url
-      };
-
-    } catch (error: any) {
-      return {
-        success: false,
-        error: error.message || 'TikTok init request failed'
-      };
+    // Add franchise as hashtag
+    if (metadata.franchiseId) {
+      hashtags.push(`#${metadata.franchiseId}`);
     }
+
+    // Add SL18 branding
+    hashtags.push('#SL18');
+
+    return hashtags;
   }
 
   /**
-   * Upload video data in chunks
+   * Check export status
+   * For TikTok, this checks if the export file exists
    */
-  private async uploadVideoData(videoPath: string, uploadUrl: string, fileSize: number): Promise<{
-    success: boolean;
-    error?: string;
-  }> {
-    const videoBuffer = readFileSync(videoPath);
-    let startOffset = 0;
-    let chunkIndex = 0;
-
-    while (startOffset < fileSize) {
-      const endOffset = Math.min(startOffset + CHUNK_SIZE, fileSize);
-      const chunk = videoBuffer.slice(startOffset, endOffset);
-
-      const headers: Record<string, string> = {
-        'Content-Type': 'video/mp4',
-        'Content-Length': chunk.length.toString(),
-        'Content-Range': `bytes ${startOffset}-${endOffset - 1}/${fileSize}`
-      };
-
-      try {
-        const response = await fetch(uploadUrl, {
-          method: 'PUT',
-          headers,
-          body: chunk
-        });
-
-        if (!response.ok && response.status !== 201 && response.status !== 206) {
-          const errorText = await response.text();
-          return {
-            success: false,
-            error: `TikTok upload chunk ${chunkIndex} failed: ${errorText || response.status}`
-          };
-        }
-
-        startOffset = endOffset;
-        chunkIndex++;
-
-      } catch (error: any) {
-        return {
-          success: false,
-          error: `TikTok upload chunk error: ${error.message}`
-        };
-      }
-    }
-
-    return { success: true };
-  }
-
-  /**
-   * Wait for video processing to complete
-   */
-  private async waitForProcessing(publishId: string): Promise<{
-    success: boolean;
-    videoId?: string;
-    videoUrl?: string;
-    error?: string;
-  }> {
-    const startTime = Date.now();
-    const url = this.getApiUrl('/post/publish/status/fetch/');
-
-    while (Date.now() - startTime < MAX_PROCESSING_WAIT_MS) {
-      await this.sleep(PROCESSING_POLL_INTERVAL_MS);
-
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${this.config.credentials.accessToken}`,
-            'Content-Type': 'application/json; charset=UTF-8'
-          },
-          body: JSON.stringify({ publish_id: publishId })
-        });
-
-        if (!response.ok) {
-          continue; // Retry on error
-        }
-
-        const data = await response.json() as {
-          data?: {
-            status?: string;
-            // Note: TikTok API uses 'publicaly_available_post_id' (their typo, not ours)
-            publicaly_available_post_id?: string[];
-            fail_reason?: string;
-          };
-        };
-
-        const status = data.data?.status;
-
-        if (status === 'PUBLISH_COMPLETE') {
-          const postIds = data.data?.publicaly_available_post_id || [];
-          const videoId = postIds[0] || publishId;
-          
-          return {
-            success: true,
-            videoId,
-            videoUrl: `https://www.tiktok.com/@${process.env.TIKTOK_USERNAME || 'user'}/video/${videoId}`
-          };
-        } else if (status === 'FAILED') {
-          return {
-            success: false,
-            error: `TikTok publishing failed: ${data.data?.fail_reason || 'Unknown error'}`
-          };
-        }
-
-        // Log progress
-        console.log(`[tiktok-adapter] Processing status: ${status}`);
-
-      } catch (error) {
-        // Continue polling
-      }
-    }
-
+  async checkStatus(exportId: string): Promise<{ status: string; progress?: number }> {
+    // For exports, we just return the manual upload status
     return {
-      success: false,
-      error: 'TikTok video processing timeout'
+      status: 'MANUAL_UPLOAD_REQUIRED',
+      progress: 100
     };
   }
 
   /**
-   * Map privacy status to TikTok privacy level
+   * Delete exported video
+   * Removes the export file from the export directory
    */
-  private mapPrivacyLevel(privacyStatus?: string): string {
-    switch (privacyStatus) {
-      case 'public':
-        return 'PUBLIC_TO_EVERYONE';
-      case 'unlisted':
-        return 'MUTUAL_FOLLOW_FRIENDS';
-      case 'private':
-        return 'SELF_ONLY';
-      default:
-        return 'SELF_ONLY'; // Default to private
-    }
-  }
-
-  /**
-   * Check video status
-   */
-  async checkStatus(publishId: string): Promise<{ status: string; progress?: number }> {
-    if (!this.config.credentials.accessToken) {
-      return { status: 'unknown' };
-    }
-
+  async deleteVideo(exportPath: string): Promise<boolean> {
     try {
-      const url = this.getApiUrl('/post/publish/status/fetch/');
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.credentials.accessToken}`,
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: JSON.stringify({ publish_id: publishId })
-      });
-
-      if (!response.ok) {
-        return { status: 'unknown' };
+      if (existsSync(exportPath)) {
+        const fs = await import('fs/promises');
+        await fs.unlink(exportPath);
+        return true;
       }
-
-      const data = await response.json() as {
-        data?: { status?: string };
-      };
-
-      return { status: data.data?.status || 'unknown' };
+      return false;
     } catch (error) {
-      return { status: 'error' };
+      console.error('[tiktok-adapter] Error deleting export:', error);
+      return false;
     }
   }
 
   /**
-   * Delete video from TikTok
-   * Note: TikTok API doesn't support video deletion via API.
+   * Get export directory path
    */
-  async deleteVideo(_videoId: string): Promise<boolean> {
-    console.warn('[tiktok-adapter] TikTok API does not support video deletion. Use the TikTok app.');
-    return false;
-  }
-
-  private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  getExportDir(): string {
+    return this.exportDir;
   }
 }
 

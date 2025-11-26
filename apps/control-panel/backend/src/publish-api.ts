@@ -633,7 +633,10 @@ publishRouter.post('/instagram/:episodeId', async (req: Request, res: Response) 
 
 /**
  * POST /api/publish/tiktok/:episodeId
- * Publish to TikTok specifically
+ * Prepare TikTok export (manual upload required)
+ * 
+ * ⚠️ IMPORTANT: TikTok does not provide a public API for video publishing.
+ * This endpoint prepares TikTok-ready assets for MANUAL upload by operators.
  */
 publishRouter.post('/tiktok/:episodeId', async (req: Request, res: Response) => {
   try {
@@ -645,7 +648,7 @@ publishRouter.post('/tiktok/:episodeId', async (req: Request, res: Response) => 
       description: body.metadata?.description || '',
       tags: body.metadata?.tags || [],
       privacyStatus: body.metadata?.privacyStatus || 'private',
-      custom: body.metadata?.custom
+      custom: { ...body.metadata?.custom, episodeId }
     };
 
     const manager = await getPublishingManager();
@@ -666,27 +669,86 @@ publishRouter.post('/tiktok/:episodeId', async (req: Request, res: Response) => 
       res.status(400).json({
         success: false,
         errors: result.errors,
-        message: 'Failed to create TikTok publishing job'
+        message: 'Failed to create TikTok export job'
       });
       return;
     }
 
+    // TikTok jobs are exports, not direct publishes
     res.json({
       success: true,
       episodeId,
       platform: 'tiktok',
+      manualUploadRequired: true,
       jobs: result.jobs.map((job: any) => ({
         id: job.id,
         platform: job.platform,
         status: job.status,
         createdAt: job.createdAt
       })),
-      message: 'TikTok publishing job created'
+      message: '⚠️ TikTok export prepared - MANUAL UPLOAD REQUIRED. TikTok does not provide a public publishing API.',
+      instructions: [
+        '1. Wait for the export job to complete',
+        '2. Download the TikTok-ready video from the exports folder',
+        '3. Use the metadata file for captions and hashtags',
+        '4. Upload manually via TikTok app or approved third-party tools'
+      ]
     });
 
   } catch (error) {
-    console.error('[publish-api] Error creating TikTok job:', error);
-    res.status(500).json({ error: 'Failed to create TikTok publishing job' });
+    console.error('[publish-api] Error creating TikTok export job:', error);
+    res.status(500).json({ error: 'Failed to create TikTok export job' });
+  }
+});
+
+/**
+ * GET /api/publish/tiktok/:episodeId/download
+ * Get download information for TikTok export
+ */
+publishRouter.get('/tiktok/:episodeId/download', async (req: Request, res: Response) => {
+  try {
+    const { episodeId } = req.params;
+
+    // Check for export files
+    const exportDir = path.join(repoRoot, 'exports/tiktok', episodeId);
+    
+    if (!existsSync(exportDir)) {
+      res.status(404).json({
+        error: 'No TikTok export found for this episode',
+        message: 'Create a TikTok export first using POST /api/publish/tiktok/:episodeId'
+      });
+      return;
+    }
+
+    // List available exports
+    const fs = await import('fs/promises');
+    const files = await fs.readdir(exportDir);
+    const videoFiles = files.filter(f => f.endsWith('.mp4'));
+    const metadataFiles = files.filter(f => f.endsWith('_metadata.json'));
+
+    res.json({
+      episodeId,
+      platform: 'tiktok',
+      manualUploadRequired: true,
+      exportDir,
+      exports: videoFiles.map((video, index) => ({
+        video,
+        metadata: metadataFiles[index] || null,
+        downloadPath: `/api/storage/tiktok/${episodeId}/${video}`
+      })),
+      count: videoFiles.length,
+      instructions: [
+        '1. Download the video file from the downloadPath',
+        '2. Review the metadata file for captions and hashtags',
+        '3. Upload manually via TikTok app',
+        '4. Add sounds, effects, or filters as needed'
+      ],
+      note: 'TikTok does not provide a public API for video publishing. Manual upload is required.'
+    });
+
+  } catch (error) {
+    console.error('[publish-api] Error getting TikTok download info:', error);
+    res.status(500).json({ error: 'Failed to get TikTok download information' });
   }
 });
 
