@@ -8,6 +8,7 @@ import Airtable, { type FieldSet, type SelectOptions } from 'airtable';
 import { fileURLToPath } from 'url';
 import { renderRouter } from './render-api.js';
 import { storageRouter, createStorageFileMiddleware } from './storage-api.js';
+import { qcRouter } from './qc-api.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +33,9 @@ app.use('/api/render', renderRouter);
 
 // Mount storage API routes
 app.use('/api/storage', storageRouter);
+
+// Mount QC API routes
+app.use('/api/qc', qcRouter);
 
 // Mount storage file serving middleware
 app.use('/storage', createStorageFileMiddleware());

@@ -169,6 +169,10 @@ export interface QCFlags {
   durationExceeded?: boolean;
   /** Additional QC notes */
   notes?: string[];
+  /** When the episode was reviewed */
+  reviewedAt?: string;
+  /** Who reviewed the episode */
+  reviewedBy?: string;
 }
 
 /**
