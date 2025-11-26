@@ -9,17 +9,17 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import type {
-  Timeline,
-  Track,
-  Clip,
-  CaptionSegment,
-  PersonaStyle,
-  QCFlags,
-  RenderProfile,
-  TimelineBuildOptions,
-  TimelineValidationResult,
-  TIMELINE_SCHEMA_VERSION
+import {
+  TIMELINE_SCHEMA_VERSION,
+  type Timeline,
+  type Track,
+  type Clip,
+  type CaptionSegment,
+  type PersonaStyle,
+  type QCFlags,
+  type RenderProfile,
+  type TimelineBuildOptions,
+  type TimelineValidationResult
 } from '../types/timeline.types.js';
 import type {
   AssetManifest,
@@ -29,6 +29,9 @@ import type {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const repoRoot = join(__dirname, '../..');
+
+/** Background music volume (0.0-1.0) */
+const BACKGROUND_MUSIC_VOLUME = 0.3;
 
 /** Default persona styles - loaded from persona_styles.json if available */
 const DEFAULT_PERSONA_STYLE: PersonaStyle = {
@@ -268,9 +271,9 @@ export async function buildTimeline(options: TimelineBuildOptions): Promise<Time
         startTime: 0,
         duration: musicAsset.duration ?? duration,
         layer: 5,
-        volume: 0.3 // Background music lower
+        volume: BACKGROUND_MUSIC_VOLUME
       }],
-      volume: 0.3
+      volume: BACKGROUND_MUSIC_VOLUME
     });
   }
   
@@ -293,7 +296,7 @@ export async function buildTimeline(options: TimelineBuildOptions): Promise<Time
   
   // Build initial timeline
   const timeline: Timeline = {
-    timelineVersion: '1.0.0',
+    timelineVersion: TIMELINE_SCHEMA_VERSION,
     episodeId,
     personaCode: manifest.episode.personaCode,
     franchiseId: manifest.episode.franchiseId,
