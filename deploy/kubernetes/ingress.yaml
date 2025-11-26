@@ -16,13 +16,17 @@ metadata:
     nginx.ingress.kubernetes.io/limit-rps: "50"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
+  # NOTE: Replace example.com with your actual domain
+  # For production, create environment-specific files:
+  #   - ingress-production.yaml (your-domain.com)
+  #   - ingress-staging.yaml (staging.your-domain.com)
   tls:
     - hosts:
-        - sl18.example.com
-        - api.sl18.example.com
+        - sl18.your-domain.com  # REPLACE with actual domain
+        - api.sl18.your-domain.com  # REPLACE with actual domain
       secretName: sl18-tls
   rules:
-    - host: sl18.example.com
+    - host: sl18.your-domain.com  # REPLACE with actual domain
       http:
         paths:
           - path: /
@@ -32,7 +36,7 @@ spec:
                 name: control-panel
                 port:
                   number: 5178
-    - host: api.sl18.example.com
+    - host: api.sl18.your-domain.com  # REPLACE with actual domain
       http:
         paths:
           - path: /api/render

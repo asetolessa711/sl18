@@ -112,8 +112,17 @@ function getResourceMetrics(): { cpuUsage: number; memoryUsage: number; memoryTo
   const heapTotal = memUsage.heapTotal;
   const memoryUsage = heapTotal > 0 ? Math.round((heapUsed / heapTotal) * 100) : 0;
   
-  // CPU usage approximation (would need proper monitoring in production)
-  const cpuUsage = Math.round(Math.random() * 30 + 10); // Placeholder for demo
+  // CPU usage using Node.js process.cpuUsage()
+  // Note: In production, consider using 'pidusage' or 'systeminformation' for more accurate metrics
+  let cpuUsage = 0;
+  try {
+    const usage = process.cpuUsage();
+    const totalCpuTime = usage.user + usage.system;
+    // Approximate percentage based on elapsed time (normalized to 100ms)
+    cpuUsage = Math.min(100, Math.round((totalCpuTime / 1000000) * 10));
+  } catch {
+    cpuUsage = 0;
+  }
   
   return {
     cpuUsage,
