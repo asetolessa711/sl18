@@ -6,6 +6,7 @@ import path from 'path';
 import { existsSync, promises as fs } from 'fs';
 import Airtable, { type FieldSet, type SelectOptions } from 'airtable';
 import { fileURLToPath } from 'url';
+import { renderRouter } from './render-api.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +25,9 @@ dotenv.config({ path: backendEnvLocalPath });
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Mount render API routes
+app.use('/api/render', renderRouter);
 
 const PORT = process.env.SL18_PANEL_PORT ? Number(process.env.SL18_PANEL_PORT) : 5178;
 
