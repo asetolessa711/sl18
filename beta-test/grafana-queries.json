@@ -1,0 +1,219 @@
+{
+  "grafanaDashboardQueries": {
+    "dashboardName": "SL18 Autonomous Mode Monitoring",
+    "version": "1.0.0",
+    "refreshInterval": "30s",
+    "timeRange": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "panelId": 1,
+        "title": "Overall Confidence Score",
+        "type": "gauge",
+        "description": "Current confidence score for Fully AI mode eligibility",
+        "query": {
+          "promQL": "avg(sl18_ai_confidence_score{mode=\"fullyAI\"})",
+          "legendFormat": "Overall Confidence"
+        },
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            { "value": 0, "color": "red" },
+            { "value": 0.85, "color": "orange" },
+            { "value": 0.90, "color": "yellow" },
+            { "value": 0.95, "color": "green" }
+          ]
+        },
+        "unit": "percentunit"
+      },
+      {
+        "panelId": 2,
+        "title": "QC Pass Rate (30-day rolling)",
+        "type": "stat",
+        "description": "Percentage of episodes passing QC checks in Fully AI mode",
+        "query": {
+          "promQL": "sum(rate(sl18_qc_checks_passed_total[30d])) / sum(rate(sl18_qc_checks_total[30d]))",
+          "legendFormat": "QC Pass Rate"
+        },
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            { "value": 0, "color": "red" },
+            { "value": 0.90, "color": "orange" },
+            { "value": 0.95, "color": "green" }
+          ]
+        },
+        "unit": "percentunit",
+        "target": 0.95
+      },
+      {
+        "panelId": 3,
+        "title": "Publishing Error Rate",
+        "type": "stat",
+        "description": "Percentage of publishing failures (should be < 1%)",
+        "query": {
+          "promQL": "sum(rate(sl18_publish_errors_total[30d])) / sum(rate(sl18_publish_attempts_total[30d]))",
+          "legendFormat": "Error Rate"
+        },
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            { "value": 0, "color": "green" },
+            { "value": 0.005, "color": "yellow" },
+            { "value": 0.01, "color": "orange" },
+            { "value": 0.02, "color": "red" }
+          ]
+        },
+        "unit": "percentunit",
+        "target": 0.01
+      },
+      {
+        "panelId": 4,
+        "title": "AI Accuracy Score",
+        "type": "gauge",
+        "description": "AI decision accuracy based on operator confirmations",
+        "query": {
+          "promQL": "sum(sl18_ai_decisions_confirmed{result=\"match\"}) / sum(sl18_ai_decisions_confirmed)",
+          "legendFormat": "AI Accuracy"
+        },
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            { "value": 0, "color": "red" },
+            { "value": 0.85, "color": "orange" },
+            { "value": 0.90, "color": "green" }
+          ]
+        },
+        "unit": "percentunit",
+        "target": 0.90
+      },
+      {
+        "panelId": 5,
+        "title": "Confidence Score Trend",
+        "type": "timeseries",
+        "description": "Confidence score over time with threshold line",
+        "query": {
+          "promQL": "avg(sl18_ai_confidence_score{mode=\"fullyAI\"}) by (component)",
+          "legendFormat": "{{component}}"
+        },
+        "thresholdLines": [
+          { "value": 0.95, "label": "Fully AI Threshold", "color": "green" },
+          { "value": 0.90, "label": "Human-Assisted Threshold", "color": "yellow" }
+        ]
+      },
+      {
+        "panelId": 6,
+        "title": "Publishing by Platform",
+        "type": "barchart",
+        "description": "Successful publishes by platform in last 24h",
+        "query": {
+          "promQL": "sum(increase(sl18_publish_success_total[24h])) by (platform)",
+          "legendFormat": "{{platform}}"
+        },
+        "stacking": false
+      },
+      {
+        "panelId": 7,
+        "title": "Shadow vs Operator Decisions",
+        "type": "piechart",
+        "description": "Match rate between AI shadow decisions and operator actions",
+        "queries": [
+          {
+            "promQL": "sum(sl18_shadow_decisions{match=\"true\"})",
+            "legendFormat": "Matched"
+          },
+          {
+            "promQL": "sum(sl18_shadow_decisions{match=\"false\"})",
+            "legendFormat": "Mismatched"
+          }
+        ]
+      },
+      {
+        "panelId": 8,
+        "title": "Override Actions",
+        "type": "timeseries",
+        "description": "Operator overrides and rollbacks over time",
+        "queries": [
+          {
+            "promQL": "sum(rate(sl18_operator_overrides_total[1h])) by (action_type)",
+            "legendFormat": "{{action_type}}"
+          }
+        ]
+      },
+      {
+        "panelId": 9,
+        "title": "QC Check Results by Genre",
+        "type": "heatmap",
+        "description": "QC pass/fail distribution by genre",
+        "query": {
+          "promQL": "sum(sl18_qc_results{result=\"pass\"}) by (genre) / sum(sl18_qc_results) by (genre)",
+          "legendFormat": "{{genre}}"
+        }
+      },
+      {
+        "panelId": 10,
+        "title": "Autonomous Mode Activity",
+        "type": "table",
+        "description": "Recent autonomous publishing activity",
+        "query": {
+          "promQL": "topk(10, sl18_autonomous_publish_latest by (episode_id, platform, status, timestamp))",
+          "columns": ["episode_id", "platform", "status", "confidence", "timestamp"]
+        }
+      }
+    ],
+    "alertRules": [
+      {
+        "alertName": "ConfidenceBelowThreshold",
+        "expression": "avg(sl18_ai_confidence_score{mode=\"fullyAI\"}) < 0.90",
+        "for": "5m",
+        "severity": "warning",
+        "summary": "AI confidence score dropped below 90%",
+        "description": "The overall AI confidence score has dropped below the Human-Assisted threshold. Consider switching to Human-Assisted mode."
+      },
+      {
+        "alertName": "HighPublishingErrorRate",
+        "expression": "sum(rate(sl18_publish_errors_total[1h])) / sum(rate(sl18_publish_attempts_total[1h])) > 0.01",
+        "for": "10m",
+        "severity": "critical",
+        "summary": "Publishing error rate exceeds 1%",
+        "description": "Publishing error rate has exceeded the 1% threshold. Autonomous publishing should be paused."
+      },
+      {
+        "alertName": "QCPassRateDrop",
+        "expression": "sum(rate(sl18_qc_checks_passed_total[6h])) / sum(rate(sl18_qc_checks_total[6h])) < 0.95",
+        "for": "15m",
+        "severity": "warning",
+        "summary": "QC pass rate dropped below 95%",
+        "description": "QC pass rate has dropped below the 95% threshold for Fully AI mode eligibility."
+      },
+      {
+        "alertName": "AutonomousModeDisabled",
+        "expression": "sl18_autonomous_mode_enabled == 0",
+        "for": "1m",
+        "severity": "info",
+        "summary": "Autonomous mode has been disabled",
+        "description": "Autonomous publishing mode has been disabled. Check audit logs for details."
+      }
+    ],
+    "variables": [
+      {
+        "name": "workspace",
+        "type": "query",
+        "query": "label_values(sl18_workspace_info, workspace_id)",
+        "multi": true
+      },
+      {
+        "name": "genre",
+        "type": "custom",
+        "options": ["drama", "comedy", "music", "educational", "news"]
+      },
+      {
+        "name": "platform",
+        "type": "custom",
+        "options": ["youtube", "facebook", "instagram", "tiktok"]
+      }
+    ]
+  }
+}

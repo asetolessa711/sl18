@@ -1,0 +1,168 @@
+{
+  "shadowPublishingLogs": {
+    "generatedAt": "2025-11-27T08:00:00.000Z",
+    "mode": "fullyAI",
+    "confidenceThresholds": {
+      "qcPassRate": 0.95,
+      "publishErrorRate": 0.01,
+      "aiAccuracy": 0.9
+    },
+    "episodes": [
+      {
+        "episodeId": "EP-001-DRAMA",
+        "title": "The Last Sunrise - Episode 1",
+        "genre": "drama",
+        "workspaceId": "ws-drama-001",
+        "shadowLog": {
+          "timestamp": "2025-11-27T08:15:32.000Z",
+          "aiDecision": {
+            "publish": true,
+            "platforms": ["youtube", "facebook", "instagram"],
+            "metadata": {
+              "title": "The Last Sunrise | Episode 1 | SL18 Drama",
+              "description": "A gripping tale of hope and redemption. Follow the journey as...",
+              "tags": ["drama", "emotional", "series", "SL18"],
+              "thumbnailGenerated": true,
+              "captionsGenerated": true,
+              "hashtagsGenerated": true
+            },
+            "confidence": {
+              "overall": 0.97,
+              "qcScore": 0.98,
+              "contentQuality": 0.96,
+              "metadataAccuracy": 0.97
+            }
+          },
+          "qcResults": {
+            "passed": true,
+            "checks": [
+              { "name": "pacingThreshold", "passed": true, "value": 2.3, "threshold": 3.0 },
+              { "name": "emotionalBeats", "passed": true, "value": 8, "threshold": 5 },
+              { "name": "sceneDuration", "passed": true, "value": 45, "threshold": 60 },
+              { "name": "captionLength", "passed": true, "value": 120, "threshold": 150 },
+              { "name": "loudnessNormalization", "passed": true, "value": -14, "threshold": -16 }
+            ]
+          },
+          "simulatedPublish": {
+            "youtube": { "status": "simulated_success", "videoId": "sim_yt_001", "estimatedReach": 15000 },
+            "facebook": { "status": "simulated_success", "postId": "sim_fb_001", "estimatedReach": 8000 },
+            "instagram": { "status": "simulated_success", "reelId": "sim_ig_001", "estimatedReach": 12000 }
+          },
+          "operatorComparison": {
+            "operatorDecision": "pending",
+            "matchScore": null,
+            "notes": "Awaiting operator review for calibration"
+          }
+        }
+      },
+      {
+        "episodeId": "EP-002-COMEDY",
+        "title": "Coffee Break Chronicles - S2E5",
+        "genre": "comedy",
+        "workspaceId": "ws-comedy-001",
+        "shadowLog": {
+          "timestamp": "2025-11-27T08:22:15.000Z",
+          "aiDecision": {
+            "publish": true,
+            "platforms": ["youtube", "facebook", "instagram"],
+            "metadata": {
+              "title": "Coffee Break Chronicles | S2E5 | Office Humor",
+              "description": "When the coffee machine breaks down, chaos ensues...",
+              "tags": ["comedy", "office", "humor", "SL18"],
+              "thumbnailGenerated": true,
+              "captionsGenerated": true,
+              "hashtagsGenerated": true
+            },
+            "confidence": {
+              "overall": 0.94,
+              "qcScore": 0.96,
+              "contentQuality": 0.93,
+              "metadataAccuracy": 0.95
+            }
+          },
+          "qcResults": {
+            "passed": true,
+            "checks": [
+              { "name": "punchlinePause", "passed": true, "value": 1.8, "threshold": 2.0 },
+              { "name": "jokeSpacing", "passed": true, "value": 25, "threshold": 30 },
+              { "name": "comedyTiming", "passed": true, "value": 0.92, "threshold": 0.85 },
+              { "name": "captionLength", "passed": true, "value": 95, "threshold": 150 },
+              { "name": "audioClarity", "passed": true, "value": 0.98, "threshold": 0.90 }
+            ]
+          },
+          "simulatedPublish": {
+            "youtube": { "status": "simulated_success", "videoId": "sim_yt_002", "estimatedReach": 22000 },
+            "facebook": { "status": "simulated_success", "postId": "sim_fb_002", "estimatedReach": 11000 },
+            "instagram": { "status": "simulated_success", "reelId": "sim_ig_002", "estimatedReach": 18000 }
+          },
+          "operatorComparison": {
+            "operatorDecision": "approved",
+            "matchScore": 0.95,
+            "notes": "Operator agreed with AI publish decision"
+          }
+        }
+      },
+      {
+        "episodeId": "EP-003-MUSIC",
+        "title": "Rhythm of the Streets - Music Video",
+        "genre": "music",
+        "workspaceId": "ws-music-001",
+        "shadowLog": {
+          "timestamp": "2025-11-27T08:35:48.000Z",
+          "aiDecision": {
+            "publish": false,
+            "platforms": [],
+            "metadata": {
+              "title": "Rhythm of the Streets | Official Music Video",
+              "description": "An urban anthem celebrating street culture...",
+              "tags": ["music", "hiphop", "urban", "SL18"],
+              "thumbnailGenerated": true,
+              "captionsGenerated": true,
+              "hashtagsGenerated": true
+            },
+            "confidence": {
+              "overall": 0.88,
+              "qcScore": 0.85,
+              "contentQuality": 0.91,
+              "metadataAccuracy": 0.89
+            },
+            "holdReason": "QC score below 95% threshold - requires operator review"
+          },
+          "qcResults": {
+            "passed": false,
+            "checks": [
+              { "name": "loudnessNormalization", "passed": false, "value": -10, "threshold": -14 },
+              { "name": "truePeak", "passed": false, "value": -0.5, "threshold": -1.0 },
+              { "name": "beatSync", "passed": true, "value": 0.96, "threshold": 0.90 },
+              { "name": "visualAudioSync", "passed": true, "value": 0.98, "threshold": 0.95 },
+              { "name": "captionLength", "passed": true, "value": 80, "threshold": 150 }
+            ],
+            "failedChecks": ["loudnessNormalization", "truePeak"],
+            "recommendations": [
+              "Apply loudness normalization to -14 LUFS",
+              "Reduce true peak to below -1.0 dB"
+            ]
+          },
+          "simulatedPublish": {
+            "youtube": { "status": "not_simulated", "reason": "QC failed" },
+            "facebook": { "status": "not_simulated", "reason": "QC failed" },
+            "instagram": { "status": "not_simulated", "reason": "QC failed" }
+          },
+          "operatorComparison": {
+            "operatorDecision": "rejected",
+            "matchScore": 1.0,
+            "notes": "Operator agreed with AI hold decision - audio needs adjustment"
+          }
+        }
+      }
+    ],
+    "summary": {
+      "totalEpisodes": 3,
+      "aiPublishDecisions": { "publish": 2, "hold": 1 },
+      "operatorMatches": 2,
+      "operatorPending": 1,
+      "averageConfidence": 0.93,
+      "qcPassRate": 0.67
+    }
+  }
+}
