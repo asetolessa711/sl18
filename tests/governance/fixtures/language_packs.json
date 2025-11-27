@@ -1,0 +1,178 @@
+{
+  "validLanguagePacks": [
+    {
+      "languageCode": "en",
+      "displayName": "English",
+      "nativeName": "English",
+      "direction": "ltr",
+      "scriptGeneration": {
+        "enabled": true,
+        "promptTemplate": "prompts/script_template_en.txt",
+        "toneGuidelines": ["Casual", "Humorous", "Relatable"],
+        "forbiddenPhrases": []
+      },
+      "subtitles": {
+        "enabled": true,
+        "fontFamily": "Arial",
+        "fontSize": 24,
+        "maxCharsPerLine": 42,
+        "maxLinesPerFrame": 2
+      },
+      "captions": {
+        "enabled": true,
+        "format": "srt",
+        "includeTimestamps": true
+      },
+      "personaStyling": {
+        "voiceId": "voice_en_001",
+        "speakingRate": 1.0,
+        "pitch": 1.0
+      },
+      "qcRules": {
+        "translationAccuracyThreshold": 95,
+        "personaConsistencyRequired": true,
+        "culturalReviewRequired": true,
+        "nativeReviewerRequired": false
+      },
+      "status": "active",
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": "2025-01-01T00:00:00Z"
+    },
+    {
+      "languageCode": "fr",
+      "displayName": "French",
+      "nativeName": "Français",
+      "direction": "ltr",
+      "scriptGeneration": {
+        "enabled": true,
+        "promptTemplate": "prompts/script_template_fr.txt",
+        "toneGuidelines": ["Élégant", "Spirituel", "Accessible"],
+        "forbiddenPhrases": []
+      },
+      "subtitles": {
+        "enabled": true,
+        "fontFamily": "Arial",
+        "fontSize": 24,
+        "maxCharsPerLine": 40,
+        "maxLinesPerFrame": 2
+      },
+      "captions": {
+        "enabled": true,
+        "format": "srt",
+        "includeTimestamps": true
+      },
+      "personaStyling": {
+        "voiceId": "voice_fr_001",
+        "speakingRate": 0.95,
+        "pitch": 1.0
+      },
+      "qcRules": {
+        "translationAccuracyThreshold": 95,
+        "personaConsistencyRequired": true,
+        "culturalReviewRequired": true,
+        "nativeReviewerRequired": true
+      },
+      "status": "active",
+      "createdAt": "2025-01-15T00:00:00Z",
+      "updatedAt": "2025-01-15T00:00:00Z"
+    },
+    {
+      "languageCode": "ar",
+      "displayName": "Arabic",
+      "nativeName": "العربية",
+      "direction": "rtl",
+      "scriptGeneration": {
+        "enabled": true,
+        "promptTemplate": "prompts/script_template_ar.txt",
+        "toneGuidelines": ["Formal", "Respectful", "Culturally sensitive"],
+        "forbiddenPhrases": ["taboo_phrase_1", "taboo_phrase_2"]
+      },
+      "subtitles": {
+        "enabled": true,
+        "fontFamily": "Amiri",
+        "fontSize": 26,
+        "maxCharsPerLine": 35,
+        "maxLinesPerFrame": 2
+      },
+      "captions": {
+        "enabled": true,
+        "format": "vtt",
+        "includeTimestamps": true
+      },
+      "personaStyling": {
+        "voiceId": "voice_ar_001",
+        "speakingRate": 0.9,
+        "pitch": 1.0
+      },
+      "qcRules": {
+        "translationAccuracyThreshold": 98,
+        "personaConsistencyRequired": true,
+        "culturalReviewRequired": true,
+        "nativeReviewerRequired": true
+      },
+      "status": "active",
+      "createdAt": "2025-02-01T00:00:00Z",
+      "updatedAt": "2025-02-01T00:00:00Z"
+    },
+    {
+      "languageCode": "zh-CN",
+      "displayName": "Chinese (Simplified)",
+      "nativeName": "简体中文",
+      "direction": "ltr",
+      "scriptGeneration": {
+        "enabled": true,
+        "promptTemplate": "prompts/script_template_zh.txt",
+        "toneGuidelines": ["Engaging", "Modern", "Youthful"]
+      },
+      "subtitles": {
+        "enabled": true,
+        "fontFamily": "Noto Sans SC",
+        "fontSize": 28,
+        "maxCharsPerLine": 20,
+        "maxLinesPerFrame": 2
+      },
+      "qcRules": {
+        "translationAccuracyThreshold": 95,
+        "personaConsistencyRequired": true,
+        "culturalReviewRequired": true
+      },
+      "status": "active",
+      "createdAt": "2025-02-15T00:00:00Z",
+      "updatedAt": "2025-02-15T00:00:00Z"
+    }
+  ],
+  "invalidLanguagePacks": [
+    {
+      "description": "Invalid language code format",
+      "data": {
+        "languageCode": "english",
+        "displayName": "English",
+        "nativeName": "English",
+        "direction": "ltr",
+        "status": "active"
+      },
+      "expectedError": "languageCode must match ISO pattern"
+    },
+    {
+      "description": "Missing required displayName",
+      "data": {
+        "languageCode": "en",
+        "nativeName": "English",
+        "direction": "ltr",
+        "status": "active"
+      },
+      "expectedError": "displayName is required"
+    },
+    {
+      "description": "Invalid direction value",
+      "data": {
+        "languageCode": "en",
+        "displayName": "English",
+        "nativeName": "English",
+        "direction": "vertical",
+        "status": "active"
+      },
+      "expectedError": "direction must be ltr or rtl"
+    }
+  ]
+}

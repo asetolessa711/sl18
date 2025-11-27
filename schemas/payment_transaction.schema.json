@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaymentTransaction",
+  "description": "Schema for payment transactions in SL18 monetization layer",
+  "type": "object",
+  "properties": {
+    "transactionId": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 100,
+      "description": "Unique payment transaction identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "Reference to the franchise"
+    },
+    "paymentGateway": {
+      "type": "string",
+      "enum": ["visa", "mastercard", "paypal", "stripe", "bank_transfer", "other"],
+      "description": "Payment gateway used"
+    },
+    "paymentMethod": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["credit_card", "debit_card", "paypal", "bank_account", "wallet"],
+          "description": "Type of payment method"
+        },
+        "lastFourDigits": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$",
+          "description": "Last 4 digits of card (if applicable)"
+        },
+        "cardBrand": {
+          "type": "string",
+          "enum": ["visa", "mastercard", "amex", "discover", "other"],
+          "description": "Card brand (if applicable)"
+        },
+        "expiryMonth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "description": "Card expiry month"
+        },
+        "expiryYear": {
+          "type": "integer",
+          "minimum": 2024,
+          "maximum": 2099,
+          "description": "Card expiry year"
+        },
+        "holderName": {
+          "type": "string",
+          "description": "Name on payment method"
+        },
+        "billingAddress": {
+          "type": "object",
+          "properties": {
+            "line1": { "type": "string" },
+            "line2": { "type": "string" },
+            "city": { "type": "string" },
+            "state": { "type": "string" },
+            "postalCode": { "type": "string" },
+            "country": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "amount": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Transaction amount"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "ISO 4217 currency code"
+        },
+        "fees": {
+          "type": "number",
+          "minimum": 0,
+          "default": 0,
+          "description": "Processing fees"
+        },
+        "netAmount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Amount after fees"
+        }
+      },
+      "required": ["value", "currency"],
+      "additionalProperties": false
+    },
+    "transactionType": {
+      "type": "string",
+      "enum": ["registration_fee", "monthly_fee", "payout", "refund", "adjustment", "chargeback"],
+      "description": "Type of transaction"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "processing", "completed", "failed", "cancelled", "refunded", "disputed"],
+      "description": "Transaction status"
+    },
+    "gatewayReference": {
+      "type": "object",
+      "properties": {
+        "gatewayTransactionId": {
+          "type": "string",
+          "description": "Transaction ID from payment gateway"
+        },
+        "authorizationCode": {
+          "type": "string",
+          "description": "Authorization code from gateway"
+        },
+        "receiptUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to transaction receipt"
+        }
+      },
+      "additionalProperties": false
+    },
+    "relatedTransactionId": {
+      "type": ["string", "null"],
+      "description": "Reference to related transaction (for refunds, chargebacks)"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Transaction description"
+        },
+        "invoiceId": {
+          "type": "string",
+          "description": "Related invoice ID"
+        },
+        "ledgerEntryId": {
+          "type": "string",
+          "description": "Related revenue ledger entry"
+        },
+        "registrationId": {
+          "type": "string",
+          "description": "Related registration ID"
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "IP address of payer"
+        },
+        "userAgent": {
+          "type": "string",
+          "description": "User agent of payer"
+        }
+      },
+      "additionalProperties": true
+    },
+    "fraudDetection": {
+      "type": "object",
+      "properties": {
+        "riskScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Fraud risk score (0-100)"
+        },
+        "riskLevel": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "description": "Risk level classification"
+        },
+        "flagged": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether transaction was flagged for review"
+        },
+        "reviewStatus": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected"],
+          "description": "Manual review status"
+        },
+        "reviewedBy": {
+          "type": "string",
+          "description": "Who reviewed the transaction"
+        },
+        "reviewedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the transaction was reviewed"
+        },
+        "signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Fraud signals detected"
+        }
+      },
+      "additionalProperties": false
+    },
+    "timestamps": {
+      "type": "object",
+      "properties": {
+        "initiatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When transaction was initiated"
+        },
+        "processedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When transaction was processed"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When transaction was completed"
+        },
+        "failedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When transaction failed"
+        }
+      },
+      "required": ["initiatedAt"],
+      "additionalProperties": false
+    },
+    "failureDetails": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Error code"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message"
+        },
+        "declineReason": {
+          "type": "string",
+          "description": "Reason for decline (if applicable)"
+        },
+        "retryable": {
+          "type": "boolean",
+          "description": "Whether transaction can be retried"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "transactionId",
+    "franchiseId",
+    "paymentGateway",
+    "paymentMethod",
+    "amount",
+    "transactionType",
+    "status",
+    "timestamps"
+  ],
+  "additionalProperties": false
+}

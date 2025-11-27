@@ -1,0 +1,210 @@
+{
+  "validPaymentTransactions": [
+    {
+      "transactionId": "txn-2025-001-visa",
+      "franchiseId": "kenya-001",
+      "paymentGateway": "visa",
+      "paymentMethod": {
+        "type": "credit_card",
+        "lastFourDigits": "4242",
+        "cardBrand": "visa",
+        "expiryMonth": 12,
+        "expiryYear": 2027,
+        "holderName": "Kenya Partner"
+      },
+      "amount": {
+        "value": 100.00,
+        "currency": "USD",
+        "fees": 2.90,
+        "netAmount": 97.10
+      },
+      "transactionType": "registration_fee",
+      "status": "completed",
+      "gatewayReference": {
+        "gatewayTransactionId": "ch_3abc123",
+        "authorizationCode": "AUTH123",
+        "receiptUrl": "https://pay.example.com/receipt/abc123"
+      },
+      "timestamps": {
+        "initiatedAt": "2025-02-05T10:00:00Z",
+        "processedAt": "2025-02-05T10:00:05Z",
+        "completedAt": "2025-02-05T10:00:10Z"
+      }
+    },
+    {
+      "transactionId": "txn-2025-002-paypal",
+      "franchiseId": "nigeria-001",
+      "paymentGateway": "paypal",
+      "paymentMethod": {
+        "type": "paypal",
+        "holderName": "Nigeria Partner"
+      },
+      "amount": {
+        "value": 150.00,
+        "currency": "USD",
+        "fees": 4.65,
+        "netAmount": 145.35
+      },
+      "transactionType": "registration_fee",
+      "status": "completed",
+      "gatewayReference": {
+        "gatewayTransactionId": "PAYPAL-123ABC",
+        "receiptUrl": "https://paypal.com/receipt/123ABC"
+      },
+      "timestamps": {
+        "initiatedAt": "2025-02-10T14:00:00Z",
+        "completedAt": "2025-02-10T14:00:30Z"
+      }
+    },
+    {
+      "transactionId": "txn-2025-003-stripe",
+      "franchiseId": "core",
+      "paymentGateway": "stripe",
+      "paymentMethod": {
+        "type": "credit_card",
+        "lastFourDigits": "1234",
+        "cardBrand": "mastercard",
+        "expiryMonth": 6,
+        "expiryYear": 2026,
+        "holderName": "Central Ops"
+      },
+      "amount": {
+        "value": 437.50,
+        "currency": "USD",
+        "fees": 12.99,
+        "netAmount": 424.51
+      },
+      "transactionType": "payout",
+      "status": "completed",
+      "metadata": {
+        "ledgerEntryId": "led-core-2025-01",
+        "description": "Monthly revenue payout"
+      },
+      "timestamps": {
+        "initiatedAt": "2025-02-15T09:00:00Z",
+        "processedAt": "2025-02-15T09:00:10Z",
+        "completedAt": "2025-02-15T09:05:00Z"
+      }
+    },
+    {
+      "transactionId": "txn-2025-004-refund",
+      "franchiseId": "test-franchise",
+      "paymentGateway": "stripe",
+      "paymentMethod": {
+        "type": "credit_card",
+        "lastFourDigits": "5678"
+      },
+      "amount": {
+        "value": 50.00,
+        "currency": "USD",
+        "fees": 0,
+        "netAmount": 50.00
+      },
+      "transactionType": "refund",
+      "status": "completed",
+      "relatedTransactionId": "txn-2025-000-original",
+      "metadata": {
+        "description": "Refund for cancelled registration"
+      },
+      "timestamps": {
+        "initiatedAt": "2025-02-20T11:00:00Z",
+        "completedAt": "2025-02-20T11:30:00Z"
+      }
+    },
+    {
+      "transactionId": "txn-2025-005-flagged",
+      "franchiseId": "suspicious-franchise",
+      "paymentGateway": "stripe",
+      "paymentMethod": {
+        "type": "credit_card",
+        "lastFourDigits": "9999",
+        "cardBrand": "visa"
+      },
+      "amount": {
+        "value": 500.00,
+        "currency": "USD"
+      },
+      "transactionType": "registration_fee",
+      "status": "pending",
+      "fraudDetection": {
+        "riskScore": 75,
+        "riskLevel": "high",
+        "flagged": true,
+        "reviewStatus": "pending",
+        "signals": ["velocity_check_failed", "ip_mismatch", "card_country_mismatch"]
+      },
+      "timestamps": {
+        "initiatedAt": "2025-02-25T15:00:00Z"
+      }
+    }
+  ],
+  "invalidPaymentTransactions": [
+    {
+      "description": "Missing required transactionId",
+      "data": {
+        "franchiseId": "test",
+        "paymentGateway": "stripe",
+        "paymentMethod": { "type": "credit_card" },
+        "amount": { "value": 100, "currency": "USD" },
+        "transactionType": "registration_fee",
+        "status": "pending",
+        "timestamps": { "initiatedAt": "2025-01-01T00:00:00Z" }
+      },
+      "expectedError": "transactionId is required"
+    },
+    {
+      "description": "Invalid payment gateway",
+      "data": {
+        "transactionId": "txn-test-001",
+        "franchiseId": "test",
+        "paymentGateway": "bitcoin",
+        "paymentMethod": { "type": "credit_card" },
+        "amount": { "value": 100, "currency": "USD" },
+        "transactionType": "registration_fee",
+        "status": "pending",
+        "timestamps": { "initiatedAt": "2025-01-01T00:00:00Z" }
+      },
+      "expectedError": "paymentGateway must be one of enum values"
+    },
+    {
+      "description": "Invalid currency format",
+      "data": {
+        "transactionId": "txn-test-001",
+        "franchiseId": "test",
+        "paymentGateway": "stripe",
+        "paymentMethod": { "type": "credit_card" },
+        "amount": { "value": 100, "currency": "dollars" },
+        "transactionType": "registration_fee",
+        "status": "pending",
+        "timestamps": { "initiatedAt": "2025-01-01T00:00:00Z" }
+      },
+      "expectedError": "currency must match ISO 4217 pattern"
+    }
+  ],
+  "paymentValidationTestCases": [
+    {
+      "description": "Calculate net amount after Stripe fees (2.9% + $0.30)",
+      "grossAmount": 100.00,
+      "feePercentage": 2.9,
+      "fixedFee": 0.30,
+      "expectedFees": 3.20,
+      "expectedNetAmount": 96.80
+    },
+    {
+      "description": "Calculate net amount for PayPal (3.49% + $0.49)",
+      "grossAmount": 150.00,
+      "feePercentage": 3.49,
+      "fixedFee": 0.49,
+      "expectedFees": 5.73,
+      "expectedNetAmount": 144.27
+    },
+    {
+      "description": "Zero fees for bank transfer",
+      "grossAmount": 500.00,
+      "feePercentage": 0,
+      "fixedFee": 0,
+      "expectedFees": 0,
+      "expectedNetAmount": 500.00
+    }
+  ]
+}

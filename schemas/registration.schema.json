@@ -74,6 +74,51 @@
       "format": "date-time",
       "description": "ISO 8601 timestamp when the franchise was approved"
     },
+    "payment": {
+      "type": "object",
+      "description": "Payment information for registration (Phase 15: Monetization)",
+      "properties": {
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["visa", "mastercard", "paypal", "stripe", "bank_transfer", "none"],
+          "description": "Payment gateway used for registration"
+        },
+        "transactionId": {
+          "type": ["string", "null"],
+          "description": "Payment transaction reference"
+        },
+        "paymentStatus": {
+          "type": "string",
+          "enum": ["pending", "processing", "completed", "failed", "refunded", "waived"],
+          "description": "Status of registration payment"
+        },
+        "amount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Payment amount"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "default": "USD",
+          "description": "Payment currency (ISO 4217)"
+        },
+        "paidAt": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When payment was completed"
+        }
+      },
+      "additionalProperties": false
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+      },
+      "description": "Enabled languages for this franchise (Phase 15: Globalization)"
+    },
     "notes": {
       "type": "string",
       "description": "Additional notes about the registration"

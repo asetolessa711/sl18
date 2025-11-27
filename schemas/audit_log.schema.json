@@ -41,13 +41,28 @@
         "content_rollback",
         "override_applied",
         "credential_rotated",
-        "system_alert"
+        "system_alert",
+        "payment_initiated",
+        "payment_completed",
+        "payment_failed",
+        "payment_refunded",
+        "payment_disputed",
+        "fraud_detected",
+        "workspace_provisioned",
+        "workspace_suspended",
+        "language_pack_added",
+        "language_pack_removed",
+        "translation_submitted",
+        "translation_approved",
+        "translation_rejected",
+        "multilingual_qc_passed",
+        "multilingual_qc_failed"
       ],
       "description": "Type of governance event"
     },
     "category": {
       "type": "string",
-      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system"],
+      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization"],
       "description": "Category of the audit event"
     },
     "actor": {
@@ -75,7 +90,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["franchise", "agreement", "ledger", "episode", "content"],
+          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack"],
           "description": "Type of target entity"
         },
         "id": {

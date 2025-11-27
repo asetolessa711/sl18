@@ -1,0 +1,234 @@
+{
+  "validMultilingualQC": [
+    {
+      "qcId": "mqc-2025-001",
+      "episodeId": "ep-core-2025-02-01",
+      "franchiseId": "core",
+      "sourceLanguage": "en",
+      "targetLanguage": "fr",
+      "translationAccuracy": {
+        "score": 97,
+        "threshold": 95,
+        "passed": true,
+        "issues": []
+      },
+      "personaConsistency": {
+        "score": 98,
+        "passed": true,
+        "personaId": "auntie-tech",
+        "checks": {
+          "toneMatch": true,
+          "vocabularyMatch": true,
+          "signOffPresent": true,
+          "culturalAlignment": true
+        },
+        "issues": []
+      },
+      "genreRules": {
+        "genre": "comedy",
+        "passed": true,
+        "rules": [
+          { "ruleId": "timing", "description": "Comic timing preserved", "passed": true },
+          { "ruleId": "wordplay", "description": "Wordplay adapted appropriately", "passed": true }
+        ]
+      },
+      "culturalSensitivity": {
+        "reviewed": true,
+        "passed": true,
+        "reviewer": "fr-reviewer@sl18.africa",
+        "flags": []
+      },
+      "subtitleQC": {
+        "passed": true,
+        "checks": {
+          "timingAccurate": true,
+          "lengthCompliant": true,
+          "readabilityOk": true,
+          "formattingCorrect": true
+        },
+        "issues": []
+      },
+      "overallResult": {
+        "status": "passed",
+        "score": 97,
+        "publishReady": true,
+        "requiredActions": []
+      },
+      "reviewer": {
+        "id": "reviewer-001",
+        "name": "Marie Dupont",
+        "isNativeSpeaker": true
+      },
+      "timestamps": {
+        "submittedAt": "2025-02-01T10:00:00Z",
+        "reviewedAt": "2025-02-01T14:00:00Z",
+        "completedAt": "2025-02-01T14:30:00Z"
+      }
+    },
+    {
+      "qcId": "mqc-2025-002",
+      "episodeId": "ep-core-2025-02-02",
+      "franchiseId": "core",
+      "sourceLanguage": "en",
+      "targetLanguage": "ar",
+      "translationAccuracy": {
+        "score": 92,
+        "threshold": 95,
+        "passed": false,
+        "issues": [
+          {
+            "type": "mistranslation",
+            "severity": "major",
+            "location": "00:15-00:20",
+            "original": "That's what I call a tech fail!",
+            "translated": "هذا ما أسميه فشل",
+            "suggestion": "هذا ما أسميه فشلاً تقنياً!"
+          }
+        ]
+      },
+      "personaConsistency": {
+        "score": 88,
+        "passed": false,
+        "personaId": "auntie-tech",
+        "checks": {
+          "toneMatch": true,
+          "vocabularyMatch": false,
+          "signOffPresent": true,
+          "culturalAlignment": true
+        },
+        "issues": [
+          {
+            "type": "vocabulary_deviation",
+            "description": "Formal vocabulary used instead of casual persona style",
+            "location": "00:30-00:45"
+          }
+        ]
+      },
+      "culturalSensitivity": {
+        "reviewed": true,
+        "passed": true,
+        "reviewer": "ar-reviewer@sl18.africa",
+        "flags": []
+      },
+      "overallResult": {
+        "status": "failed",
+        "score": 88,
+        "publishReady": false,
+        "requiredActions": [
+          "Fix translation at 00:15-00:20",
+          "Adjust vocabulary to match persona casual tone"
+        ]
+      },
+      "timestamps": {
+        "submittedAt": "2025-02-02T09:00:00Z",
+        "reviewedAt": "2025-02-02T15:00:00Z",
+        "completedAt": "2025-02-02T15:30:00Z"
+      }
+    },
+    {
+      "qcId": "mqc-2025-003",
+      "episodeId": "ep-kenya-2025-02-03",
+      "franchiseId": "kenya-001",
+      "sourceLanguage": "en",
+      "targetLanguage": "zh-CN",
+      "translationAccuracy": {
+        "score": 96,
+        "threshold": 95,
+        "passed": true,
+        "issues": []
+      },
+      "personaConsistency": {
+        "score": 95,
+        "passed": true,
+        "personaId": "local-comedian",
+        "checks": {
+          "toneMatch": true,
+          "vocabularyMatch": true,
+          "signOffPresent": true,
+          "culturalAlignment": true
+        }
+      },
+      "culturalSensitivity": {
+        "reviewed": true,
+        "passed": false,
+        "reviewer": "zh-reviewer@sl18.africa",
+        "flags": [
+          {
+            "type": "insensitive",
+            "severity": "warning",
+            "description": "Reference to historical event may be perceived differently",
+            "location": "01:20-01:25",
+            "resolution": "Removed reference, replaced with neutral joke"
+          }
+        ]
+      },
+      "overallResult": {
+        "status": "conditional",
+        "score": 94,
+        "publishReady": false,
+        "requiredActions": [
+          "Apply cultural sensitivity resolution before publishing"
+        ]
+      },
+      "timestamps": {
+        "submittedAt": "2025-02-03T08:00:00Z",
+        "reviewedAt": "2025-02-03T12:00:00Z"
+      }
+    }
+  ],
+  "invalidMultilingualQC": [
+    {
+      "description": "Missing required sourceLanguage",
+      "data": {
+        "qcId": "mqc-test-001",
+        "episodeId": "ep-test-001",
+        "franchiseId": "test",
+        "targetLanguage": "fr",
+        "translationAccuracy": { "score": 95, "threshold": 95, "passed": true },
+        "overallResult": { "status": "passed", "publishReady": true },
+        "timestamps": { "submittedAt": "2025-01-01T00:00:00Z" }
+      },
+      "expectedError": "sourceLanguage is required"
+    },
+    {
+      "description": "Invalid language code format",
+      "data": {
+        "qcId": "mqc-test-001",
+        "episodeId": "ep-test-001",
+        "franchiseId": "test",
+        "sourceLanguage": "english",
+        "targetLanguage": "french",
+        "translationAccuracy": { "score": 95, "threshold": 95, "passed": true },
+        "overallResult": { "status": "passed", "publishReady": true },
+        "timestamps": { "submittedAt": "2025-01-01T00:00:00Z" }
+      },
+      "expectedError": "language code must match ISO pattern"
+    }
+  ],
+  "translationAccuracyTestCases": [
+    {
+      "description": "Score above threshold passes",
+      "score": 97,
+      "threshold": 95,
+      "expectedPassed": true
+    },
+    {
+      "description": "Score at threshold passes",
+      "score": 95,
+      "threshold": 95,
+      "expectedPassed": true
+    },
+    {
+      "description": "Score below threshold fails",
+      "score": 92,
+      "threshold": 95,
+      "expectedPassed": false
+    },
+    {
+      "description": "High threshold for RTL languages",
+      "score": 96,
+      "threshold": 98,
+      "expectedPassed": false
+    }
+  ]
+}
