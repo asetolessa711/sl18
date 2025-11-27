@@ -1,0 +1,858 @@
+{
+  "validAudienceInsights": [
+    {
+      "insightId": "insight-2025-001",
+      "franchiseId": "kenya-001",
+      "channelId": "youtube-ke-001",
+      "contentId": "content-ep-001",
+      "periodStart": "2025-11-01T00:00:00Z",
+      "periodEnd": "2025-11-07T23:59:59Z",
+      "engagementMetrics": {
+        "totalViews": 125000,
+        "uniqueViewers": 87500,
+        "avgWatchTime": 420,
+        "totalWatchTime": 52500000,
+        "completionRate": 72.5,
+        "interactions": {
+          "likes": 8500,
+          "dislikes": 350,
+          "shares": 2100,
+          "comments": 1850,
+          "saves": 3200,
+          "subscribeActions": 450
+        },
+        "engagementRate": 12.8,
+        "bingePatterns": {
+          "avgEpisodesPerSession": 2.4,
+          "bingeViewerCount": 15000,
+          "bingePercentage": 17.1
+        }
+      },
+      "sentimentAnalysis": {
+        "overallSentiment": "positive",
+        "sentimentScore": 0.72,
+        "sentimentBreakdown": {
+          "positiveCount": 1450,
+          "neutralCount": 280,
+          "negativeCount": 120
+        },
+        "topPositiveThemes": [
+          {
+            "theme": "storytelling",
+            "count": 520,
+            "examples": ["Amazing story!", "Best episode yet", "Love the plot"]
+          },
+          {
+            "theme": "characters",
+            "count": 380,
+            "examples": ["Great acting", "Love the main character"]
+          }
+        ],
+        "topNegativeThemes": [
+          {
+            "theme": "pacing",
+            "count": 45,
+            "examples": ["Too slow", "Could be tighter"]
+          }
+        ],
+        "culturalReactions": [
+          {
+            "region": "KE",
+            "sentiment": "very_positive",
+            "culturalIssues": []
+          },
+          {
+            "region": "NG",
+            "sentiment": "positive",
+            "culturalIssues": []
+          }
+        ],
+        "analyzedAt": "2025-11-08T06:00:00Z"
+      },
+      "retentionCurves": {
+        "curveType": "quartile",
+        "dataPoints": [
+          { "position": 0, "retentionPercentage": 100, "absoluteViewers": 125000 },
+          { "position": 25, "retentionPercentage": 85, "absoluteViewers": 106250 },
+          { "position": 50, "retentionPercentage": 78, "absoluteViewers": 97500 },
+          { "position": 75, "retentionPercentage": 74, "absoluteViewers": 92500 },
+          { "position": 100, "retentionPercentage": 72.5, "absoluteViewers": 90625 }
+        ],
+        "dropOffPoints": [
+          {
+            "position": 12,
+            "dropPercentage": 8,
+            "reason": "pacing_issue",
+            "suggestedAction": "Tighten intro segment"
+          }
+        ],
+        "peakMoments": [
+          {
+            "position": 65,
+            "engagementSpike": 1.4,
+            "peakType": "emotional_peak"
+          }
+        ]
+      },
+      "demographicBreakdown": {
+        "byRegion": [
+          { "region": "Africa", "country": "KE", "viewerCount": 45000, "viewerPercentage": 36, "avgWatchTime": 480, "engagementRate": 15.2 },
+          { "region": "Africa", "country": "NG", "viewerCount": 32000, "viewerPercentage": 25.6, "avgWatchTime": 390, "engagementRate": 11.8 }
+        ],
+        "byAgeGroup": [
+          { "ageGroup": "18-24", "viewerCount": 48000, "viewerPercentage": 38.4, "engagementRate": 16.5 },
+          { "ageGroup": "25-34", "viewerCount": 42000, "viewerPercentage": 33.6, "engagementRate": 14.2 }
+        ],
+        "byLanguage": [
+          { "language": "en", "viewerCount": 75000, "viewerPercentage": 60, "subtitleUsage": 25 },
+          { "language": "sw", "viewerCount": 50000, "viewerPercentage": 40, "subtitleUsage": 85 }
+        ],
+        "byDevice": [
+          { "deviceType": "mobile", "viewerCount": 87500, "viewerPercentage": 70, "avgWatchTime": 380 },
+          { "deviceType": "desktop", "viewerCount": 25000, "viewerPercentage": 20, "avgWatchTime": 520 }
+        ]
+      },
+      "comparativeAnalysis": {
+        "vsAverageContent": {
+          "viewsComparison": 25,
+          "engagementComparison": 18,
+          "retentionComparison": 12
+        },
+        "vsPreviousContent": {
+          "previousContentId": "content-ep-000",
+          "viewsChange": 15,
+          "engagementChange": 8,
+          "retentionChange": 5
+        },
+        "vsGenreBenchmark": {
+          "genre": "drama",
+          "benchmarkPercentile": 82,
+          "performanceRating": "above_average"
+        }
+      },
+      "feedbackSignals": {
+        "personalizationSignals": [
+          { "signalType": "persona_preference", "signalValue": "narrator-ke-001", "confidence": 78, "sampleSize": 5000 },
+          { "signalType": "format_preference", "signalValue": "serialized", "confidence": 85, "sampleSize": 12000 }
+        ],
+        "monetizationSignals": [
+          { "signalType": "upgrade_potential", "signalValue": "high", "confidence": 72 },
+          { "signalType": "ad_tolerance", "signalValue": "medium", "confidence": 65 }
+        ],
+        "qcSignals": []
+      },
+      "status": "ready",
+      "dataQuality": {
+        "completeness": 98.5,
+        "reliability": "high",
+        "sampleSize": 125000,
+        "lastUpdated": "2025-11-08T06:00:00Z"
+      },
+      "createdAt": "2025-11-08T00:00:00Z",
+      "updatedAt": "2025-11-08T06:00:00Z"
+    },
+    {
+      "insightId": "insight-2025-002",
+      "franchiseId": "ethiopia-001",
+      "channelId": "tiktok-et-001",
+      "contentId": "content-short-001",
+      "periodStart": "2025-11-01T00:00:00Z",
+      "periodEnd": "2025-11-07T23:59:59Z",
+      "engagementMetrics": {
+        "totalViews": 850000,
+        "uniqueViewers": 720000,
+        "avgWatchTime": 45,
+        "totalWatchTime": 38250000,
+        "completionRate": 92,
+        "interactions": {
+          "likes": 125000,
+          "dislikes": 2500,
+          "shares": 45000,
+          "comments": 28000,
+          "saves": 65000,
+          "subscribeActions": 8500
+        },
+        "engagementRate": 31.2,
+        "bingePatterns": {
+          "avgEpisodesPerSession": 5.2,
+          "bingeViewerCount": 320000,
+          "bingePercentage": 44.4
+        }
+      },
+      "sentimentAnalysis": {
+        "overallSentiment": "very_positive",
+        "sentimentScore": 0.88,
+        "sentimentBreakdown": {
+          "positiveCount": 24500,
+          "neutralCount": 2800,
+          "negativeCount": 700
+        },
+        "topPositiveThemes": [
+          { "theme": "humor", "count": 8500, "examples": ["So funny!", "Made my day"] },
+          { "theme": "relatable", "count": 6200, "examples": ["This is so true", "I feel seen"] }
+        ],
+        "topNegativeThemes": [],
+        "culturalReactions": [
+          { "region": "ET", "sentiment": "very_positive", "culturalIssues": [] }
+        ],
+        "analyzedAt": "2025-11-08T06:00:00Z"
+      },
+      "retentionCurves": {
+        "curveType": "decile",
+        "dataPoints": [
+          { "position": 0, "retentionPercentage": 100, "absoluteViewers": 850000 },
+          { "position": 50, "retentionPercentage": 95, "absoluteViewers": 807500 },
+          { "position": 100, "retentionPercentage": 92, "absoluteViewers": 782000 }
+        ],
+        "dropOffPoints": [],
+        "peakMoments": [
+          { "position": 35, "engagementSpike": 1.8, "peakType": "share_moment" }
+        ]
+      },
+      "demographicBreakdown": {
+        "byRegion": [
+          { "region": "Africa", "country": "ET", "viewerCount": 520000, "viewerPercentage": 61.2, "avgWatchTime": 48, "engagementRate": 35 }
+        ],
+        "byAgeGroup": [
+          { "ageGroup": "13-17", "viewerCount": 280000, "viewerPercentage": 32.9, "engagementRate": 42 },
+          { "ageGroup": "18-24", "viewerCount": 380000, "viewerPercentage": 44.7, "engagementRate": 38 }
+        ],
+        "byLanguage": [
+          { "language": "am", "viewerCount": 600000, "viewerPercentage": 70.6, "subtitleUsage": 5 },
+          { "language": "en", "viewerCount": 250000, "viewerPercentage": 29.4, "subtitleUsage": 45 }
+        ],
+        "byDevice": [
+          { "deviceType": "mobile", "viewerCount": 800000, "viewerPercentage": 94.1, "avgWatchTime": 45 }
+        ]
+      },
+      "feedbackSignals": {
+        "personalizationSignals": [
+          { "signalType": "format_preference", "signalValue": "short_form", "confidence": 95, "sampleSize": 720000 },
+          { "signalType": "duration_preference", "signalValue": "micro", "confidence": 88, "sampleSize": 720000 }
+        ],
+        "monetizationSignals": [
+          { "signalType": "ad_tolerance", "signalValue": "high", "confidence": 82 }
+        ],
+        "qcSignals": []
+      },
+      "status": "ready",
+      "dataQuality": {
+        "completeness": 99.2,
+        "reliability": "high",
+        "sampleSize": 850000,
+        "lastUpdated": "2025-11-08T06:00:00Z"
+      },
+      "createdAt": "2025-11-08T00:00:00Z",
+      "updatedAt": "2025-11-08T06:00:00Z"
+    }
+  ],
+  "invalidAudienceInsights": [
+    {
+      "description": "Missing required insightId",
+      "data": {
+        "franchiseId": "kenya-001",
+        "contentId": "content-001",
+        "periodStart": "2025-11-01T00:00:00Z",
+        "periodEnd": "2025-11-07T23:59:59Z",
+        "engagementMetrics": { "totalViews": 1000, "uniqueViewers": 800, "avgWatchTime": 120 },
+        "status": "ready"
+      }
+    },
+    {
+      "description": "Missing required engagementMetrics",
+      "data": {
+        "insightId": "insight-invalid-001",
+        "franchiseId": "kenya-001",
+        "contentId": "content-001",
+        "periodStart": "2025-11-01T00:00:00Z",
+        "periodEnd": "2025-11-07T23:59:59Z",
+        "status": "ready"
+      }
+    },
+    {
+      "description": "Invalid sentiment value",
+      "data": {
+        "insightId": "insight-invalid-002",
+        "franchiseId": "kenya-001",
+        "contentId": "content-001",
+        "periodStart": "2025-11-01T00:00:00Z",
+        "periodEnd": "2025-11-07T23:59:59Z",
+        "engagementMetrics": { "totalViews": 1000, "uniqueViewers": 800, "avgWatchTime": 120 },
+        "sentimentAnalysis": { "overallSentiment": "super_positive", "sentimentScore": 0.9 },
+        "status": "ready"
+      }
+    }
+  ],
+  "validFeedbackLoops": [
+    {
+      "loopId": "loop-2025-001",
+      "franchiseId": "kenya-001",
+      "insightId": "insight-2025-001",
+      "loopType": "personalization",
+      "triggers": [
+        {
+          "triggerId": "trigger-001",
+          "triggerType": "engagement_threshold",
+          "condition": {
+            "metric": "engagementRate",
+            "operator": "lt",
+            "threshold": 10,
+            "timeWindow": "24h",
+            "minimumSampleSize": 1000
+          },
+          "priority": "high",
+          "enabled": true,
+          "cooldownPeriod": "6h"
+        },
+        {
+          "triggerId": "trigger-002",
+          "triggerType": "sentiment_change",
+          "condition": {
+            "metric": "sentimentScore",
+            "operator": "change_by",
+            "threshold": -0.2,
+            "timeWindow": "7d"
+          },
+          "priority": "critical",
+          "enabled": true,
+          "cooldownPeriod": "24h"
+        },
+        {
+          "triggerId": "trigger-003",
+          "triggerType": "retention_drop",
+          "condition": {
+            "metric": "completionRate",
+            "operator": "lt",
+            "threshold": 50,
+            "minimumSampleSize": 5000
+          },
+          "priority": "high",
+          "enabled": true,
+          "cooldownPeriod": "12h"
+        }
+      ],
+      "actions": [
+        {
+          "actionId": "action-001",
+          "actionType": "adjust_personalization",
+          "triggeredBy": ["trigger-001", "trigger-003"],
+          "parameters": {
+            "targetSystem": "personalization_engine",
+            "adjustmentType": "format_preference",
+            "adjustmentValue": "short_form",
+            "scope": "demographic",
+            "scopeFilter": { "engagementScore": { "lt": 40 } }
+          },
+          "requiresApproval": false,
+          "enabled": true
+        },
+        {
+          "actionId": "action-002",
+          "actionType": "notify_operator",
+          "triggeredBy": ["trigger-002"],
+          "parameters": {
+            "targetSystem": "notification_service",
+            "notificationChannels": ["slack", "email"],
+            "notificationRecipients": ["ops-team@franchise.com"]
+          },
+          "requiresApproval": false,
+          "enabled": true
+        },
+        {
+          "actionId": "action-003",
+          "actionType": "flag_qc_review",
+          "triggeredBy": ["trigger-002"],
+          "parameters": {
+            "targetSystem": "qc_dashboard",
+            "adjustmentType": "cultural_sensitivity_review",
+            "scope": "regional"
+          },
+          "requiresApproval": true,
+          "approvalRoles": ["qc_lead", "operator"],
+          "enabled": true
+        }
+      ],
+      "personalizationAdjustments": {
+        "enabled": true,
+        "rules": [
+          {
+            "ruleId": "rule-001",
+            "condition": { "signalType": "format_preference", "signalThreshold": 80 },
+            "adjustment": {
+              "targetField": "recommendedFormat",
+              "adjustmentType": "boost",
+              "value": 1.5
+            }
+          },
+          {
+            "ruleId": "rule-002",
+            "condition": { "signalType": "persona_preference", "signalThreshold": 75 },
+            "adjustment": {
+              "targetField": "recommendedPersona",
+              "adjustmentType": "add_weight",
+              "value": 20
+            }
+          }
+        ],
+        "feedbackToEngine": {
+          "engineId": "engine-ke-001",
+          "updateFrequency": "hourly",
+          "learningRate": 0.15
+        }
+      },
+      "monetizationSignals": {
+        "enabled": true,
+        "churnRiskActions": [
+          { "riskLevel": "high", "action": "discount_offer", "discountPercentage": 25, "validityPeriod": "30d" },
+          { "riskLevel": "critical", "action": "personal_outreach", "validityPeriod": "7d" }
+        ],
+        "upgradePotentialActions": [
+          { "potentialLevel": "high", "suggestedTier": "premium", "incentive": "free_trial" }
+        ],
+        "pricingFeedback": {
+          "priceSensitivityScore": 65,
+          "suggestedPriceAdjustment": -10,
+          "adjustmentReason": "Regional purchasing power below threshold"
+        }
+      },
+      "qcFeedback": {
+        "enabled": true,
+        "culturalSensitivityAlerts": [],
+        "translationQualityFlags": [],
+        "personaConsistencyFlags": []
+      },
+      "executionHistory": [
+        {
+          "executionId": "exec-001",
+          "triggerId": "trigger-001",
+          "actionId": "action-001",
+          "executedAt": "2025-11-07T14:30:00Z",
+          "result": "success",
+          "details": "Personalization adjusted for low-engagement demographic",
+          "impactMetrics": {
+            "affectedViewers": 12500,
+            "measurementPeriod": "24h",
+            "engagementChange": 8.5,
+            "revenueImpact": 250
+          }
+        }
+      ],
+      "status": "active",
+      "config": {
+        "evaluationInterval": "1h",
+        "autoExecute": true,
+        "maxActionsPerHour": 10,
+        "rollbackEnabled": true,
+        "rollbackThreshold": -15
+      },
+      "createdAt": "2025-11-01T00:00:00Z",
+      "updatedAt": "2025-11-08T06:00:00Z"
+    },
+    {
+      "loopId": "loop-2025-002",
+      "franchiseId": "ethiopia-001",
+      "insightId": "insight-2025-002",
+      "loopType": "monetization",
+      "triggers": [
+        {
+          "triggerId": "trigger-churn-001",
+          "triggerType": "churn_risk",
+          "condition": {
+            "metric": "churnRiskScore",
+            "operator": "gte",
+            "threshold": 70,
+            "minimumSampleSize": 100
+          },
+          "priority": "critical",
+          "enabled": true,
+          "cooldownPeriod": "24h"
+        },
+        {
+          "triggerId": "trigger-upgrade-001",
+          "triggerType": "engagement_threshold",
+          "condition": {
+            "metric": "engagementRate",
+            "operator": "gt",
+            "threshold": 30,
+            "timeWindow": "7d",
+            "minimumSampleSize": 500
+          },
+          "priority": "medium",
+          "enabled": true,
+          "cooldownPeriod": "7d"
+        }
+      ],
+      "actions": [
+        {
+          "actionId": "action-churn-001",
+          "actionType": "trigger_retention",
+          "triggeredBy": ["trigger-churn-001"],
+          "parameters": {
+            "targetSystem": "adaptive_pricing",
+            "adjustmentType": "discount_offer",
+            "adjustmentValue": 20,
+            "scope": "individual"
+          },
+          "requiresApproval": false,
+          "enabled": true
+        },
+        {
+          "actionId": "action-upgrade-001",
+          "actionType": "modify_pricing",
+          "triggeredBy": ["trigger-upgrade-001"],
+          "parameters": {
+            "targetSystem": "adaptive_pricing",
+            "adjustmentType": "tier_upgrade_prompt",
+            "adjustmentValue": "premium",
+            "scope": "individual"
+          },
+          "requiresApproval": false,
+          "enabled": true
+        }
+      ],
+      "personalizationAdjustments": {
+        "enabled": false,
+        "rules": []
+      },
+      "monetizationSignals": {
+        "enabled": true,
+        "churnRiskActions": [
+          { "riskLevel": "medium", "action": "content_recommendation", "validityPeriod": "14d" },
+          { "riskLevel": "high", "action": "discount_offer", "discountPercentage": 15, "validityPeriod": "30d" }
+        ],
+        "upgradePotentialActions": [
+          { "potentialLevel": "medium", "suggestedTier": "basic", "incentive": "discount" },
+          { "potentialLevel": "high", "suggestedTier": "premium", "incentive": "feature_preview" }
+        ]
+      },
+      "qcFeedback": {
+        "enabled": false,
+        "culturalSensitivityAlerts": [],
+        "translationQualityFlags": [],
+        "personaConsistencyFlags": []
+      },
+      "executionHistory": [],
+      "status": "active",
+      "config": {
+        "evaluationInterval": "6h",
+        "autoExecute": true,
+        "maxActionsPerHour": 20,
+        "rollbackEnabled": false
+      },
+      "createdAt": "2025-11-01T00:00:00Z",
+      "updatedAt": "2025-11-08T06:00:00Z"
+    }
+  ],
+  "invalidFeedbackLoops": [
+    {
+      "description": "Missing required loopId",
+      "data": {
+        "franchiseId": "kenya-001",
+        "loopType": "personalization",
+        "triggers": [],
+        "actions": [],
+        "status": "active"
+      }
+    },
+    {
+      "description": "Invalid loopType",
+      "data": {
+        "loopId": "loop-invalid-001",
+        "franchiseId": "kenya-001",
+        "loopType": "invalid_type",
+        "triggers": [],
+        "actions": [],
+        "status": "active"
+      }
+    },
+    {
+      "description": "Missing required triggers",
+      "data": {
+        "loopId": "loop-invalid-002",
+        "franchiseId": "kenya-001",
+        "loopType": "personalization",
+        "actions": [],
+        "status": "active"
+      }
+    }
+  ],
+  "engagementTestCases": [
+    {
+      "description": "High engagement content should trigger positive signals",
+      "input": {
+        "totalViews": 100000,
+        "uniqueViewers": 85000,
+        "interactions": { "likes": 15000, "shares": 5000, "comments": 3000 }
+      },
+      "expectedEngagementRate": 23,
+      "expectedSignal": "high_engagement"
+    },
+    {
+      "description": "Low engagement content should trigger review",
+      "input": {
+        "totalViews": 50000,
+        "uniqueViewers": 45000,
+        "interactions": { "likes": 500, "shares": 50, "comments": 100 }
+      },
+      "expectedEngagementRate": 1.3,
+      "expectedSignal": "low_engagement"
+    },
+    {
+      "description": "Viral content with high share rate",
+      "input": {
+        "totalViews": 500000,
+        "uniqueViewers": 400000,
+        "interactions": { "likes": 80000, "shares": 50000, "comments": 25000 }
+      },
+      "expectedEngagementRate": 31,
+      "expectedSignal": "viral"
+    }
+  ],
+  "sentimentTestCases": [
+    {
+      "description": "Positive sentiment should return positive classification",
+      "input": {
+        "positiveCount": 500,
+        "neutralCount": 350,
+        "negativeCount": 150
+      },
+      "expectedSentiment": "positive",
+      "expectedScoreRange": [0.3, 0.59]
+    },
+    {
+      "description": "Negative sentiment should return negative classification",
+      "input": {
+        "positiveCount": 150,
+        "neutralCount": 350,
+        "negativeCount": 500
+      },
+      "expectedSentiment": "negative",
+      "expectedScoreRange": [-0.59, -0.3]
+    },
+    {
+      "description": "Mixed sentiment should return neutral classification",
+      "input": {
+        "positiveCount": 350,
+        "neutralCount": 400,
+        "negativeCount": 250
+      },
+      "expectedSentiment": "neutral",
+      "expectedScoreRange": [-0.2, 0.2]
+    }
+  ],
+  "retentionTestCases": [
+    {
+      "description": "Early drop-off should flag pacing issue",
+      "input": {
+        "dataPoints": [
+          { "position": 0, "retentionPercentage": 100 },
+          { "position": 10, "retentionPercentage": 60 },
+          { "position": 25, "retentionPercentage": 55 }
+        ]
+      },
+      "expectedDropOff": { "position": 10, "reason": "pacing_issue" }
+    },
+    {
+      "description": "High retention throughout should flag as good content",
+      "input": {
+        "dataPoints": [
+          { "position": 0, "retentionPercentage": 100 },
+          { "position": 50, "retentionPercentage": 92 },
+          { "position": 100, "retentionPercentage": 88 }
+        ]
+      },
+      "expectedPerformance": "excellent"
+    },
+    {
+      "description": "Gradual decline is normal pattern",
+      "input": {
+        "dataPoints": [
+          { "position": 0, "retentionPercentage": 100 },
+          { "position": 50, "retentionPercentage": 75 },
+          { "position": 100, "retentionPercentage": 60 }
+        ]
+      },
+      "expectedPerformance": "normal"
+    }
+  ],
+  "feedbackLoopTriggerTestCases": [
+    {
+      "description": "Engagement below threshold triggers action",
+      "trigger": {
+        "triggerType": "engagement_threshold",
+        "condition": { "metric": "engagementRate", "operator": "lt", "threshold": 10 }
+      },
+      "input": { "engagementRate": 5.2 },
+      "expectedTriggered": true
+    },
+    {
+      "description": "Engagement above threshold does not trigger",
+      "trigger": {
+        "triggerType": "engagement_threshold",
+        "condition": { "metric": "engagementRate", "operator": "lt", "threshold": 10 }
+      },
+      "input": { "engagementRate": 15.8 },
+      "expectedTriggered": false
+    },
+    {
+      "description": "Sentiment change triggers cultural review",
+      "trigger": {
+        "triggerType": "sentiment_change",
+        "condition": { "metric": "sentimentScore", "operator": "change_by", "threshold": -0.2 }
+      },
+      "input": { "previousSentimentScore": 0.7, "currentSentimentScore": 0.4 },
+      "expectedTriggered": true
+    },
+    {
+      "description": "Retention drop triggers content review",
+      "trigger": {
+        "triggerType": "retention_drop",
+        "condition": { "metric": "completionRate", "operator": "lt", "threshold": 50 }
+      },
+      "input": { "completionRate": 42 },
+      "expectedTriggered": true
+    },
+    {
+      "description": "Churn risk triggers retention action",
+      "trigger": {
+        "triggerType": "churn_risk",
+        "condition": { "metric": "churnRiskScore", "operator": "gte", "threshold": 70 }
+      },
+      "input": { "churnRiskScore": 78 },
+      "expectedTriggered": true
+    }
+  ],
+  "feedbackLoopActionTestCases": [
+    {
+      "description": "Personalization adjustment applies to engine",
+      "action": {
+        "actionType": "adjust_personalization",
+        "parameters": {
+          "targetSystem": "personalization_engine",
+          "adjustmentType": "format_preference",
+          "adjustmentValue": "short_form"
+        }
+      },
+      "expectedResult": { "targetSystem": "personalization_engine", "applied": true }
+    },
+    {
+      "description": "QC flag requires manual approval",
+      "action": {
+        "actionType": "flag_qc_review",
+        "requiresApproval": true,
+        "approvalRoles": ["qc_lead"]
+      },
+      "expectedResult": { "status": "pending_approval" }
+    },
+    {
+      "description": "Retention action sends discount offer",
+      "action": {
+        "actionType": "trigger_retention",
+        "parameters": {
+          "targetSystem": "adaptive_pricing",
+          "adjustmentType": "discount_offer",
+          "adjustmentValue": 20
+        }
+      },
+      "expectedResult": { "discountApplied": 20, "targetSystem": "adaptive_pricing" }
+    }
+  ],
+  "personalizationFeedbackTestCases": [
+    {
+      "description": "Strong format preference boosts recommendation weight",
+      "rule": {
+        "condition": { "signalType": "format_preference", "signalThreshold": 80 },
+        "adjustment": { "targetField": "recommendedFormat", "adjustmentType": "boost", "value": 1.5 }
+      },
+      "input": { "signalConfidence": 85, "signalType": "format_preference", "signalValue": "short_form" },
+      "expectedAdjustment": { "field": "recommendedFormat", "multiplier": 1.5 }
+    },
+    {
+      "description": "Persona preference adds weight to recommendation",
+      "rule": {
+        "condition": { "signalType": "persona_preference", "signalThreshold": 75 },
+        "adjustment": { "targetField": "recommendedPersona", "adjustmentType": "add_weight", "value": 20 }
+      },
+      "input": { "signalConfidence": 78, "signalType": "persona_preference", "signalValue": "narrator-ke-001" },
+      "expectedAdjustment": { "field": "recommendedPersona", "weightAdded": 20 }
+    }
+  ],
+  "monetizationFeedbackTestCases": [
+    {
+      "description": "High churn risk triggers discount offer",
+      "input": { "churnRiskScore": 75, "currentTier": "basic" },
+      "expectedAction": { "action": "discount_offer", "discountPercentage": 25 }
+    },
+    {
+      "description": "Critical churn risk triggers personal outreach",
+      "input": { "churnRiskScore": 90, "currentTier": "premium" },
+      "expectedAction": { "action": "personal_outreach" }
+    },
+    {
+      "description": "High upgrade potential suggests tier upgrade",
+      "input": { "engagementRate": 35, "completionRate": 90, "bingeViewerPercentage": 40 },
+      "expectedAction": { "suggestedTier": "premium", "incentive": "free_trial" }
+    }
+  ],
+  "qcFeedbackTestCases": [
+    {
+      "description": "Cultural sensitivity issue flags review",
+      "input": {
+        "region": "SA",
+        "negativeSentimentCount": 150,
+        "culturalKeywords": ["offensive", "inappropriate"]
+      },
+      "expectedAlert": { "severity": "high", "autoFlagged": true }
+    },
+    {
+      "description": "Translation quality below threshold flags review",
+      "input": {
+        "language": "am",
+        "qualityScore": 72,
+        "issues": ["grammar_errors", "context_loss"]
+      },
+      "expectedFlag": { "suggestedReview": true, "qualityScore": 72 }
+    },
+    {
+      "description": "Persona drift detected flags consistency review",
+      "input": {
+        "personaId": "narrator-ke-001",
+        "driftType": "voice_drift",
+        "confidence": 82
+      },
+      "expectedFlag": { "inconsistencyType": "voice_drift", "confidence": 82 }
+    }
+  ],
+  "auditLogTestData": [
+    {
+      "logId": "log-insight-001",
+      "timestamp": "2025-11-08T06:00:00Z",
+      "eventType": "insight_collected",
+      "category": "audience_insights",
+      "actor": { "type": "system", "id": "analytics-service" },
+      "target": { "type": "audience_insight", "id": "insight-2025-001", "franchiseId": "kenya-001" },
+      "details": { "description": "Audience insight data collected for weekly period" },
+      "result": "success"
+    },
+    {
+      "logId": "log-feedback-001",
+      "timestamp": "2025-11-08T06:30:00Z",
+      "eventType": "feedback_loop_triggered",
+      "category": "feedback_loop",
+      "actor": { "type": "automation", "id": "feedback-engine" },
+      "target": { "type": "feedback_loop", "id": "loop-2025-001", "franchiseId": "kenya-001" },
+      "details": { "description": "Feedback loop triggered by engagement threshold", "metadata": { "triggerId": "trigger-001" } },
+      "result": "success"
+    },
+    {
+      "logId": "log-personalization-001",
+      "timestamp": "2025-11-08T06:31:00Z",
+      "eventType": "personalization_adjusted",
+      "category": "feedback_loop",
+      "actor": { "type": "automation", "id": "feedback-engine" },
+      "target": { "type": "viewer", "id": "demographic-low-engagement", "franchiseId": "kenya-001" },
+      "details": { "description": "Personalization adjusted for low-engagement demographic", "previousValue": "serialized", "newValue": "short_form" },
+      "result": "success"
+    }
+  ]
+}

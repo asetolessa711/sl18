@@ -10,14 +10,15 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node tests/governance/governance.test.js && node tests/governance/globalization.test.js && node tests/governance/language_registry.test.js && node tests/governance/observability.test.js && node tests/governance/personalization.test.js && node tests/governance/governance_scaling.test.js && node tests/governance/distribution.test.js",
+    "test": "node tests/governance/governance.test.js && node tests/governance/globalization.test.js && node tests/governance/language_registry.test.js && node tests/governance/observability.test.js && node tests/governance/personalization.test.js && node tests/governance/governance_scaling.test.js && node tests/governance/distribution.test.js && node tests/governance/audience_insights.test.js",
     "test:governance": "node tests/governance/governance.test.js",
     "test:globalization": "node tests/governance/globalization.test.js",
     "test:language-registry": "node tests/governance/language_registry.test.js",
     "test:observability": "node tests/governance/observability.test.js",
     "test:personalization": "node tests/governance/personalization.test.js",
     "test:governance-scaling": "node tests/governance/governance_scaling.test.js",
-    "test:distribution": "node tests/governance/distribution.test.js"
+    "test:distribution": "node tests/governance/distribution.test.js",
+    "test:audience-insights": "node tests/governance/audience_insights.test.js"
   },
   "keywords": [],
   "author": "",

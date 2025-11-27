@@ -157,13 +157,35 @@
         "regional_compliance_check_failed",
         "geo_restriction_applied",
         "licensing_agreement_created",
-        "licensing_agreement_expired"
+        "licensing_agreement_expired",
+        "insight_collected",
+        "insight_processed",
+        "insight_ready",
+        "engagement_metrics_updated",
+        "sentiment_analysis_completed",
+        "retention_curve_generated",
+        "demographic_breakdown_updated",
+        "feedback_loop_triggered",
+        "feedback_loop_action_executed",
+        "feedback_loop_action_failed",
+        "feedback_loop_rollback",
+        "personalization_adjusted",
+        "monetization_signal_detected",
+        "qc_feedback_generated",
+        "cultural_sensitivity_alert",
+        "translation_quality_flagged",
+        "persona_consistency_flagged",
+        "churn_action_triggered",
+        "upgrade_potential_detected",
+        "binge_pattern_detected",
+        "retention_drop_detected",
+        "regional_performance_alert"
       ],
       "description": "Type of governance event"
     },
     "category": {
       "type": "string",
-      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace", "distribution", "syndication", "partner"],
+      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace", "distribution", "syndication", "partner", "audience_insights", "feedback_loop"],
       "description": "Category of the audit event"
     },
     "actor": {
@@ -191,7 +213,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion", "distribution_channel", "syndication_feed", "partner_integration"],
+          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion", "distribution_channel", "syndication_feed", "partner_integration", "audience_insight", "feedback_loop", "engagement_metric", "sentiment_analysis", "retention_curve"],
           "description": "Type of target entity"
         },
         "id": {

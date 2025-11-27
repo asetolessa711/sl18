@@ -1,0 +1,494 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AudienceInsights",
+  "description": "Schema for audience insights in SL18 - engagement metrics, sentiment analysis, retention curves, and demographic breakdowns",
+  "type": "object",
+  "properties": {
+    "insightId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique audience insight identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "channelId": {
+      "type": "string",
+      "description": "Distribution channel identifier (from Phase 19)"
+    },
+    "contentId": {
+      "type": "string",
+      "description": "Content identifier being tracked"
+    },
+    "periodStart": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Start of the insight collection period"
+    },
+    "periodEnd": {
+      "type": "string",
+      "format": "date-time",
+      "description": "End of the insight collection period"
+    },
+    "engagementMetrics": {
+      "type": "object",
+      "properties": {
+        "totalViews": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of views"
+        },
+        "uniqueViewers": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of unique viewers"
+        },
+        "avgWatchTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average watch time in seconds"
+        },
+        "totalWatchTime": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total watch time in seconds across all viewers"
+        },
+        "completionRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of viewers who completed the content"
+        },
+        "interactions": {
+          "type": "object",
+          "properties": {
+            "likes": { "type": "integer", "minimum": 0 },
+            "dislikes": { "type": "integer", "minimum": 0 },
+            "shares": { "type": "integer", "minimum": 0 },
+            "comments": { "type": "integer", "minimum": 0 },
+            "saves": { "type": "integer", "minimum": 0 },
+            "subscribeActions": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "engagementRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Overall engagement rate calculated from interactions/views"
+        },
+        "bingePatterns": {
+          "type": "object",
+          "properties": {
+            "avgEpisodesPerSession": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Average episodes watched per session"
+            },
+            "bingeViewerCount": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of viewers watching 3+ episodes"
+            },
+            "bingePercentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["totalViews", "uniqueViewers", "avgWatchTime"],
+      "additionalProperties": false
+    },
+    "sentimentAnalysis": {
+      "type": "object",
+      "properties": {
+        "overallSentiment": {
+          "type": "string",
+          "enum": ["very_positive", "positive", "neutral", "negative", "very_negative"],
+          "description": "Overall sentiment classification"
+        },
+        "sentimentScore": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1,
+          "description": "Sentiment score from -1 (negative) to 1 (positive)"
+        },
+        "sentimentBreakdown": {
+          "type": "object",
+          "properties": {
+            "positiveCount": { "type": "integer", "minimum": 0 },
+            "neutralCount": { "type": "integer", "minimum": 0 },
+            "negativeCount": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "topPositiveThemes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "theme": { "type": "string" },
+              "count": { "type": "integer" },
+              "examples": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["theme", "count"],
+            "additionalProperties": false
+          }
+        },
+        "topNegativeThemes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "theme": { "type": "string" },
+              "count": { "type": "integer" },
+              "examples": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["theme", "count"],
+            "additionalProperties": false
+          }
+        },
+        "culturalReactions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "sentiment": {
+                "type": "string",
+                "enum": ["very_positive", "positive", "neutral", "negative", "very_negative"]
+              },
+              "culturalIssues": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["region", "sentiment"],
+            "additionalProperties": false
+          }
+        },
+        "analyzedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["overallSentiment", "sentimentScore"],
+      "additionalProperties": false
+    },
+    "retentionCurves": {
+      "type": "object",
+      "properties": {
+        "curveType": {
+          "type": "string",
+          "enum": ["second_by_second", "minute_by_minute", "quartile", "decile"],
+          "description": "Granularity of retention curve data"
+        },
+        "dataPoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Position in content as percentage"
+              },
+              "retentionPercentage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "absoluteViewers": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": ["position", "retentionPercentage"],
+            "additionalProperties": false
+          }
+        },
+        "dropOffPoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "dropPercentage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "reason": {
+                "type": "string",
+                "enum": ["natural_end", "content_quality", "pacing_issue", "ad_break", "technical_issue", "external_distraction", "unknown"]
+              },
+              "suggestedAction": {
+                "type": "string"
+              }
+            },
+            "required": ["position", "dropPercentage"],
+            "additionalProperties": false
+          }
+        },
+        "peakMoments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "engagementSpike": {
+                "type": "number",
+                "description": "Relative spike in engagement at this point"
+              },
+              "peakType": {
+                "type": "string",
+                "enum": ["rewatch", "share_moment", "comment_trigger", "emotional_peak"]
+              }
+            },
+            "required": ["position", "engagementSpike"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["curveType", "dataPoints"],
+      "additionalProperties": false
+    },
+    "demographicBreakdown": {
+      "type": "object",
+      "properties": {
+        "byRegion": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "country": { "type": "string" },
+              "viewerCount": { "type": "integer", "minimum": 0 },
+              "viewerPercentage": { "type": "number", "minimum": 0, "maximum": 100 },
+              "avgWatchTime": { "type": "number", "minimum": 0 },
+              "engagementRate": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["region", "viewerCount"],
+            "additionalProperties": false
+          }
+        },
+        "byAgeGroup": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ageGroup": {
+                "type": "string",
+                "enum": ["13-17", "18-24", "25-34", "35-44", "45-54", "55-64", "65+"]
+              },
+              "viewerCount": { "type": "integer", "minimum": 0 },
+              "viewerPercentage": { "type": "number", "minimum": 0, "maximum": 100 },
+              "engagementRate": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["ageGroup", "viewerCount"],
+            "additionalProperties": false
+          }
+        },
+        "byLanguage": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "language": { "type": "string" },
+              "viewerCount": { "type": "integer", "minimum": 0 },
+              "viewerPercentage": { "type": "number", "minimum": 0, "maximum": 100 },
+              "subtitleUsage": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["language", "viewerCount"],
+            "additionalProperties": false
+          }
+        },
+        "byDevice": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "deviceType": {
+                "type": "string",
+                "enum": ["mobile", "tablet", "desktop", "tv", "console", "other"]
+              },
+              "viewerCount": { "type": "integer", "minimum": 0 },
+              "viewerPercentage": { "type": "number", "minimum": 0, "maximum": 100 },
+              "avgWatchTime": { "type": "number", "minimum": 0 }
+            },
+            "required": ["deviceType", "viewerCount"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "comparativeAnalysis": {
+      "type": "object",
+      "properties": {
+        "vsAverageContent": {
+          "type": "object",
+          "properties": {
+            "viewsComparison": { "type": "number", "description": "Percentage difference vs average" },
+            "engagementComparison": { "type": "number" },
+            "retentionComparison": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "vsPreviousContent": {
+          "type": "object",
+          "properties": {
+            "previousContentId": { "type": "string" },
+            "viewsChange": { "type": "number" },
+            "engagementChange": { "type": "number" },
+            "retentionChange": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "vsGenreBenchmark": {
+          "type": "object",
+          "properties": {
+            "genre": { "type": "string" },
+            "benchmarkPercentile": { "type": "number", "minimum": 0, "maximum": 100 },
+            "performanceRating": {
+              "type": "string",
+              "enum": ["exceptional", "above_average", "average", "below_average", "poor"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "feedbackSignals": {
+      "type": "object",
+      "properties": {
+        "personalizationSignals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "signalType": {
+                "type": "string",
+                "enum": ["persona_preference", "format_preference", "duration_preference", "tone_preference", "genre_preference"]
+              },
+              "signalValue": { "type": "string" },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 100 },
+              "sampleSize": { "type": "integer", "minimum": 0 }
+            },
+            "required": ["signalType", "signalValue", "confidence"],
+            "additionalProperties": false
+          }
+        },
+        "monetizationSignals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "signalType": {
+                "type": "string",
+                "enum": ["churn_risk", "upgrade_potential", "price_sensitivity", "ad_tolerance"]
+              },
+              "signalValue": { "type": "string" },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["signalType", "signalValue", "confidence"],
+            "additionalProperties": false
+          }
+        },
+        "qcSignals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "signalType": {
+                "type": "string",
+                "enum": ["cultural_sensitivity_issue", "translation_quality_issue", "persona_consistency_issue", "technical_quality_issue"]
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"]
+              },
+              "affectedRegions": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "description": { "type": "string" }
+            },
+            "required": ["signalType", "severity"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["collecting", "processing", "ready", "stale", "error"],
+      "description": "Current status of the insight data"
+    },
+    "dataQuality": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of expected data points collected"
+        },
+        "reliability": {
+          "type": "string",
+          "enum": ["high", "medium", "low"],
+          "description": "Reliability rating of the data"
+        },
+        "sampleSize": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "insightId",
+    "franchiseId",
+    "contentId",
+    "periodStart",
+    "periodEnd",
+    "engagementMetrics",
+    "status"
+  ],
+  "additionalProperties": false
+}
