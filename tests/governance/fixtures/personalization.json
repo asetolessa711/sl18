@@ -1,0 +1,711 @@
+{
+  "validPersonalizationEngines": [
+    {
+      "engineId": "pe-kenya-001-v001",
+      "franchiseId": "kenya-001",
+      "viewerProfile": {
+        "viewerId": "viewer-ke-12345",
+        "demographics": {
+          "region": "KE",
+          "ageGroup": "25-34",
+          "timezone": "Africa/Nairobi"
+        },
+        "languagePreferences": {
+          "primary": "sw",
+          "secondary": ["en"],
+          "subtitlePreference": "primary",
+          "captionPreference": "auto"
+        },
+        "genreAffinity": [
+          { "genre": "drama", "affinityScore": 85, "watchCount": 42 },
+          { "genre": "comedy", "affinityScore": 72, "watchCount": 28 },
+          { "genre": "music", "affinityScore": 65, "watchCount": 15 }
+        ],
+        "engagementHistory": {
+          "totalWatchTime": 1250,
+          "avgSessionDuration": 22.5,
+          "lastActiveAt": "2025-01-15T14:30:00Z",
+          "engagementScore": 78,
+          "interactionPatterns": {
+            "likesGiven": 156,
+            "commentsPosted": 23,
+            "sharesCompleted": 12,
+            "episodesCompleted": 45
+          }
+        },
+        "personaPreferences": [
+          { "personaId": "persona-amina", "preferenceScore": 92, "interactionCount": 38 },
+          { "personaId": "persona-jabari", "preferenceScore": 78, "interactionCount": 22 }
+        ]
+      },
+      "recommendations": {
+        "recommendedPersona": {
+          "personaId": "persona-amina",
+          "confidenceScore": 94,
+          "reasoning": "High affinity for drama genre and previous positive interactions"
+        },
+        "recommendedFormat": {
+          "format": "serialized",
+          "duration": "medium",
+          "confidenceScore": 88
+        },
+        "recommendedContentStyle": {
+          "tone": "dramatic",
+          "pacing": "moderate",
+          "visualStyle": "cinematic",
+          "confidenceScore": 82
+        },
+        "generatedAt": "2025-01-15T14:35:00Z",
+        "expiresAt": "2025-01-16T14:35:00Z"
+      },
+      "adaptiveRendering": {
+        "enabled": true,
+        "subtitleConfig": {
+          "language": "sw",
+          "fontSize": "medium",
+          "position": "bottom",
+          "style": "standard"
+        },
+        "captionConfig": {
+          "enabled": true,
+          "language": "sw",
+          "includeAudioDescriptions": false
+        },
+        "personaVoiceSelection": {
+          "personaId": "persona-amina",
+          "voiceVariant": "amina-sw-ke",
+          "language": "sw",
+          "adjustedForRegion": true
+        },
+        "teaserGeneration": {
+          "enabled": true,
+          "style": "cliffhanger",
+          "duration": 15,
+          "basedOnEngagement": true
+        }
+      },
+      "qcEnforcement": {
+        "enabled": true,
+        "brandContinuityCheck": true,
+        "personaContinuityCheck": true,
+        "culturalSensitivityCheck": true,
+        "contentGuidelinesCheck": true,
+        "lastQcResult": {
+          "passed": true,
+          "checkedAt": "2025-01-15T14:34:00Z",
+          "violations": []
+        }
+      },
+      "status": "active",
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": "2025-01-15T14:35:00Z"
+    },
+    {
+      "engineId": "pe-ethiopia-002-v001",
+      "franchiseId": "ethiopia-001",
+      "viewerProfile": {
+        "viewerId": "viewer-et-67890",
+        "demographics": {
+          "region": "ET",
+          "ageGroup": "18-24",
+          "timezone": "Africa/Addis_Ababa"
+        },
+        "languagePreferences": {
+          "primary": "am",
+          "secondary": ["om", "en"],
+          "subtitlePreference": "auto",
+          "captionPreference": "always"
+        },
+        "genreAffinity": [
+          { "genre": "music", "affinityScore": 95, "watchCount": 78 },
+          { "genre": "comedy", "affinityScore": 80, "watchCount": 45 }
+        ],
+        "engagementHistory": {
+          "totalWatchTime": 890,
+          "avgSessionDuration": 18.2,
+          "lastActiveAt": "2025-01-14T20:15:00Z",
+          "engagementScore": 85,
+          "interactionPatterns": {
+            "likesGiven": 234,
+            "commentsPosted": 67,
+            "sharesCompleted": 45,
+            "episodesCompleted": 32
+          }
+        },
+        "personaPreferences": [
+          { "personaId": "persona-selam", "preferenceScore": 88, "interactionCount": 56 }
+        ]
+      },
+      "recommendations": {
+        "recommendedPersona": {
+          "personaId": "persona-selam",
+          "confidenceScore": 91,
+          "reasoning": "Strong music genre affinity matches persona style"
+        },
+        "recommendedFormat": {
+          "format": "short_form",
+          "duration": "short",
+          "confidenceScore": 92
+        },
+        "recommendedContentStyle": {
+          "tone": "humorous",
+          "pacing": "fast",
+          "visualStyle": "vibrant",
+          "confidenceScore": 87
+        },
+        "generatedAt": "2025-01-14T20:20:00Z",
+        "expiresAt": "2025-01-15T20:20:00Z"
+      },
+      "adaptiveRendering": {
+        "enabled": true,
+        "subtitleConfig": {
+          "language": "am",
+          "fontSize": "large",
+          "position": "bottom",
+          "style": "highlighted"
+        },
+        "captionConfig": {
+          "enabled": true,
+          "language": "am",
+          "includeAudioDescriptions": true
+        },
+        "personaVoiceSelection": {
+          "personaId": "persona-selam",
+          "voiceVariant": "selam-am-et",
+          "language": "am",
+          "adjustedForRegion": true
+        },
+        "teaserGeneration": {
+          "enabled": true,
+          "style": "highlight",
+          "duration": 10,
+          "basedOnEngagement": true
+        }
+      },
+      "qcEnforcement": {
+        "enabled": true,
+        "brandContinuityCheck": true,
+        "personaContinuityCheck": true,
+        "culturalSensitivityCheck": true,
+        "contentGuidelinesCheck": true,
+        "lastQcResult": {
+          "passed": true,
+          "checkedAt": "2025-01-14T20:19:00Z",
+          "violations": []
+        }
+      },
+      "status": "active",
+      "createdAt": "2024-12-15T00:00:00Z",
+      "updatedAt": "2025-01-14T20:20:00Z"
+    }
+  ],
+  "invalidPersonalizationEngines": [
+    {
+      "description": "Missing required viewerProfile",
+      "expectedError": "viewerProfile is required",
+      "data": {
+        "engineId": "pe-invalid-001",
+        "franchiseId": "test-001",
+        "recommendations": {
+          "recommendedPersona": { "personaId": "test", "confidenceScore": 50 },
+          "recommendedFormat": { "format": "short_form", "confidenceScore": 50 },
+          "generatedAt": "2025-01-01T00:00:00Z"
+        },
+        "status": "active"
+      }
+    },
+    {
+      "description": "Invalid format type",
+      "expectedError": "format must be one of enum values",
+      "data": {
+        "engineId": "pe-invalid-002",
+        "franchiseId": "test-001",
+        "viewerProfile": { "viewerId": "test-viewer" },
+        "recommendations": {
+          "recommendedPersona": { "personaId": "test", "confidenceScore": 50 },
+          "recommendedFormat": { "format": "invalid_format", "confidenceScore": 50 },
+          "generatedAt": "2025-01-01T00:00:00Z"
+        },
+        "status": "active"
+      }
+    },
+    {
+      "description": "Missing recommendations",
+      "expectedError": "recommendations is required",
+      "data": {
+        "engineId": "pe-invalid-003",
+        "franchiseId": "test-001",
+        "viewerProfile": { "viewerId": "test-viewer" },
+        "status": "active"
+      }
+    }
+  ],
+  "personalizationTestCases": [
+    {
+      "description": "High drama affinity viewer should get drama persona",
+      "viewerProfile": {
+        "genreAffinity": [
+          { "genre": "drama", "affinityScore": 90 },
+          { "genre": "comedy", "affinityScore": 30 }
+        ]
+      },
+      "availablePersonas": [
+        { "personaId": "drama-lead", "primaryGenre": "drama" },
+        { "personaId": "comedy-host", "primaryGenre": "comedy" }
+      ],
+      "expectedPersonaId": "drama-lead"
+    },
+    {
+      "description": "Music lover should get music-focused format",
+      "viewerProfile": {
+        "genreAffinity": [
+          { "genre": "music", "affinityScore": 95 },
+          { "genre": "drama", "affinityScore": 40 }
+        ]
+      },
+      "expectedFormat": "short_form",
+      "expectedDuration": "short"
+    },
+    {
+      "description": "High engagement viewer should get serialized content",
+      "viewerProfile": {
+        "engagementHistory": {
+          "avgSessionDuration": 45,
+          "engagementScore": 92,
+          "episodesCompleted": 100
+        }
+      },
+      "expectedFormat": "serialized",
+      "expectedDuration": "long"
+    },
+    {
+      "description": "Casual viewer should get short-form content",
+      "viewerProfile": {
+        "engagementHistory": {
+          "avgSessionDuration": 5,
+          "engagementScore": 35,
+          "episodesCompleted": 8
+        }
+      },
+      "expectedFormat": "short_form",
+      "expectedDuration": "micro"
+    }
+  ],
+  "qcPersonalizationTestCases": [
+    {
+      "description": "Personalization passes when brand consistency maintained",
+      "personalization": {
+        "recommendedPersona": { "personaId": "brand-approved-persona" },
+        "recommendedContentStyle": { "tone": "casual" }
+      },
+      "brandGuidelines": {
+        "approvedPersonas": ["brand-approved-persona", "other-approved"],
+        "allowedTones": ["casual", "formal", "inspirational"]
+      },
+      "expectedPassed": true
+    },
+    {
+      "description": "Personalization fails when persona not brand-approved",
+      "personalization": {
+        "recommendedPersona": { "personaId": "unapproved-persona" },
+        "recommendedContentStyle": { "tone": "casual" }
+      },
+      "brandGuidelines": {
+        "approvedPersonas": ["brand-approved-persona", "other-approved"],
+        "allowedTones": ["casual", "formal"]
+      },
+      "expectedPassed": false,
+      "expectedViolation": "persona_not_approved"
+    },
+    {
+      "description": "Personalization fails when tone violates guidelines",
+      "personalization": {
+        "recommendedPersona": { "personaId": "brand-approved-persona" },
+        "recommendedContentStyle": { "tone": "humorous" }
+      },
+      "brandGuidelines": {
+        "approvedPersonas": ["brand-approved-persona"],
+        "allowedTones": ["formal", "educational"]
+      },
+      "expectedPassed": false,
+      "expectedViolation": "tone_not_allowed"
+    },
+    {
+      "description": "Cultural sensitivity check passes for appropriate content",
+      "personalization": {
+        "region": "KE",
+        "contentStyle": { "tone": "inspirational" }
+      },
+      "culturalRules": {
+        "KE": { "forbiddenTones": ["controversial", "offensive"] }
+      },
+      "expectedPassed": true
+    },
+    {
+      "description": "Cultural sensitivity check fails for inappropriate content",
+      "personalization": {
+        "region": "SA",
+        "contentStyle": { "tone": "controversial" }
+      },
+      "culturalRules": {
+        "SA": { "forbiddenTones": ["controversial", "offensive"] }
+      },
+      "expectedPassed": false,
+      "expectedViolation": "cultural_sensitivity_violation"
+    }
+  ],
+  "validAdaptivePricingConfigs": [
+    {
+      "pricingId": "pricing-kenya-premium-001",
+      "franchiseId": "kenya-001",
+      "region": "KE",
+      "currency": "KES",
+      "viewerTier": {
+        "tierId": "tier-premium-ke",
+        "tierName": "premium",
+        "tierFeatures": ["ad_free", "offline_access", "exclusive_content", "early_access"],
+        "adsEnabled": false,
+        "offlineAccess": true,
+        "qualityLimit": "full_hd"
+      },
+      "priceModel": {
+        "type": "subscription",
+        "basePrice": 500,
+        "billingCycle": "monthly",
+        "trialPeriod": {
+          "enabled": true,
+          "durationDays": 7,
+          "trialTier": "premium"
+        },
+        "discounts": [
+          {
+            "discountId": "disc-annual-20",
+            "type": "percentage",
+            "value": 20,
+            "conditions": { "minSubscriptionMonths": 12 },
+            "validFrom": "2025-01-01T00:00:00Z",
+            "validUntil": "2025-12-31T23:59:59Z"
+          },
+          {
+            "discountId": "disc-referral-10",
+            "type": "percentage",
+            "value": 10,
+            "conditions": { "referralCode": "FRIEND10" },
+            "validFrom": "2025-01-01T00:00:00Z"
+          }
+        ]
+      },
+      "revenueOptimization": {
+        "enabled": true,
+        "engagementFactors": {
+          "watchTimeWeight": 0.4,
+          "interactionWeight": 0.3,
+          "completionRateWeight": 0.3
+        },
+        "churnPrediction": {
+          "enabled": true,
+          "riskScore": 15,
+          "riskLevel": "low",
+          "retentionActions": [
+            { "actionType": "content_recommendation", "priority": 1, "description": "Recommend new drama series" }
+          ],
+          "lastAssessedAt": "2025-01-15T00:00:00Z"
+        },
+        "regionalEconomics": {
+          "purchasingPowerIndex": 0.72,
+          "localizedPricing": true,
+          "priceAdjustmentFactor": 0.85,
+          "lastUpdatedAt": "2025-01-01T00:00:00Z"
+        },
+        "dynamicAdjustments": []
+      },
+      "revenueLedgerIntegration": {
+        "ledgerId": "ledger-kenya-001",
+        "realTimeUpdates": true,
+        "transactionTracking": {
+          "enabled": true,
+          "lastTransactionId": "txn-ke-20250115-001",
+          "totalRevenue": 125000,
+          "currency": "KES"
+        }
+      },
+      "status": "active",
+      "effectiveFrom": "2025-01-01T00:00:00Z",
+      "createdAt": "2024-12-15T00:00:00Z",
+      "updatedAt": "2025-01-15T00:00:00Z"
+    },
+    {
+      "pricingId": "pricing-ethiopia-freemium-001",
+      "franchiseId": "ethiopia-001",
+      "region": "ET",
+      "currency": "ETB",
+      "viewerTier": {
+        "tierId": "tier-free-et",
+        "tierName": "free",
+        "tierFeatures": ["basic_content", "limited_episodes"],
+        "adsEnabled": true,
+        "offlineAccess": false,
+        "qualityLimit": "sd"
+      },
+      "priceModel": {
+        "type": "freemium",
+        "basePrice": 0,
+        "billingCycle": "monthly",
+        "trialPeriod": {
+          "enabled": false
+        },
+        "discounts": []
+      },
+      "revenueOptimization": {
+        "enabled": true,
+        "engagementFactors": {
+          "watchTimeWeight": 0.5,
+          "interactionWeight": 0.3,
+          "completionRateWeight": 0.2
+        },
+        "churnPrediction": {
+          "enabled": true,
+          "riskScore": 45,
+          "riskLevel": "medium",
+          "retentionActions": [
+            { "actionType": "tier_upgrade_prompt", "priority": 1, "description": "Prompt upgrade to basic tier" },
+            { "actionType": "discount_offer", "priority": 2, "description": "Offer 50% off first month" }
+          ],
+          "lastAssessedAt": "2025-01-14T00:00:00Z"
+        },
+        "regionalEconomics": {
+          "purchasingPowerIndex": 0.45,
+          "localizedPricing": true,
+          "priceAdjustmentFactor": 0.55,
+          "lastUpdatedAt": "2025-01-01T00:00:00Z"
+        },
+        "dynamicAdjustments": [
+          {
+            "adjustmentId": "adj-et-seasonal-001",
+            "trigger": "seasonal",
+            "adjustmentType": "feature_unlock",
+            "value": 1,
+            "appliedAt": "2025-01-07T00:00:00Z",
+            "expiresAt": "2025-01-21T00:00:00Z",
+            "reasoning": "New Year promotional feature unlock"
+          }
+        ]
+      },
+      "revenueLedgerIntegration": {
+        "ledgerId": "ledger-ethiopia-001",
+        "realTimeUpdates": true,
+        "transactionTracking": {
+          "enabled": true,
+          "totalRevenue": 0,
+          "currency": "ETB"
+        }
+      },
+      "status": "active",
+      "effectiveFrom": "2025-01-01T00:00:00Z",
+      "createdAt": "2024-12-01T00:00:00Z",
+      "updatedAt": "2025-01-14T00:00:00Z"
+    },
+    {
+      "pricingId": "pricing-global-enterprise-001",
+      "franchiseId": "global-001",
+      "region": "US",
+      "currency": "USD",
+      "viewerTier": {
+        "tierId": "tier-enterprise-us",
+        "tierName": "enterprise",
+        "tierFeatures": ["all_content", "api_access", "custom_branding", "priority_support", "analytics_dashboard"],
+        "adsEnabled": false,
+        "offlineAccess": true,
+        "qualityLimit": "4k"
+      },
+      "priceModel": {
+        "type": "subscription",
+        "basePrice": 99.99,
+        "billingCycle": "monthly",
+        "trialPeriod": {
+          "enabled": true,
+          "durationDays": 14,
+          "trialTier": "enterprise"
+        },
+        "discounts": [
+          {
+            "discountId": "disc-annual-25",
+            "type": "percentage",
+            "value": 25,
+            "conditions": { "minSubscriptionMonths": 12 }
+          }
+        ]
+      },
+      "revenueOptimization": {
+        "enabled": true,
+        "engagementFactors": {
+          "watchTimeWeight": 0.35,
+          "interactionWeight": 0.35,
+          "completionRateWeight": 0.30
+        },
+        "churnPrediction": {
+          "enabled": true,
+          "riskScore": 8,
+          "riskLevel": "low",
+          "retentionActions": [],
+          "lastAssessedAt": "2025-01-15T00:00:00Z"
+        },
+        "regionalEconomics": {
+          "purchasingPowerIndex": 1.0,
+          "localizedPricing": false,
+          "priceAdjustmentFactor": 1.0,
+          "lastUpdatedAt": "2025-01-01T00:00:00Z"
+        },
+        "dynamicAdjustments": []
+      },
+      "revenueLedgerIntegration": {
+        "ledgerId": "ledger-global-001",
+        "realTimeUpdates": true,
+        "transactionTracking": {
+          "enabled": true,
+          "lastTransactionId": "txn-us-20250115-042",
+          "totalRevenue": 45678.50,
+          "currency": "USD"
+        }
+      },
+      "status": "active",
+      "effectiveFrom": "2025-01-01T00:00:00Z",
+      "createdAt": "2024-11-01T00:00:00Z",
+      "updatedAt": "2025-01-15T00:00:00Z"
+    }
+  ],
+  "invalidAdaptivePricingConfigs": [
+    {
+      "description": "Missing required priceModel",
+      "expectedError": "priceModel is required",
+      "data": {
+        "pricingId": "pricing-invalid-001",
+        "franchiseId": "test-001",
+        "region": "US",
+        "currency": "USD",
+        "viewerTier": { "tierId": "test", "tierName": "basic" },
+        "status": "active"
+      }
+    },
+    {
+      "description": "Invalid tier name",
+      "expectedError": "tierName must be one of enum values",
+      "data": {
+        "pricingId": "pricing-invalid-002",
+        "franchiseId": "test-001",
+        "region": "US",
+        "currency": "USD",
+        "viewerTier": { "tierId": "test", "tierName": "invalid_tier" },
+        "priceModel": { "type": "subscription", "basePrice": 10 },
+        "status": "active"
+      }
+    },
+    {
+      "description": "Invalid price model type",
+      "expectedError": "type must be one of enum values",
+      "data": {
+        "pricingId": "pricing-invalid-003",
+        "franchiseId": "test-001",
+        "region": "US",
+        "currency": "USD",
+        "viewerTier": { "tierId": "test", "tierName": "basic" },
+        "priceModel": { "type": "invalid_type", "basePrice": 10 },
+        "status": "active"
+      }
+    }
+  ],
+  "pricingAdjustmentTestCases": [
+    {
+      "description": "Churn risk triggers discount offer",
+      "input": {
+        "churnRiskScore": 75,
+        "currentTier": "premium",
+        "region": "KE"
+      },
+      "expectedAdjustment": {
+        "trigger": "churn_risk",
+        "adjustmentType": "price_decrease",
+        "suggestedValue": 20
+      }
+    },
+    {
+      "description": "High engagement triggers tier upgrade prompt",
+      "input": {
+        "engagementScore": 95,
+        "currentTier": "basic",
+        "watchTimeHours": 100
+      },
+      "expectedAdjustment": {
+        "trigger": "engagement_drop",
+        "adjustmentType": "tier_promotion"
+      }
+    },
+    {
+      "description": "Regional economics adjusts base price (factor = purchasingPowerIndex + 0.1 offset, clamped 0.1-1.0)",
+      "input": {
+        "basePrice": 10,
+        "region": "ET",
+        "purchasingPowerIndex": 0.45
+      },
+      "expectedAdjustedPrice": 5.5,
+      "expectedFactor": 0.55,
+      "calculationNote": "0.45 + 0.1 = 0.55, within bounds; adjustedPrice = 10 * 0.55 = 5.50"
+    },
+    {
+      "description": "Seasonal promotion applies bundle offer",
+      "input": {
+        "currentDate": "2025-01-07T00:00:00Z",
+        "promotionPeriod": {
+          "start": "2025-01-01T00:00:00Z",
+          "end": "2025-01-14T00:00:00Z"
+        }
+      },
+      "expectedAdjustment": {
+        "trigger": "seasonal",
+        "adjustmentType": "bundle_offer"
+      }
+    }
+  ],
+  "revenueLedgerIntegrationTestCases": [
+    {
+      "description": "Subscription payment updates ledger",
+      "input": {
+        "pricingId": "pricing-kenya-premium-001",
+        "transactionType": "subscription_payment",
+        "amount": 500,
+        "currency": "KES"
+      },
+      "expectedLedgerUpdate": {
+        "entryType": "revenue",
+        "source": "subscription",
+        "amount": 500
+      }
+    },
+    {
+      "description": "Tier upgrade records revenue delta",
+      "input": {
+        "previousTier": "basic",
+        "newTier": "premium",
+        "previousPrice": 200,
+        "newPrice": 500
+      },
+      "expectedLedgerUpdate": {
+        "entryType": "revenue",
+        "source": "tier_upgrade",
+        "delta": 300
+      }
+    },
+    {
+      "description": "Subscription cancellation records churn",
+      "input": {
+        "pricingId": "pricing-kenya-premium-001",
+        "transactionType": "cancellation",
+        "remainingValue": 250
+      },
+      "expectedLedgerUpdate": {
+        "entryType": "churn",
+        "lostRevenue": 250
+      }
+    }
+  ]
+}

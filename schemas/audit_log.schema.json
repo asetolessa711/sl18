@@ -76,13 +76,29 @@
         "hybrid_pipeline_started",
         "hybrid_pipeline_completed",
         "cross_format_qc_passed",
-        "cross_format_qc_failed"
+        "cross_format_qc_failed",
+        "personalization_served",
+        "personalization_updated",
+        "recommendation_generated",
+        "adaptive_rendering_applied",
+        "qc_personalization_passed",
+        "qc_personalization_failed",
+        "pricing_adjusted",
+        "tier_upgraded",
+        "tier_downgraded",
+        "subscription_created",
+        "subscription_renewed",
+        "subscription_cancelled",
+        "churn_risk_detected",
+        "retention_action_triggered",
+        "dynamic_discount_applied",
+        "revenue_optimization_applied"
       ],
       "description": "Type of governance event"
     },
     "category": {
       "type": "string",
-      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid"],
+      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization"],
       "description": "Category of the audit event"
     },
     "actor": {
@@ -110,7 +126,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert"],
+          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing"],
           "description": "Type of target entity"
         },
         "id": {
