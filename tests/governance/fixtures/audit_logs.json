@@ -1,0 +1,206 @@
+{
+  "validAuditLogs": [
+    {
+      "logId": "audit-20251127-001",
+      "timestamp": "2025-11-27T10:00:00Z",
+      "eventType": "registration_submitted",
+      "category": "registration",
+      "actor": {
+        "type": "user",
+        "id": "partner@sl18.ng",
+        "name": "Nigeria Partner"
+      },
+      "target": {
+        "type": "franchise",
+        "id": "nigeria-001",
+        "franchiseId": "nigeria-001"
+      },
+      "details": {
+        "description": "New franchise registration submitted for Nigeria",
+        "metadata": {
+          "country": "Nigeria",
+          "registrationModel": "fee"
+        }
+      },
+      "result": "success",
+      "correlationId": "reg-nigeria-2025"
+    },
+    {
+      "logId": "audit-20251127-002",
+      "timestamp": "2025-11-27T14:00:00Z",
+      "eventType": "registration_approved",
+      "category": "registration",
+      "actor": {
+        "type": "user",
+        "id": "ops@sl18.africa",
+        "name": "Central Ops"
+      },
+      "target": {
+        "type": "franchise",
+        "id": "nigeria-001",
+        "franchiseId": "nigeria-001"
+      },
+      "details": {
+        "description": "Franchise registration approved after verification",
+        "previousValue": "pending",
+        "newValue": "approved",
+        "reason": "All requirements met"
+      },
+      "result": "success",
+      "correlationId": "reg-nigeria-2025"
+    },
+    {
+      "logId": "audit-20251127-003",
+      "timestamp": "2025-11-27T15:00:00Z",
+      "eventType": "agreement_signed",
+      "category": "agreement",
+      "actor": {
+        "type": "user",
+        "id": "partner@sl18.ng",
+        "name": "Nigeria Partner"
+      },
+      "target": {
+        "type": "agreement",
+        "id": "agr-nigeria-2025-001",
+        "franchiseId": "nigeria-001"
+      },
+      "details": {
+        "description": "Franchise agreement signed by partner",
+        "metadata": {
+          "version": "1.0",
+          "signatureHash": "sha256:xyz789"
+        }
+      },
+      "result": "success",
+      "correlationId": "agr-nigeria-2025"
+    },
+    {
+      "logId": "audit-20251127-004",
+      "timestamp": "2025-11-27T16:00:00Z",
+      "eventType": "qc_approved",
+      "category": "qc",
+      "actor": {
+        "type": "user",
+        "id": "ops@sl18.africa",
+        "name": "Central Ops"
+      },
+      "target": {
+        "type": "episode",
+        "id": "ep-core-2025-11-27",
+        "franchiseId": "core"
+      },
+      "details": {
+        "description": "Episode passed QC review",
+        "previousValue": "qc_submitted",
+        "newValue": "qc_approved",
+        "metadata": {
+          "qcChecklist": {
+            "personaAlignment": true,
+            "audioQuality": true,
+            "visualStandards": true,
+            "captionAccuracy": true
+          }
+        }
+      },
+      "result": "success"
+    },
+    {
+      "logId": "audit-20251127-005",
+      "timestamp": "2025-11-27T17:00:00Z",
+      "eventType": "payout_completed",
+      "category": "revenue",
+      "actor": {
+        "type": "system",
+        "id": "payout-processor",
+        "name": "Automated Payout System"
+      },
+      "target": {
+        "type": "ledger",
+        "id": "led-core-2025-01",
+        "franchiseId": "core"
+      },
+      "details": {
+        "description": "Monthly payout processed successfully",
+        "metadata": {
+          "amount": 437.50,
+          "currency": "USD",
+          "transactionId": "txn-2025-02-001",
+          "paymentMethod": "bank_transfer"
+        }
+      },
+      "result": "success"
+    },
+    {
+      "logId": "audit-20251127-006",
+      "timestamp": "2025-11-27T18:00:00Z",
+      "eventType": "qc_rejected",
+      "category": "qc",
+      "actor": {
+        "type": "user",
+        "id": "ops@sl18.africa",
+        "name": "Central Ops"
+      },
+      "target": {
+        "type": "episode",
+        "id": "ep-kenya-2025-11-27",
+        "franchiseId": "kenya-001"
+      },
+      "details": {
+        "description": "Episode failed QC review - audio quality issues",
+        "previousValue": "qc_submitted",
+        "newValue": "qc_rejected",
+        "reason": "Audio levels unbalanced, background noise detected",
+        "metadata": {
+          "failedCriteria": ["audioQuality"],
+          "strikeIssued": false
+        }
+      },
+      "result": "failure"
+    }
+  ],
+  "invalidAuditLogs": [
+    {
+      "description": "Missing required eventType",
+      "data": {
+        "logId": "audit-test-001",
+        "timestamp": "2025-11-27T00:00:00Z",
+        "category": "registration",
+        "actor": {
+          "type": "user",
+          "id": "test@test.com"
+        },
+        "target": {
+          "type": "franchise",
+          "id": "test"
+        },
+        "details": {
+          "description": "Test event"
+        },
+        "result": "success"
+      },
+      "expectedError": "eventType is required"
+    },
+    {
+      "description": "Invalid result value",
+      "data": {
+        "logId": "audit-test-001",
+        "timestamp": "2025-11-27T00:00:00Z",
+        "eventType": "registration_submitted",
+        "category": "registration",
+        "actor": {
+          "type": "user",
+          "id": "test@test.com"
+        },
+        "target": {
+          "type": "franchise",
+          "id": "test"
+        },
+        "details": {
+          "description": "Test event"
+        },
+        "result": "unknown"
+      },
+      "expectedError": "result must be one of enum values"
+    }
+  ]
+}

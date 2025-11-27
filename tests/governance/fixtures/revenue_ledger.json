@@ -1,0 +1,198 @@
+{
+  "validLedgerEntries": [
+    {
+      "ledgerId": "led-core-2025-01",
+      "franchiseId": "core",
+      "period": {
+        "startDate": "2025-01-01",
+        "endDate": "2025-01-31",
+        "type": "monthly"
+      },
+      "revenueGenerated": {
+        "total": 1250.00,
+        "currency": "USD",
+        "breakdown": {
+          "youtube": 500.00,
+          "instagram": 400.00,
+          "facebook": 200.00,
+          "tiktok": 150.00
+        }
+      },
+      "revenueSplit": {
+        "partnerShare": 437.50,
+        "centralShare": 812.50,
+        "partnerPercentage": 35,
+        "centralPercentage": 65
+      },
+      "payoutSchedule": {
+        "scheduledDate": "2025-02-15",
+        "status": "completed",
+        "actualDate": "2025-02-15",
+        "paymentMethod": "bank_transfer",
+        "transactionId": "txn-2025-02-001"
+      },
+      "adjustments": [],
+      "createdAt": "2025-02-01T00:00:00Z",
+      "updatedAt": "2025-02-15T00:00:00Z"
+    },
+    {
+      "ledgerId": "led-core-2025-02",
+      "franchiseId": "core",
+      "period": {
+        "startDate": "2025-02-01",
+        "endDate": "2025-02-28",
+        "type": "monthly"
+      },
+      "revenueGenerated": {
+        "total": 1800.00,
+        "currency": "USD",
+        "breakdown": {
+          "youtube": 700.00,
+          "instagram": 600.00,
+          "facebook": 300.00,
+          "tiktok": 200.00
+        }
+      },
+      "revenueSplit": {
+        "partnerShare": 630.00,
+        "centralShare": 1170.00,
+        "partnerPercentage": 35,
+        "centralPercentage": 65
+      },
+      "payoutSchedule": {
+        "scheduledDate": "2025-03-15",
+        "status": "pending"
+      },
+      "adjustments": [
+        {
+          "adjustmentId": "adj-2025-02-001",
+          "type": "bonus",
+          "amount": 50.00,
+          "reason": "Performance bonus for viral content",
+          "appliedAt": "2025-03-01T00:00:00Z",
+          "appliedBy": "ops@sl18.africa"
+        }
+      ],
+      "createdAt": "2025-03-01T00:00:00Z",
+      "updatedAt": "2025-03-01T00:00:00Z",
+      "notes": "Strong February performance"
+    },
+    {
+      "ledgerId": "led-kenya-2025-02",
+      "franchiseId": "kenya-001",
+      "period": {
+        "startDate": "2025-02-01",
+        "endDate": "2025-02-28",
+        "type": "monthly"
+      },
+      "revenueGenerated": {
+        "total": 450.00,
+        "currency": "USD",
+        "breakdown": {
+          "youtube": 200.00,
+          "instagram": 150.00,
+          "tiktok": 100.00
+        }
+      },
+      "revenueSplit": {
+        "partnerShare": 180.00,
+        "centralShare": 270.00,
+        "partnerPercentage": 40,
+        "centralPercentage": 60
+      },
+      "payoutSchedule": {
+        "scheduledDate": "2025-03-15",
+        "status": "pending"
+      },
+      "adjustments": [],
+      "createdAt": "2025-03-01T00:00:00Z"
+    }
+  ],
+  "invalidLedgerEntries": [
+    {
+      "description": "Revenue split doesn't match total",
+      "data": {
+        "ledgerId": "led-test-001",
+        "franchiseId": "test",
+        "period": {
+          "startDate": "2025-01-01",
+          "endDate": "2025-01-31",
+          "type": "monthly"
+        },
+        "revenueGenerated": {
+          "total": 1000.00,
+          "currency": "USD"
+        },
+        "revenueSplit": {
+          "partnerShare": 400.00,
+          "centralShare": 700.00,
+          "partnerPercentage": 35,
+          "centralPercentage": 65
+        },
+        "payoutSchedule": {
+          "scheduledDate": "2025-02-15",
+          "status": "pending"
+        },
+        "createdAt": "2025-02-01T00:00:00Z"
+      },
+      "expectedError": "Revenue split amounts don't match total"
+    },
+    {
+      "description": "Missing required period",
+      "data": {
+        "ledgerId": "led-test-001",
+        "franchiseId": "test",
+        "revenueGenerated": {
+          "total": 1000.00,
+          "currency": "USD"
+        },
+        "revenueSplit": {
+          "partnerShare": 350.00,
+          "centralShare": 650.00,
+          "partnerPercentage": 35,
+          "centralPercentage": 65
+        },
+        "payoutSchedule": {
+          "scheduledDate": "2025-02-15",
+          "status": "pending"
+        },
+        "createdAt": "2025-02-01T00:00:00Z"
+      },
+      "expectedError": "period is required"
+    }
+  ],
+  "revenueSplitTestCases": [
+    {
+      "description": "Standard 35/65 split",
+      "totalRevenue": 1000.00,
+      "partnerPercentage": 35,
+      "centralPercentage": 65,
+      "expectedPartnerShare": 350.00,
+      "expectedCentralShare": 650.00
+    },
+    {
+      "description": "40/60 split for premium partner",
+      "totalRevenue": 2500.00,
+      "partnerPercentage": 40,
+      "centralPercentage": 60,
+      "expectedPartnerShare": 1000.00,
+      "expectedCentralShare": 1500.00
+    },
+    {
+      "description": "50/50 split",
+      "totalRevenue": 800.00,
+      "partnerPercentage": 50,
+      "centralPercentage": 50,
+      "expectedPartnerShare": 400.00,
+      "expectedCentralShare": 400.00
+    },
+    {
+      "description": "Zero revenue",
+      "totalRevenue": 0,
+      "partnerPercentage": 35,
+      "centralPercentage": 65,
+      "expectedPartnerShare": 0,
+      "expectedCentralShare": 0
+    }
+  ]
+}

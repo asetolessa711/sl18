@@ -1,0 +1,171 @@
+{
+  "validAgreements": [
+    {
+      "agreementId": "agr-core-2025-001",
+      "franchiseId": "core",
+      "version": "1.0",
+      "terms": {
+        "fees": {
+          "registrationFee": 0,
+          "monthlyFee": 0,
+          "currency": "USD"
+        },
+        "revenueShare": {
+          "partnerPercentage": 35,
+          "centralPercentage": 65,
+          "payoutThreshold": 50,
+          "payoutSchedule": "monthly"
+        },
+        "qcObligations": {
+          "requiredBeforePublish": true,
+          "qcTurnaroundHours": 24,
+          "strikeLimit": 3,
+          "qcCriteria": [
+            "Persona alignment verified",
+            "Audio quality acceptable",
+            "Visual standards met",
+            "Caption accuracy confirmed"
+          ]
+        },
+        "publishingRights": {
+          "platforms": ["youtube", "instagram", "facebook", "tiktok"],
+          "exclusiveTerritory": null,
+          "contentOwnership": "shared"
+        },
+        "overrideRules": {
+          "centralCanOverride": true,
+          "overrideNoticeHours": 0,
+          "overrideReasons": ["Platform policy violation", "Brand safety concern"]
+        },
+        "rollbackRules": {
+          "allowRollback": true,
+          "rollbackWindowHours": 48,
+          "requiresApproval": false
+        }
+      },
+      "effectiveDate": "2025-01-01T00:00:00Z",
+      "expirationDate": null,
+      "signedBy": {
+        "franchiseRepresentative": {
+          "name": "Central Ops",
+          "signedAt": "2025-01-01T00:00:00Z",
+          "signatureHash": "sha256:abc123"
+        },
+        "centralRepresentative": {
+          "name": "SL18 Admin",
+          "signedAt": "2025-01-01T00:00:00Z",
+          "signatureHash": "sha256:def456"
+        }
+      },
+      "status": "active",
+      "amendments": []
+    },
+    {
+      "agreementId": "agr-kenya-2025-001",
+      "franchiseId": "kenya-001",
+      "version": "1.0",
+      "terms": {
+        "fees": {
+          "registrationFee": 100,
+          "monthlyFee": 25,
+          "currency": "USD"
+        },
+        "revenueShare": {
+          "partnerPercentage": 40,
+          "centralPercentage": 60,
+          "payoutThreshold": 100,
+          "payoutSchedule": "monthly"
+        },
+        "qcObligations": {
+          "requiredBeforePublish": true,
+          "qcTurnaroundHours": 12,
+          "strikeLimit": 3
+        },
+        "publishingRights": {
+          "platforms": ["youtube", "instagram", "tiktok"],
+          "exclusiveTerritory": "Kenya",
+          "contentOwnership": "shared"
+        }
+      },
+      "effectiveDate": "2025-02-05T00:00:00Z",
+      "expirationDate": "2026-02-05T00:00:00Z",
+      "signedBy": {
+        "franchiseRepresentative": {
+          "name": "Kenya Partner",
+          "signedAt": "2025-02-05T00:00:00Z"
+        },
+        "centralRepresentative": {
+          "name": "SL18 Admin",
+          "signedAt": "2025-02-05T00:00:00Z"
+        }
+      },
+      "status": "active",
+      "amendments": []
+    }
+  ],
+  "invalidAgreements": [
+    {
+      "description": "Missing required terms",
+      "data": {
+        "agreementId": "agr-test-001",
+        "franchiseId": "test",
+        "version": "1.0",
+        "effectiveDate": "2025-01-01T00:00:00Z",
+        "status": "draft"
+      },
+      "expectedError": "terms is required"
+    },
+    {
+      "description": "Revenue share percentages don't add up",
+      "data": {
+        "agreementId": "agr-test-001",
+        "franchiseId": "test",
+        "version": "1.0",
+        "terms": {
+          "revenueShare": {
+            "partnerPercentage": 50,
+            "centralPercentage": 60,
+            "payoutSchedule": "monthly"
+          },
+          "qcObligations": {
+            "requiredBeforePublish": true,
+            "strikeLimit": 3
+          },
+          "publishingRights": {
+            "platforms": ["youtube"],
+            "contentOwnership": "shared"
+          }
+        },
+        "effectiveDate": "2025-01-01T00:00:00Z",
+        "status": "draft"
+      },
+      "expectedError": "Revenue share percentages should add up to 100"
+    },
+    {
+      "description": "Invalid version format",
+      "data": {
+        "agreementId": "agr-test-001",
+        "franchiseId": "test",
+        "version": "v1",
+        "terms": {
+          "revenueShare": {
+            "partnerPercentage": 35,
+            "centralPercentage": 65,
+            "payoutSchedule": "monthly"
+          },
+          "qcObligations": {
+            "requiredBeforePublish": true,
+            "strikeLimit": 3
+          },
+          "publishingRights": {
+            "platforms": ["youtube"],
+            "contentOwnership": "shared"
+          }
+        },
+        "effectiveDate": "2025-01-01T00:00:00Z",
+        "status": "draft"
+      },
+      "expectedError": "version must match semver pattern"
+    }
+  ]
+}

@@ -8,8 +8,10 @@
   "version": "1.0.0",
   "description": "This repository scaffold is designed for **Azure DevOps (VSO)** with **GPT‑5 + Codex Preview**. It supports a minimal‑code workflow where automation prepares the script, persona TTS, backing music stem, and CapCut-ready project assets before the clip is finished manually.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/governance/governance.test.js",
+    "test:governance": "node tests/governance/governance.test.js"
   },
   "keywords": [],
   "author": "",

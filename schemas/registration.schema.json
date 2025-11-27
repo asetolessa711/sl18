@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FranchiseRegistration",
+  "description": "Schema for franchise registration records in SL18 governance layer",
+  "type": "object",
+  "properties": {
+    "franchiseId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "Unique franchise identifier (lowercase, alphanumeric with underscores/hyphens)"
+    },
+    "creatorId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100,
+      "description": "Identifier of the franchise creator/owner"
+    },
+    "registrationModel": {
+      "type": "string",
+      "enum": ["fee", "revenueShare"],
+      "description": "Registration model: 'fee' for upfront payment, 'revenueShare' for revenue-based"
+    },
+    "agreementSigned": {
+      "type": "boolean",
+      "description": "Whether the franchise agreement has been signed"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "approved", "active", "suspended", "terminated"],
+      "description": "Current status of the franchise registration"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100,
+      "description": "Display name for the franchise"
+    },
+    "country": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100,
+      "description": "Country where the franchise operates"
+    },
+    "ownerContact": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Contact name"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Contact email address"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone number"
+        }
+      },
+      "required": ["name", "email"],
+      "additionalProperties": false
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the franchise was registered"
+    },
+    "approvedAt": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the franchise was approved"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes about the registration"
+    }
+  },
+  "required": [
+    "franchiseId",
+    "creatorId",
+    "registrationModel",
+    "agreementSigned",
+    "status"
+  ],
+  "additionalProperties": false
+}
