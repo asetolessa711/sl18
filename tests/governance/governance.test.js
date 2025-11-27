@@ -13,6 +13,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const repoRoot = join(__dirname, '../..');
 
+// Constants
+const REVENUE_TOLERANCE = 0.01; // Precision threshold for floating-point revenue comparisons
+
 // Test result tracking
 let passed = 0;
 let failed = 0;
@@ -43,8 +46,30 @@ function assertEqual(actual, expected, message) {
   }
 }
 
+/**
+ * Deep equality check that handles object property order independence
+ */
+function deepEqual(a, b) {
+  if (a === b) return true;
+  if (a === null || b === null) return a === b;
+  if (typeof a !== typeof b) return false;
+  if (typeof a !== 'object') return a === b;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  
+  if (Array.isArray(a)) {
+    if (a.length !== b.length) return false;
+    return a.every((item, i) => deepEqual(item, b[i]));
+  }
+  
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  
+  return keysA.every(key => Object.prototype.hasOwnProperty.call(b, key) && deepEqual(a[key], b[key]));
+}
+
 function assertDeepEqual(actual, expected, message) {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+  if (!deepEqual(actual, expected)) {
     throw new Error(message || `Deep equality failed`);
   }
 }
@@ -176,7 +201,7 @@ function validateLedgerEntry(data) {
   if (data.revenueGenerated && data.revenueSplit) {
     const total = data.revenueGenerated.total;
     const splitTotal = data.revenueSplit.partnerShare + data.revenueSplit.centralShare;
-    if (Math.abs(total - splitTotal) > 0.01) {
+    if (Math.abs(total - splitTotal) > REVENUE_TOLERANCE) {
       return { valid: false, error: `Revenue split amounts don't match total: ${splitTotal} vs ${total}` };
     }
   }
