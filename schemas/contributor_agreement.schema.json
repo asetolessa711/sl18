@@ -1,0 +1,426 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ContributorAgreement",
+  "description": "Schema for contributor agreements in SL18 - terms for creators, reviewers, and operators",
+  "type": "object",
+  "properties": {
+    "agreementId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^contrib-agr-[a-z0-9-]+$",
+      "description": "Unique contributor agreement identifier"
+    },
+    "contributorId": {
+      "type": "string",
+      "description": "Contributor/user identifier"
+    },
+    "contributorType": {
+      "type": "string",
+      "enum": ["creator", "reviewer", "operator", "auditor", "translator", "voice_artist"],
+      "description": "Type of contributor"
+    },
+    "personalInfo": {
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 200,
+          "description": "Contributor legal name"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Contributor email"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of residence"
+        },
+        "taxId": {
+          "type": "string",
+          "description": "Tax identification number (encrypted)"
+        },
+        "identityVerified": {
+          "type": "boolean",
+          "description": "Whether identity has been verified"
+        },
+        "verificationMethod": {
+          "type": "string",
+          "enum": ["government_id", "passport", "video_verification", "bank_verification"],
+          "description": "Method of identity verification"
+        },
+        "verifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Verification timestamp"
+        }
+      },
+      "required": ["fullName", "email", "country"],
+      "additionalProperties": false
+    },
+    "terms": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Terms version"
+        },
+        "revenueShare": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "type": "string",
+              "enum": ["percentage", "flat_fee", "tiered", "hybrid"],
+              "description": "Revenue share model"
+            },
+            "percentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Contributor percentage share"
+            },
+            "minimumPayout": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Minimum payout threshold"
+            },
+            "payoutCurrency": {
+              "type": "string",
+              "description": "Preferred payout currency"
+            },
+            "payoutFrequency": {
+              "type": "string",
+              "enum": ["weekly", "biweekly", "monthly", "quarterly"],
+              "description": "Payout frequency"
+            },
+            "tiers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "threshold": {
+                    "type": "number",
+                    "description": "Revenue threshold for tier"
+                  },
+                  "percentage": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Percentage at this tier"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "description": "Tiered revenue share structure"
+            }
+          },
+          "required": ["model"],
+          "additionalProperties": false
+        },
+        "exclusivity": {
+          "type": "object",
+          "properties": {
+            "exclusive": {
+              "type": "boolean",
+              "description": "Whether agreement is exclusive"
+            },
+            "scope": {
+              "type": "string",
+              "enum": ["platform", "franchise", "content_type", "region"],
+              "description": "Exclusivity scope"
+            },
+            "duration": {
+              "type": "integer",
+              "description": "Exclusivity duration in days"
+            },
+            "territories": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Exclusive territories"
+            }
+          },
+          "additionalProperties": false
+        },
+        "intellectualProperty": {
+          "type": "object",
+          "properties": {
+            "ownership": {
+              "type": "string",
+              "enum": ["contributor", "platform", "shared", "work_for_hire"],
+              "description": "IP ownership model"
+            },
+            "license": {
+              "type": "string",
+              "enum": ["exclusive", "non_exclusive", "perpetual", "limited"],
+              "description": "License type granted"
+            },
+            "attribution": {
+              "type": "boolean",
+              "description": "Whether contributor receives attribution"
+            },
+            "derivativeWorks": {
+              "type": "boolean",
+              "description": "Whether derivative works are allowed"
+            }
+          },
+          "required": ["ownership", "license"],
+          "additionalProperties": false
+        },
+        "contentStandards": {
+          "type": "object",
+          "properties": {
+            "qcThreshold": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Minimum QC score required"
+            },
+            "revisionLimit": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Maximum revisions allowed per submission"
+            },
+            "turnaroundTime": {
+              "type": "integer",
+              "description": "Expected turnaround time in hours"
+            },
+            "prohibitedContent": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Types of prohibited content"
+            }
+          },
+          "additionalProperties": false
+        },
+        "confidentiality": {
+          "type": "object",
+          "properties": {
+            "ndaRequired": {
+              "type": "boolean",
+              "description": "Whether NDA is required"
+            },
+            "ndaVersion": {
+              "type": "string",
+              "description": "NDA version signed"
+            },
+            "scope": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["content", "financial", "platform_data", "contributor_info"]
+              },
+              "description": "Confidentiality scope"
+            },
+            "duration": {
+              "type": "integer",
+              "description": "Confidentiality duration in months"
+            }
+          },
+          "additionalProperties": false
+        },
+        "termination": {
+          "type": "object",
+          "properties": {
+            "noticePeriod": {
+              "type": "integer",
+              "description": "Notice period in days"
+            },
+            "terminationForCause": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Causes for immediate termination"
+            },
+            "postTermination": {
+              "type": "object",
+              "properties": {
+                "contentHandling": {
+                  "type": "string",
+                  "enum": ["remove", "retain", "archive", "negotiate"],
+                  "description": "How content is handled after termination"
+                },
+                "revenueHandling": {
+                  "type": "string",
+                  "enum": ["stop_immediately", "payout_pending", "continue_existing"],
+                  "description": "How pending revenue is handled"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["version", "revenueShare", "intellectualProperty"],
+      "additionalProperties": false
+    },
+    "paymentInfo": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["bank_transfer", "paypal", "stripe", "wise", "crypto"],
+          "description": "Preferred payment method"
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Whether payment method is verified"
+        },
+        "accountDetails": {
+          "type": "object",
+          "description": "Encrypted payment account details",
+          "properties": {
+            "lastFour": {
+              "type": "string",
+              "description": "Last 4 digits of account/card"
+            },
+            "bankName": {
+              "type": "string",
+              "description": "Bank name (if applicable)"
+            },
+            "accountType": {
+              "type": "string",
+              "description": "Account type"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["method"],
+      "additionalProperties": false
+    },
+    "franchiseAssociations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "franchiseId": {
+            "type": "string",
+            "description": "Associated franchise ID"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["creator", "reviewer", "operator", "auditor"],
+            "description": "Role within franchise"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Association start date"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "pending", "suspended", "terminated"],
+            "description": "Association status"
+          }
+        },
+        "required": ["franchiseId", "role", "status"],
+        "additionalProperties": false
+      },
+      "description": "Franchises contributor is associated with"
+    },
+    "qcHistory": {
+      "type": "object",
+      "properties": {
+        "totalSubmissions": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total content submissions"
+        },
+        "approvedSubmissions": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Approved submissions"
+        },
+        "averageScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Average QC score"
+        },
+        "lastSubmission": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last submission timestamp"
+        }
+      },
+      "additionalProperties": false
+    },
+    "signatures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "documentType": {
+            "type": "string",
+            "enum": ["main_agreement", "nda", "addendum", "amendment"],
+            "description": "Type of document signed"
+          },
+          "version": {
+            "type": "string",
+            "description": "Document version"
+          },
+          "signedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Signature timestamp"
+          },
+          "ipAddress": {
+            "type": "string",
+            "description": "IP address at signing"
+          },
+          "signatureHash": {
+            "type": "string",
+            "description": "Digital signature hash"
+          }
+        },
+        "required": ["documentType", "version", "signedAt"],
+        "additionalProperties": false
+      },
+      "description": "Document signatures"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending_verification", "pending_signature", "active", "suspended", "terminated", "expired"],
+      "description": "Agreement status"
+    },
+    "effectiveDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Agreement effective date"
+    },
+    "expirationDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Agreement expiration date"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    }
+  },
+  "required": [
+    "agreementId",
+    "contributorId",
+    "contributorType",
+    "personalInfo",
+    "terms",
+    "status",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

@@ -1,6 +1,6 @@
-# Phase 14: Governance Layer Documentation
+# SL18 Governance Documentation
 
-This document describes the SL18 governance layer implementation, covering franchise registration, agreements, revenue management, and QC enforcement.
+This document describes the SL18 governance layer implementation, covering franchise registration, agreements, revenue management, QC enforcement, governance policies, and access control.
 
 ## Overview
 
@@ -10,6 +10,8 @@ The governance layer provides structured workflows for:
 - **Revenue Ledger**: Centralized revenue tracking and distribution
 - **Audit Logging**: Complete traceability of governance actions
 - **QC Enforcement**: Quality control gates before publishing
+- **Governance Policies**: Framework for rules, compliance, and audit requirements (Phase 18)
+- **Access Control**: Role-based permissions and MFA enforcement (Phase 18)
 
 ## Schema Files
 
@@ -21,6 +23,8 @@ All governance data structures are defined in JSON Schema format:
 | Agreement | `schemas/agreement.schema.json` | Digital agreement templates |
 | Revenue Ledger | `schemas/revenue_ledger.schema.json` | Revenue tracking and payouts |
 | Audit Log | `schemas/audit_log.schema.json` | Governance event logging |
+| Governance Policy | `schemas/governance_policy.schema.json` | Policy rules and compliance (Phase 18) |
+| Contributor Agreement | `schemas/contributor_agreement.schema.json` | Contributor terms (Phase 18) |
 
 ## Franchise Registration Workflow
 
@@ -308,6 +312,146 @@ Backend API endpoints for governance:
 - [x] Audit logs capture all governance events
 - [x] QC enforcement prevents unapproved publishing
 - [x] Test cases pass for all workflows
+- [x] Governance policies enforce compliance (Phase 18)
+- [x] Role-based access control implemented (Phase 18)
+
+## Phase 18: Governance Scaling
+
+### Governance Policies
+
+The governance policy schema (`schemas/governance_policy.schema.json`) enables:
+
+#### Policy Types
+- `franchise_rules`: Franchise-specific operating rules
+- `compliance`: Regulatory compliance requirements
+- `audit`: Audit requirements and frequency
+- `access_control`: Permission and role definitions
+- `content_standards`: Content quality requirements
+- `revenue_sharing`: Revenue distribution policies
+- `contributor_terms`: Terms for contributors
+- `platform_usage`: Platform usage guidelines
+
+#### Policy Scope Levels
+- **Global**: Applies to all franchises and regions
+- **Region**: Applies to specific geographic regions
+- **Franchise**: Applies to specific franchise(s)
+- **Contributor**: Applies to specific contributor types
+
+#### Policy Rules
+
+Each policy contains rules with:
+- `ruleId`: Unique rule identifier
+- `enforcement`: `mandatory`, `recommended`, or `optional`
+- `action`: `allow`, `deny`, `warn`, `require_approval`, `log_only`
+- `penalty`: Violation penalties with severity levels
+
+Example policy:
+```json
+{
+  "policyId": "policy-content-global-001",
+  "name": "Global Content Standards",
+  "version": "1.0.0",
+  "type": "content_standards",
+  "scope": { "level": "global" },
+  "rules": [
+    {
+      "ruleId": "qc-threshold",
+      "name": "Minimum QC Score",
+      "enforcement": "mandatory",
+      "condition": "qcScore >= 85",
+      "action": "deny",
+      "penalty": {
+        "type": "warning",
+        "severity": "medium"
+      }
+    }
+  ],
+  "status": "active"
+}
+```
+
+### Access Control
+
+Role-based permissions system with:
+
+#### Roles
+| Role | Description | MFA Required |
+|------|-------------|--------------|
+| `operator` | Day-to-day operations | Optional |
+| `reviewer` | Content review and QC | Optional |
+| `contributor` | Create and submit content | No |
+| `auditor` | Access audit logs and reports | Yes |
+| `admin` | Manage policies and users | Yes |
+| `super_admin` | Full system access | Yes |
+
+#### Permissions
+- Content: `view_content`, `create_content`, `edit_content`, `delete_content`, `publish_content`
+- Review: `review_content`, `approve_content`
+- Revenue: `view_revenue`, `manage_revenue`
+- Policy: `view_policies`, `create_policies`, `edit_policies`, `delete_policies`
+- Access: `assign_roles`, `revoke_roles`
+- Audit: `view_audit_logs`, `export_audit_logs`, `perform_audit`
+- Management: `manage_contributors`, `manage_marketplace`, `access_sensitive_data`
+
+#### MFA Enforcement
+Sensitive actions requiring MFA regardless of role:
+- Policy changes
+- Role assignments
+- Payout approvals
+- Data exports
+- System configuration
+
+### Compliance Requirements
+
+The governance layer supports compliance with:
+- **GDPR**: Data protection for EU users
+- **CCPA**: California consumer privacy
+- **SOC2**: Security controls
+- **ISO27001**: Information security management
+- **PCI-DSS**: Payment card security
+- **Local Regulations**: Region-specific requirements
+
+#### Data Retention
+| Data Type | Retention Period |
+|-----------|------------------|
+| Audit Logs | 7 years minimum |
+| User Content | 30 days after deletion request |
+| Financial Records | 7 years minimum |
+
+### Audit Requirements
+
+Configurable audit settings:
+- **Frequency**: `continuous`, `daily`, `weekly`, `monthly`, `quarterly`
+- **Scope**: Access logs, financial transactions, content changes, policy changes, role changes, security events
+- **Automation**: Automated or manual audit triggers
+- **Alerts**: Tiered alerts with notification channels
+
+### Governance Event Logging
+
+Phase 18 adds new audit event types:
+
+**Policy Events:**
+- `policy_created`
+- `policy_updated`
+- `policy_activated`
+- `policy_suspended`
+- `policy_deprecated`
+- `policy_violation_detected`
+- `compliance_check_passed`
+- `compliance_check_failed`
+
+**Access Control Events:**
+- `role_assigned`
+- `role_revoked`
+- `permission_granted`
+- `permission_revoked`
+- `mfa_enabled`
+- `mfa_disabled`
+- `sensitive_action_attempted`
+
+**Audit Events:**
+- `audit_started`
+- `audit_completed`
 
 ## Next Steps
 
@@ -316,9 +460,10 @@ Backend API endpoints for governance:
 3. Configure Make.com scenarios for automated governance
 4. Build dashboard views for governance monitoring
 5. Train operators on governance workflows
+6. Implement contributor marketplace (see `Docs/contributor_marketplace.md`)
 
 ---
 
-*Version: 1.0*
-*Phase: 14 - Governance Layer*
+*Version: 2.0*
+*Phases: 14 (Governance Layer) + 18 (Governance Scaling)*
 *Last Updated: November 2025*

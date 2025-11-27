@@ -1,0 +1,334 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GovernancePolicy",
+  "description": "Schema for governance policies in SL18 - franchise rules, compliance, and audit requirements",
+  "type": "object",
+  "properties": {
+    "policyId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^policy-[a-z0-9-]+$",
+      "description": "Unique policy identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable policy name"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Policy version (semver format)"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["franchise_rules", "compliance", "audit", "access_control", "content_standards", "revenue_sharing", "contributor_terms", "platform_usage"],
+      "description": "Type of governance policy"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "region", "franchise", "contributor"],
+          "description": "Policy scope level"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Regions where policy applies (if region-scoped)"
+        },
+        "franchiseIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Franchise IDs where policy applies (if franchise-scoped)"
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "Unique rule identifier within policy"
+          },
+          "name": {
+            "type": "string",
+            "description": "Rule name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Rule description"
+          },
+          "enforcement": {
+            "type": "string",
+            "enum": ["mandatory", "recommended", "optional"],
+            "description": "Enforcement level"
+          },
+          "condition": {
+            "type": "string",
+            "description": "Condition expression for rule evaluation"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["allow", "deny", "warn", "require_approval", "log_only"],
+            "description": "Action when rule is triggered"
+          },
+          "penalty": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["none", "warning", "suspension", "termination", "financial"],
+                "description": "Penalty type for violation"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"],
+                "description": "Penalty severity"
+              },
+              "description": {
+                "type": "string",
+                "description": "Penalty description"
+              }
+            },
+            "required": ["type", "severity"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["ruleId", "name", "enforcement", "action"],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "description": "Policy rules"
+    },
+    "accessControl": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": ["operator", "reviewer", "contributor", "auditor", "admin", "super_admin"],
+                "description": "Role name"
+              },
+              "permissions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "view_content",
+                    "create_content",
+                    "edit_content",
+                    "delete_content",
+                    "publish_content",
+                    "review_content",
+                    "approve_content",
+                    "view_revenue",
+                    "manage_revenue",
+                    "view_policies",
+                    "create_policies",
+                    "edit_policies",
+                    "delete_policies",
+                    "assign_roles",
+                    "revoke_roles",
+                    "view_audit_logs",
+                    "export_audit_logs",
+                    "manage_contributors",
+                    "manage_marketplace",
+                    "access_sensitive_data",
+                    "perform_audit"
+                  ]
+                },
+                "description": "Permissions granted to role"
+              },
+              "mfaRequired": {
+                "type": "boolean",
+                "description": "Whether MFA is required for this role"
+              }
+            },
+            "required": ["role", "permissions"],
+            "additionalProperties": false
+          },
+          "description": "Role definitions with permissions"
+        },
+        "sensitiveActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Actions requiring MFA regardless of role"
+        }
+      },
+      "additionalProperties": false
+    },
+    "complianceRequirements": {
+      "type": "object",
+      "properties": {
+        "frameworks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["GDPR", "CCPA", "SOC2", "ISO27001", "PCI-DSS", "HIPAA", "local_regulations"]
+          },
+          "description": "Compliance frameworks"
+        },
+        "dataRetention": {
+          "type": "object",
+          "properties": {
+            "auditLogs": {
+              "type": "integer",
+              "minimum": 30,
+              "maximum": 3650,
+              "description": "Days to retain audit logs"
+            },
+            "userContent": {
+              "type": "integer",
+              "minimum": 30,
+              "description": "Days to retain user content after deletion request"
+            },
+            "financialRecords": {
+              "type": "integer",
+              "minimum": 365,
+              "description": "Days to retain financial records"
+            }
+          },
+          "additionalProperties": false
+        },
+        "reportingFrequency": {
+          "type": "string",
+          "enum": ["daily", "weekly", "monthly", "quarterly", "annually"],
+          "description": "Compliance reporting frequency"
+        }
+      },
+      "additionalProperties": false
+    },
+    "auditRequirements": {
+      "type": "object",
+      "properties": {
+        "frequency": {
+          "type": "string",
+          "enum": ["continuous", "daily", "weekly", "monthly", "quarterly"],
+          "description": "Audit frequency"
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["access_logs", "financial_transactions", "content_changes", "policy_changes", "role_changes", "security_events"]
+          },
+          "description": "Audit scope areas"
+        },
+        "automated": {
+          "type": "boolean",
+          "description": "Whether audit is automated"
+        },
+        "alerts": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "channels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["email", "slack", "webhook", "sms", "pagerduty"]
+              }
+            },
+            "threshold": {
+              "type": "string",
+              "enum": ["any_violation", "high_severity", "critical_only"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "effectiveDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When policy becomes effective"
+    },
+    "expirationDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When policy expires (if applicable)"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "pending_approval", "active", "suspended", "deprecated", "archived"],
+      "description": "Policy status"
+    },
+    "approvals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "approver": {
+            "type": "string",
+            "description": "Approver identifier"
+          },
+          "role": {
+            "type": "string",
+            "description": "Approver role"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "approved", "rejected"]
+          },
+          "comments": {
+            "type": "string"
+          }
+        },
+        "required": ["approver", "role", "status"],
+        "additionalProperties": false
+      },
+      "description": "Policy approval chain"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Policy creation timestamp"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Creator identifier"
+    }
+  },
+  "required": [
+    "policyId",
+    "name",
+    "version",
+    "type",
+    "scope",
+    "rules",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

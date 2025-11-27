@@ -92,13 +92,49 @@
         "churn_risk_detected",
         "retention_action_triggered",
         "dynamic_discount_applied",
-        "revenue_optimization_applied"
+        "revenue_optimization_applied",
+        "policy_created",
+        "policy_updated",
+        "policy_activated",
+        "policy_suspended",
+        "policy_deprecated",
+        "policy_violation_detected",
+        "compliance_check_passed",
+        "compliance_check_failed",
+        "role_assigned",
+        "role_revoked",
+        "permission_granted",
+        "permission_revoked",
+        "mfa_enabled",
+        "mfa_disabled",
+        "sensitive_action_attempted",
+        "audit_started",
+        "audit_completed",
+        "contributor_registered",
+        "contributor_verified",
+        "contributor_agreement_signed",
+        "contributor_agreement_amended",
+        "contributor_suspended",
+        "contributor_reinstated",
+        "contributor_terminated",
+        "listing_created",
+        "listing_approved",
+        "listing_featured",
+        "listing_suspended",
+        "listing_removed",
+        "marketplace_transaction_initiated",
+        "marketplace_transaction_completed",
+        "marketplace_transaction_failed",
+        "marketplace_payout_scheduled",
+        "marketplace_payout_completed",
+        "cross_promotion_created",
+        "cross_promotion_approved"
       ],
       "description": "Type of governance event"
     },
     "category": {
       "type": "string",
-      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization"],
+      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace"],
       "description": "Category of the audit event"
     },
     "actor": {
@@ -126,7 +162,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing"],
+          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion"],
           "description": "Type of target entity"
         },
         "id": {
