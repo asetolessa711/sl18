@@ -56,6 +56,20 @@ Phase 15 extends the governance layer (Phase 14) with:
 | `es` | Spanish | LTR | Yes |
 | `ar` | Arabic | RTL | Yes |
 | `zh-CN` | Chinese (Simplified) | LTR | Yes |
+| `it` | Italian | LTR | Yes |
+| `om` | Oromifa (Afaan Oromo) | LTR | Yes |
+| `am` | Amharic | LTR | Yes |
+| `sw` | Kiswahili | LTR | Yes |
+
+### Dynamic Language Registry
+
+Languages are managed through a dynamic registry (`schemas/language_pack_registry.schema.json`):
+- Add new languages without code changes
+- On-demand loading when operator selects a language
+- Per-language QC thresholds and font recommendations
+- Locale variations (e.g., `pt-BR`, `sw-KE`)
+
+See `Docs/language_selection.md` for registry usage and configuration.
 
 ### Language Configuration at Setup
 

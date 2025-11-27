@@ -10,9 +10,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node tests/governance/governance.test.js && node tests/governance/globalization.test.js",
+    "test": "node tests/governance/governance.test.js && node tests/governance/globalization.test.js && node tests/governance/language_registry.test.js",
     "test:governance": "node tests/governance/governance.test.js",
-    "test:globalization": "node tests/governance/globalization.test.js"
+    "test:globalization": "node tests/governance/globalization.test.js",
+    "test:language-registry": "node tests/governance/language_registry.test.js"
   },
   "keywords": [],
   "author": "",

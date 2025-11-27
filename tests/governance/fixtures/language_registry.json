@@ -1,0 +1,332 @@
+{
+  "validRegistry": {
+    "registryVersion": "1.0.0",
+    "lastUpdated": "2025-01-01T00:00:00Z",
+    "languages": [
+      {
+        "code": "en",
+        "displayName": "English",
+        "nativeName": "English",
+        "direction": "ltr",
+        "region": "Global",
+        "scriptSystem": "latin",
+        "qcThresholds": {
+          "translationAccuracy": 95,
+          "personaConsistency": 90,
+          "culturalSensitivity": 95
+        },
+        "fontRecommendations": ["Arial", "Roboto", "Open Sans"],
+        "ttsVoices": [
+          { "voiceId": "voice_en_001", "provider": "elevenlabs", "gender": "female", "style": "casual" },
+          { "voiceId": "voice_en_002", "provider": "elevenlabs", "gender": "male", "style": "professional" }
+        ],
+        "status": "available",
+        "loadOnDemand": false,
+        "packPath": "language_packs/en.json"
+      },
+      {
+        "code": "fr",
+        "displayName": "French",
+        "nativeName": "Français",
+        "direction": "ltr",
+        "region": "Europe",
+        "localeVariations": [
+          { "code": "fr-FR", "displayName": "French (France)", "description": "Metropolitan French" },
+          { "code": "fr-CA", "displayName": "French (Canada)", "description": "Canadian French" }
+        ],
+        "scriptSystem": "latin",
+        "qcThresholds": {
+          "translationAccuracy": 95,
+          "personaConsistency": 90,
+          "culturalSensitivity": 95
+        },
+        "fontRecommendations": ["Arial", "Roboto"],
+        "ttsVoices": [
+          { "voiceId": "voice_fr_001", "provider": "elevenlabs", "gender": "female", "style": "elegant" }
+        ],
+        "status": "available",
+        "loadOnDemand": true,
+        "packPath": "language_packs/fr.json"
+      },
+      {
+        "code": "ar",
+        "displayName": "Arabic",
+        "nativeName": "العربية",
+        "direction": "rtl",
+        "region": "Middle East",
+        "scriptSystem": "arabic",
+        "qcThresholds": {
+          "translationAccuracy": 98,
+          "personaConsistency": 95,
+          "culturalSensitivity": 98
+        },
+        "fontRecommendations": ["Amiri", "Noto Sans Arabic", "Cairo"],
+        "ttsVoices": [
+          { "voiceId": "voice_ar_001", "provider": "elevenlabs", "gender": "male", "style": "formal" }
+        ],
+        "status": "available",
+        "loadOnDemand": true,
+        "packPath": "language_packs/ar.json"
+      },
+      {
+        "code": "zh-CN",
+        "displayName": "Chinese (Simplified)",
+        "nativeName": "简体中文",
+        "direction": "ltr",
+        "region": "Asia",
+        "localeVariations": [
+          { "code": "zh-TW", "displayName": "Chinese (Traditional)", "description": "Taiwan/Hong Kong" }
+        ],
+        "scriptSystem": "chinese",
+        "qcThresholds": {
+          "translationAccuracy": 95,
+          "personaConsistency": 90,
+          "culturalSensitivity": 95
+        },
+        "fontRecommendations": ["Noto Sans SC", "PingFang SC"],
+        "ttsVoices": [
+          { "voiceId": "voice_zh_001", "provider": "elevenlabs", "gender": "female", "style": "modern" }
+        ],
+        "status": "available",
+        "loadOnDemand": true,
+        "packPath": "language_packs/zh-CN.json"
+      },
+      {
+        "code": "it",
+        "displayName": "Italian",
+        "nativeName": "Italiano",
+        "direction": "ltr",
+        "region": "Europe",
+        "scriptSystem": "latin",
+        "qcThresholds": {
+          "translationAccuracy": 95,
+          "personaConsistency": 90,
+          "culturalSensitivity": 95
+        },
+        "fontRecommendations": ["Arial", "Georgia", "Roboto"],
+        "ttsVoices": [
+          { "voiceId": "voice_it_001", "provider": "elevenlabs", "gender": "female", "style": "expressive" },
+          { "voiceId": "voice_it_002", "provider": "google", "gender": "male", "style": "standard" }
+        ],
+        "status": "available",
+        "loadOnDemand": true,
+        "packPath": "language_packs/it.json"
+      },
+      {
+        "code": "om",
+        "displayName": "Oromifa (Afaan Oromo)",
+        "nativeName": "Afaan Oromoo",
+        "direction": "ltr",
+        "region": "Africa",
+        "scriptSystem": "latin",
+        "qcThresholds": {
+          "translationAccuracy": 95,
+          "personaConsistency": 90,
+          "culturalSensitivity": 98
+        },
+        "fontRecommendations": ["Noto Sans", "Arial"],
+        "ttsVoices": [
+          { "voiceId": "voice_om_001", "provider": "azure", "gender": "female", "style": "traditional" }
+        ],
+        "status": "available",
+        "loadOnDemand": true,
+        "packPath": "language_packs/om.json"
+      },
+      {
+        "code": "am",
+        "displayName": "Amharic",
+        "nativeName": "አማርኛ",
+        "direction": "ltr",
+        "region": "Africa",
+        "scriptSystem": "ethiopic",
+        "qcThresholds": {
+          "translationAccuracy": 97,
+          "personaConsistency": 92,
+          "culturalSensitivity": 98
+        },
+        "fontRecommendations": ["Noto Sans Ethiopic", "Nyala", "Abyssinica SIL"],
+        "ttsVoices": [
+          { "voiceId": "voice_am_001", "provider": "azure", "gender": "male", "style": "formal" }
+        ],
+        "status": "available",
+        "loadOnDemand": true,
+        "packPath": "language_packs/am.json"
+      },
+      {
+        "code": "sw",
+        "displayName": "Kiswahili",
+        "nativeName": "Kiswahili",
+        "direction": "ltr",
+        "region": "Africa",
+        "localeVariations": [
+          { "code": "sw-KE", "displayName": "Swahili (Kenya)", "description": "Kenyan Swahili" },
+          { "code": "sw-TZ", "displayName": "Swahili (Tanzania)", "description": "Tanzanian Swahili" }
+        ],
+        "scriptSystem": "latin",
+        "qcThresholds": {
+          "translationAccuracy": 95,
+          "personaConsistency": 90,
+          "culturalSensitivity": 95
+        },
+        "fontRecommendations": ["Arial", "Roboto", "Open Sans"],
+        "ttsVoices": [
+          { "voiceId": "voice_sw_001", "provider": "google", "gender": "female", "style": "warm" }
+        ],
+        "status": "available",
+        "loadOnDemand": true,
+        "packPath": "language_packs/sw.json"
+      },
+      {
+        "code": "es",
+        "displayName": "Spanish",
+        "nativeName": "Español",
+        "direction": "ltr",
+        "region": "Global",
+        "localeVariations": [
+          { "code": "es-ES", "displayName": "Spanish (Spain)", "description": "European Spanish" },
+          { "code": "es-MX", "displayName": "Spanish (Mexico)", "description": "Mexican Spanish" },
+          { "code": "es-AR", "displayName": "Spanish (Argentina)", "description": "Argentine Spanish" }
+        ],
+        "scriptSystem": "latin",
+        "qcThresholds": {
+          "translationAccuracy": 95,
+          "personaConsistency": 90,
+          "culturalSensitivity": 95
+        },
+        "fontRecommendations": ["Arial", "Roboto"],
+        "ttsVoices": [
+          { "voiceId": "voice_es_001", "provider": "elevenlabs", "gender": "female", "style": "energetic" }
+        ],
+        "status": "available",
+        "loadOnDemand": true,
+        "packPath": "language_packs/es.json"
+      },
+      {
+        "code": "pt",
+        "displayName": "Portuguese",
+        "nativeName": "Português",
+        "direction": "ltr",
+        "region": "Global",
+        "localeVariations": [
+          { "code": "pt-BR", "displayName": "Portuguese (Brazil)", "description": "Brazilian Portuguese" },
+          { "code": "pt-PT", "displayName": "Portuguese (Portugal)", "description": "European Portuguese" }
+        ],
+        "scriptSystem": "latin",
+        "qcThresholds": {
+          "translationAccuracy": 95,
+          "personaConsistency": 90,
+          "culturalSensitivity": 95
+        },
+        "fontRecommendations": ["Arial", "Roboto"],
+        "ttsVoices": [
+          { "voiceId": "voice_pt_001", "provider": "elevenlabs", "gender": "female", "style": "friendly" }
+        ],
+        "status": "beta",
+        "loadOnDemand": true,
+        "packPath": "language_packs/pt.json"
+      }
+    ],
+    "defaultLanguage": "en",
+    "supportedCategories": ["scripts", "subtitles", "captions", "metadata"]
+  },
+  "invalidRegistries": [
+    {
+      "description": "Missing required registryVersion",
+      "data": {
+        "lastUpdated": "2025-01-01T00:00:00Z",
+        "languages": [],
+        "defaultLanguage": "en"
+      },
+      "expectedError": "registryVersion is required"
+    },
+    {
+      "description": "Invalid language code in languages array",
+      "data": {
+        "registryVersion": "1.0.0",
+        "lastUpdated": "2025-01-01T00:00:00Z",
+        "languages": [
+          {
+            "code": "english",
+            "displayName": "English",
+            "nativeName": "English",
+            "direction": "ltr",
+            "status": "available"
+          }
+        ],
+        "defaultLanguage": "en"
+      },
+      "expectedError": "code must match ISO pattern"
+    },
+    {
+      "description": "Invalid status value",
+      "data": {
+        "registryVersion": "1.0.0",
+        "lastUpdated": "2025-01-01T00:00:00Z",
+        "languages": [
+          {
+            "code": "en",
+            "displayName": "English",
+            "nativeName": "English",
+            "direction": "ltr",
+            "status": "enabled"
+          }
+        ],
+        "defaultLanguage": "en"
+      },
+      "expectedError": "status must be one of enum values"
+    }
+  ],
+  "languageSelectionTestCases": [
+    {
+      "description": "Search by display name returns correct language",
+      "searchTerm": "Italian",
+      "expectedCode": "it"
+    },
+    {
+      "description": "Search by native name returns correct language",
+      "searchTerm": "አማርኛ",
+      "expectedCode": "am"
+    },
+    {
+      "description": "Search by code returns correct language",
+      "searchTerm": "sw",
+      "expectedCode": "sw"
+    },
+    {
+      "description": "Case-insensitive search works",
+      "searchTerm": "KISWAHILI",
+      "expectedCode": "sw"
+    },
+    {
+      "description": "Partial match returns results",
+      "searchTerm": "oro",
+      "expectedCode": "om"
+    }
+  ],
+  "dynamicLoadingTestCases": [
+    {
+      "description": "On-demand language loads successfully",
+      "languageCode": "it",
+      "expectedLoaded": true,
+      "loadOnDemand": true
+    },
+    {
+      "description": "Preloaded language is immediately available",
+      "languageCode": "en",
+      "expectedLoaded": true,
+      "loadOnDemand": false
+    },
+    {
+      "description": "RTL language renders correctly",
+      "languageCode": "ar",
+      "expectedDirection": "rtl",
+      "expectedLoaded": true
+    },
+    {
+      "description": "Ethiopic script language loads with correct font",
+      "languageCode": "am",
+      "expectedScriptSystem": "ethiopic",
+      "expectedFont": "Noto Sans Ethiopic"
+    }
+  ]
+}
