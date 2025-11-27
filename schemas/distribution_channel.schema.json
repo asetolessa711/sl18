@@ -1,0 +1,488 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DistributionChannel",
+  "description": "Schema for distribution channels in SL18 - platform metadata, regional settings, format requirements, and monetization rules",
+  "type": "object",
+  "properties": {
+    "channelId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^channel-[a-z0-9-]+$",
+      "description": "Unique distribution channel identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Channel name"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["streaming", "broadcast", "social_media", "podcast", "ott", "radio", "web", "mobile_app", "smart_tv", "syndication_network"],
+      "description": "Channel type"
+    },
+    "platform": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["youtube", "tiktok", "instagram", "facebook", "spotify", "apple_podcasts", "netflix", "amazon_prime", "hulu", "disney_plus", "peacock", "paramount_plus", "hbo_max", "custom"],
+          "description": "Platform name"
+        },
+        "apiVersion": {
+          "type": "string",
+          "description": "Platform API version"
+        },
+        "apiEndpoint": {
+          "type": "string",
+          "format": "uri",
+          "description": "Platform API endpoint"
+        },
+        "credentials": {
+          "type": "object",
+          "properties": {
+            "authType": {
+              "type": "string",
+              "enum": ["oauth2", "api_key", "bearer_token", "basic_auth", "custom"],
+              "description": "Authentication type"
+            },
+            "credentialRef": {
+              "type": "string",
+              "pattern": "^vault://[a-zA-Z0-9/_-]+$",
+              "description": "Reference to stored credentials (never store actual credentials)"
+            },
+            "scopes": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Required API scopes"
+            }
+          },
+          "required": ["authType", "credentialRef"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    },
+    "regions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 region code or 'global'"
+          },
+          "name": {
+            "type": "string",
+            "description": "Region name"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether distribution is enabled in this region"
+          },
+          "restrictions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["content_rating", "genre", "language", "licensing", "regulatory", "custom"],
+                  "description": "Restriction type"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Restriction description"
+                },
+                "action": {
+                  "type": "string",
+                  "enum": ["block", "modify", "require_approval", "age_gate"],
+                  "description": "Action to take"
+                }
+              },
+              "required": ["type", "action"],
+              "additionalProperties": false
+            },
+            "description": "Regional restrictions"
+          },
+          "compliance": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["GDPR", "CCPA", "COPPA", "LGPD", "PDPA", "local_broadcast_law", "content_rating_board"]
+            },
+            "description": "Required compliance frameworks"
+          }
+        },
+        "required": ["code", "enabled"],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "description": "Supported regions"
+    },
+    "formats": {
+      "type": "object",
+      "properties": {
+        "video": {
+          "type": "object",
+          "properties": {
+            "supported": {
+              "type": "boolean"
+            },
+            "codecs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["h264", "h265", "vp9", "av1", "prores"]
+              }
+            },
+            "resolutions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["720p", "1080p", "1440p", "4k", "8k"]
+              }
+            },
+            "maxDuration": {
+              "type": "integer",
+              "description": "Maximum duration in seconds"
+            },
+            "minDuration": {
+              "type": "integer",
+              "description": "Minimum duration in seconds"
+            },
+            "aspectRatios": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["16:9", "9:16", "1:1", "4:3", "21:9"]
+              }
+            },
+            "maxFileSizeMB": {
+              "type": "integer",
+              "description": "Maximum file size in MB"
+            }
+          },
+          "additionalProperties": false
+        },
+        "audio": {
+          "type": "object",
+          "properties": {
+            "supported": {
+              "type": "boolean"
+            },
+            "codecs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["aac", "mp3", "flac", "opus", "wav"]
+              }
+            },
+            "sampleRates": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "channels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["mono", "stereo", "5.1", "7.1", "atmos"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "subtitles": {
+          "type": "object",
+          "properties": {
+            "supported": {
+              "type": "boolean"
+            },
+            "formats": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["srt", "vtt", "ass", "dfxp", "ttml", "stl"]
+              }
+            },
+            "burnInRequired": {
+              "type": "boolean",
+              "description": "Whether subtitles must be burned in"
+            }
+          },
+          "additionalProperties": false
+        },
+        "captions": {
+          "type": "object",
+          "properties": {
+            "supported": {
+              "type": "boolean"
+            },
+            "closedCaptionsRequired": {
+              "type": "boolean",
+              "description": "Whether closed captions are mandatory"
+            },
+            "formats": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["cea-608", "cea-708", "webvtt", "ttml"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "thumbnail": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "formats": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["jpg", "png", "webp"]
+              }
+            },
+            "minWidth": {
+              "type": "integer"
+            },
+            "minHeight": {
+              "type": "integer"
+            },
+            "aspectRatio": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "localization": {
+      "type": "object",
+      "properties": {
+        "supportedLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Supported language codes"
+        },
+        "defaultLanguage": {
+          "type": "string",
+          "description": "Default language"
+        },
+        "requiresLocalization": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["title", "description", "subtitles", "captions", "metadata", "thumbnail"]
+          },
+          "description": "Elements requiring localization"
+        },
+        "translationQcRequired": {
+          "type": "boolean",
+          "description": "Whether translation QC is required"
+        },
+        "rtlSupport": {
+          "type": "boolean",
+          "description": "RTL language support"
+        }
+      },
+      "additionalProperties": false
+    },
+    "monetization": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": ["ad_supported", "subscription", "transactional", "hybrid", "free", "licensed"],
+          "description": "Monetization model"
+        },
+        "adTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["pre_roll", "mid_roll", "post_roll", "banner", "overlay", "sponsored"]
+          },
+          "description": "Supported ad types"
+        },
+        "revenueShare": {
+          "type": "object",
+          "properties": {
+            "creatorPercentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "platformPercentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "franchisePercentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        },
+        "minimumPayoutThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Minimum payout threshold"
+        },
+        "payoutCurrency": {
+          "type": "string",
+          "description": "Payout currency"
+        },
+        "payoutFrequency": {
+          "type": "string",
+          "enum": ["weekly", "biweekly", "monthly", "quarterly"],
+          "description": "Payout frequency"
+        }
+      },
+      "required": ["model"],
+      "additionalProperties": false
+    },
+    "scheduling": {
+      "type": "object",
+      "properties": {
+        "immediatePublish": {
+          "type": "boolean",
+          "description": "Whether immediate publishing is supported"
+        },
+        "scheduledPublish": {
+          "type": "boolean",
+          "description": "Whether scheduled publishing is supported"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "Default timezone for scheduling"
+        },
+        "publishWindows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dayOfWeek": {
+                "type": "string",
+                "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "any"]
+              },
+              "startTime": {
+                "type": "string",
+                "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+              },
+              "endTime": {
+                "type": "string",
+                "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Optimal publish windows"
+        },
+        "leadTimeHours": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Required lead time for publishing in hours"
+        }
+      },
+      "additionalProperties": false
+    },
+    "qcRequirements": {
+      "type": "object",
+      "properties": {
+        "autoQc": {
+          "type": "boolean",
+          "description": "Whether automatic QC is performed"
+        },
+        "manualReviewRequired": {
+          "type": "boolean",
+          "description": "Whether manual review is required"
+        },
+        "minimumQcScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Minimum QC score required"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["technical_quality", "content_rating", "brand_safety", "copyright", "persona_consistency", "translation_accuracy", "metadata_completeness"]
+          },
+          "description": "Required QC checks"
+        }
+      },
+      "additionalProperties": false
+    },
+    "analytics": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean",
+          "description": "Whether analytics are available"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["views", "watch_time", "engagement", "shares", "likes", "comments", "subscribers", "revenue", "ctr", "retention"]
+          },
+          "description": "Available metrics"
+        },
+        "reportingFrequency": {
+          "type": "string",
+          "enum": ["real_time", "hourly", "daily", "weekly"],
+          "description": "Analytics reporting frequency"
+        },
+        "apiAccess": {
+          "type": "boolean",
+          "description": "Whether analytics API access is available"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "maintenance", "deprecated", "pending_setup"],
+      "description": "Channel status"
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Distribution priority (1 = highest)"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "channelId",
+    "name",
+    "type",
+    "platform",
+    "regions",
+    "formats",
+    "monetization",
+    "status",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

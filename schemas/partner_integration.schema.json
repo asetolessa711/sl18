@@ -1,0 +1,521 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PartnerIntegration",
+  "description": "Schema for partner integrations in SL18 - payment providers, distribution partners, analytics partners, and API configurations",
+  "type": "object",
+  "properties": {
+    "partnerId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^partner-[a-z0-9-]+$",
+      "description": "Unique partner identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Partner name"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["payment_provider", "distribution_platform", "analytics_provider", "cdn_provider", "transcoding_service", "translation_service", "moderation_service", "advertising_network", "syndicator", "broadcaster", "licensing_agent"],
+      "description": "Partner type"
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["strategic", "preferred", "standard", "trial"],
+      "description": "Partnership tier"
+    },
+    "contact": {
+      "type": "object",
+      "properties": {
+        "primaryContact": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "phone": { "type": "string" },
+            "role": { "type": "string" }
+          },
+          "required": ["name", "email"],
+          "additionalProperties": false
+        },
+        "technicalContact": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "phone": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "escalationContact": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "phone": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "supportUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": ["primaryContact"],
+      "additionalProperties": false
+    },
+    "api": {
+      "type": "object",
+      "properties": {
+        "baseUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "API base URL"
+        },
+        "version": {
+          "type": "string",
+          "description": "API version"
+        },
+        "authentication": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["api_key", "oauth2", "bearer_token", "basic_auth", "hmac", "jwt", "custom"]
+            },
+            "credentialRef": {
+              "type": "string",
+              "pattern": "^vault://[a-zA-Z0-9/_-]+$",
+              "description": "Reference to stored API credentials"
+            },
+            "tokenEndpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "OAuth2 token endpoint"
+            },
+            "scopes": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Required OAuth scopes"
+            },
+            "expiresAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Credential expiration"
+            }
+          },
+          "required": ["type", "credentialRef"],
+          "additionalProperties": false
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string",
+                "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+              },
+              "description": {
+                "type": "string"
+              },
+              "rateLimit": {
+                "type": "integer",
+                "description": "Requests per minute"
+              }
+            },
+            "required": ["name", "path", "method"],
+            "additionalProperties": false
+          },
+          "description": "Available endpoints"
+        },
+        "webhooks": {
+          "type": "object",
+          "properties": {
+            "supported": {
+              "type": "boolean"
+            },
+            "events": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Available webhook events"
+            },
+            "signatureVerification": {
+              "type": "string",
+              "enum": ["hmac_sha256", "hmac_sha512", "rsa", "none"]
+            },
+            "secretRef": {
+              "type": "string",
+              "description": "Reference to webhook secret"
+            }
+          },
+          "additionalProperties": false
+        },
+        "sdks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "language": {
+                "type": "string",
+                "enum": ["javascript", "python", "java", "csharp", "go", "ruby", "php"]
+              },
+              "version": {
+                "type": "string"
+              },
+              "repository": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Available SDKs"
+        },
+        "sandbox": {
+          "type": "object",
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "baseUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "credentialRef": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["baseUrl", "authentication"],
+      "additionalProperties": false
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "capabilityId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "configuration": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": ["capabilityId", "name", "enabled"],
+        "additionalProperties": false
+      },
+      "description": "Partner capabilities"
+    },
+    "revenueShare": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": ["percentage", "flat_fee", "tiered", "performance_based", "hybrid"],
+          "description": "Revenue share model"
+        },
+        "terms": {
+          "type": "object",
+          "properties": {
+            "sl18Percentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "partnerPercentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "flatFee": {
+              "type": "number",
+              "minimum": 0
+            },
+            "minimumGuarantee": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "tiers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "threshold": {
+                "type": "number"
+              },
+              "sl18Percentage": {
+                "type": "number"
+              },
+              "partnerPercentage": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "payoutSchedule": {
+          "type": "string",
+          "enum": ["weekly", "biweekly", "monthly", "quarterly", "on_demand"]
+        },
+        "currency": {
+          "type": "string"
+        },
+        "minimumPayout": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": ["model"],
+      "additionalProperties": false
+    },
+    "sla": {
+      "type": "object",
+      "properties": {
+        "uptimeGuarantee": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Uptime guarantee percentage"
+        },
+        "responseTime": {
+          "type": "object",
+          "properties": {
+            "p50": { "type": "integer", "description": "50th percentile in ms" },
+            "p95": { "type": "integer", "description": "95th percentile in ms" },
+            "p99": { "type": "integer", "description": "99th percentile in ms" }
+          },
+          "additionalProperties": false
+        },
+        "supportResponseTime": {
+          "type": "object",
+          "properties": {
+            "critical": { "type": "string", "description": "Critical issue response time" },
+            "high": { "type": "string" },
+            "medium": { "type": "string" },
+            "low": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "dataProcessingTime": {
+          "type": "string",
+          "description": "Maximum data processing time"
+        },
+        "penalties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": { "type": "string" },
+              "penalty": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "certifications": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["SOC2", "ISO27001", "PCI-DSS", "GDPR", "CCPA", "HIPAA", "FedRAMP"]
+          },
+          "description": "Compliance certifications"
+        },
+        "dataResidency": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Data residency regions"
+        },
+        "dataProcessingAgreement": {
+          "type": "object",
+          "properties": {
+            "signed": { "type": "boolean" },
+            "signedAt": { "type": "string", "format": "date-time" },
+            "documentRef": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "privacyPolicy": {
+          "type": "string",
+          "format": "uri"
+        },
+        "securityContact": {
+          "type": "string",
+          "format": "email"
+        }
+      },
+      "additionalProperties": false
+    },
+    "regions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "endpoint": {
+            "type": "string",
+            "format": "uri"
+          },
+          "restrictions": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["code", "enabled"],
+        "additionalProperties": false
+      },
+      "description": "Supported regions"
+    },
+    "integrationStatus": {
+      "type": "object",
+      "properties": {
+        "setupComplete": {
+          "type": "boolean"
+        },
+        "lastHealthCheck": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "healthStatus": {
+          "type": "string",
+          "enum": ["healthy", "degraded", "unhealthy", "unknown"]
+        },
+        "lastError": {
+          "type": "object",
+          "properties": {
+            "timestamp": { "type": "string", "format": "date-time" },
+            "code": { "type": "string" },
+            "message": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "testsPassed": {
+          "type": "boolean"
+        },
+        "lastTestedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "totalTransactions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalRevenue": {
+          "type": "number",
+          "minimum": 0
+        },
+        "averageResponseTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average API response time in ms"
+        },
+        "errorRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Error rate percentage"
+        },
+        "uptime": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Uptime percentage"
+        }
+      },
+      "additionalProperties": false
+    },
+    "agreement": {
+      "type": "object",
+      "properties": {
+        "contractId": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "autoRenew": {
+          "type": "boolean"
+        },
+        "terminationNoticeDays": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "documentRef": {
+          "type": "string",
+          "description": "Reference to contract document"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "pending_setup", "suspended", "terminated", "trial"],
+      "description": "Integration status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "partnerId",
+    "name",
+    "type",
+    "contact",
+    "api",
+    "status",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,923 @@
+{
+  "validDistributionChannels": [
+    {
+      "channelId": "channel-youtube-global",
+      "name": "YouTube Global Distribution",
+      "type": "streaming",
+      "platform": {
+        "name": "youtube",
+        "apiVersion": "v3",
+        "apiEndpoint": "https://www.googleapis.com/youtube/v3",
+        "credentials": {
+          "authType": "oauth2",
+          "credentialRef": "vault://youtube/oauth-main",
+          "scopes": ["youtube.upload", "youtube.readonly", "youtube.partner"]
+        }
+      },
+      "regions": [
+        {
+          "code": "global",
+          "name": "Worldwide",
+          "enabled": true,
+          "restrictions": [],
+          "compliance": ["GDPR", "CCPA", "COPPA"]
+        },
+        {
+          "code": "CN",
+          "name": "China",
+          "enabled": false,
+          "restrictions": [
+            {
+              "type": "regulatory",
+              "description": "YouTube not available in China",
+              "action": "block"
+            }
+          ],
+          "compliance": []
+        }
+      ],
+      "formats": {
+        "video": {
+          "supported": true,
+          "codecs": ["h264", "h265", "vp9"],
+          "resolutions": ["720p", "1080p", "1440p", "4k"],
+          "maxDuration": 43200,
+          "minDuration": 1,
+          "aspectRatios": ["16:9", "9:16", "1:1"],
+          "maxFileSizeMB": 256000
+        },
+        "audio": {
+          "supported": true,
+          "codecs": ["aac", "mp3", "opus"],
+          "sampleRates": [44100, 48000],
+          "channels": ["mono", "stereo", "5.1"]
+        },
+        "subtitles": {
+          "supported": true,
+          "formats": ["srt", "vtt", "ass"],
+          "burnInRequired": false
+        },
+        "captions": {
+          "supported": true,
+          "closedCaptionsRequired": false,
+          "formats": ["cea-608", "cea-708", "webvtt"]
+        },
+        "thumbnail": {
+          "required": true,
+          "formats": ["jpg", "png"],
+          "minWidth": 1280,
+          "minHeight": 720,
+          "aspectRatio": "16:9"
+        }
+      },
+      "localization": {
+        "supportedLanguages": ["en", "es", "fr", "de", "pt", "ar", "zh-CN", "ja", "ko", "it", "sw", "am", "om"],
+        "defaultLanguage": "en",
+        "requiresLocalization": ["title", "description", "subtitles"],
+        "translationQcRequired": true,
+        "rtlSupport": true
+      },
+      "monetization": {
+        "model": "ad_supported",
+        "adTypes": ["pre_roll", "mid_roll", "post_roll", "overlay"],
+        "revenueShare": {
+          "creatorPercentage": 55,
+          "platformPercentage": 45,
+          "franchisePercentage": 0
+        },
+        "minimumPayoutThreshold": 100,
+        "payoutCurrency": "USD",
+        "payoutFrequency": "monthly"
+      },
+      "scheduling": {
+        "immediatePublish": true,
+        "scheduledPublish": true,
+        "timezone": "UTC",
+        "publishWindows": [
+          {
+            "dayOfWeek": "any",
+            "startTime": "00:00",
+            "endTime": "23:59"
+          }
+        ],
+        "leadTimeHours": 0
+      },
+      "qcRequirements": {
+        "autoQc": true,
+        "manualReviewRequired": false,
+        "minimumQcScore": 85,
+        "checks": ["technical_quality", "content_rating", "brand_safety", "copyright", "metadata_completeness"]
+      },
+      "analytics": {
+        "available": true,
+        "metrics": ["views", "watch_time", "engagement", "shares", "likes", "comments", "subscribers", "revenue", "ctr", "retention"],
+        "reportingFrequency": "daily",
+        "apiAccess": true
+      },
+      "status": "active",
+      "priority": 1,
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": "2025-11-27T00:00:00Z"
+    },
+    {
+      "channelId": "channel-tiktok-africa",
+      "name": "TikTok Africa Distribution",
+      "type": "social_media",
+      "platform": {
+        "name": "tiktok",
+        "apiVersion": "v2",
+        "apiEndpoint": "https://open-api.tiktok.com",
+        "credentials": {
+          "authType": "oauth2",
+          "credentialRef": "vault://tiktok/oauth-africa",
+          "scopes": ["video.upload", "video.list"]
+        }
+      },
+      "regions": [
+        {
+          "code": "KE",
+          "name": "Kenya",
+          "enabled": true,
+          "restrictions": [],
+          "compliance": ["local_broadcast_law"]
+        },
+        {
+          "code": "NG",
+          "name": "Nigeria",
+          "enabled": true,
+          "restrictions": [],
+          "compliance": ["local_broadcast_law"]
+        },
+        {
+          "code": "ET",
+          "name": "Ethiopia",
+          "enabled": true,
+          "restrictions": [],
+          "compliance": ["local_broadcast_law"]
+        }
+      ],
+      "formats": {
+        "video": {
+          "supported": true,
+          "codecs": ["h264"],
+          "resolutions": ["720p", "1080p"],
+          "maxDuration": 600,
+          "minDuration": 5,
+          "aspectRatios": ["9:16", "1:1"],
+          "maxFileSizeMB": 287
+        },
+        "audio": {
+          "supported": true,
+          "codecs": ["aac"],
+          "sampleRates": [44100],
+          "channels": ["stereo"]
+        },
+        "subtitles": {
+          "supported": true,
+          "formats": ["srt"],
+          "burnInRequired": true
+        },
+        "captions": {
+          "supported": false,
+          "closedCaptionsRequired": false,
+          "formats": []
+        },
+        "thumbnail": {
+          "required": false,
+          "formats": ["jpg"],
+          "minWidth": 720,
+          "minHeight": 1280,
+          "aspectRatio": "9:16"
+        }
+      },
+      "localization": {
+        "supportedLanguages": ["en", "sw", "am", "om"],
+        "defaultLanguage": "en",
+        "requiresLocalization": ["subtitles"],
+        "translationQcRequired": true,
+        "rtlSupport": false
+      },
+      "monetization": {
+        "model": "hybrid",
+        "adTypes": ["sponsored"],
+        "revenueShare": {
+          "creatorPercentage": 50,
+          "platformPercentage": 30,
+          "franchisePercentage": 20
+        },
+        "minimumPayoutThreshold": 50,
+        "payoutCurrency": "USD",
+        "payoutFrequency": "monthly"
+      },
+      "scheduling": {
+        "immediatePublish": true,
+        "scheduledPublish": true,
+        "timezone": "Africa/Nairobi",
+        "publishWindows": [
+          {
+            "dayOfWeek": "any",
+            "startTime": "18:00",
+            "endTime": "22:00"
+          }
+        ],
+        "leadTimeHours": 1
+      },
+      "qcRequirements": {
+        "autoQc": true,
+        "manualReviewRequired": true,
+        "minimumQcScore": 90,
+        "checks": ["technical_quality", "content_rating", "persona_consistency", "translation_accuracy"]
+      },
+      "analytics": {
+        "available": true,
+        "metrics": ["views", "engagement", "shares", "likes", "comments"],
+        "reportingFrequency": "daily",
+        "apiAccess": true
+      },
+      "status": "active",
+      "priority": 2,
+      "createdAt": "2025-03-01T00:00:00Z",
+      "updatedAt": "2025-11-27T00:00:00Z"
+    }
+  ],
+  "validSyndicationFeeds": [
+    {
+      "feedId": "feed-podcast-kenya",
+      "name": "Kenya Franchise Podcast Feed",
+      "franchiseId": "kenya-001",
+      "type": "rss",
+      "format": {
+        "contentType": "application/rss+xml",
+        "version": "2.0",
+        "encoding": "UTF-8",
+        "extensions": [
+          {
+            "name": "itunes",
+            "prefix": "itunes",
+            "namespaceUri": "http://www.itunes.com/dtds/podcast-1.0.dtd"
+          },
+          {
+            "name": "media_rss",
+            "prefix": "media",
+            "namespaceUri": "http://search.yahoo.com/mrss/"
+          }
+        ]
+      },
+      "endpoint": {
+        "url": "https://feeds.sl18.io/kenya-001/podcast.rss",
+        "authentication": {
+          "required": false,
+          "type": "none"
+        },
+        "rateLimit": {
+          "requestsPerMinute": 60,
+          "requestsPerHour": 1000,
+          "requestsPerDay": 10000
+        },
+        "caching": {
+          "enabled": true,
+          "ttlSeconds": 3600,
+          "etag": true
+        }
+      },
+      "content": {
+        "itemLimit": 100,
+        "includeTypes": ["episode", "trailer"],
+        "excludeTypes": [],
+        "filters": [
+          {
+            "field": "status",
+            "operator": "equals",
+            "value": "published"
+          },
+          {
+            "field": "language",
+            "operator": "in",
+            "value": ["en", "sw"]
+          }
+        ],
+        "sorting": {
+          "field": "publishedAt",
+          "order": "desc"
+        }
+      },
+      "metadata": {
+        "title": "SL18 Kenya Podcast",
+        "description": "Official podcast feed for the SL18 Kenya franchise featuring drama, comedy, and music content",
+        "language": "en",
+        "author": {
+          "name": "SL18 Kenya",
+          "email": "kenya@sl18.io",
+          "url": "https://sl18.io/kenya"
+        },
+        "copyright": "© 2025 SL18 Kenya. All rights reserved.",
+        "image": {
+          "url": "https://assets.sl18.io/kenya/podcast-cover.jpg",
+          "title": "SL18 Kenya Podcast",
+          "width": 3000,
+          "height": 3000
+        },
+        "categories": ["Drama", "Comedy", "Entertainment"],
+        "explicit": false,
+        "keywords": ["drama", "comedy", "kenya", "africa", "entertainment"]
+      },
+      "localization": {
+        "enabled": true,
+        "languages": [
+          {
+            "code": "en",
+            "feedUrl": "https://feeds.sl18.io/kenya-001/podcast-en.rss",
+            "includeTranslations": true
+          },
+          {
+            "code": "sw",
+            "feedUrl": "https://feeds.sl18.io/kenya-001/podcast-sw.rss",
+            "includeTranslations": true
+          }
+        ],
+        "fallbackLanguage": "en"
+      },
+      "distribution": {
+        "channels": ["channel-spotify-podcast", "channel-apple-podcasts"],
+        "partners": ["partner-spotify", "partner-apple"],
+        "autoPublish": true,
+        "publishDelay": 0,
+        "expirationPolicy": {
+          "enabled": false,
+          "daysUntilExpiration": 365,
+          "action": "archive"
+        }
+      },
+      "compliance": {
+        "contentRating": "TV-PG",
+        "geoRestrictions": [],
+        "licensingTerms": {
+          "licenseType": "non_exclusive",
+          "startDate": "2025-01-01T00:00:00Z",
+          "territories": ["KE", "TZ", "UG"]
+        },
+        "copyrightNotice": "© 2025 SL18 Kenya"
+      },
+      "webhooks": [
+        {
+          "webhookId": "webhook-feed-update-001",
+          "url": "https://hooks.sl18.io/feed-updates",
+          "events": ["item_added", "item_updated", "feed_updated"],
+          "secret": "vault://webhooks/feed-kenya",
+          "active": true
+        }
+      ],
+      "metrics": {
+        "totalItems": 156,
+        "totalSubscribers": 12500,
+        "requestsToday": 3420,
+        "lastFetched": "2025-11-27T12:00:00Z",
+        "averageResponseTime": 45
+      },
+      "status": "active",
+      "createdAt": "2025-01-15T00:00:00Z",
+      "updatedAt": "2025-11-27T00:00:00Z"
+    },
+    {
+      "feedId": "feed-api-syndication",
+      "name": "API Syndication Feed",
+      "franchiseId": "global",
+      "type": "api",
+      "format": {
+        "contentType": "application/json",
+        "version": "1.0",
+        "encoding": "UTF-8"
+      },
+      "endpoint": {
+        "url": "https://api.sl18.io/v1/syndication/content",
+        "authentication": {
+          "required": true,
+          "type": "bearer_token",
+          "credentialRef": "vault://api/syndication-token"
+        },
+        "rateLimit": {
+          "requestsPerMinute": 100,
+          "requestsPerHour": 5000,
+          "requestsPerDay": 50000
+        },
+        "caching": {
+          "enabled": true,
+          "ttlSeconds": 300,
+          "etag": true
+        }
+      },
+      "content": {
+        "itemLimit": 500,
+        "includeTypes": ["episode", "series", "clip", "teaser"],
+        "filters": [],
+        "sorting": {
+          "field": "updatedAt",
+          "order": "desc"
+        }
+      },
+      "metadata": {
+        "title": "SL18 Syndication API",
+        "description": "Real-time content syndication API for distribution partners",
+        "language": "en"
+      },
+      "distribution": {
+        "channels": [],
+        "partners": ["partner-broadcaster-001", "partner-ott-001"],
+        "autoPublish": false,
+        "publishDelay": 60
+      },
+      "compliance": {
+        "contentRating": "unrated",
+        "geoRestrictions": [],
+        "licensingTerms": {
+          "licenseType": "non_exclusive"
+        }
+      },
+      "webhooks": [],
+      "metrics": {
+        "totalItems": 2340,
+        "totalSubscribers": 15,
+        "requestsToday": 8750,
+        "lastFetched": "2025-11-27T14:30:00Z",
+        "averageResponseTime": 120
+      },
+      "status": "active",
+      "createdAt": "2025-02-01T00:00:00Z",
+      "updatedAt": "2025-11-27T00:00:00Z"
+    }
+  ],
+  "validPartnerIntegrations": [
+    {
+      "partnerId": "partner-stripe-payments",
+      "name": "Stripe Payment Processing",
+      "type": "payment_provider",
+      "tier": "strategic",
+      "contact": {
+        "primaryContact": {
+          "name": "Stripe Partner Support",
+          "email": "partners@stripe.com",
+          "role": "Partner Manager"
+        },
+        "technicalContact": {
+          "name": "Stripe Technical Support",
+          "email": "techsupport@stripe.com"
+        },
+        "supportUrl": "https://support.stripe.com"
+      },
+      "api": {
+        "baseUrl": "https://api.stripe.com/v1",
+        "version": "2023-10-16",
+        "authentication": {
+          "type": "bearer_token",
+          "credentialRef": "vault://stripe/api-key-live",
+          "expiresAt": null
+        },
+        "endpoints": [
+          {
+            "name": "Create Payment Intent",
+            "path": "/payment_intents",
+            "method": "POST",
+            "description": "Create a payment intent for processing",
+            "rateLimit": 100
+          },
+          {
+            "name": "Create Payout",
+            "path": "/payouts",
+            "method": "POST",
+            "description": "Create a payout to connected account",
+            "rateLimit": 50
+          },
+          {
+            "name": "List Transactions",
+            "path": "/balance_transactions",
+            "method": "GET",
+            "description": "List balance transactions",
+            "rateLimit": 100
+          }
+        ],
+        "webhooks": {
+          "supported": true,
+          "events": ["payment_intent.succeeded", "payment_intent.payment_failed", "payout.paid", "payout.failed", "charge.refunded", "charge.dispute.created"],
+          "signatureVerification": "hmac_sha256",
+          "secretRef": "vault://stripe/webhook-secret"
+        },
+        "sdks": [
+          {
+            "language": "javascript",
+            "version": "14.0.0",
+            "repository": "https://github.com/stripe/stripe-node"
+          },
+          {
+            "language": "python",
+            "version": "7.0.0",
+            "repository": "https://github.com/stripe/stripe-python"
+          }
+        ],
+        "sandbox": {
+          "available": true,
+          "baseUrl": "https://api.stripe.com/v1",
+          "credentialRef": "vault://stripe/api-key-test"
+        }
+      },
+      "capabilities": [
+        {
+          "capabilityId": "payment_processing",
+          "name": "Payment Processing",
+          "description": "Process payments via Visa, Mastercard, PayPal, etc.",
+          "enabled": true,
+          "configuration": {
+            "supportedMethods": ["card", "paypal", "bank_transfer", "crypto"],
+            "currencies": ["USD", "EUR", "GBP", "KES", "NGN", "ETB"]
+          }
+        },
+        {
+          "capabilityId": "payouts",
+          "name": "Contributor Payouts",
+          "description": "Automated payouts to contributors",
+          "enabled": true,
+          "configuration": {
+            "payoutMethods": ["bank_transfer", "stripe_connect"],
+            "minimumPayout": 10
+          }
+        },
+        {
+          "capabilityId": "fraud_detection",
+          "name": "Fraud Detection",
+          "description": "AI-powered fraud detection",
+          "enabled": true,
+          "configuration": {
+            "riskThreshold": 75,
+            "autoBlock": true
+          }
+        }
+      ],
+      "revenueShare": {
+        "model": "percentage",
+        "terms": {
+          "sl18Percentage": 0,
+          "partnerPercentage": 2.9
+        },
+        "payoutSchedule": "on_demand",
+        "currency": "USD",
+        "minimumPayout": 0
+      },
+      "sla": {
+        "uptimeGuarantee": 99.99,
+        "responseTime": {
+          "p50": 100,
+          "p95": 500,
+          "p99": 1000
+        },
+        "supportResponseTime": {
+          "critical": "1 hour",
+          "high": "4 hours",
+          "medium": "24 hours",
+          "low": "72 hours"
+        },
+        "dataProcessingTime": "< 5 seconds"
+      },
+      "compliance": {
+        "certifications": ["SOC2", "PCI-DSS", "GDPR"],
+        "dataResidency": ["US", "EU", "AP"],
+        "dataProcessingAgreement": {
+          "signed": true,
+          "signedAt": "2025-01-01T00:00:00Z",
+          "documentRef": "contracts/stripe-dpa-2025.pdf"
+        },
+        "privacyPolicy": "https://stripe.com/privacy",
+        "securityContact": "security@stripe.com"
+      },
+      "regions": [
+        {
+          "code": "global",
+          "enabled": true,
+          "endpoint": "https://api.stripe.com/v1"
+        }
+      ],
+      "integrationStatus": {
+        "setupComplete": true,
+        "lastHealthCheck": "2025-11-27T14:00:00Z",
+        "healthStatus": "healthy",
+        "testsPassed": true,
+        "lastTestedAt": "2025-11-27T10:00:00Z"
+      },
+      "metrics": {
+        "totalTransactions": 125000,
+        "totalRevenue": 4500000,
+        "averageResponseTime": 150,
+        "errorRate": 0.02,
+        "uptime": 99.99
+      },
+      "agreement": {
+        "contractId": "stripe-contract-2025",
+        "startDate": "2025-01-01",
+        "endDate": "2026-12-31",
+        "autoRenew": true,
+        "terminationNoticeDays": 90,
+        "documentRef": "contracts/stripe-master-2025.pdf"
+      },
+      "status": "active",
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": "2025-11-27T00:00:00Z"
+    },
+    {
+      "partnerId": "partner-analytics-mixpanel",
+      "name": "Mixpanel Analytics",
+      "type": "analytics_provider",
+      "tier": "preferred",
+      "contact": {
+        "primaryContact": {
+          "name": "Mixpanel Partner Team",
+          "email": "partners@mixpanel.com",
+          "role": "Account Manager"
+        },
+        "supportUrl": "https://help.mixpanel.com"
+      },
+      "api": {
+        "baseUrl": "https://api.mixpanel.com",
+        "version": "2.0",
+        "authentication": {
+          "type": "bearer_token",
+          "credentialRef": "vault://mixpanel/api-secret"
+        },
+        "endpoints": [
+          {
+            "name": "Track Event",
+            "path": "/track",
+            "method": "POST",
+            "description": "Track user events",
+            "rateLimit": 1000
+          },
+          {
+            "name": "Query Events",
+            "path": "/query",
+            "method": "POST",
+            "description": "Query event data",
+            "rateLimit": 60
+          }
+        ],
+        "webhooks": {
+          "supported": false,
+          "events": []
+        },
+        "sdks": [
+          {
+            "language": "javascript",
+            "version": "2.47.0",
+            "repository": "https://github.com/mixpanel/mixpanel-js"
+          }
+        ],
+        "sandbox": {
+          "available": true,
+          "baseUrl": "https://api.mixpanel.com",
+          "credentialRef": "vault://mixpanel/api-secret-dev"
+        }
+      },
+      "capabilities": [
+        {
+          "capabilityId": "event_tracking",
+          "name": "Event Tracking",
+          "description": "Track user events and engagement",
+          "enabled": true
+        },
+        {
+          "capabilityId": "audience_insights",
+          "name": "Audience Insights",
+          "description": "Analyze audience demographics and behavior",
+          "enabled": true
+        },
+        {
+          "capabilityId": "retention_analysis",
+          "name": "Retention Analysis",
+          "description": "Analyze user retention and churn",
+          "enabled": true
+        }
+      ],
+      "revenueShare": {
+        "model": "flat_fee",
+        "terms": {
+          "flatFee": 2000
+        },
+        "payoutSchedule": "monthly",
+        "currency": "USD"
+      },
+      "sla": {
+        "uptimeGuarantee": 99.9,
+        "responseTime": {
+          "p50": 50,
+          "p95": 200,
+          "p99": 500
+        },
+        "supportResponseTime": {
+          "critical": "4 hours",
+          "high": "8 hours",
+          "medium": "24 hours",
+          "low": "72 hours"
+        }
+      },
+      "compliance": {
+        "certifications": ["SOC2", "GDPR", "CCPA"],
+        "dataResidency": ["US", "EU"],
+        "dataProcessingAgreement": {
+          "signed": true,
+          "signedAt": "2025-02-01T00:00:00Z",
+          "documentRef": "contracts/mixpanel-dpa-2025.pdf"
+        },
+        "privacyPolicy": "https://mixpanel.com/legal/privacy-policy"
+      },
+      "regions": [
+        {
+          "code": "US",
+          "enabled": true,
+          "endpoint": "https://api.mixpanel.com"
+        },
+        {
+          "code": "EU",
+          "enabled": true,
+          "endpoint": "https://api-eu.mixpanel.com"
+        }
+      ],
+      "integrationStatus": {
+        "setupComplete": true,
+        "lastHealthCheck": "2025-11-27T14:00:00Z",
+        "healthStatus": "healthy",
+        "testsPassed": true,
+        "lastTestedAt": "2025-11-20T10:00:00Z"
+      },
+      "metrics": {
+        "totalTransactions": 5000000,
+        "totalRevenue": 0,
+        "averageResponseTime": 75,
+        "errorRate": 0.01,
+        "uptime": 99.95
+      },
+      "agreement": {
+        "contractId": "mixpanel-contract-2025",
+        "startDate": "2025-02-01",
+        "endDate": "2026-01-31",
+        "autoRenew": true,
+        "terminationNoticeDays": 30,
+        "documentRef": "contracts/mixpanel-master-2025.pdf"
+      },
+      "status": "active",
+      "createdAt": "2025-02-01T00:00:00Z",
+      "updatedAt": "2025-11-27T00:00:00Z"
+    }
+  ],
+  "distributionAuditEvents": [
+    {
+      "logId": "audit-dist-001",
+      "timestamp": "2025-11-27T10:00:00Z",
+      "eventType": "distribution_started",
+      "category": "distribution",
+      "actor": {
+        "type": "automation",
+        "id": "distribution-service",
+        "name": "SL18 Distribution Service"
+      },
+      "target": {
+        "type": "distribution_channel",
+        "id": "channel-youtube-global",
+        "franchiseId": "kenya-001"
+      },
+      "details": {
+        "description": "Started distribution to YouTube Global for episode EP-2025-156",
+        "metadata": {
+          "episodeId": "EP-2025-156",
+          "contentType": "episode",
+          "language": "en",
+          "resolution": "1080p"
+        }
+      },
+      "result": "success",
+      "correlationId": "dist-batch-20251127-001"
+    },
+    {
+      "logId": "audit-dist-002",
+      "timestamp": "2025-11-27T10:05:00Z",
+      "eventType": "distribution_completed",
+      "category": "distribution",
+      "actor": {
+        "type": "automation",
+        "id": "distribution-service",
+        "name": "SL18 Distribution Service"
+      },
+      "target": {
+        "type": "distribution_channel",
+        "id": "channel-youtube-global",
+        "franchiseId": "kenya-001"
+      },
+      "details": {
+        "description": "Successfully distributed episode to YouTube",
+        "metadata": {
+          "episodeId": "EP-2025-156",
+          "platformVideoId": "dQw4w9WgXcQ",
+          "uploadDuration": 285,
+          "processingStatus": "complete"
+        }
+      },
+      "result": "success",
+      "correlationId": "dist-batch-20251127-001"
+    },
+    {
+      "logId": "audit-partner-001",
+      "timestamp": "2025-11-27T09:00:00Z",
+      "eventType": "partner_integration_created",
+      "category": "partner",
+      "actor": {
+        "type": "user",
+        "id": "admin-001",
+        "name": "System Administrator"
+      },
+      "target": {
+        "type": "partner_integration",
+        "id": "partner-broadcaster-africa"
+      },
+      "details": {
+        "description": "Created new partner integration for Africa Broadcasting Network",
+        "metadata": {
+          "partnerType": "broadcaster",
+          "tier": "preferred",
+          "regions": ["KE", "NG", "ET", "TZ"]
+        }
+      },
+      "result": "success",
+      "correlationId": "partner-setup-20251127-001"
+    },
+    {
+      "logId": "audit-feed-001",
+      "timestamp": "2025-11-27T08:00:00Z",
+      "eventType": "syndication_feed_updated",
+      "category": "syndication",
+      "actor": {
+        "type": "automation",
+        "id": "feed-generator",
+        "name": "Syndication Feed Generator"
+      },
+      "target": {
+        "type": "syndication_feed",
+        "id": "feed-podcast-kenya",
+        "franchiseId": "kenya-001"
+      },
+      "details": {
+        "description": "Updated podcast feed with 3 new episodes",
+        "metadata": {
+          "itemsAdded": 3,
+          "itemsRemoved": 0,
+          "totalItems": 156,
+          "feedSize": 245678
+        }
+      },
+      "result": "success",
+      "correlationId": "feed-update-20251127-001"
+    },
+    {
+      "logId": "audit-compliance-001",
+      "timestamp": "2025-11-27T07:00:00Z",
+      "eventType": "regional_compliance_check_passed",
+      "category": "compliance",
+      "actor": {
+        "type": "automation",
+        "id": "compliance-checker",
+        "name": "Regional Compliance Checker"
+      },
+      "target": {
+        "type": "content",
+        "id": "EP-2025-156",
+        "franchiseId": "kenya-001"
+      },
+      "details": {
+        "description": "Content passed regional compliance check for Kenya distribution",
+        "metadata": {
+          "region": "KE",
+          "checksPassed": ["content_rating", "local_broadcast_law", "language_requirements"],
+          "score": 100
+        }
+      },
+      "result": "success",
+      "correlationId": "compliance-20251127-001"
+    }
+  ],
+  "invalidDistributionChannel": {
+    "channelId": "invalid",
+    "name": "X",
+    "type": "invalid_type",
+    "platform": {},
+    "regions": [],
+    "formats": {},
+    "monetization": {},
+    "status": "unknown"
+  },
+  "invalidSyndicationFeed": {
+    "feedId": "bad",
+    "type": "invalid",
+    "format": {},
+    "endpoint": {}
+  },
+  "invalidPartnerIntegration": {
+    "partnerId": "x",
+    "type": "unknown",
+    "contact": {},
+    "api": {}
+  }
+}
