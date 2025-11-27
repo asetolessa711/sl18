@@ -1,0 +1,357 @@
+{
+  "validSeriesWorkspaces": [
+    {
+      "seriesId": "series-drama-001",
+      "franchiseId": "kenya-001",
+      "title": "The Nairobi Chronicles",
+      "description": "A serialized drama following the lives of young entrepreneurs in Nairobi",
+      "format": "serialized_drama",
+      "seasonInfo": {
+        "seasonNumber": 1,
+        "totalSeasons": 3,
+        "episodesPerSeason": 10
+      },
+      "episodes": [
+        {
+          "episodeId": "ep-s1-e01",
+          "seasonNumber": 1,
+          "episodeNumber": 1,
+          "title": "New Beginnings",
+          "synopsis": "Three friends launch their startup in downtown Nairobi",
+          "duration": 1200,
+          "status": "published",
+          "languages": ["en", "sw"],
+          "publishedAt": "2025-01-15T18:00:00Z"
+        },
+        {
+          "episodeId": "ep-s1-e02",
+          "seasonNumber": 1,
+          "episodeNumber": 2,
+          "title": "First Investor",
+          "synopsis": "The team meets their first potential investor",
+          "duration": 1180,
+          "status": "published",
+          "continuityNotes": "Reference to launch event from E01",
+          "previousEpisodeRef": "ep-s1-e01",
+          "languages": ["en", "sw"],
+          "publishedAt": "2025-01-22T18:00:00Z"
+        },
+        {
+          "episodeId": "ep-s1-e03",
+          "seasonNumber": 1,
+          "episodeNumber": 3,
+          "title": "The Pitch",
+          "synopsis": "High-stakes investor presentation",
+          "duration": 1250,
+          "status": "qc",
+          "continuityNotes": "Investor character introduced in E02",
+          "previousEpisodeRef": "ep-s1-e02",
+          "languages": ["en", "sw"]
+        }
+      ],
+      "personaProfile": {
+        "primaryPersonas": [
+          {
+            "personaId": "persona-amara",
+            "name": "Amara Okonkwo",
+            "role": "Lead Founder",
+            "firstAppearance": {
+              "seasonNumber": 1,
+              "episodeNumber": 1
+            },
+            "characteristics": ["Ambitious", "Optimistic", "Tech-savvy"],
+            "voiceProfile": {
+              "voiceId": "voice-amara-001",
+              "tone": "Confident and warm",
+              "speechPatterns": ["Uses tech jargon", "Ends sentences with 'you know?'"]
+            }
+          },
+          {
+            "personaId": "persona-kofi",
+            "name": "Kofi Mensah",
+            "role": "CTO",
+            "firstAppearance": {
+              "seasonNumber": 1,
+              "episodeNumber": 1
+            },
+            "characteristics": ["Introverted", "Brilliant", "Cautious"],
+            "voiceProfile": {
+              "voiceId": "voice-kofi-001",
+              "tone": "Thoughtful and measured"
+            }
+          }
+        ],
+        "recurringPersonas": [
+          {
+            "personaId": "persona-investor",
+            "name": "Mr. Obi",
+            "episodeAppearances": ["ep-s1-e02", "ep-s1-e03"]
+          }
+        ],
+        "continuityRules": [
+          {
+            "ruleId": "rule-amara-speech",
+            "personaId": "persona-amara",
+            "rule": "Must maintain consistent use of tech startup vocabulary",
+            "enforceAcrossEpisodes": true
+          },
+          {
+            "ruleId": "rule-kofi-tone",
+            "personaId": "persona-kofi",
+            "rule": "Never raises voice unless extreme situation",
+            "enforceAcrossEpisodes": true
+          }
+        ]
+      },
+      "continuityNotes": {
+        "plotThreads": [
+          {
+            "threadId": "thread-funding",
+            "description": "Search for Series A funding",
+            "status": "active",
+            "introducedIn": "ep-s1-e01"
+          },
+          {
+            "threadId": "thread-competitor",
+            "description": "Rival company stealing ideas",
+            "status": "active",
+            "introducedIn": "ep-s1-e02"
+          }
+        ],
+        "worldBuildingElements": [
+          {
+            "elementId": "elem-office",
+            "type": "location",
+            "name": "The Hub",
+            "description": "Co-working space in Westlands",
+            "firstMention": "ep-s1-e01"
+          }
+        ],
+        "timelineEvents": [
+          {
+            "eventId": "event-launch",
+            "description": "Startup officially launched",
+            "episodeId": "ep-s1-e01",
+            "inStoryDate": "January 2025"
+          }
+        ]
+      },
+      "qcRequirements": {
+        "personaContinuityCheck": true,
+        "plotContinuityCheck": true,
+        "crossEpisodeReview": true,
+        "minimumContinuityScore": 90
+      },
+      "languages": ["en", "sw"],
+      "status": "active",
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": "2025-01-22T18:00:00Z"
+    }
+  ],
+  "validHybridPipelines": [
+    {
+      "pipelineId": "pipeline-hybrid-001",
+      "franchiseId": "kenya-001",
+      "name": "Kenya Hybrid Content Pipeline",
+      "pipelineType": "hybrid",
+      "shortFormConfig": {
+        "enabled": true,
+        "contentTypes": ["comedy_skit", "news_commentary", "promotional"],
+        "maxDuration": 60,
+        "platforms": ["tiktok", "instagram_reels", "youtube_shorts"],
+        "publishingSchedule": {
+          "frequency": "daily",
+          "preferredTimes": ["09:00", "12:00", "18:00"],
+          "timezone": "Africa/Nairobi"
+        }
+      },
+      "serializedConfig": {
+        "enabled": true,
+        "seriesIds": ["series-drama-001"],
+        "contentTypes": ["drama", "documentary"],
+        "episodeDuration": {
+          "min": 600,
+          "max": 1800
+        },
+        "platforms": ["youtube"],
+        "releaseSchedule": {
+          "frequency": "weekly",
+          "releaseDay": "friday",
+          "releaseTime": "18:00",
+          "timezone": "Africa/Nairobi"
+        }
+      },
+      "hybridRules": {
+        "crossPromotion": {
+          "enabled": true,
+          "clipFromSeries": true,
+          "teaserGeneration": true
+        },
+        "personaSharing": {
+          "enabled": true,
+          "consistencyEnforced": true
+        },
+        "workflowIntegration": {
+          "sharedAssetLibrary": true,
+          "unifiedQC": true,
+          "separatePipelines": false
+        }
+      },
+      "qcEnforcement": {
+        "shortFormQC": {
+          "enabled": true,
+          "rules": ["audio_quality", "video_quality", "content_guidelines"]
+        },
+        "serializedQC": {
+          "enabled": true,
+          "personaContinuity": true,
+          "plotContinuity": true,
+          "rules": ["continuity_check", "pacing", "narrative_structure"]
+        },
+        "crossFormatQC": {
+          "enabled": true,
+          "personaConsistency": true,
+          "brandConsistency": true
+        }
+      },
+      "languages": ["en", "sw"],
+      "status": "active",
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": "2025-01-15T00:00:00Z"
+    },
+    {
+      "pipelineId": "pipeline-shortform-001",
+      "franchiseId": "nigeria-001",
+      "name": "Nigeria Short-Form Only",
+      "pipelineType": "short_form_only",
+      "shortFormConfig": {
+        "enabled": true,
+        "contentTypes": ["comedy_skit", "music_clip"],
+        "maxDuration": 90,
+        "platforms": ["tiktok", "instagram_reels"],
+        "publishingSchedule": {
+          "frequency": "multiple_daily"
+        }
+      },
+      "languages": ["en"],
+      "status": "active",
+      "createdAt": "2025-01-05T00:00:00Z"
+    }
+  ],
+  "continuityValidationTestCases": [
+    {
+      "description": "Persona consistency passes when voice profile matches",
+      "persona": {
+        "personaId": "persona-amara",
+        "voiceProfile": { "tone": "Confident and warm" }
+      },
+      "episode1": { "personaTone": "Confident and warm" },
+      "episode2": { "personaTone": "Confident and warm" },
+      "expectedPassed": true
+    },
+    {
+      "description": "Persona consistency fails when voice profile differs",
+      "persona": {
+        "personaId": "persona-kofi",
+        "voiceProfile": { "tone": "Thoughtful and measured" }
+      },
+      "episode1": { "personaTone": "Thoughtful and measured" },
+      "episode2": { "personaTone": "Aggressive and loud" },
+      "expectedPassed": false
+    },
+    {
+      "description": "Plot continuity passes when threads are consistent",
+      "plotThread": {
+        "threadId": "thread-funding",
+        "status": "active"
+      },
+      "previousEpisode": { "threadMentioned": true, "threadStatus": "active" },
+      "currentEpisode": { "threadMentioned": true, "threadStatus": "active" },
+      "expectedPassed": true
+    },
+    {
+      "description": "Plot continuity fails when resolved thread reappears as active",
+      "plotThread": {
+        "threadId": "thread-mystery",
+        "status": "resolved"
+      },
+      "previousEpisode": { "threadMentioned": true, "threadStatus": "resolved" },
+      "currentEpisode": { "threadMentioned": true, "threadStatus": "active" },
+      "expectedPassed": false
+    }
+  ],
+  "hybridPipelineTestCases": [
+    {
+      "description": "Hybrid pipeline processes short-form without breaking serialized",
+      "pipelineType": "hybrid",
+      "shortFormContent": { "type": "comedy_skit", "duration": 45 },
+      "serializedContent": { "seriesId": "series-drama-001", "episodeId": "ep-s1-e03" },
+      "expectedShortFormProcessed": true,
+      "expectedSerializedUnaffected": true
+    },
+    {
+      "description": "Cross-promotion generates teaser from series episode",
+      "pipelineType": "hybrid",
+      "crossPromotion": { "enabled": true, "teaserGeneration": true },
+      "sourceEpisode": { "episodeId": "ep-s1-e03", "duration": 1250 },
+      "expectedTeaserGenerated": true,
+      "expectedTeaserMaxDuration": 60
+    },
+    {
+      "description": "Persona shared correctly across formats",
+      "pipelineType": "hybrid",
+      "personaSharing": { "enabled": true, "consistencyEnforced": true },
+      "shortFormPersona": { "personaId": "persona-amara", "tone": "Confident and warm" },
+      "serializedPersona": { "personaId": "persona-amara", "tone": "Confident and warm" },
+      "expectedConsistent": true
+    }
+  ],
+  "invalidSeriesWorkspaces": [
+    {
+      "description": "Missing required seriesId",
+      "data": {
+        "franchiseId": "test",
+        "title": "Test Series",
+        "format": "serialized_drama",
+        "episodes": [],
+        "status": "active"
+      },
+      "expectedError": "seriesId is required"
+    },
+    {
+      "description": "Invalid format type",
+      "data": {
+        "seriesId": "test-series",
+        "franchiseId": "test",
+        "title": "Test Series",
+        "format": "movie",
+        "episodes": [],
+        "status": "active"
+      },
+      "expectedError": "format must be one of enum values"
+    }
+  ],
+  "invalidHybridPipelines": [
+    {
+      "description": "Missing required pipelineId",
+      "data": {
+        "franchiseId": "test",
+        "name": "Test Pipeline",
+        "pipelineType": "hybrid",
+        "status": "active"
+      },
+      "expectedError": "pipelineId is required"
+    },
+    {
+      "description": "Invalid pipeline type",
+      "data": {
+        "pipelineId": "test-pipeline",
+        "franchiseId": "test",
+        "name": "Test Pipeline",
+        "pipelineType": "streaming",
+        "status": "active"
+      },
+      "expectedError": "pipelineType must be one of enum values"
+    }
+  ]
+}

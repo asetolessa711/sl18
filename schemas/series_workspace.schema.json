@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SeriesWorkspace",
+  "description": "Schema for series workspace supporting multi-episode arcs with persona continuity in SL18",
+  "type": "object",
+  "properties": {
+    "seriesId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "Unique series identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "Associated franchise"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 200,
+      "description": "Series title"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 2000,
+      "description": "Series description"
+    },
+    "format": {
+      "type": "string",
+      "enum": ["serialized_drama", "serialized_comedy", "serialized_documentary", "anthology", "hybrid"],
+      "description": "Series format type"
+    },
+    "seasonInfo": {
+      "type": "object",
+      "properties": {
+        "seasonNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Current season number"
+        },
+        "totalSeasons": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Planned total seasons"
+        },
+        "episodesPerSeason": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Episodes per season"
+        }
+      },
+      "additionalProperties": false
+    },
+    "episodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "episodeId": {
+            "type": "string",
+            "description": "Unique episode identifier"
+          },
+          "seasonNumber": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "episodeNumber": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string"
+          },
+          "synopsis": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration in seconds"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["planned", "scripting", "production", "post_production", "qc", "ready", "published"],
+            "description": "Episode production status"
+          },
+          "continuityNotes": {
+            "type": "string",
+            "description": "Notes for maintaining continuity from previous episodes"
+          },
+          "previousEpisodeRef": {
+            "type": "string",
+            "description": "Reference to previous episode for continuity"
+          },
+          "languages": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Languages this episode is available in"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["episodeId", "seasonNumber", "episodeNumber", "title", "status"],
+        "additionalProperties": false
+      },
+      "description": "List of episodes in the series"
+    },
+    "personaProfile": {
+      "type": "object",
+      "properties": {
+        "primaryPersonas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "personaId": { "type": "string" },
+              "name": { "type": "string" },
+              "role": { "type": "string" },
+              "firstAppearance": {
+                "type": "object",
+                "properties": {
+                  "seasonNumber": { "type": "integer" },
+                  "episodeNumber": { "type": "integer" }
+                },
+                "additionalProperties": false
+              },
+              "characteristics": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "voiceProfile": {
+                "type": "object",
+                "properties": {
+                  "voiceId": { "type": "string" },
+                  "tone": { "type": "string" },
+                  "speechPatterns": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": ["personaId", "name"],
+            "additionalProperties": false
+          }
+        },
+        "recurringPersonas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "personaId": { "type": "string" },
+              "name": { "type": "string" },
+              "episodeAppearances": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["personaId", "name"],
+            "additionalProperties": false
+          }
+        },
+        "continuityRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": { "type": "string" },
+              "personaId": { "type": "string" },
+              "rule": { "type": "string" },
+              "enforceAcrossEpisodes": { "type": "boolean", "default": true }
+            },
+            "required": ["ruleId", "rule"],
+            "additionalProperties": false
+          },
+          "description": "Rules for maintaining persona consistency across episodes"
+        }
+      },
+      "additionalProperties": false
+    },
+    "continuityNotes": {
+      "type": "object",
+      "properties": {
+        "plotThreads": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "threadId": { "type": "string" },
+              "description": { "type": "string" },
+              "status": {
+                "type": "string",
+                "enum": ["active", "resolved", "abandoned"]
+              },
+              "introducedIn": { "type": "string" },
+              "resolvedIn": { "type": "string" }
+            },
+            "required": ["threadId", "description", "status"],
+            "additionalProperties": false
+          }
+        },
+        "worldBuildingElements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "elementId": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["location", "item", "concept", "relationship", "event"]
+              },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "firstMention": { "type": "string" }
+            },
+            "required": ["elementId", "type", "name"],
+            "additionalProperties": false
+          }
+        },
+        "timelineEvents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "eventId": { "type": "string" },
+              "description": { "type": "string" },
+              "episodeId": { "type": "string" },
+              "inStoryDate": { "type": "string" }
+            },
+            "required": ["eventId", "description"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "qcRequirements": {
+      "type": "object",
+      "properties": {
+        "personaContinuityCheck": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enforce persona consistency across episodes"
+        },
+        "plotContinuityCheck": {
+          "type": "boolean",
+          "default": true,
+          "description": "Verify plot threads are consistent"
+        },
+        "crossEpisodeReview": {
+          "type": "boolean",
+          "default": true,
+          "description": "Review episode in context of previous episodes"
+        },
+        "minimumContinuityScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 90,
+          "description": "Minimum continuity score required"
+        }
+      },
+      "additionalProperties": false
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+      },
+      "description": "Languages the series is available in"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planning", "active", "on_hiatus", "completed", "cancelled"],
+      "description": "Series status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "seriesId",
+    "franchiseId",
+    "title",
+    "format",
+    "episodes",
+    "status"
+  ],
+  "additionalProperties": false
+}

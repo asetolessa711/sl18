@@ -56,13 +56,33 @@
         "translation_approved",
         "translation_rejected",
         "multilingual_qc_passed",
-        "multilingual_qc_failed"
+        "multilingual_qc_failed",
+        "anomaly_detected",
+        "incident_created",
+        "incident_acknowledged",
+        "incident_resolved",
+        "incident_closed",
+        "alert_triggered",
+        "alert_escalated",
+        "alert_resolved",
+        "diagnostics_started",
+        "diagnostics_completed",
+        "series_created",
+        "series_updated",
+        "episode_created",
+        "episode_published",
+        "continuity_check_passed",
+        "continuity_check_failed",
+        "hybrid_pipeline_started",
+        "hybrid_pipeline_completed",
+        "cross_format_qc_passed",
+        "cross_format_qc_failed"
       ],
       "description": "Type of governance event"
     },
     "category": {
       "type": "string",
-      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization"],
+      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid"],
       "description": "Category of the audit event"
     },
     "actor": {
@@ -90,7 +110,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack"],
+          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert"],
           "description": "Type of target entity"
         },
         "id": {

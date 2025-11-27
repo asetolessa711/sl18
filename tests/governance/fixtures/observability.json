@@ -1,0 +1,371 @@
+{
+  "validObservabilityConfigs": [
+    {
+      "configId": "obs-config-001",
+      "scope": {
+        "franchises": [],
+        "languages": [],
+        "regions": []
+      },
+      "dashboards": [
+        {
+          "dashboardId": "dash-franchise-overview",
+          "name": "Multi-Franchise Overview",
+          "type": "franchise_overview",
+          "refreshInterval": 60,
+          "widgets": [
+            {
+              "widgetId": "widget-001",
+              "type": "metric_card",
+              "dataSource": "franchise_count"
+            },
+            {
+              "widgetId": "widget-002",
+              "type": "line_chart",
+              "dataSource": "revenue_trend"
+            }
+          ]
+        },
+        {
+          "dashboardId": "dash-language-metrics",
+          "name": "Language Performance",
+          "type": "language_metrics",
+          "refreshInterval": 120
+        },
+        {
+          "dashboardId": "dash-combined",
+          "name": "Combined Operations View",
+          "type": "combined",
+          "refreshInterval": 30
+        }
+      ],
+      "anomalyDetection": {
+        "enabled": true,
+        "rules": [
+          {
+            "ruleId": "rule-qc-drop",
+            "name": "QC Pass Rate Drop",
+            "type": "qc_drop",
+            "threshold": {
+              "metric": "qc_pass_rate",
+              "operator": "lt",
+              "value": 80,
+              "windowMinutes": 60
+            },
+            "severity": "warning",
+            "enabled": true
+          },
+          {
+            "ruleId": "rule-fraud-spike",
+            "name": "Fraud Attempt Spike",
+            "type": "fraud_spike",
+            "threshold": {
+              "metric": "fraud_attempts",
+              "operator": "deviation",
+              "deviationMultiplier": 3,
+              "windowMinutes": 30
+            },
+            "severity": "critical",
+            "enabled": true
+          },
+          {
+            "ruleId": "rule-publishing-error",
+            "name": "Publishing Error Rate",
+            "type": "publishing_error",
+            "threshold": {
+              "metric": "publishing_error_rate",
+              "operator": "gt",
+              "value": 5,
+              "windowMinutes": 15
+            },
+            "severity": "critical",
+            "enabled": true
+          },
+          {
+            "ruleId": "rule-revenue-anomaly",
+            "name": "Revenue Anomaly",
+            "type": "revenue_anomaly",
+            "threshold": {
+              "metric": "daily_revenue",
+              "operator": "deviation",
+              "deviationMultiplier": 2.5,
+              "windowMinutes": 1440
+            },
+            "severity": "warning",
+            "enabled": true
+          }
+        ]
+      },
+      "diagnostics": {
+        "enabled": true,
+        "correlationTracking": true,
+        "rootCauseAnalysis": {
+          "enabled": true,
+          "maxDepth": 5,
+          "includePaymentEvents": true,
+          "includeMultilingualEvents": true
+        },
+        "automatedIncidentReports": {
+          "enabled": true,
+          "includeSuggestedActions": true,
+          "notifyOperators": true
+        }
+      },
+      "alerts": {
+        "enabled": true,
+        "channels": [
+          {
+            "channelId": "channel-email",
+            "type": "email",
+            "config": {
+              "recipients": ["ops@sl18.africa"]
+            },
+            "severities": ["warning", "critical"]
+          },
+          {
+            "channelId": "channel-slack",
+            "type": "slack",
+            "config": {
+              "webhook": "https://hooks.slack.com/services/xxx"
+            },
+            "severities": ["critical"]
+          },
+          {
+            "channelId": "channel-dashboard",
+            "type": "dashboard",
+            "severities": ["info", "warning", "critical"]
+          }
+        ],
+        "escalation": {
+          "enabled": true,
+          "rules": [
+            {
+              "fromSeverity": "warning",
+              "toSeverity": "critical",
+              "afterMinutes": 30,
+              "condition": "unacknowledged"
+            }
+          ]
+        }
+      },
+      "retentionDays": 90,
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": "2025-01-01T00:00:00Z"
+    }
+  ],
+  "validIncidentReports": [
+    {
+      "incidentId": "inc-2025-001",
+      "title": "QC Pass Rate Drop Below Threshold",
+      "severity": "warning",
+      "status": "resolved",
+      "category": "qc_failure",
+      "scope": {
+        "franchises": ["kenya-001"],
+        "languages": ["sw"],
+        "episodeCount": 3
+      },
+      "timeline": {
+        "detectedAt": "2025-02-01T10:00:00Z",
+        "acknowledgedAt": "2025-02-01T10:15:00Z",
+        "identifiedAt": "2025-02-01T10:30:00Z",
+        "resolvedAt": "2025-02-01T11:00:00Z"
+      },
+      "rootCauseAnalysis": {
+        "completed": true,
+        "primaryCause": "Translation accuracy threshold misconfigured for Kiswahili",
+        "contributingFactors": [
+          "Recent language pack update",
+          "QC threshold not adjusted for regional dialect"
+        ],
+        "correlatedEvents": [
+          {
+            "eventId": "audit-001",
+            "eventType": "language_pack_added",
+            "timestamp": "2025-02-01T09:00:00Z",
+            "correlationId": "corr-001",
+            "description": "Kiswahili language pack updated"
+          },
+          {
+            "eventId": "audit-002",
+            "eventType": "multilingual_qc_failed",
+            "timestamp": "2025-02-01T10:00:00Z",
+            "correlationId": "corr-001",
+            "description": "QC failed for episode ep-ke-001"
+          }
+        ],
+        "multilingualEvents": [
+          {
+            "languageCode": "sw",
+            "eventType": "translation_rejected",
+            "timestamp": "2025-02-01T10:00:00Z",
+            "qcStatus": "failed"
+          }
+        ]
+      },
+      "suggestedActions": [
+        {
+          "actionId": "action-001",
+          "priority": "immediate",
+          "description": "Review and adjust Kiswahili QC thresholds",
+          "category": "remediation",
+          "automated": false,
+          "status": "completed"
+        },
+        {
+          "actionId": "action-002",
+          "priority": "high",
+          "description": "Re-run QC for affected episodes",
+          "category": "remediation",
+          "automated": true,
+          "status": "completed"
+        }
+      ],
+      "operatorSummary": {
+        "impactDescription": "3 episodes failed QC due to translation threshold mismatch",
+        "technicalDetails": "Language pack sw v1.2 introduced stricter defaults",
+        "remediationSteps": [
+          "1. Navigate to QC settings",
+          "2. Adjust translation threshold to 92%",
+          "3. Re-run QC pipeline"
+        ],
+        "preventionRecommendations": [
+          "Add threshold compatibility check to language pack updates",
+          "Implement gradual rollout for QC rule changes"
+        ]
+      },
+      "metadata": {
+        "triggeredBy": "rule-qc-drop",
+        "anomalyRuleId": "rule-qc-drop",
+        "tags": ["qc", "kiswahili", "threshold"]
+      },
+      "createdAt": "2025-02-01T10:00:00Z",
+      "updatedAt": "2025-02-01T11:00:00Z"
+    },
+    {
+      "incidentId": "inc-2025-002",
+      "title": "Fraud Attempt Spike Detected",
+      "severity": "critical",
+      "status": "investigating",
+      "category": "fraud_alert",
+      "scope": {
+        "franchises": ["nigeria-001", "ghana-001"],
+        "regions": ["West Africa"]
+      },
+      "timeline": {
+        "detectedAt": "2025-02-15T14:00:00Z",
+        "acknowledgedAt": "2025-02-15T14:05:00Z"
+      },
+      "rootCauseAnalysis": {
+        "completed": false,
+        "correlatedEvents": [
+          {
+            "eventId": "audit-003",
+            "eventType": "fraud_detected",
+            "timestamp": "2025-02-15T13:55:00Z",
+            "correlationId": "corr-002"
+          }
+        ],
+        "paymentEvents": [
+          {
+            "transactionId": "txn-suspicious-001",
+            "eventType": "payment_failed",
+            "timestamp": "2025-02-15T13:50:00Z",
+            "status": "flagged"
+          }
+        ]
+      },
+      "suggestedActions": [
+        {
+          "actionId": "action-003",
+          "priority": "immediate",
+          "description": "Enable enhanced fraud detection mode",
+          "category": "prevention",
+          "automated": true,
+          "status": "in_progress"
+        }
+      ],
+      "createdAt": "2025-02-15T14:00:00Z"
+    }
+  ],
+  "anomalyDetectionTestCases": [
+    {
+      "description": "QC drop below threshold triggers warning",
+      "rule": {
+        "type": "qc_drop",
+        "threshold": { "metric": "qc_pass_rate", "operator": "lt", "value": 80 },
+        "severity": "warning"
+      },
+      "currentValue": 75,
+      "expectedTrigger": true,
+      "expectedSeverity": "warning"
+    },
+    {
+      "description": "QC rate above threshold does not trigger",
+      "rule": {
+        "type": "qc_drop",
+        "threshold": { "metric": "qc_pass_rate", "operator": "lt", "value": 80 },
+        "severity": "warning"
+      },
+      "currentValue": 85,
+      "expectedTrigger": false
+    },
+    {
+      "description": "Fraud spike deviation triggers critical",
+      "rule": {
+        "type": "fraud_spike",
+        "threshold": { "metric": "fraud_attempts", "operator": "deviation", "deviationMultiplier": 3 },
+        "severity": "critical"
+      },
+      "baselineValue": 5,
+      "standardDeviation": 2,
+      "currentValue": 15,
+      "expectedTrigger": true,
+      "expectedSeverity": "critical"
+    },
+    {
+      "description": "Normal fraud attempts do not trigger",
+      "rule": {
+        "type": "fraud_spike",
+        "threshold": { "metric": "fraud_attempts", "operator": "deviation", "deviationMultiplier": 3 },
+        "severity": "critical"
+      },
+      "baselineValue": 5,
+      "standardDeviation": 2,
+      "currentValue": 7,
+      "expectedTrigger": false
+    }
+  ],
+  "invalidObservabilityConfigs": [
+    {
+      "description": "Missing required configId",
+      "data": {
+        "dashboards": [],
+        "anomalyDetection": { "enabled": true, "rules": [] },
+        "alerts": { "enabled": true }
+      },
+      "expectedError": "configId is required"
+    },
+    {
+      "description": "Invalid anomaly rule type",
+      "data": {
+        "configId": "obs-test-001",
+        "dashboards": [],
+        "anomalyDetection": {
+          "enabled": true,
+          "rules": [
+            {
+              "ruleId": "test",
+              "name": "Test",
+              "type": "invalid_type",
+              "threshold": { "metric": "test", "operator": "gt" },
+              "severity": "warning"
+            }
+          ]
+        },
+        "alerts": { "enabled": true }
+      },
+      "expectedError": "type must be one of enum values"
+    }
+  ]
+}

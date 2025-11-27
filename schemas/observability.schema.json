@@ -1,0 +1,301 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ObservabilityConfig",
+  "description": "Schema for advanced observability configuration in SL18 - monitoring, diagnostics, and anomaly detection",
+  "type": "object",
+  "properties": {
+    "configId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique observability configuration identifier"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "franchises": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Franchises to monitor (empty = all)"
+        },
+        "languages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Languages to monitor (empty = all)"
+        },
+        "regions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Regions to monitor (empty = all)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "dashboards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "dashboardId": {
+            "type": "string",
+            "description": "Unique dashboard identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Dashboard display name"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["franchise_overview", "language_metrics", "region_metrics", "revenue_stream", "qc_metrics", "publishing_health", "combined"],
+            "description": "Dashboard type"
+          },
+          "refreshInterval": {
+            "type": "integer",
+            "minimum": 10,
+            "maximum": 3600,
+            "default": 60,
+            "description": "Refresh interval in seconds"
+          },
+          "widgets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "widgetId": { "type": "string" },
+                "type": {
+                  "type": "string",
+                  "enum": ["metric_card", "line_chart", "bar_chart", "pie_chart", "table", "heatmap", "alert_feed"]
+                },
+                "dataSource": { "type": "string" },
+                "filters": { "type": "object" }
+              },
+              "required": ["widgetId", "type", "dataSource"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["dashboardId", "name", "type"],
+        "additionalProperties": false
+      },
+      "description": "Configured dashboards"
+    },
+    "anomalyDetection": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether anomaly detection is enabled"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": {
+                "type": "string",
+                "description": "Unique rule identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Rule display name"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["qc_drop", "fraud_spike", "publishing_error", "revenue_anomaly", "latency_spike", "error_rate"],
+                "description": "Type of anomaly to detect"
+              },
+              "threshold": {
+                "type": "object",
+                "properties": {
+                  "metric": { "type": "string" },
+                  "operator": {
+                    "type": "string",
+                    "enum": ["gt", "lt", "gte", "lte", "eq", "deviation"]
+                  },
+                  "value": { "type": "number" },
+                  "deviationMultiplier": {
+                    "type": "number",
+                    "description": "Standard deviations for deviation-based detection"
+                  },
+                  "windowMinutes": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Time window for threshold evaluation"
+                  }
+                },
+                "required": ["metric", "operator"],
+                "additionalProperties": false
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["info", "warning", "critical"],
+                "description": "Severity level when triggered"
+              },
+              "enabled": {
+                "type": "boolean",
+                "default": true
+              }
+            },
+            "required": ["ruleId", "name", "type", "threshold", "severity"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "diagnostics": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether diagnostics layer is enabled"
+        },
+        "correlationTracking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable correlation ID tracking across events"
+        },
+        "rootCauseAnalysis": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "maxDepth": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 5,
+              "description": "Maximum depth for root cause analysis"
+            },
+            "includePaymentEvents": {
+              "type": "boolean",
+              "default": true
+            },
+            "includeMultilingualEvents": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "automatedIncidentReports": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "includeSuggestedActions": {
+              "type": "boolean",
+              "default": true
+            },
+            "notifyOperators": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "alerts": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether alerts are enabled"
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "channelId": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["email", "slack", "webhook", "sms", "dashboard"]
+              },
+              "config": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "severities": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["info", "warning", "critical"]
+                }
+              }
+            },
+            "required": ["channelId", "type"],
+            "additionalProperties": false
+          }
+        },
+        "escalation": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fromSeverity": { "type": "string" },
+                  "toSeverity": { "type": "string" },
+                  "afterMinutes": { "type": "integer" },
+                  "condition": { "type": "string" }
+                },
+                "required": ["fromSeverity", "toSeverity", "afterMinutes"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "quietHours": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "startTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+            "endTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+            "timezone": { "type": "string" },
+            "exceptCritical": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "retentionDays": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 365,
+      "default": 90,
+      "description": "Days to retain observability data"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "configId",
+    "dashboards",
+    "anomalyDetection",
+    "alerts"
+  ],
+  "additionalProperties": false
+}
