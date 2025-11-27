@@ -1,0 +1,163 @@
+# SL18 Render Stack - Docker Compose
+# Phase 8: Scaling & Deployment
+#
+# Local development and testing deployment configuration
+
+version: '3.8'
+
+services:
+  # Control Panel - Main API and operator dashboard
+  control-panel:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.control-panel
+    container_name: sl18-control-panel
+    ports:
+      - "5178:5178"
+    environment:
+      - NODE_ENV=production
+      - SL18_PANEL_PORT=5178
+      - SL18_VERSION=1.0.0
+      - AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+      - AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
+      - STORAGE_PROVIDER=local
+    volumes:
+      - logs:/app/logs
+      - storage:/app/storage
+    networks:
+      - sl18-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5178/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Render Worker - ffmpeg-based video rendering
+  render-worker:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.render-worker
+    container_name: sl18-render-worker
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - RENDER_WORKER_PORT=3001
+      - CONTROL_PANEL_URL=http://control-panel:5178
+      - FFMPEG_PATH=/usr/bin/ffmpeg
+      - MAX_CONCURRENT_RENDERS=4
+    volumes:
+      - renders:/app/renders
+      - timelines:/app/timelines
+      - logs:/app/logs
+      - storage:/app/storage
+    networks:
+      - sl18-network
+    depends_on:
+      - control-panel
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    restart: unless-stopped
+
+  # Publishing Manager - Multi-platform distribution
+  publishing-manager:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.publishing-manager
+    container_name: sl18-publishing-manager
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PUBLISH_WORKER_PORT=3002
+      - CONTROL_PANEL_URL=http://control-panel:5178
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - FACEBOOK_ACCESS_TOKEN=${FACEBOOK_ACCESS_TOKEN}
+      - FACEBOOK_PAGE_ID=${FACEBOOK_PAGE_ID}
+      - INSTAGRAM_ACCESS_TOKEN=${INSTAGRAM_ACCESS_TOKEN}
+      - INSTAGRAM_USER_ID=${INSTAGRAM_USER_ID}
+    volumes:
+      - exports:/app/exports
+      - logs:/app/logs
+      - storage:/app/storage
+    networks:
+      - sl18-network
+    depends_on:
+      - control-panel
+    restart: unless-stopped
+
+  # Prometheus - Metrics collection
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: sl18-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    networks:
+      - sl18-network
+    restart: unless-stopped
+
+  # Grafana - Dashboards and visualization
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: sl18-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      # REQUIRED: Set GRAFANA_ADMIN_PASSWORD in .env (minimum 12 characters recommended)
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ../monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    networks:
+      - sl18-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # Nginx - Load balancer and reverse proxy
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: sl18-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - sl18-network
+    depends_on:
+      - control-panel
+      - render-worker
+      - publishing-manager
+    restart: unless-stopped
+
+networks:
+  sl18-network:
+    driver: bridge
+
+volumes:
+  renders:
+  timelines:
+  storage:
+  logs:
+  exports:
+  prometheus-data:
+  grafana-data:

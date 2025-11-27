@@ -1,0 +1,89 @@
+{
+  "autonomousConfig": {
+    "defaultMode": "humanAssisted",
+    "modes": {
+      "humanLead": {
+        "description": "Operator drives, AI suggests",
+        "scriptGeneration": "suggest-only",
+        "styling": "suggest-only",
+        "qcChecks": "flag-only",
+        "publishing": "manual"
+      },
+      "humanAssisted": {
+        "description": "AI drafts, operator approves",
+        "scriptGeneration": "draft-with-approval",
+        "styling": "pre-fill-with-confirmation",
+        "qcChecks": "recommend-fixes",
+        "publishing": "operator-confirm"
+      },
+      "fullyAI": {
+        "description": "AI auto-generates and publishes",
+        "scriptGeneration": "auto-apply",
+        "styling": "auto-apply",
+        "qcChecks": "auto-enforce",
+        "publishing": "auto-publish",
+        "confidenceThresholds": {
+          "qcPassRate": 0.95,
+          "publishErrorRate": 0.01,
+          "aiAccuracy": 0.9
+        }
+      }
+    },
+    "confidenceSettings": {
+      "minimumSamples": 50,
+      "rollingWindowDays": 30,
+      "defaultThresholds": {
+        "qcPassRate": 0.95,
+        "publishErrorRate": 0.01,
+        "aiAccuracy": 0.9
+      }
+    },
+    "shadowPublishing": {
+      "enabled": true,
+      "logRetentionDays": 30,
+      "comparisonMetrics": [
+        "publishDecision",
+        "metadataMatch",
+        "timingAccuracy"
+      ]
+    },
+    "platformSupport": {
+      "youtube": {
+        "autonomous": true,
+        "apiIntegration": true
+      },
+      "facebook": {
+        "autonomous": true,
+        "apiIntegration": true
+      },
+      "instagram": {
+        "autonomous": true,
+        "apiIntegration": true
+      },
+      "tiktok": {
+        "autonomous": false,
+        "apiIntegration": false,
+        "note": "Manual export only - TikTok API requires partner access"
+      }
+    },
+    "override": {
+      "enabled": true,
+      "rollbackEndpoint": "/api/publish/rollback/:jobId",
+      "overrideEndpoint": "/api/ai/publish/auto/:id/override",
+      "requireReason": true
+    },
+    "audit": {
+      "enabled": true,
+      "logEndpoint": "/api/ai/audit",
+      "retentionDays": 90,
+      "logLevel": "detailed"
+    },
+    "featureFlags": {
+      "enableAutonomousPublishing": true,
+      "enableShadowPublishing": true,
+      "enableConfidenceTracking": true,
+      "enableRollback": true,
+      "enableOverride": true
+    }
+  }
+}

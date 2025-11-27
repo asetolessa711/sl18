@@ -28,6 +28,12 @@ CI / Secrets / Deploy
 - CI entry: `azure-pipelines.yml` triggers on `main` and templates `pipelines/mvp.yml`.
 - Secrets: pipeline references a variable group `SL18-Secrets` — update secrets there (Azure DevOps) rather than committing credentials to the repo.
 
+Testing
+- Test framework: **Vitest** (configured at root level).
+- Run tests: `npm test` (single run) or `npm run test:watch` (watch mode).
+- Test files: `tests/*.test.ts` — add new tests here when modifying utility functions.
+- Before committing: always run `npm test` to ensure all tests pass.
+
 Developer workflows (practical examples)
 - To update the canonical episodes CSV (run via Airtable): edit Airtable Automation inputs, then run the Airtable automation that contains `exportEpisodesToGitHub.js` to update `Docs/episodes.csv` in the repo.
 - To change Make.com automation: edit scenario in Make.com → export JSON → replace matching file in `automation/make/` and commit with a short explanation in the commit message.

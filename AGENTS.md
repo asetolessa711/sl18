@@ -5,12 +5,49 @@
 - Highlight automation boundaries (Airtable, Make.com, n8n) and required hand-offs to humans.
 - Provide ready-to-run checklists for the most common maintenance tasks.
 
+## Read, Write, Test — Quick Start
+
+### Reading the Codebase
+- Start with `README.md` for high-level architecture and operational context.
+- Review `.github/copilot-instructions.md` for repo conventions.
+- Key code locations:
+  - `apps/control-panel/backend/` — Express/TypeScript API server
+  - `apps/control-panel/frontend/` — React/Vite UI
+  - `automation/` — Airtable, Make.com, and n8n integration scripts
+  - `scripts/` — PowerShell utilities and smoke tests
+
+### Writing Code
+- Follow existing patterns in each directory.
+- TypeScript files use ES modules (`import/export`).
+- Prefer minimal changes; avoid refactoring unrelated code.
+- Update tests when modifying utility functions.
+
+### Running Tests
+Tests are powered by **Vitest**. Run from the repository root:
+```bash
+# Run all tests once
+npm test
+
+# Run tests in watch mode (useful during development)
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+Test files live in the `tests/` directory and follow the naming convention `*.test.ts`.
+
+**Before committing changes:**
+1. Run `npm test` to ensure all tests pass.
+2. Add tests for new utility functions.
+3. Verify existing functionality is not broken.
+
 ## Pre-Flight Checklist
 - Read `.github/copilot-instructions.md` for repo norms and platform caveats.
 - Confirm with the user which platform (Airtable, Make.com, n8n, Azure Pipelines) is in scope before editing files.
 - Assume Airtable scripts, Make.com blueprints, and n8n snippets are canonical exports; plan changes in their native UIs first.
 - Avoid running automation scripts locally. Anything under `automation/airtable/` expects Airtable runtime globals.
- - Use the centralized setup script for scaffolding: `scripts/setup/setup-sl18.ps1` (wrapper also at `apps/control-panel/backend/setup-sl18.ps1`).
+- Use the centralized setup script for scaffolding: `scripts/setup/setup-sl18.ps1` (wrapper also at `apps/control-panel/backend/setup-sl18.ps1`).
 
 ## Tooling Map
 - **Airtable** (`automation/airtable/exportEpisodesToGitHub.js`) exports `Docs/episodes.csv`. Any schema change must update `orderedFields` and drive ID expectations.

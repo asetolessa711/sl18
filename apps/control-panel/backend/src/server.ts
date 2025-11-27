@@ -6,6 +6,14 @@ import path from 'path';
 import { existsSync, promises as fs } from 'fs';
 import Airtable, { type FieldSet, type SelectOptions } from 'airtable';
 import { fileURLToPath } from 'url';
+import { renderRouter } from './render-api.js';
+import { storageRouter, createStorageFileMiddleware } from './storage-api.js';
+import { qcRouter } from './qc-api.js';
+import { controlPanelRouter } from './control-panel-api.js';
+import { publishRouter } from './publish-api.js';
+import { systemRouter } from './system-api.js';
+import { workspaceRouter } from './workspace-api.js';
+import { aiRouter } from './ai-api.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +32,33 @@ dotenv.config({ path: backendEnvLocalPath });
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Mount render API routes
+app.use('/api/render', renderRouter);
+
+// Mount storage API routes
+app.use('/api/storage', storageRouter);
+
+// Mount QC API routes
+app.use('/api/qc', qcRouter);
+
+// Mount Control Panel API routes
+app.use('/api/control-panel', controlPanelRouter);
+
+// Mount Publishing API routes
+app.use('/api/publish', publishRouter);
+
+// Mount System API routes (Phase 8: Scaling & Deployment)
+app.use('/api/system', systemRouter);
+
+// Mount Workspace API routes (Phase 9: Creative Workspaces)
+app.use('/api/workspace', workspaceRouter);
+
+// Mount AI API routes (Phase 10: AI Integration)
+app.use('/api/ai', aiRouter);
+
+// Mount storage file serving middleware
+app.use('/storage', createStorageFileMiddleware());
 
 const PORT = process.env.SL18_PANEL_PORT ? Number(process.env.SL18_PANEL_PORT) : 5178;
 

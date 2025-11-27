@@ -1,0 +1,104 @@
+# SL18 Render Stack - Control Panel Deployment
+# Phase 8: Scaling & Deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: control-panel
+  namespace: sl18
+  labels:
+    app: sl18
+    component: control-panel
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sl18
+      component: control-panel
+  template:
+    metadata:
+      labels:
+        app: sl18
+        component: control-panel
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "5178"
+        prometheus.io/path: "/api/system/metrics/prometheus"
+    spec:
+      containers:
+        - name: control-panel
+          image: sl18/control-panel:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5178
+              name: http
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: SL18_PANEL_PORT
+              value: "5178"
+            - name: SL18_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: sl18-config
+                  key: version
+            - name: AIRTABLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sl18-secrets
+                  key: airtable-api-key
+            - name: AIRTABLE_BASE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: sl18-secrets
+                  key: airtable-base-id
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5178
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5178
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+            - name: storage
+              mountPath: /app/storage
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: sl18-logs-pvc
+        - name: storage
+          persistentVolumeClaim:
+            claimName: sl18-storage-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: control-panel
+  namespace: sl18
+  labels:
+    app: sl18
+    component: control-panel
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5178
+      targetPort: 5178
+      name: http
+  selector:
+    app: sl18
+    component: control-panel

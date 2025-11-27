@@ -1,0 +1,98 @@
+# SL18 Render Stack - Ingress Configuration
+# Phase 8: Scaling & Deployment
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sl18-ingress
+  namespace: sl18
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/limit-connections: "100"
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  # NOTE: Replace example.com with your actual domain
+  # For production, create environment-specific files:
+  #   - ingress-production.yaml (your-domain.com)
+  #   - ingress-staging.yaml (staging.your-domain.com)
+  tls:
+    - hosts:
+        - sl18.your-domain.com  # REPLACE with actual domain
+        - api.sl18.your-domain.com  # REPLACE with actual domain
+      secretName: sl18-tls
+  rules:
+    - host: sl18.your-domain.com  # REPLACE with actual domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: control-panel
+                port:
+                  number: 5178
+    - host: api.sl18.your-domain.com  # REPLACE with actual domain
+      http:
+        paths:
+          - path: /api/render
+            pathType: Prefix
+            backend:
+              service:
+                name: render-worker
+                port:
+                  number: 3001
+          - path: /api/publish
+            pathType: Prefix
+            backend:
+              service:
+                name: publishing-manager
+                port:
+                  number: 3002
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: control-panel
+                port:
+                  number: 5178
+
+---
+# Network Policy for security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sl18-network-policy
+  namespace: sl18
+spec:
+  podSelector:
+    matchLabels:
+      app: sl18
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app: sl18
+    - ports:
+        - protocol: TCP
+          port: 5178
+        - protocol: TCP
+          port: 3001
+        - protocol: TCP
+          port: 3002
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: sl18
+    - to: []  # Allow all outbound (for external APIs)

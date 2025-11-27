@@ -1,0 +1,208 @@
+{
+  "overrideAuditLogs": {
+    "generatedAt": "2025-11-27T09:00:00.000Z",
+    "mode": "humanAssisted",
+    "description": "Sample operator override and rollback actions in Human-Assisted mode",
+    "entries": [
+      {
+        "auditId": "audit-001",
+        "timestamp": "2025-11-27T09:05:23.000Z",
+        "action": "OVERRIDE_AI_DECISION",
+        "episodeId": "EP-004-EDU",
+        "operator": {
+          "id": "op-jane-001",
+          "name": "Jane Smith",
+          "role": "content_operator"
+        },
+        "context": {
+          "mode": "humanAssisted",
+          "workspaceId": "ws-education-001",
+          "genre": "educational"
+        },
+        "aiDecision": {
+          "action": "publish",
+          "platforms": ["youtube", "facebook"],
+          "confidence": 0.91,
+          "reasoning": "Content meets all QC thresholds"
+        },
+        "operatorDecision": {
+          "action": "hold",
+          "reason": "Content references outdated statistics - needs update",
+          "requiredChanges": [
+            "Update statistics to 2024 data",
+            "Add source citations",
+            "Re-record narrator segment at 2:45"
+          ]
+        },
+        "outcome": {
+          "status": "override_applied",
+          "newState": "pending_revision",
+          "notificationsSent": ["content_team", "narrator"]
+        }
+      },
+      {
+        "auditId": "audit-002",
+        "timestamp": "2025-11-27T09:18:45.000Z",
+        "action": "ROLLBACK_PUBLISH",
+        "episodeId": "EP-005-NEWS",
+        "operator": {
+          "id": "op-mike-002",
+          "name": "Mike Johnson",
+          "role": "senior_operator"
+        },
+        "context": {
+          "mode": "humanAssisted",
+          "workspaceId": "ws-news-001",
+          "genre": "news"
+        },
+        "originalPublish": {
+          "timestamp": "2025-11-27T09:10:00.000Z",
+          "platforms": ["youtube"],
+          "platformIds": {
+            "youtube": "yt_vid_12345"
+          }
+        },
+        "rollbackReason": {
+          "category": "content_accuracy",
+          "description": "Breaking update invalidates key information in segment",
+          "urgency": "high"
+        },
+        "rollbackResult": {
+          "youtube": {
+            "status": "rolled_back",
+            "action": "video_unlisted",
+            "timestamp": "2025-11-27T09:19:02.000Z"
+          }
+        },
+        "outcome": {
+          "status": "rollback_complete",
+          "newState": "unlisted_pending_update",
+          "notificationsSent": ["news_team", "editorial_lead"]
+        }
+      },
+      {
+        "auditId": "audit-003",
+        "timestamp": "2025-11-27T09:32:10.000Z",
+        "action": "APPROVE_AI_RECOMMENDATION",
+        "episodeId": "EP-006-DRAMA",
+        "operator": {
+          "id": "op-sarah-003",
+          "name": "Sarah Lee",
+          "role": "content_operator"
+        },
+        "context": {
+          "mode": "humanAssisted",
+          "workspaceId": "ws-drama-001",
+          "genre": "drama"
+        },
+        "aiRecommendation": {
+          "action": "publish",
+          "platforms": ["youtube", "facebook", "instagram"],
+          "confidence": 0.97,
+          "qcScore": 0.98,
+          "stylingApplied": true,
+          "metadataGenerated": true
+        },
+        "operatorAction": {
+          "decision": "approve",
+          "modifications": ["Adjusted thumbnail crop for Instagram"],
+          "approvalTimestamp": "2025-11-27T09:32:10.000Z"
+        },
+        "outcome": {
+          "status": "published",
+          "platforms": {
+            "youtube": { "videoId": "yt_vid_67890", "status": "live" },
+            "facebook": { "postId": "fb_post_11111", "status": "live" },
+            "instagram": { "reelId": "ig_reel_22222", "status": "live" }
+          },
+          "notificationsSent": ["marketing_team", "analytics"]
+        }
+      },
+      {
+        "auditId": "audit-004",
+        "timestamp": "2025-11-27T09:45:55.000Z",
+        "action": "REJECT_AI_STYLING",
+        "episodeId": "EP-007-COMEDY",
+        "operator": {
+          "id": "op-jane-001",
+          "name": "Jane Smith",
+          "role": "content_operator"
+        },
+        "context": {
+          "mode": "humanAssisted",
+          "workspaceId": "ws-comedy-001",
+          "genre": "comedy"
+        },
+        "aiStyling": {
+          "fontFamily": "Comic Sans MS",
+          "overlayColor": "#FF5722",
+          "transitionStyle": "bounce",
+          "confidence": 0.82
+        },
+        "operatorDecision": {
+          "action": "reject_styling",
+          "reason": "Font choice doesn't match brand guidelines",
+          "alternativeStyling": {
+            "fontFamily": "Roboto Bold",
+            "overlayColor": "#2196F3",
+            "transitionStyle": "smooth_fade"
+          }
+        },
+        "outcome": {
+          "status": "styling_replaced",
+          "aiLearningFeedback": {
+            "sent": true,
+            "category": "brand_compliance",
+            "weight": 0.8
+          }
+        }
+      },
+      {
+        "auditId": "audit-005",
+        "timestamp": "2025-11-27T10:02:30.000Z",
+        "action": "EMERGENCY_OVERRIDE",
+        "episodeId": "EP-008-LIVE",
+        "operator": {
+          "id": "op-admin-001",
+          "name": "Admin User",
+          "role": "administrator"
+        },
+        "context": {
+          "mode": "fullyAI",
+          "workspaceId": "ws-live-001",
+          "genre": "live_event"
+        },
+        "triggerCondition": {
+          "type": "external_flag",
+          "source": "legal_team",
+          "description": "Content contains unlicensed music segment"
+        },
+        "aiState": {
+          "action": "auto_publishing",
+          "confidence": 0.96,
+          "platforms": ["youtube", "facebook"]
+        },
+        "emergencyAction": {
+          "immediateHalt": true,
+          "publishBlocked": true,
+          "contentQuarantined": true
+        },
+        "outcome": {
+          "status": "emergency_halt_applied",
+          "newState": "legal_review",
+          "notificationsSent": ["legal_team", "content_lead", "executive_team"],
+          "escalationLevel": "critical"
+        }
+      }
+    ],
+    "summary": {
+      "totalAuditEntries": 5,
+      "overrideActions": 2,
+      "rollbackActions": 1,
+      "approvalActions": 1,
+      "emergencyActions": 1,
+      "operatorsInvolved": 4,
+      "averageResponseTime": "4.2 minutes"
+    }
+  }
+}

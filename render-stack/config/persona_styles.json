@@ -1,0 +1,32 @@
+{
+  "ADDIS": {
+    "personaCode": "ADDIS",
+    "primaryColor": "#FF6B35",
+    "secondaryColor": "#004E89",
+    "fontFamily": "Inter",
+    "captionPosition": "bottom-center",
+    "motionPreset": "subtle-zoom",
+    "transitionPreset": "fade",
+    "defaultRenderProfile": "vertical_1080x1920"
+  },
+  "HABESHA_HUMOR": {
+    "personaCode": "HABESHA_HUMOR",
+    "primaryColor": "#E63946",
+    "secondaryColor": "#1D3557",
+    "fontFamily": "Poppins",
+    "captionPosition": "bottom-center",
+    "motionPreset": "ken-burns",
+    "transitionPreset": "crossfade",
+    "defaultRenderProfile": "vertical_1080x1920"
+  },
+  "TECH_TALK": {
+    "personaCode": "TECH_TALK",
+    "primaryColor": "#00D4FF",
+    "secondaryColor": "#0A0A0A",
+    "fontFamily": "JetBrains Mono",
+    "captionPosition": "bottom-center",
+    "motionPreset": "none",
+    "transitionPreset": "fade",
+    "defaultRenderProfile": "horizontal_1920x1080"
+  }
+}

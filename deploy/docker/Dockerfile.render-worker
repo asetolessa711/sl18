@@ -1,0 +1,63 @@
+# SL18 Render Stack - Render Worker Dockerfile
+# Phase 8: Scaling & Deployment
+#
+# Multi-stage build for production-ready render worker container
+
+# Build stage
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy source files
+COPY render-stack/ ./render-stack/
+COPY apps/control-panel/backend/ ./apps/control-panel/backend/
+
+# Production stage
+FROM node:20-alpine AS production
+
+# Install ffmpeg for video processing
+RUN apk add --no-cache ffmpeg
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S sl18 && \
+    adduser -S sl18 -u 1001 -G sl18
+
+WORKDIR /app
+
+# Copy built application
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/render-stack ./render-stack
+COPY --from=builder /app/apps ./apps
+
+# Create directories for renders and logs
+RUN mkdir -p /app/renders /app/timelines /app/logs /app/storage && \
+    chown -R sl18:sl18 /app
+
+# Switch to non-root user
+USER sl18
+
+# Environment variables
+ENV NODE_ENV=production
+ENV RENDER_WORKER_PORT=3001
+ENV STORAGE_PATH=/app/storage
+ENV RENDERS_PATH=/app/renders
+ENV TIMELINES_PATH=/app/timelines
+ENV LOG_PATH=/app/logs
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${RENDER_WORKER_PORT}/healthz || exit 1
+
+# Expose port
+EXPOSE 3001
+
+# Start render worker
+CMD ["node", "--experimental-specifier-resolution=node", "render-stack/worker/index.js"]

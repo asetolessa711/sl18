@@ -1,0 +1,131 @@
+# SL18 Render Stack - Render Worker Deployment
+# Phase 8: Scaling & Deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: render-worker
+  namespace: sl18
+  labels:
+    app: sl18
+    component: render-worker
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sl18
+      component: render-worker
+  template:
+    metadata:
+      labels:
+        app: sl18
+        component: render-worker
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3001"
+    spec:
+      containers:
+        - name: render-worker
+          image: sl18/render-worker:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3001
+              name: http
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: RENDER_WORKER_PORT
+              value: "3001"
+            - name: CONTROL_PANEL_URL
+              value: "http://control-panel:5178"
+            - name: FFMPEG_PATH
+              value: "/usr/bin/ffmpeg"
+            - name: MAX_CONCURRENT_RENDERS
+              value: "4"
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1000m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: renders
+              mountPath: /app/renders
+            - name: timelines
+              mountPath: /app/timelines
+            - name: logs
+              mountPath: /app/logs
+            - name: storage
+              mountPath: /app/storage
+      volumes:
+        - name: renders
+          persistentVolumeClaim:
+            claimName: sl18-renders-pvc
+        - name: timelines
+          persistentVolumeClaim:
+            claimName: sl18-timelines-pvc
+        - name: logs
+          persistentVolumeClaim:
+            claimName: sl18-logs-pvc
+        - name: storage
+          persistentVolumeClaim:
+            claimName: sl18-storage-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: render-worker
+  namespace: sl18
+  labels:
+    app: sl18
+    component: render-worker
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: 3001
+      name: http
+  selector:
+    app: sl18
+    component: render-worker
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: render-worker-hpa
+  namespace: sl18
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: render-worker
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
