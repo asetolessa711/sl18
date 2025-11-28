@@ -1,0 +1,878 @@
+{
+  "socialConnector": {
+    "connectorId": "social-waliin-studio-main",
+    "version": "1.0.0",
+    "branding": {
+      "studioName": "Waliin Studio",
+      "tagline": "Together through stories",
+      "primaryHashtags": ["#WaliinTogether", "#WaliinStudio", "#ShortDrama", "#PoweredBySL18"],
+      "secondaryHashtags": ["#AfricanDrama", "#EthiopianDrama", "#OromoDrama", "#KenyanDrama"],
+      "colorPalette": {
+        "primary": "#FF6B35",
+        "secondary": "#2E4057",
+        "accent": "#FFD700",
+        "text": "#333333"
+      },
+      "logoAssets": {
+        "squareUrl": "https://waliin.studio/assets/logo-square.png",
+        "bannerUrl": "https://waliin.studio/assets/banner.png",
+        "watermarkUrl": "https://waliin.studio/assets/watermark.png",
+        "iconUrl": "https://waliin.studio/assets/icon.png"
+      }
+    },
+    "platforms": {
+      "youtube": {
+        "enabled": true,
+        "channelId": "UCabcdefghijklmnopqrstuv",
+        "channelHandle": "@WaliinStudio",
+        "channelUrl": "https://youtube.com/@WaliinStudio",
+        "purpose": ["shorts", "trailers", "full_episodes", "behind_scenes", "live_streams", "community"],
+        "contentTypes": ["short", "teaser", "trailer", "highlight", "full_episode", "behind_scenes", "live_stream", "community_post"],
+        "monetization": ["ads", "super_chat", "super_thanks", "memberships", "brand_connect"],
+        "credentials": {
+          "oauthRef": "vault://youtube/waliin-studio/oauth",
+          "apiKeyRef": "vault://youtube/waliin-studio/api-key"
+        },
+        "youtubeIntegrationRef": "youtube-waliin-studio-main"
+      },
+      "facebook": {
+        "enabled": true,
+        "pageId": "123456789012345",
+        "pageName": "Waliin Studio",
+        "pageUrl": "https://facebook.com/WaliinStudio",
+        "groupId": "987654321098765",
+        "groupName": "Waliin Studio Community",
+        "groupUrl": "https://facebook.com/groups/WaliinStudioCommunity",
+        "purpose": ["premieres", "polls", "discussions", "reels", "stories", "events", "live"],
+        "contentTypes": ["reel", "story", "post_image", "post_video", "poll", "event", "live_stream", "premiere"],
+        "monetization": ["ad_breaks", "fan_subscriptions", "branded_content", "stars"],
+        "credentials": {
+          "pageAccessTokenRef": "vault://facebook/waliin-studio/page-token",
+          "appIdRef": "vault://facebook/waliin-studio/app-id",
+          "appSecretRef": "vault://facebook/waliin-studio/app-secret"
+        }
+      },
+      "instagram": {
+        "enabled": true,
+        "accountId": "17841400000000000",
+        "accountHandle": "@waliinstudio",
+        "accountUrl": "https://instagram.com/waliinstudio",
+        "purpose": ["reels", "stories", "carousels", "highlights", "behind_scenes", "live"],
+        "contentTypes": ["reel", "story", "carousel", "single_image", "single_video", "live"],
+        "monetization": ["branded_content", "affiliate_links", "badges", "subscriptions"],
+        "credentials": {
+          "accessTokenRef": "vault://instagram/waliin-studio/access-token",
+          "businessAccountId": "17841400000000000"
+        }
+      },
+      "tiktok": {
+        "enabled": true,
+        "accountId": "7000000000000000000",
+        "accountHandle": "@waliinstudio",
+        "accountUrl": "https://tiktok.com/@waliinstudio",
+        "purpose": ["trend_challenges", "highlights", "duets", "stitches", "live", "series"],
+        "contentTypes": ["video", "duet", "stitch", "live", "photo_carousel", "series"],
+        "monetization": ["creator_fund", "brand_partnerships", "live_gifts", "tips", "series_subscriptions"],
+        "credentials": {
+          "accessTokenRef": "vault://tiktok/waliin-studio/access-token",
+          "openIdRef": "vault://tiktok/waliin-studio/open-id"
+        }
+      },
+      "waliinNative": {
+        "enabled": true,
+        "baseUrl": "https://waliin.studio",
+        "premiumUrl": "https://waliin.studio/premium",
+        "purpose": ["showcase", "streaming", "polls", "subscriptions", "downloads", "community"],
+        "contentTypes": ["full_episode", "series", "movie", "short_drama", "exclusive", "premiere"],
+        "monetization": ["subscriptions", "tvod", "avod", "pvod", "est", "downloads"]
+      }
+    },
+    "interlinking": {
+      "enabled": true,
+      "strategy": {
+        "bioLinks": {
+          "enabled": true,
+          "linktreeEnabled": true,
+          "linktreeUrl": "https://linktr.ee/waliinstudio",
+          "primaryDestination": "waliin_native"
+        },
+        "crossPlatformLinks": {
+          "youtubeToWaliin": true,
+          "facebookToWaliin": true,
+          "instagramToWaliin": true,
+          "tiktokToWaliin": true,
+          "waliinToYoutube": true,
+          "waliinToSocial": true
+        },
+        "endScreens": {
+          "enabled": true,
+          "primaryCta": "subscribe_waliin",
+          "secondaryCta": "watch_more"
+        },
+        "pinnedComments": {
+          "enabled": true,
+          "template": "🎬 Watch the full episode on Waliin Studio: {waliin_url}\n💎 Get premium access: {premium_url}\n#WaliinTogether",
+          "platforms": ["youtube", "facebook"]
+        },
+        "communitySync": {
+          "enabled": true,
+          "syncPolls": true,
+          "syncAnnouncements": true,
+          "syncTeasers": true
+        }
+      },
+      "hashtagStrategy": {
+        "usePrimary": true,
+        "useSecondary": true,
+        "platformSpecific": {
+          "youtube": ["#Shorts", "#Drama", "#AfricanContent"],
+          "instagram": ["#InstaReels", "#DramaClips", "#MustWatch"],
+          "tiktok": ["#fyp", "#viral", "#dramaclip"],
+          "facebook": ["#FacebookWatch", "#DramaSeries"]
+        },
+        "maxHashtags": {
+          "youtube": 15,
+          "instagram": 30,
+          "tiktok": 5,
+          "facebook": 10
+        }
+      }
+    },
+    "publishingWorkflows": {
+      "autoPublish": false,
+      "approvalRequired": true,
+      "approvalRoles": ["social_media_manager", "content_manager"],
+      "crossPostEnabled": true,
+      "crossPostRules": [
+        {
+          "sourceContent": "short",
+          "sourcePlatform": "youtube",
+          "targetPlatforms": ["instagram", "tiktok", "facebook"],
+          "adaptFormat": true,
+          "delayMinutes": 30
+        },
+        {
+          "sourceContent": "trailer",
+          "sourcePlatform": "youtube",
+          "targetPlatforms": ["facebook", "instagram"],
+          "adaptFormat": true,
+          "delayMinutes": 60
+        }
+      ],
+      "schedulingEnabled": true,
+      "optimalPostingTimes": {
+        "youtube": [
+          { "day": "tuesday", "timeUtc": "15:00" },
+          { "day": "thursday", "timeUtc": "15:00" },
+          { "day": "saturday", "timeUtc": "12:00" }
+        ],
+        "instagram": [
+          { "day": "monday", "timeUtc": "08:00" },
+          { "day": "wednesday", "timeUtc": "16:00" },
+          { "day": "friday", "timeUtc": "18:00" }
+        ]
+      }
+    },
+    "monetization": {
+      "revenueTracking": true,
+      "platformRevenue": {
+        "youtube": {
+          "adsEnabled": true,
+          "membershipsEnabled": true,
+          "superChatEnabled": true,
+          "shoppingEnabled": false,
+          "brandConnectEnabled": true
+        },
+        "facebook": {
+          "adBreaksEnabled": true,
+          "fanSubscriptionsEnabled": true,
+          "brandedContentEnabled": true,
+          "starsEnabled": true
+        },
+        "instagram": {
+          "brandedContentEnabled": true,
+          "affiliateLinksEnabled": true,
+          "badgesEnabled": true,
+          "subscriptionsEnabled": true
+        },
+        "tiktok": {
+          "creatorFundEnabled": true,
+          "brandPartnershipsEnabled": true,
+          "liveGiftsEnabled": true,
+          "tipsEnabled": true,
+          "seriesEnabled": true
+        },
+        "waliinNative": {
+          "subscriptionsEnabled": true,
+          "tvodEnabled": true,
+          "avodEnabled": true,
+          "downloadSalesEnabled": true
+        }
+      },
+      "funnelConversions": {
+        "trackYoutubeToWaliin": true,
+        "trackFacebookToWaliin": true,
+        "trackInstagramToWaliin": true,
+        "trackTiktokToWaliin": true,
+        "conversionGoals": [
+          { "name": "Premium Subscription", "type": "subscription", "targetMonthly": 500, "value": 9.99 },
+          { "name": "Trial Start", "type": "trial_start", "targetMonthly": 2000, "value": 0 },
+          { "name": "TVOD Purchase", "type": "tvod_purchase", "targetMonthly": 1000, "value": 4.99 }
+        ]
+      }
+    },
+    "governance": {
+      "culturalSensitivity": {
+        "enabled": true,
+        "phase25Integration": true,
+        "reviewRequired": true,
+        "blockedCategories": ["religious_sensitivity", "political_sensitivity"]
+      },
+      "contentGuidelines": {
+        "brandVoice": "inspirational",
+        "toneGuidelines": ["positive", "inclusive", "community-focused", "authentic"],
+        "prohibitedTopics": ["politics", "religion controversy", "competitor bashing"],
+        "requiredDisclosures": {
+          "sponsoredContent": true,
+          "paidPartnership": true,
+          "affiliateLinks": true,
+          "aiGeneratedContent": true
+        }
+      },
+      "copyrightCompliance": {
+        "contentIdRegistration": true,
+        "musicLicensingRequired": true,
+        "imageLicensingRequired": true,
+        "claimMonitoring": true
+      },
+      "accessControl": {
+        "publishingRoles": ["social_media_manager", "content_manager", "marketing_lead"],
+        "approvalRoles": ["social_media_manager", "content_manager", "marketing_lead", "ceo"],
+        "analyticsRoles": ["social_media_manager", "content_manager", "marketing_lead", "ceo", "analyst"]
+      }
+    },
+    "status": "active",
+    "statistics": {
+      "totalPosts": 150,
+      "totalReach": 5000000,
+      "totalEngagements": 250000,
+      "totalFollowers": {
+        "youtube": 25000,
+        "facebook": 15000,
+        "instagram": 30000,
+        "tiktok": 45000,
+        "waliinCustomers": 5000
+      },
+      "totalRevenue": 15000.00,
+      "lastPostAt": "2024-01-15T18:00:00Z",
+      "lastSyncAt": "2024-01-15T19:00:00Z"
+    }
+  },
+  "socialAnalytics": {
+    "analyticsId": "analytics-social-waliin-main",
+    "version": "1.0.0",
+    "connectorRef": "social-waliin-studio-main",
+    "metricsCollection": {
+      "enabled": true,
+      "syncIntervalMinutes": 60,
+      "platforms": {
+        "youtube": {
+          "enabled": true,
+          "metrics": ["views", "watch_time", "subscribers", "estimated_revenue", "card_clicks", "end_screen_clicks"],
+          "dimensions": ["video", "date", "country", "device_type"]
+        },
+        "facebook": {
+          "enabled": true,
+          "metrics": ["page_fans", "page_impressions", "post_engagements", "ad_break_earnings"],
+          "dimensions": ["post", "date", "country"]
+        },
+        "instagram": {
+          "enabled": true,
+          "metrics": ["followers_count", "impressions", "reach", "reel_plays", "reel_likes"],
+          "dimensions": ["media", "date", "country", "media_type"]
+        },
+        "tiktok": {
+          "enabled": true,
+          "metrics": ["followers_count", "video_views", "shares", "creator_fund_earnings"],
+          "dimensions": ["video", "date", "country"]
+        },
+        "waliinNative": {
+          "enabled": true,
+          "metrics": ["subscribers", "views", "watch_time", "mrr", "arpu", "churn_rate"],
+          "dimensions": ["content", "date", "country", "subscription_tier"]
+        }
+      }
+    },
+    "crossPlatformKPIs": {
+      "reach": {
+        "totalReach": 5000000,
+        "uniqueReach": 3500000,
+        "reachByPlatform": {
+          "youtube": 1500000,
+          "facebook": 800000,
+          "instagram": 1200000,
+          "tiktok": 1500000,
+          "waliinNative": 100000
+        },
+        "reachGrowthPercent": 25.5
+      },
+      "engagement": {
+        "totalEngagements": 250000,
+        "engagementRate": 5.0,
+        "engagementByPlatform": {
+          "youtube": 4.2,
+          "facebook": 3.8,
+          "instagram": 6.5,
+          "tiktok": 8.2,
+          "waliinNative": 12.0
+        }
+      },
+      "audience": {
+        "totalFollowers": 120000,
+        "followersByPlatform": {
+          "youtube": 25000,
+          "facebook": 15000,
+          "instagram": 30000,
+          "tiktok": 45000,
+          "waliinCustomers": 5000
+        },
+        "followerGrowthPercent": 15.3,
+        "demographicBreakdown": {
+          "ageGroups": {
+            "18_24": 35.0,
+            "25_34": 40.0,
+            "35_44": 15.0,
+            "45_54": 7.0,
+            "55_64": 3.0
+          },
+          "genderSplit": {
+            "male": 45.0,
+            "female": 52.0,
+            "other": 3.0
+          },
+          "topCountries": [
+            { "country": "Ethiopia", "percentage": 35.0, "count": 42000 },
+            { "country": "Kenya", "percentage": 20.0, "count": 24000 },
+            { "country": "Nigeria", "percentage": 15.0, "count": 18000 }
+          ]
+        }
+      },
+      "conversions": {
+        "totalConversions": 5000,
+        "conversionRate": 4.2,
+        "conversionsBySource": {
+          "youtube": 2000,
+          "facebook": 800,
+          "instagram": 1200,
+          "tiktok": 700,
+          "organic": 200,
+          "direct": 100
+        },
+        "conversionsByType": {
+          "signups": 3000,
+          "trials": 1500,
+          "subscriptions": 400,
+          "tvodPurchases": 100
+        },
+        "conversionValue": 15000.00
+      },
+      "revenue": {
+        "totalRevenue": 25000.00,
+        "revenueByPlatform": {
+          "youtube": 8000.00,
+          "facebook": 2000.00,
+          "instagram": 1500.00,
+          "tiktok": 1000.00,
+          "waliinNative": 12500.00
+        },
+        "revenueByType": {
+          "ads": 5000.00,
+          "subscriptions": 10000.00,
+          "transactions": 5000.00,
+          "tips_gifts": 2000.00,
+          "brand_deals": 3000.00
+        },
+        "revenueGrowthPercent": 35.0
+      }
+    },
+    "funnelTracking": {
+      "enabled": true,
+      "utmTracking": {
+        "enabled": true,
+        "utmSource": {
+          "youtube": "youtube",
+          "facebook": "facebook",
+          "instagram": "instagram",
+          "tiktok": "tiktok"
+        },
+        "utmMedium": {
+          "video": "video",
+          "short": "short",
+          "story": "story",
+          "post": "post",
+          "bio": "bio"
+        }
+      },
+      "funnelStages": [
+        { "stageName": "awareness", "platforms": ["youtube", "tiktok", "instagram"], "metrics": ["impressions", "reach", "views"], "conversionToNext": 15.0 },
+        { "stageName": "interest", "platforms": ["youtube", "facebook", "instagram"], "metrics": ["engagement", "follows", "saves"], "conversionToNext": 25.0 },
+        { "stageName": "consideration", "platforms": ["youtube", "waliin_native"], "metrics": ["link_clicks", "site_visits", "video_completions"], "conversionToNext": 35.0 },
+        { "stageName": "intent", "platforms": ["waliin_native"], "metrics": ["signups", "trial_starts", "cart_adds"], "conversionToNext": 50.0 },
+        { "stageName": "purchase", "platforms": ["waliin_native"], "metrics": ["subscriptions", "transactions", "revenue"], "conversionToNext": 100.0 }
+      ],
+      "attributionModel": "last_click",
+      "attributionWindow": {
+        "clickWindowDays": 30,
+        "viewWindowDays": 7
+      }
+    },
+    "dashboards": {
+      "overviewDashboard": {
+        "enabled": true,
+        "widgets": ["total_reach", "total_engagement", "total_followers", "total_revenue", "platform_breakdown", "top_content"],
+        "refreshIntervalMinutes": 15
+      },
+      "funnelDashboard": {
+        "enabled": true,
+        "widgets": ["funnel_visualization", "conversion_rates", "attribution", "source_breakdown"]
+      },
+      "campaignDashboard": {
+        "enabled": true,
+        "widgets": ["active_campaigns", "campaign_performance", "milestone_tracker", "calendar_view"]
+      }
+    },
+    "alerting": {
+      "enabled": true,
+      "alertTypes": [
+        { "type": "follower_milestone", "enabled": true, "threshold": 10000, "platforms": ["youtube", "instagram", "tiktok"], "notificationChannels": ["slack", "email"], "severity": "info" },
+        { "type": "viral_content", "enabled": true, "threshold": 100000, "platforms": ["all"], "notificationChannels": ["slack", "push"], "severity": "info" },
+        { "type": "engagement_drop", "enabled": true, "threshold": -20, "platforms": ["all"], "notificationChannels": ["email", "slack"], "severity": "warning" }
+      ]
+    },
+    "reporting": {
+      "scheduledReports": [
+        {
+          "reportId": "weekly-social",
+          "name": "Weekly Social Performance",
+          "frequency": "weekly",
+          "recipients": ["marketing@waliin.studio", "ceo@waliin.studio"],
+          "format": "pdf",
+          "sections": ["overview", "platforms", "content", "engagement", "conversions"],
+          "includePlatforms": ["youtube", "facebook", "instagram", "tiktok", "waliinNative"]
+        }
+      ],
+      "executiveReport": {
+        "enabled": true,
+        "frequency": "weekly",
+        "highlights": ["total_reach", "engagement_rate", "conversions", "revenue", "top_content"]
+      },
+      "exportFormats": ["pdf", "xlsx", "csv"]
+    },
+    "status": "active"
+  },
+  "campaignCalendar": {
+    "calendarId": "calendar-waliin-2024",
+    "version": "1.0.0",
+    "connectorRef": "social-waliin-studio-main",
+    "calendarSettings": {
+      "name": "Waliin Studio Global Campaign Calendar",
+      "timezone": "Africa/Addis_Ababa",
+      "startDate": "2024-01-01",
+      "fiscalYearStart": "01-01",
+      "viewModes": ["week", "month", "quarter", "timeline"]
+    },
+    "launchPhases": [
+      {
+        "phaseId": "phase-prelaunch",
+        "phaseName": "pre_launch",
+        "startDate": "2024-01-01",
+        "endDate": "2024-02-28",
+        "objectives": ["Build initial audience", "Create content backlog", "Test publishing workflows", "Establish brand presence"],
+        "keyMilestones": [
+          { "milestone": "All platforms accounts created", "targetDate": "2024-01-15", "status": "completed", "owner": "social_media_manager" },
+          { "milestone": "50 pieces of content ready", "targetDate": "2024-02-01", "status": "in_progress", "owner": "content_manager" },
+          { "milestone": "10K total followers", "targetDate": "2024-02-28", "status": "not_started", "owner": "marketing_lead" }
+        ],
+        "targetKPIs": {
+          "followers": 10000,
+          "reach": 100000,
+          "engagement": 5.0
+        },
+        "status": "active"
+      },
+      {
+        "phaseId": "phase-launch",
+        "phaseName": "launch",
+        "startDate": "2024-03-01",
+        "endDate": "2024-03-31",
+        "objectives": ["Maximum awareness", "Rapid growth", "Convert to subscribers", "First content premiere"],
+        "keyMilestones": [
+          { "milestone": "Launch day announcement", "targetDate": "2024-03-01", "status": "not_started", "owner": "ceo" },
+          { "milestone": "First premiere", "targetDate": "2024-03-15", "status": "not_started", "owner": "content_manager" },
+          { "milestone": "1000 subscribers", "targetDate": "2024-03-31", "status": "not_started", "owner": "marketing_lead" }
+        ],
+        "targetKPIs": {
+          "followers": 50000,
+          "reach": 1000000,
+          "subscribers": 5000,
+          "revenue": 10000
+        },
+        "status": "planning"
+      },
+      {
+        "phaseId": "phase-growth",
+        "phaseName": "growth",
+        "startDate": "2024-04-01",
+        "endDate": "2024-06-30",
+        "objectives": ["Sustain momentum", "Optimize content performance", "Expand regional reach"],
+        "targetKPIs": {
+          "followers": 150000,
+          "subscribers": 15000,
+          "revenue": 50000
+        },
+        "status": "planning"
+      }
+    ],
+    "campaigns": [
+      {
+        "campaignId": "campaign-launch-2024",
+        "name": "Waliin Studio Grand Launch",
+        "description": "Official launch of Waliin Studio across all social platforms",
+        "type": "launch",
+        "status": "scheduled",
+        "startDate": "2024-03-01T00:00:00Z",
+        "endDate": "2024-03-31T23:59:59Z",
+        "platforms": ["youtube", "facebook", "instagram", "tiktok", "waliin_native"],
+        "objectives": [
+          { "metric": "reach", "target": 1000000, "current": 0, "progress": 0 },
+          { "metric": "followers", "target": 50000, "current": 10000, "progress": 20 },
+          { "metric": "subscribers", "target": 5000, "current": 0, "progress": 0 },
+          { "metric": "revenue", "target": 10000, "current": 0, "progress": 0 }
+        ],
+        "budget": {
+          "total": 50000,
+          "currency": "USD",
+          "allocated": {
+            "content_production": 20000,
+            "paid_promotion": 20000,
+            "influencer": 8000,
+            "tools": 2000
+          },
+          "spent": 5000
+        },
+        "contentPlan": [
+          {
+            "contentId": "content-launch-teaser",
+            "title": "Waliin Studio Launch Teaser",
+            "contentType": "teaser",
+            "platforms": ["youtube", "instagram", "tiktok"],
+            "scheduledDate": "2024-02-25T12:00:00Z",
+            "status": "ready",
+            "assignee": "video_editor_1"
+          },
+          {
+            "contentId": "content-launch-trailer",
+            "title": "Waliin Studio Official Trailer",
+            "contentType": "trailer",
+            "platforms": ["youtube", "facebook"],
+            "scheduledDate": "2024-03-01T00:00:00Z",
+            "status": "in_production",
+            "assignee": "video_editor_1"
+          }
+        ],
+        "team": [
+          { "role": "campaign_lead", "userId": "user-001", "name": "Campaign Lead" },
+          { "role": "content_creator", "userId": "user-002", "name": "Content Creator" },
+          { "role": "video_editor", "userId": "user-003", "name": "Video Editor" }
+        ],
+        "tags": ["launch", "2024", "priority"]
+      },
+      {
+        "campaignId": "campaign-premiere-seeds",
+        "name": "Seeds of Tomorrow Premiere",
+        "description": "First original series premiere campaign",
+        "type": "premiere",
+        "status": "draft",
+        "startDate": "2024-03-08T00:00:00Z",
+        "endDate": "2024-03-22T23:59:59Z",
+        "platforms": ["youtube", "facebook", "instagram", "waliin_native"],
+        "objectives": [
+          { "metric": "views", "target": 100000, "current": 0, "progress": 0 },
+          { "metric": "subscribers", "target": 2000, "current": 0, "progress": 0 }
+        ],
+        "tags": ["premiere", "series", "seeds-of-tomorrow"]
+      }
+    ],
+    "contentCadence": {
+      "weeklyTargets": {
+        "youtube": {
+          "shorts": 5,
+          "longForm": 2,
+          "live": 0,
+          "communityPosts": 3
+        },
+        "facebook": {
+          "reels": 3,
+          "posts": 5,
+          "stories": 7,
+          "live": 1
+        },
+        "instagram": {
+          "reels": 5,
+          "posts": 3,
+          "stories": 14,
+          "carousels": 2
+        },
+        "tiktok": {
+          "videos": 7,
+          "live": 1
+        }
+      },
+      "optimalPostingTimes": {
+        "youtube": [
+          { "day": "tuesday", "times": ["15:00", "18:00"] },
+          { "day": "thursday", "times": ["15:00", "20:00"] },
+          { "day": "saturday", "times": ["12:00", "18:00"] }
+        ],
+        "instagram": [
+          { "day": "monday", "times": ["08:00", "18:00"] },
+          { "day": "wednesday", "times": ["11:00", "16:00"] },
+          { "day": "friday", "times": ["11:00", "18:00", "21:00"] }
+        ]
+      },
+      "contentMix": {
+        "entertainment": 40,
+        "educational": 20,
+        "promotional": 20,
+        "community": 10,
+        "behindScenes": 10
+      }
+    },
+    "milestones": [
+      {
+        "milestoneId": "milestone-10k-youtube",
+        "name": "10K YouTube Subscribers",
+        "type": "subscriber_milestone",
+        "platform": "youtube",
+        "targetValue": 10000,
+        "currentValue": 5000,
+        "targetDate": "2024-03-31",
+        "status": "in_progress",
+        "celebrationPlan": {
+          "enabled": true,
+          "celebrationContent": [
+            { "platform": "youtube", "contentType": "community_post", "message": "Thank you for 10K subscribers! 🎉" },
+            { "platform": "instagram", "contentType": "story", "message": "10K on YouTube! Thank you! 💖" }
+          ],
+          "communityEngagement": true
+        }
+      },
+      {
+        "milestoneId": "milestone-50k-tiktok",
+        "name": "50K TikTok Followers",
+        "type": "follower_milestone",
+        "platform": "tiktok",
+        "targetValue": 50000,
+        "currentValue": 20000,
+        "targetDate": "2024-04-30",
+        "status": "in_progress"
+      },
+      {
+        "milestoneId": "milestone-first-1m-views",
+        "name": "First Video with 1M Views",
+        "type": "view_milestone",
+        "platform": "all",
+        "targetValue": 1000000,
+        "currentValue": 0,
+        "targetDate": "2024-06-30",
+        "status": "not_started"
+      }
+    ],
+    "premiereCalendar": [
+      {
+        "premiereId": "premiere-seeds-ep1",
+        "contentTitle": "Seeds of Tomorrow - Episode 1",
+        "contentType": "series",
+        "premiereDate": "2024-03-15T18:00:00Z",
+        "platform": "both",
+        "promotionPlan": {
+          "teaserReleaseDate": "2024-02-25",
+          "trailerReleaseDate": "2024-03-05",
+          "countdownStart": "2024-03-10",
+          "socialBlitz": [
+            {
+              "platform": "youtube",
+              "contentTypes": ["short", "community_post"],
+              "frequency": "daily",
+              "startDate": "2024-03-10",
+              "endDate": "2024-03-15"
+            },
+            {
+              "platform": "instagram",
+              "contentTypes": ["reel", "story"],
+              "frequency": "twice_daily",
+              "startDate": "2024-03-10",
+              "endDate": "2024-03-15"
+            }
+          ],
+          "liveEvents": [
+            {
+              "eventType": "premiere_watch_party",
+              "platform": "youtube",
+              "date": "2024-03-15T18:00:00Z"
+            },
+            {
+              "eventType": "cast_interview",
+              "platform": "instagram",
+              "date": "2024-03-16T15:00:00Z"
+            }
+          ]
+        },
+        "status": "announced"
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventId": "event-new-year-2024",
+        "name": "Ethiopian New Year 2024",
+        "type": "cultural_event",
+        "date": "2024-09-11",
+        "regions": ["Ethiopia"],
+        "contentPlan": [
+          { "platform": "all", "contentType": "announcement", "scheduledDate": "2024-09-11T00:00:00Z", "theme": "new year celebration" }
+        ],
+        "priority": "high"
+      },
+      {
+        "eventId": "event-africa-day",
+        "name": "Africa Day",
+        "type": "cultural_event",
+        "date": "2024-05-25",
+        "regions": ["Africa"],
+        "contentPlan": [
+          { "platform": "all", "contentType": "carousel", "scheduledDate": "2024-05-25T09:00:00Z", "theme": "African storytelling" }
+        ],
+        "priority": "high"
+      }
+    ],
+    "approvalWorkflow": {
+      "enabled": true,
+      "stages": [
+        { "stageName": "content_review", "required": true, "approverRoles": ["content_manager"], "slaHours": 24 },
+        { "stageName": "cultural_review", "required": true, "approverRoles": ["cultural_reviewer"], "slaHours": 24 },
+        { "stageName": "final_approval", "required": true, "approverRoles": ["social_media_manager", "ceo"], "slaHours": 12 }
+      ],
+      "escalationEnabled": true,
+      "escalationAfterHours": 48
+    },
+    "teamAssignments": [
+      { "userId": "user-ceo", "name": "CEO", "email": "ceo@waliin.studio", "role": "ceo", "platforms": ["all"], "permissions": ["view", "approve", "analytics", "admin"] },
+      { "userId": "user-mkt-lead", "name": "Marketing Lead", "email": "marketing@waliin.studio", "role": "marketing_lead", "platforms": ["all"], "permissions": ["view", "create", "edit", "publish", "approve", "analytics"] },
+      { "userId": "user-social-mgr", "name": "Social Media Manager", "email": "social@waliin.studio", "role": "social_media_manager", "platforms": ["youtube", "facebook", "instagram", "tiktok"], "permissions": ["view", "create", "edit", "publish", "approve", "analytics"] },
+      { "userId": "user-content-mgr", "name": "Content Manager", "email": "content@waliin.studio", "role": "content_manager", "platforms": ["all"], "permissions": ["view", "create", "edit", "approve", "analytics"] },
+      { "userId": "user-creator-1", "name": "Content Creator", "email": "creator1@waliin.studio", "role": "content_creator", "platforms": ["all"], "permissions": ["view", "create", "edit"] }
+    ],
+    "notifications": {
+      "enabled": true,
+      "channels": ["email", "slack", "operator_console"],
+      "triggers": [
+        { "event": "approval_needed", "enabled": true, "recipients": ["content_manager", "social_media_manager"] },
+        { "event": "milestone_approaching", "enabled": true, "recipients": ["marketing_lead", "ceo"], "advanceNoticeDays": 7 },
+        { "event": "premiere_reminder", "enabled": true, "recipients": ["all"], "advanceNoticeDays": 3 },
+        { "event": "deadline_approaching", "enabled": true, "recipients": ["assignee"], "advanceNoticeDays": 2 }
+      ]
+    },
+    "integrations": {
+      "airtable": {
+        "enabled": true,
+        "baseId": "appXXXXXXXXXXXXXX",
+        "contentCalendarTable": "Content Calendar",
+        "campaignsTable": "Campaigns",
+        "milestonesTable": "Milestones"
+      },
+      "slack": {
+        "enabled": true,
+        "channelId": "C0XXXXXXX",
+        "botToken": "vault://slack/waliin-bot-token"
+      }
+    },
+    "status": "active"
+  },
+  "auditLogEvents": [
+    "social_connector_created",
+    "social_connector_updated",
+    "social_connector_activated",
+    "social_connector_deactivated",
+    "social_platform_connected",
+    "social_platform_disconnected",
+    "social_content_scheduled",
+    "social_content_published",
+    "social_content_cross_posted",
+    "social_content_failed",
+    "social_content_deleted",
+    "social_engagement_tracked",
+    "social_mention_detected",
+    "social_comment_received",
+    "social_comment_replied",
+    "social_message_received",
+    "social_follower_milestone",
+    "social_engagement_spike",
+    "social_viral_content_detected",
+    "social_negative_sentiment_detected",
+    "social_copyright_claim",
+    "social_policy_violation",
+    "social_approval_requested",
+    "social_approval_granted",
+    "social_approval_rejected",
+    "social_bio_link_updated",
+    "social_cross_link_configured",
+    "social_hashtag_updated",
+    "social_monetization_enabled",
+    "social_monetization_disabled",
+    "social_revenue_tracked",
+    "social_conversion_tracked",
+    "social_funnel_click_tracked",
+    "social_analytics_synced",
+    "social_analytics_exported",
+    "social_report_generated",
+    "social_alert_triggered",
+    "social_alert_resolved",
+    "social_dashboard_viewed",
+    "campaign_created",
+    "campaign_updated",
+    "campaign_activated",
+    "campaign_paused",
+    "campaign_completed",
+    "campaign_cancelled",
+    "campaign_content_added",
+    "campaign_content_removed",
+    "campaign_content_scheduled",
+    "campaign_content_published",
+    "campaign_milestone_set",
+    "campaign_milestone_achieved",
+    "campaign_milestone_missed",
+    "campaign_budget_updated",
+    "campaign_budget_alert",
+    "campaign_objective_updated",
+    "campaign_objective_achieved",
+    "campaign_team_assigned",
+    "campaign_team_removed",
+    "calendar_created",
+    "calendar_updated",
+    "calendar_phase_started",
+    "calendar_phase_completed",
+    "calendar_event_created",
+    "calendar_event_updated",
+    "calendar_event_cancelled",
+    "calendar_premiere_scheduled",
+    "calendar_premiere_announced",
+    "calendar_premiere_completed",
+    "calendar_notification_sent",
+    "calendar_deadline_approaching",
+    "calendar_deadline_missed",
+    "calendar_approval_requested",
+    "calendar_approval_completed",
+    "calendar_sync_completed",
+    "calendar_export_generated"
+  ]
+}
