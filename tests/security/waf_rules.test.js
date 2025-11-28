@@ -670,3 +670,100 @@ describe('OWASP Compliance', () => {
     expect(a03Rules.length).toBeGreaterThan(0);
   });
 });
+
+describe('Landing Page Endpoint Protection', () => {
+  describe('Token Redemption Endpoint', () => {
+    test('should have rate limit for token redemption endpoint', () => {
+      const rateLimitGroup = wafRules.rule_groups.find(g => g.id === 'rate_limiting');
+      const tokenRule = rateLimitGroup.rules.find(r => r.id === 'rate_003');
+      
+      expect(tokenRule).toBeDefined();
+      expect(tokenRule.expression).toContain('/api/invite/redeem');
+      expect(tokenRule.rate_limit.requests).toBe(5);
+      expect(tokenRule.rate_limit.period_seconds).toBe(60);
+    });
+
+    test('should protect token endpoint from SQLi', () => {
+      const sqliGroup = wafRules.rule_groups.find(g => g.id === 'sqli_protection');
+      const bodyRule = sqliGroup.rules.find(r => r.id === 'sqli_003');
+      
+      // POST requests to redeem endpoint should be protected
+      expect(bodyRule.expression).toContain('POST');
+      expect(bodyRule.enabled).toBe(true);
+    });
+
+    test('should protect token endpoint from XSS', () => {
+      const xssGroup = wafRules.rule_groups.find(g => g.id === 'xss_protection');
+      
+      // All XSS rules should be enabled
+      xssGroup.rules.forEach(rule => {
+        expect(rule.enabled).toBe(true);
+      });
+    });
+  });
+
+  describe('Signup Endpoint', () => {
+    test('should have strict rate limit for signup', () => {
+      const rateLimitGroup = wafRules.rule_groups.find(g => g.id === 'rate_limiting');
+      const signupRule = rateLimitGroup.rules.find(r => r.id === 'rate_002');
+      
+      expect(signupRule).toBeDefined();
+      expect(signupRule.expression).toContain('/api/auth/signup');
+      expect(signupRule.rate_limit.requests).toBe(3);
+      expect(signupRule.rate_limit.period_seconds).toBe(300); // 5 minutes
+      expect(signupRule.action).toBe('managed_challenge');
+    });
+  });
+
+  describe('Static Assets', () => {
+    test('should allow health check endpoints to bypass WAF', () => {
+      const healthBypass = wafRules.bypass_rules.find(r => r.id === 'bypass_002');
+      
+      expect(healthBypass).toBeDefined();
+      expect(healthBypass.enabled).toBe(true);
+      expect(healthBypass.expression).toContain('/health');
+    });
+  });
+
+  describe('Bot Protection for Landing Page', () => {
+    test('should challenge automated tools accessing landing page', () => {
+      const botGroup = wafRules.rule_groups.find(g => g.id === 'bot_mitigation');
+      const automationRule = botGroup.rules.find(r => r.id === 'bot_003');
+      
+      expect(automationRule).toBeDefined();
+      expect(automationRule.enabled).toBe(true);
+      expect(automationRule.action).toBe('managed_challenge');
+    });
+
+    test('should block headless browsers', () => {
+      const botGroup = wafRules.rule_groups.find(g => g.id === 'bot_mitigation');
+      const headlessRule = botGroup.rules.find(r => r.id === 'bot_004');
+      
+      expect(headlessRule).toBeDefined();
+      expect(headlessRule.enabled).toBe(true);
+      expect(headlessRule.expression).toContain('HeadlessChrome');
+      expect(headlessRule.expression).toContain('Selenium');
+    });
+  });
+
+  describe('Content Security', () => {
+    test('should block oversized requests to landing page forms', () => {
+      const validationGroup = wafRules.rule_groups.find(g => g.id === 'request_validation');
+      const oversizedRule = validationGroup.rules.find(r => r.id === 'req_001');
+      
+      expect(oversizedRule).toBeDefined();
+      expect(oversizedRule.enabled).toBe(true);
+      // 10MB limit
+      expect(oversizedRule.expression).toContain('10485760');
+    });
+
+    test('should validate content types for POST requests', () => {
+      const validationGroup = wafRules.rule_groups.find(g => g.id === 'request_validation');
+      const contentTypeRule = validationGroup.rules.find(r => r.id === 'req_002');
+      
+      expect(contentTypeRule).toBeDefined();
+      expect(contentTypeRule.enabled).toBe(true);
+      expect(contentTypeRule.expression).toContain('application/json');
+    });
+  });
+});

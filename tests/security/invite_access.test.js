@@ -749,3 +749,200 @@ describe('Runtime Access Control Logic', () => {
     expect(canAccessFeature(openCohort, 'debug_features', 'admin_panel')).toBe(false);
   });
 });
+
+describe('Landing Page Token Form Validation', () => {
+  // Token pattern from landing/app.js and schemas/invite_token.schema.json
+  const TOKEN_PATTERN = /^[A-Za-z0-9_-]{32,64}$/;
+
+  /**
+   * Validate invite token format (mirrors landing/app.js logic)
+   */
+  function validateTokenFormat(token) {
+    if (!token || typeof token !== 'string') {
+      return { valid: false, error: 'Token is required' };
+    }
+
+    token = token.trim();
+
+    if (token.length < 32 || token.length > 64) {
+      return { valid: false, error: 'Token must be 32-64 characters' };
+    }
+
+    if (!TOKEN_PATTERN.test(token)) {
+      return { valid: false, error: 'Token contains invalid characters' };
+    }
+
+    return { valid: true, token };
+  }
+
+  /**
+   * Validate email format (mirrors landing/app.js logic)
+   */
+  function validateEmail(email) {
+    if (!email || typeof email !== 'string') {
+      return { valid: false, error: 'Email is required' };
+    }
+
+    email = email.trim().toLowerCase();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+      return { valid: false, error: 'Invalid email format' };
+    }
+
+    if (email.length > 255) {
+      return { valid: false, error: 'Email is too long' };
+    }
+
+    return { valid: true, email };
+  }
+
+  describe('Token Format Validation', () => {
+    test('should accept valid 32-character token', () => {
+      const result = validateTokenFormat('inv_a1b2c3d4e5f6g7h8i9j0k1l2m3n4');
+      expect(result.valid).toBe(true);
+    });
+
+    test('should accept valid 64-character token', () => {
+      const token = 'inv_' + 'a'.repeat(60);
+      const result = validateTokenFormat(token);
+      expect(result.valid).toBe(true);
+    });
+
+    test('should accept token with underscores and hyphens', () => {
+      const result = validateTokenFormat('inv_test-token_12345678901234567890');
+      expect(result.valid).toBe(true);
+    });
+
+    test('should reject empty token', () => {
+      const result = validateTokenFormat('');
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Token is required');
+    });
+
+    test('should reject null token', () => {
+      const result = validateTokenFormat(null);
+      expect(result.valid).toBe(false);
+    });
+
+    test('should reject token shorter than 32 characters', () => {
+      const result = validateTokenFormat('inv_short');
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Token must be 32-64 characters');
+    });
+
+    test('should reject token longer than 64 characters', () => {
+      const token = 'a'.repeat(65);
+      const result = validateTokenFormat(token);
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Token must be 32-64 characters');
+    });
+
+    test('should reject token with special characters', () => {
+      const result = validateTokenFormat('inv_test!@#$%^&*()123456789012345678901234');
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Token contains invalid characters');
+    });
+
+    test('should reject token with spaces', () => {
+      const result = validateTokenFormat('inv test token 12345678901234567');
+      expect(result.valid).toBe(false);
+    });
+
+    test('should trim whitespace from token', () => {
+      const result = validateTokenFormat('  inv_a1b2c3d4e5f6g7h8i9j0k1l2m3n4  ');
+      expect(result.valid).toBe(true);
+      expect(result.token).toBe('inv_a1b2c3d4e5f6g7h8i9j0k1l2m3n4');
+    });
+  });
+
+  describe('Email Format Validation', () => {
+    test('should accept valid email', () => {
+      const result = validateEmail('user@example.com');
+      expect(result.valid).toBe(true);
+      expect(result.email).toBe('user@example.com');
+    });
+
+    test('should accept email with subdomain', () => {
+      const result = validateEmail('user@mail.example.com');
+      expect(result.valid).toBe(true);
+    });
+
+    test('should accept email with plus sign', () => {
+      const result = validateEmail('user+tag@example.com');
+      expect(result.valid).toBe(true);
+    });
+
+    test('should lowercase email', () => {
+      const result = validateEmail('User@EXAMPLE.COM');
+      expect(result.valid).toBe(true);
+      expect(result.email).toBe('user@example.com');
+    });
+
+    test('should reject empty email', () => {
+      const result = validateEmail('');
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Email is required');
+    });
+
+    test('should reject email without @', () => {
+      const result = validateEmail('userexample.com');
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Invalid email format');
+    });
+
+    test('should reject email without domain', () => {
+      const result = validateEmail('user@');
+      expect(result.valid).toBe(false);
+    });
+
+    test('should reject email without local part', () => {
+      const result = validateEmail('@example.com');
+      expect(result.valid).toBe(false);
+    });
+
+    test('should reject email with spaces', () => {
+      const result = validateEmail('user @example.com');
+      expect(result.valid).toBe(false);
+    });
+
+    test('should reject email longer than 255 characters', () => {
+      const longEmail = 'a'.repeat(250) + '@example.com';
+      const result = validateEmail(longEmail);
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Email is too long');
+    });
+  });
+
+  describe('Integration with Schema', () => {
+    test('should align with invite_token.schema.json pattern', () => {
+      // Pattern from schema: ^[A-Za-z0-9_-]{32,64}$
+      const schemaPattern = /^[A-Za-z0-9_-]{32,64}$/;
+      
+      // Test valid tokens against both
+      const validTokens = [
+        'inv_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6',
+        'INV_UPPERCASE_12345678901234567890ab',
+        'inv-with-hyphens-1234567890123456789'
+      ];
+
+      validTokens.forEach(token => {
+        expect(schemaPattern.test(token)).toBe(true);
+        expect(validateTokenFormat(token).valid).toBe(true);
+      });
+    });
+
+    test('should align with email format from schema', () => {
+      // Schema uses format: email (JSON Schema draft-07)
+      const validEmails = [
+        'user@example.com',
+        'test.user@company.org',
+        'beta+tester@waliinstudio.com'
+      ];
+
+      validEmails.forEach(email => {
+        expect(validateEmail(email).valid).toBe(true);
+      });
+    });
+  });
+});

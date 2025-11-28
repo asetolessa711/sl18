@@ -9,14 +9,15 @@ This playbook provides guidelines for testers participating in the SL18 beta pro
 
 ## Table of Contents
 1. [Overview](#overview)
-2. [Getting Access](#getting-access)
-3. [Cohort Tiers](#cohort-tiers)
-4. [Security Guidelines](#security-guidelines)
-5. [Testing Guidelines](#testing-guidelines)
-6. [Bug Reporting](#bug-reporting)
-7. [Feedback Collection](#feedback-collection)
-8. [Frequently Asked Questions](#frequently-asked-questions)
-9. [Emergency Contacts](#emergency-contacts)
+2. [Landing Page Guide](#landing-page-guide)
+3. [Getting Access](#getting-access)
+4. [Cohort Tiers](#cohort-tiers)
+5. [Security Guidelines](#security-guidelines)
+6. [Testing Guidelines](#testing-guidelines)
+7. [Bug Reporting](#bug-reporting)
+8. [Feedback Collection](#feedback-collection)
+9. [Frequently Asked Questions](#frequently-asked-questions)
+10. [Emergency Contacts](#emergency-contacts)
 
 ---
 
@@ -29,6 +30,89 @@ The beta environment at `beta.waliinstudio.com` is a secure staging space design
 - **WAF Protection**: Web Application Firewall protects against common attacks
 - **Rate Limiting**: Abuse prevention through request rate limits
 - **Monitoring**: Real-time monitoring and alerting for security events
+
+---
+
+## Landing Page Guide
+
+The beta landing page at `https://beta.waliinstudio.com` serves as the entry point for all beta testers.
+
+### Landing Page Features
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    beta.waliinstudio.com                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│    🎬 Welcome to the Waliin Studio Beta                     │
+│                                                              │
+│    Experience the future of AI-powered content creation.    │
+│                                                              │
+│    ┌──────────────┐  ┌──────────────┐                       │
+│    │ Join the Beta│  │  Learn More  │                       │
+│    └──────────────┘  └──────────────┘                       │
+│                                                              │
+├─────────────────────────────────────────────────────────────┤
+│  Features  │  Beta Tiers  │  FAQ  │  Feedback               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Tester Onboarding Flow
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Landing    │────▶│   Token      │────▶│   Cohort     │────▶│  Dashboard   │
+│    Page      │     │   Entry      │     │  Assignment  │     │   Access     │
+└──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
+       │                    │                    │                    │
+       │              Validate:             Assign:              Grant:
+       │              - Format              - Internal           - Features
+       │              - Expiry              - Closed             - API limits
+       │              - Single-use          - Open               - Storage
+       ▼                    ▼                    ▼                    ▼
+   Click "Join"     Enter token +        See assigned       Access based
+   the Beta         email address        cohort tier        on cohort
+```
+
+### Using the Token Entry Form
+
+1. **Click "Join the Beta"** on the landing page
+2. **Enter your invite token** in the format: `inv_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+3. **Enter your email address** for verification
+4. **Click "Validate Token"** to submit
+5. **View your cohort assignment** and available features
+
+### Token Validation Rules
+
+The landing page enforces the following validation rules:
+
+| Rule | Details |
+|------|---------|
+| Token Length | 32-64 characters |
+| Allowed Characters | Letters, numbers, underscores, hyphens |
+| Expiry | 72 hours from creation |
+| Single-use | Most tokens can only be redeemed once |
+| Email | Must match expected format |
+
+### Rate Limits on Landing Page
+
+| Action | Limit | Cooldown |
+|--------|-------|----------|
+| Token validation | 5 per minute | 60 seconds |
+| Signup attempts | 3 per 5 minutes | 300 seconds |
+| Feedback submission | 10 per 5 minutes | 300 seconds |
+
+### Demo Tokens for Testing
+
+For testing purposes only, the following demo tokens are available:
+
+| Token | Cohort | Access Level |
+|-------|--------|--------------|
+| `inv_internal_demo_12345678901234567890` | Internal | Full |
+| `inv_closed_beta_demo_123456789012345678` | Closed | Standard |
+| `inv_open_beta_demo_1234567890123456789a` | Open | Limited |
+
+> ⚠️ **Note**: Demo tokens are for testing the landing page flow only and do not grant actual beta access.
 
 ---
 

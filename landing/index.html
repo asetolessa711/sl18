@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Join the Waliin Studio Beta - Experience the future of content creation with AI-powered automation.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.beta.waliinstudio.com;">
+    <title>Waliin Studio Beta | beta.waliinstudio.com</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <span class="logo">🎬</span>
+                <span class="brand-name">Waliin Studio</span>
+                <span class="beta-badge">BETA</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#cohorts">Beta Tiers</a>
+                <a href="#faq">FAQ</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="hero-content">
+                <h1>Welcome to the Waliin Studio Beta</h1>
+                <p class="hero-subtitle">Experience the future of AI-powered content creation. Join our exclusive beta program and help shape the next generation of creative automation.</p>
+                <div class="hero-cta">
+                    <button class="btn btn-primary" id="joinBetaBtn">Join the Beta</button>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-graphic">
+                    <div class="orbit orbit-1"></div>
+                    <div class="orbit orbit-2"></div>
+                    <div class="orbit orbit-3"></div>
+                    <div class="center-icon">🚀</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Token Entry Modal -->
+        <div class="modal" id="tokenModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-overlay" id="modalOverlay"></div>
+            <div class="modal-content">
+                <button class="modal-close" id="modalClose" aria-label="Close modal">&times;</button>
+                <h2 id="modalTitle">Enter Your Invite Token</h2>
+                <p class="modal-subtitle">Paste your invite token below to join the beta program.</p>
+                
+                <form id="tokenForm" class="token-form">
+                    <div class="form-group">
+                        <label for="tokenInput">Invite Token</label>
+                        <input 
+                            type="text" 
+                            id="tokenInput" 
+                            name="token"
+                            placeholder="inv_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                            pattern="^[A-Za-z0-9_-]{32,64}$"
+                            required
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <span class="input-hint">Token must be 32-64 characters (letters, numbers, underscores, hyphens)</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="emailInput">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="emailInput" 
+                            name="email"
+                            placeholder="you@example.com"
+                            required
+                            autocomplete="email"
+                        >
+                    </div>
+
+                    <div id="formError" class="form-error" role="alert" aria-live="polite"></div>
+                    <div id="formSuccess" class="form-success" role="status" aria-live="polite"></div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="submitBtn">
+                        <span class="btn-text">Validate Token</span>
+                        <span class="btn-loading" hidden>Validating...</span>
+                    </button>
+                </form>
+
+                <div class="modal-footer">
+                    <p>Don't have a token? <a href="mailto:beta@waliinstudio.com">Request an invite</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cohort Assignment Result -->
+        <div class="modal" id="cohortModal" role="dialog" aria-modal="true" aria-labelledby="cohortTitle">
+            <div class="modal-overlay" id="cohortOverlay"></div>
+            <div class="modal-content cohort-result">
+                <h2 id="cohortTitle">🎉 Welcome to the Beta!</h2>
+                <div id="cohortDetails">
+                    <div class="cohort-badge" id="cohortBadge"></div>
+                    <p class="cohort-description" id="cohortDescription"></p>
+                    <div class="cohort-features" id="cohortFeatures"></div>
+                </div>
+                <button class="btn btn-primary btn-full" id="continueBtn">Continue to Dashboard</button>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <h2>Why Join the Beta?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Early Access</h3>
+                    <p>Be the first to experience new features before public release.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Secure Environment</h3>
+                    <p>Enterprise-grade security with TLS 1.2+, WAF protection, and rate limiting.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Direct Feedback</h3>
+                    <p>Your feedback shapes the product. Report issues directly to our team.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>AI-Powered</h3>
+                    <p>Leverage GPT-5 and advanced automation for content creation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cohort Tiers Section -->
+        <section class="cohorts" id="cohorts">
+            <h2>Beta Tiers</h2>
+            <p class="section-subtitle">Access levels based on your invite cohort</p>
+            <div class="cohorts-grid">
+                <div class="cohort-card cohort-internal">
+                    <div class="cohort-header">
+                        <span class="cohort-icon">👑</span>
+                        <h3>Internal</h3>
+                    </div>
+                    <div class="cohort-capacity">50-100 users</div>
+                    <ul class="cohort-features-list">
+                        <li>✅ Full feature access</li>
+                        <li>✅ Debug mode</li>
+                        <li>✅ Admin panel</li>
+                        <li>✅ API access</li>
+                        <li>✅ 100K API calls/day</li>
+                    </ul>
+                </div>
+                <div class="cohort-card cohort-closed">
+                    <div class="cohort-header">
+                        <span class="cohort-icon">⭐</span>
+                        <h3>Closed Beta</h3>
+                    </div>
+                    <div class="cohort-capacity">500-1,000 users</div>
+                    <ul class="cohort-features-list">
+                        <li>✅ Standard feature access</li>
+                        <li>✅ API access</li>
+                        <li>✅ Data export</li>
+                        <li>❌ Debug mode</li>
+                        <li>✅ 10K API calls/day</li>
+                    </ul>
+                </div>
+                <div class="cohort-card cohort-open">
+                    <div class="cohort-header">
+                        <span class="cohort-icon">🌟</span>
+                        <h3>Open Beta</h3>
+                    </div>
+                    <div class="cohort-capacity">10K-25K users</div>
+                    <ul class="cohort-features-list">
+                        <li>✅ Limited feature access</li>
+                        <li>❌ API access</li>
+                        <li>❌ Data export</li>
+                        <li>❌ Debug mode</li>
+                        <li>✅ 1K API calls/day</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq" id="faq">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-list">
+                <details class="faq-item">
+                    <summary>How do I get an invite token?</summary>
+                    <p>Invite tokens are distributed via email from <code>beta@waliinstudio.com</code>. Contact your referrer or email us to request access.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Why did my token expire?</summary>
+                    <p>Tokens expire after 72 hours for security. Request a new token from your contact or email <code>beta@waliinstudio.com</code>.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Is my data secure?</summary>
+                    <p>Yes! We use TLS 1.2+ encryption, WAF protection, and the beta environment is completely isolated from production.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>How do I report bugs?</summary>
+                    <p>Use the "Report Issue" button in the dashboard or email <code>beta-bugs@waliinstudio.com</code> with details.</p>
+                </details>
+            </div>
+        </section>
+
+        <!-- Feedback Section -->
+        <section class="feedback" id="feedback">
+            <div class="feedback-card">
+                <h2>Have Feedback?</h2>
+                <p>Help us improve! Report issues or suggest features.</p>
+                <div class="feedback-buttons">
+                    <button class="btn btn-outline" id="reportIssueBtn">🐛 Report Issue</button>
+                    <button class="btn btn-outline" id="suggestFeatureBtn">💡 Suggest Feature</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feedback Modal -->
+        <div class="modal" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+            <div class="modal-overlay" id="feedbackOverlay"></div>
+            <div class="modal-content">
+                <button class="modal-close" id="feedbackClose" aria-label="Close modal">&times;</button>
+                <h2 id="feedbackTitle">Submit Feedback</h2>
+                
+                <form id="feedbackForm" class="feedback-form">
+                    <div class="form-group">
+                        <label for="feedbackType">Feedback Type</label>
+                        <select id="feedbackType" name="type" required>
+                            <option value="">Select type...</option>
+                            <option value="bug">🐛 Bug Report</option>
+                            <option value="feature">💡 Feature Request</option>
+                            <option value="general">💬 General Feedback</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="feedbackEmail">Your Email</label>
+                        <input type="email" id="feedbackEmail" name="email" required placeholder="you@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="feedbackMessage">Message</label>
+                        <textarea id="feedbackMessage" name="message" rows="5" required placeholder="Describe the issue or suggestion..."></textarea>
+                    </div>
+
+                    <div id="feedbackError" class="form-error" role="alert"></div>
+                    <div id="feedbackSuccess" class="form-success" role="status"></div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Submit Feedback</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="logo">🎬</span>
+                <span>Waliin Studio Beta</span>
+            </div>
+            <div class="footer-links">
+                <a href="mailto:beta@waliinstudio.com">Contact</a>
+                <a href="mailto:security@waliinstudio.com">Security</a>
+                <a href="#" id="statusLink">Status</a>
+            </div>
+            <div class="footer-security">
+                <span class="security-badge">🔒 TLS 1.2+ Secured</span>
+                <span class="security-badge">🛡️ WAF Protected</span>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            &copy; 2025 Waliin Studio. All rights reserved. Beta Environment.
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
