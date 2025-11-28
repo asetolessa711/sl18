@@ -1,0 +1,673 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DistributionConnectors",
+  "description": "Schema for short-form distribution connectors in SL18 - partner integrations, syndication rules, API endpoints for Drama Box, RealShort, Mini Drama, and OTT apps",
+  "type": "object",
+  "properties": {
+    "connectorId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^connector-[a-z0-9-]+$",
+      "description": "Unique distribution connector identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Connector name"
+    },
+    "partnerInfo": {
+      "type": "object",
+      "properties": {
+        "partnerId": {
+          "type": "string",
+          "description": "Partner identifier"
+        },
+        "partnerName": {
+          "type": "string",
+          "description": "Partner display name"
+        },
+        "partnerType": {
+          "type": "string",
+          "enum": ["drama_box", "realshort", "mini_drama", "ott_app", "streaming_service", "social_platform", "aggregator", "broadcaster", "custom"],
+          "description": "Type of distribution partner"
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["strategic", "premium", "standard", "trial", "community"],
+          "description": "Partnership tier"
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "primaryEmail": {
+              "type": "string",
+              "format": "email"
+            },
+            "technicalEmail": {
+              "type": "string",
+              "format": "email"
+            },
+            "businessEmail": {
+              "type": "string",
+              "format": "email"
+            },
+            "slackChannel": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "contractInfo": {
+          "type": "object",
+          "properties": {
+            "contractId": {
+              "type": "string"
+            },
+            "startDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "endDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "autoRenewal": {
+              "type": "boolean"
+            },
+            "renewalTerms": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["partnerId", "partnerName", "partnerType"],
+      "additionalProperties": false
+    },
+    "apiConfiguration": {
+      "type": "object",
+      "properties": {
+        "baseUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Partner API base URL"
+        },
+        "apiVersion": {
+          "type": "string",
+          "description": "API version"
+        },
+        "authType": {
+          "type": "string",
+          "enum": ["oauth2", "api_key", "bearer_token", "jwt", "hmac", "basic_auth", "custom"],
+          "description": "Authentication type"
+        },
+        "credentialRef": {
+          "type": "string",
+          "pattern": "^vault://[a-zA-Z0-9/_-]+$",
+          "description": "Vault reference for credentials"
+        },
+        "scopes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "API scopes"
+        },
+        "rateLimits": {
+          "type": "object",
+          "properties": {
+            "requestsPerMinute": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "requestsPerDay": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "burstLimit": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "timeout": {
+          "type": "object",
+          "properties": {
+            "connectTimeoutMs": {
+              "type": "integer",
+              "minimum": 1000,
+              "default": 10000
+            },
+            "readTimeoutMs": {
+              "type": "integer",
+              "minimum": 1000,
+              "default": 30000
+            }
+          },
+          "additionalProperties": false
+        },
+        "retryPolicy": {
+          "type": "object",
+          "properties": {
+            "maxRetries": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "backoffMultiplier": {
+              "type": "number",
+              "minimum": 1
+            },
+            "initialDelayMs": {
+              "type": "integer",
+              "minimum": 100
+            },
+            "maxDelayMs": {
+              "type": "integer"
+            },
+            "retryableStatusCodes": {
+              "type": "array",
+              "items": { "type": "integer" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "endpointId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string",
+                "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+              },
+              "path": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "purpose": {
+                "type": "string",
+                "enum": ["content_upload", "content_update", "content_delete", "status_check", "analytics_fetch", "metadata_sync", "availability_update", "webhook_register"]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "requestSchema": {
+                "type": "object"
+              },
+              "responseSchema": {
+                "type": "object"
+              }
+            },
+            "required": ["endpointId", "name", "method", "path", "purpose"],
+            "additionalProperties": false
+          },
+          "description": "Available API endpoints"
+        },
+        "webhooks": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "callbackUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "secretRef": {
+              "type": "string",
+              "pattern": "^vault://[a-zA-Z0-9/_-]+$"
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["content_published", "content_updated", "content_removed", "playback_started", "playback_completed", "error_occurred", "monetization_event", "rights_changed"]
+              }
+            },
+            "retryPolicy": {
+              "type": "object",
+              "properties": {
+                "maxRetries": {
+                  "type": "integer"
+                },
+                "backoffMs": {
+                  "type": "integer"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["baseUrl", "authType", "credentialRef"],
+      "additionalProperties": false
+    },
+    "syndicationRules": {
+      "type": "object",
+      "properties": {
+        "autoSyndicate": {
+          "type": "boolean",
+          "description": "Automatically syndicate new content"
+        },
+        "approvalRequired": {
+          "type": "boolean",
+          "description": "Require manual approval before syndication"
+        },
+        "contentFilters": {
+          "type": "object",
+          "properties": {
+            "contentTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["movie", "series", "episode", "short_drama", "trailer", "teaser", "behind_scenes"]
+              },
+              "description": "Content types to syndicate"
+            },
+            "genres": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Allowed genres"
+            },
+            "excludedGenres": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Excluded genres"
+            },
+            "contentRatings": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["G", "PG", "PG-13", "TV-14", "TV-MA", "R", "NC-17"]
+              },
+              "description": "Allowed content ratings"
+            },
+            "languages": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Content languages to include"
+            },
+            "minimumQcScore": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Minimum QC score required"
+            },
+            "requiredQcPasses": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["technical", "content", "cultural", "persona", "translation"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "metadataMapping": {
+          "type": "object",
+          "properties": {
+            "mappingVersion": {
+              "type": "string"
+            },
+            "titleField": {
+              "type": "string"
+            },
+            "descriptionField": {
+              "type": "string"
+            },
+            "genreMapping": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            },
+            "ratingMapping": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            },
+            "customFields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "sourceField": { "type": "string" },
+                  "targetField": { "type": "string" },
+                  "transform": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "formatRequirements": {
+          "type": "object",
+          "properties": {
+            "videoFormats": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "codec": {
+                    "type": "string",
+                    "enum": ["h264", "h265", "vp9", "av1"]
+                  },
+                  "container": {
+                    "type": "string",
+                    "enum": ["mp4", "webm", "mkv", "mov"]
+                  },
+                  "resolution": {
+                    "type": "string"
+                  },
+                  "bitrate": {
+                    "type": "integer"
+                  },
+                  "framerate": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "aspectRatios": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["16:9", "9:16", "1:1", "4:3", "21:9"]
+              },
+              "description": "Required aspect ratios (9:16 for short-form)"
+            },
+            "audioFormats": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "codec": {
+                    "type": "string",
+                    "enum": ["aac", "mp3", "opus", "flac"]
+                  },
+                  "channels": {
+                    "type": "string",
+                    "enum": ["mono", "stereo", "5.1", "7.1"]
+                  },
+                  "sampleRate": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "subtitleFormats": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["srt", "vtt", "ass", "ttml", "dfxp"]
+              }
+            },
+            "thumbnailRequirements": {
+              "type": "object",
+              "properties": {
+                "formats": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["jpg", "png", "webp"]
+                  }
+                },
+                "minWidth": { "type": "integer" },
+                "minHeight": { "type": "integer" },
+                "aspectRatio": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "maxDurationSeconds": {
+              "type": "integer",
+              "description": "Max duration for short-form content"
+            },
+            "minDurationSeconds": {
+              "type": "integer",
+              "description": "Min duration for short-form content"
+            }
+          },
+          "additionalProperties": false
+        },
+        "packagingOptions": {
+          "type": "object",
+          "properties": {
+            "generateTeasers": {
+              "type": "boolean",
+              "description": "Auto-generate short teasers"
+            },
+            "teaserDurationSeconds": {
+              "type": "integer"
+            },
+            "generateVerticalClips": {
+              "type": "boolean",
+              "description": "Auto-generate 9:16 vertical clips"
+            },
+            "burnInSubtitles": {
+              "type": "boolean"
+            },
+            "addWatermark": {
+              "type": "boolean"
+            },
+            "watermarkPosition": {
+              "type": "string",
+              "enum": ["top_left", "top_right", "bottom_left", "bottom_right", "center"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "schedulingRules": {
+          "type": "object",
+          "properties": {
+            "immediatePublish": {
+              "type": "boolean"
+            },
+            "delayAfterPrimaryMinutes": {
+              "type": "integer",
+              "description": "Delay after primary platform release"
+            },
+            "exclusivityWindowDays": {
+              "type": "integer"
+            },
+            "releaseWindow": {
+              "type": "object",
+              "properties": {
+                "startHour": { "type": "integer", "minimum": 0, "maximum": 23 },
+                "endHour": { "type": "integer", "minimum": 0, "maximum": 23 },
+                "timezone": { "type": "string" },
+                "preferredDays": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "complianceSettings": {
+      "type": "object",
+      "properties": {
+        "qcRequirements": {
+          "type": "object",
+          "properties": {
+            "technicalQc": { "type": "boolean" },
+            "contentQc": { "type": "boolean" },
+            "culturalQc": { "type": "boolean" },
+            "personaQc": { "type": "boolean" },
+            "translationQc": { "type": "boolean" },
+            "minimumScore": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "culturalSensitivity": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "regions": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "sensitivityLevels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"]
+              }
+            },
+            "blockOnViolation": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "contentModeration": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "autoReject": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["violence", "nudity", "hate_speech", "copyright", "misinformation"]
+              }
+            },
+            "flagForReview": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "auditLogging": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "retentionDays": { "type": "integer" },
+            "logLevel": {
+              "type": "string",
+              "enum": ["basic", "detailed", "full"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "healthMonitoring": {
+      "type": "object",
+      "properties": {
+        "healthCheckEnabled": {
+          "type": "boolean"
+        },
+        "healthCheckInterval": {
+          "type": "integer",
+          "description": "Health check interval in seconds"
+        },
+        "healthCheckEndpoint": {
+          "type": "string",
+          "format": "uri"
+        },
+        "alertThresholds": {
+          "type": "object",
+          "properties": {
+            "errorRatePercent": {
+              "type": "number"
+            },
+            "latencyMs": {
+              "type": "integer"
+            },
+            "availabilityPercent": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "circuitBreaker": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "failureThreshold": { "type": "integer" },
+            "recoveryTimeSeconds": { "type": "integer" },
+            "halfOpenRequests": { "type": "integer" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "maintenance", "suspended", "pending_setup", "deprecated"],
+      "description": "Connector status"
+    },
+    "lastSyncedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "statistics": {
+      "type": "object",
+      "properties": {
+        "totalContentSyndicated": { "type": "integer" },
+        "activeContent": { "type": "integer" },
+        "totalViews": { "type": "integer" },
+        "totalRevenue": { "type": "number" },
+        "lastMonthViews": { "type": "integer" },
+        "lastMonthRevenue": { "type": "number" },
+        "averageLatencyMs": { "type": "integer" },
+        "errorRate": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "connectorId",
+    "version",
+    "name",
+    "partnerInfo",
+    "apiConfiguration",
+    "syndicationRules",
+    "status"
+  ],
+  "additionalProperties": false
+}

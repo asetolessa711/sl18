@@ -1,0 +1,1111 @@
+{
+  "distributionConnector": {
+    "connectorId": "connector-dramabox-global",
+    "version": "1.0.0",
+    "name": "Drama Box Global Connector",
+    "partnerInfo": {
+      "partnerId": "partner-dramabox-001",
+      "partnerName": "Drama Box",
+      "partnerType": "drama_box",
+      "tier": "strategic",
+      "contact": {
+        "primaryEmail": "partnerships@dramabox.com",
+        "technicalEmail": "tech@dramabox.com",
+        "businessEmail": "biz@dramabox.com",
+        "slackChannel": "#sl18-dramabox"
+      },
+      "contractInfo": {
+        "contractId": "contract-db-2024-001",
+        "startDate": "2024-01-01",
+        "endDate": "2025-12-31",
+        "autoRenewal": true,
+        "renewalTerms": "12-month auto-renewal with 60-day notice"
+      }
+    },
+    "apiConfiguration": {
+      "baseUrl": "https://api.dramabox.com/v2",
+      "apiVersion": "2.0",
+      "authType": "oauth2",
+      "credentialRef": "vault://sl18/partners/dramabox/oauth",
+      "scopes": ["content:write", "content:read", "analytics:read", "metadata:write"],
+      "rateLimits": {
+        "requestsPerMinute": 100,
+        "requestsPerDay": 10000,
+        "burstLimit": 20
+      },
+      "timeout": {
+        "connectTimeoutMs": 10000,
+        "readTimeoutMs": 30000
+      },
+      "retryPolicy": {
+        "maxRetries": 3,
+        "backoffMultiplier": 2,
+        "initialDelayMs": 1000,
+        "maxDelayMs": 30000,
+        "retryableStatusCodes": [429, 500, 502, 503, 504]
+      },
+      "endpoints": [
+        {
+          "endpointId": "ep-content-upload",
+          "name": "Content Upload",
+          "method": "POST",
+          "path": "/content/upload",
+          "description": "Upload new content to Drama Box",
+          "purpose": "content_upload",
+          "required": true
+        },
+        {
+          "endpointId": "ep-content-update",
+          "name": "Content Update",
+          "method": "PUT",
+          "path": "/content/{contentId}",
+          "description": "Update existing content metadata",
+          "purpose": "content_update",
+          "required": true
+        },
+        {
+          "endpointId": "ep-analytics",
+          "name": "Analytics Fetch",
+          "method": "GET",
+          "path": "/analytics/content/{contentId}",
+          "description": "Fetch content analytics",
+          "purpose": "analytics_fetch",
+          "required": true
+        },
+        {
+          "endpointId": "ep-status",
+          "name": "Status Check",
+          "method": "GET",
+          "path": "/content/{contentId}/status",
+          "description": "Check content syndication status",
+          "purpose": "status_check",
+          "required": true
+        }
+      ],
+      "webhooks": {
+        "enabled": true,
+        "callbackUrl": "https://api.sl18.io/webhooks/dramabox",
+        "secretRef": "vault://sl18/partners/dramabox/webhook-secret",
+        "events": ["content_published", "playback_started", "playback_completed", "monetization_event"],
+        "retryPolicy": {
+          "maxRetries": 5,
+          "backoffMs": 2000
+        }
+      }
+    },
+    "syndicationRules": {
+      "autoSyndicate": false,
+      "approvalRequired": true,
+      "contentFilters": {
+        "contentTypes": ["short_drama", "episode", "movie"],
+        "genres": ["drama", "romance", "comedy", "thriller", "historical"],
+        "excludedGenres": ["horror", "adult"],
+        "contentRatings": ["G", "PG", "PG-13", "TV-14"],
+        "languages": ["en", "am", "sw", "om", "ar", "zh"],
+        "minimumQcScore": 85,
+        "requiredQcPasses": ["technical", "content", "cultural", "translation"]
+      },
+      "metadataMapping": {
+        "mappingVersion": "1.0",
+        "titleField": "title",
+        "descriptionField": "synopsis",
+        "genreMapping": {
+          "drama": "DRAMA",
+          "romance": "ROMANCE",
+          "comedy": "COMEDY",
+          "thriller": "THRILLER"
+        },
+        "ratingMapping": {
+          "G": "ALL",
+          "PG": "7+",
+          "PG-13": "13+",
+          "TV-14": "14+"
+        },
+        "customFields": [
+          {
+            "sourceField": "personas",
+            "targetField": "cast_tags",
+            "transform": "array_to_csv"
+          }
+        ]
+      },
+      "formatRequirements": {
+        "videoFormats": [
+          {
+            "codec": "h264",
+            "container": "mp4",
+            "resolution": "1080p",
+            "bitrate": 8000000,
+            "framerate": 30
+          },
+          {
+            "codec": "h265",
+            "container": "mp4",
+            "resolution": "4k",
+            "bitrate": 15000000,
+            "framerate": 30
+          }
+        ],
+        "aspectRatios": ["9:16", "16:9"],
+        "audioFormats": [
+          {
+            "codec": "aac",
+            "channels": "stereo",
+            "sampleRate": 48000
+          }
+        ],
+        "subtitleFormats": ["srt", "vtt"],
+        "thumbnailRequirements": {
+          "formats": ["jpg", "webp"],
+          "minWidth": 1280,
+          "minHeight": 720,
+          "aspectRatio": "16:9"
+        },
+        "maxDurationSeconds": 600,
+        "minDurationSeconds": 60
+      },
+      "packagingOptions": {
+        "generateTeasers": true,
+        "teaserDurationSeconds": 30,
+        "generateVerticalClips": true,
+        "burnInSubtitles": false,
+        "addWatermark": true,
+        "watermarkPosition": "bottom_right"
+      },
+      "schedulingRules": {
+        "immediatePublish": false,
+        "delayAfterPrimaryMinutes": 1440,
+        "exclusivityWindowDays": 7,
+        "releaseWindow": {
+          "startHour": 18,
+          "endHour": 22,
+          "timezone": "UTC",
+          "preferredDays": ["friday", "saturday", "sunday"]
+        }
+      }
+    },
+    "complianceSettings": {
+      "qcRequirements": {
+        "technicalQc": true,
+        "contentQc": true,
+        "culturalQc": true,
+        "personaQc": true,
+        "translationQc": true,
+        "minimumScore": 85
+      },
+      "culturalSensitivity": {
+        "enabled": true,
+        "regions": ["asia", "africa", "middle_east"],
+        "sensitivityLevels": ["medium", "high", "critical"],
+        "blockOnViolation": true
+      },
+      "contentModeration": {
+        "enabled": true,
+        "autoReject": ["violence", "nudity", "hate_speech"],
+        "flagForReview": ["political_content", "religious_references"]
+      },
+      "auditLogging": {
+        "enabled": true,
+        "retentionDays": 365,
+        "logLevel": "detailed"
+      }
+    },
+    "healthMonitoring": {
+      "healthCheckEnabled": true,
+      "healthCheckInterval": 60,
+      "healthCheckEndpoint": "https://api.dramabox.com/v2/health",
+      "alertThresholds": {
+        "errorRatePercent": 5,
+        "latencyMs": 3000,
+        "availabilityPercent": 99.5
+      },
+      "circuitBreaker": {
+        "enabled": true,
+        "failureThreshold": 5,
+        "recoveryTimeSeconds": 60,
+        "halfOpenRequests": 3
+      }
+    },
+    "status": "active",
+    "lastSyncedAt": "2024-03-01T12:00:00Z",
+    "statistics": {
+      "totalContentSyndicated": 150,
+      "activeContent": 120,
+      "totalViews": 5000000,
+      "totalRevenue": 125000,
+      "lastMonthViews": 850000,
+      "lastMonthRevenue": 22000,
+      "averageLatencyMs": 250,
+      "errorRate": 0.02
+    },
+    "metadata": {
+      "createdAt": "2024-01-01T00:00:00Z",
+      "createdBy": "operator-admin-001",
+      "updatedAt": "2024-03-01T10:00:00Z",
+      "updatedBy": "operator-partnerships-001"
+    }
+  },
+  "distributionRights": {
+    "rightsId": "rights-waliin-dramabox-global",
+    "version": "1.0.0",
+    "contentScope": {
+      "franchiseIds": ["waliin-studio", "waliin-originals"],
+      "contentTypes": ["short_drama", "episode", "movie"],
+      "scopeType": "franchise_wide"
+    },
+    "licensing": {
+      "licenseId": "license-db-waliin-2024",
+      "licenseType": "non_exclusive",
+      "territory": {
+        "type": "regional",
+        "regions": ["asia", "africa", "middle_east"],
+        "countries": ["CN", "IN", "KE", "ET", "TZ", "AE", "SA", "EG"],
+        "excludedCountries": ["KP", "IR"]
+      },
+      "term": {
+        "startDate": "2024-01-01",
+        "endDate": "2025-12-31",
+        "duration": {
+          "value": 2,
+          "unit": "years"
+        },
+        "autoRenewal": true,
+        "renewalTerms": {
+          "noticePeriodDays": 60,
+          "maxRenewals": 3,
+          "renewalDuration": 12
+        },
+        "perpetual": false
+      },
+      "rights": {
+        "streaming": true,
+        "download": true,
+        "broadcast": false,
+        "theatrical": false,
+        "homeVideo": false,
+        "mobileOnly": false,
+        "shortForm": true,
+        "socialMedia": true,
+        "editRights": false,
+        "subtitleCreation": true,
+        "dubbingRights": true
+      },
+      "exclusivity": {
+        "isExclusive": false,
+        "exclusivityType": "window",
+        "exclusivityWindow": {
+          "startDate": "2024-01-01",
+          "endDate": "2024-03-31",
+          "durationDays": 90
+        },
+        "competitorBlacklist": []
+      },
+      "holdback": {
+        "enabled": true,
+        "holdbackPeriodDays": 7,
+        "holdbackPlatforms": ["youtube", "tiktok"],
+        "afterPremiere": true
+      }
+    },
+    "revenueShare": {
+      "model": "tiered",
+      "splits": {
+        "contentOwnerPercent": 55,
+        "partnerPercent": 35,
+        "platformPercent": 10,
+        "aggregatorPercent": 0
+      },
+      "tieredRates": [
+        {
+          "tierName": "Base",
+          "threshold": {
+            "metric": "views",
+            "minValue": 0,
+            "maxValue": 1000000
+          },
+          "contentOwnerPercent": 50,
+          "partnerPercent": 40
+        },
+        {
+          "tierName": "Growth",
+          "threshold": {
+            "metric": "views",
+            "minValue": 1000001,
+            "maxValue": 5000000
+          },
+          "contentOwnerPercent": 55,
+          "partnerPercent": 35
+        },
+        {
+          "tierName": "Premium",
+          "threshold": {
+            "metric": "views",
+            "minValue": 5000001,
+            "maxValue": 999999999
+          },
+          "contentOwnerPercent": 60,
+          "partnerPercent": 30
+        }
+      ],
+      "minimumGuarantee": {
+        "enabled": true,
+        "amount": 50000,
+        "currency": "USD",
+        "period": "yearly",
+        "recoupable": true
+      },
+      "bonuses": [
+        {
+          "bonusType": "performance",
+          "condition": "Views exceed 10 million in a month",
+          "amount": 10000,
+          "currency": "USD"
+        },
+        {
+          "bonusType": "exclusivity",
+          "condition": "Exclusive premiere rights",
+          "amount": 5000,
+          "currency": "USD"
+        }
+      ],
+      "deductions": {
+        "distributionCosts": false,
+        "marketingCosts": false,
+        "technicalCosts": false,
+        "taxWithholding": {
+          "enabled": true,
+          "percent": 15
+        }
+      },
+      "paymentTerms": {
+        "frequency": "monthly",
+        "netDays": 30,
+        "minimumPayout": 100,
+        "currency": "USD",
+        "paymentMethod": "wire_transfer"
+      },
+      "reporting": {
+        "frequency": "weekly",
+        "format": "api",
+        "metrics": ["views", "watch_time", "revenue", "engagement", "retention"],
+        "auditRights": true
+      }
+    },
+    "geoRestrictions": {
+      "enabled": true,
+      "defaultPolicy": "allow_listed",
+      "allowedCountries": ["CN", "IN", "KE", "ET", "TZ", "AE", "SA", "EG", "NG", "GH", "TH", "VN", "ID", "MY", "PH"],
+      "blockedCountries": ["KP", "IR", "CU", "SY"],
+      "regionRules": [
+        {
+          "region": "asia",
+          "allowed": true,
+          "startDate": "2024-01-01",
+          "endDate": "2025-12-31",
+          "contentRating": "TV-14",
+          "restrictions": ["political_content_filtered"]
+        },
+        {
+          "region": "middle_east",
+          "allowed": true,
+          "startDate": "2024-01-01",
+          "endDate": "2025-12-31",
+          "contentRating": "PG-13",
+          "restrictions": ["cultural_sensitivity_enhanced"]
+        }
+      ],
+      "vpnDetection": {
+        "enabled": true,
+        "action": "block"
+      },
+      "proxyDetection": true,
+      "ipWhitelist": [],
+      "ipBlacklist": []
+    },
+    "adInsertion": {
+      "enabled": true,
+      "adModel": "hybrid",
+      "adTypes": ["pre_roll", "mid_roll", "rewarded"],
+      "adFrequency": {
+        "preRoll": {
+          "enabled": true,
+          "maxDurationSeconds": 15,
+          "skipAfterSeconds": 5
+        },
+        "midRoll": {
+          "enabled": true,
+          "intervalSeconds": 300,
+          "maxPerContent": 3,
+          "minContentDurationSeconds": 600
+        },
+        "postRoll": {
+          "enabled": false,
+          "maxDurationSeconds": 30
+        }
+      },
+      "adTiers": [
+        {
+          "tierName": "Free Users",
+          "adLoad": 15,
+          "adTypes": ["pre_roll", "mid_roll"],
+          "targetCpm": 8
+        },
+        {
+          "tierName": "Basic Subscribers",
+          "adLoad": 5,
+          "adTypes": ["pre_roll"],
+          "targetCpm": 12
+        }
+      ],
+      "adRevenueShare": {
+        "contentOwnerPercent": 50,
+        "partnerPercent": 40,
+        "platformPercent": 10
+      },
+      "adRestrictions": {
+        "blockedCategories": ["gambling", "alcohol", "tobacco", "adult"],
+        "blockedAdvertisers": [],
+        "competitorBlock": true,
+        "brandSafetyLevel": "high"
+      },
+      "ssaiEnabled": true
+    },
+    "windowManagement": {
+      "windows": [
+        {
+          "windowId": "window-premiere",
+          "windowType": "premium_vod",
+          "startDate": "2024-01-01",
+          "endDate": "2024-03-31",
+          "priority": 1,
+          "platforms": ["waliin_platform"],
+          "territories": ["ET", "KE", "TZ"]
+        },
+        {
+          "windowId": "window-svod",
+          "windowType": "svod",
+          "startDate": "2024-04-01",
+          "endDate": "2024-09-30",
+          "priority": 2,
+          "platforms": ["dramabox", "realshort"],
+          "territories": ["CN", "IN", "AE"]
+        },
+        {
+          "windowId": "window-avod",
+          "windowType": "avod",
+          "startDate": "2024-10-01",
+          "endDate": "2025-12-31",
+          "priority": 3,
+          "platforms": ["all"],
+          "territories": ["worldwide"]
+        }
+      ],
+      "defaultWindow": "window-avod",
+      "cascadeRules": [
+        {
+          "fromWindow": "window-premiere",
+          "toWindow": "window-svod",
+          "delayDays": 90
+        },
+        {
+          "fromWindow": "window-svod",
+          "toWindow": "window-avod",
+          "delayDays": 180
+        }
+      ]
+    },
+    "status": "active",
+    "compliance": {
+      "dataPrivacy": ["GDPR", "CCPA", "LGPD"],
+      "contentRegulations": ["MPAA", "local_broadcasting_laws"],
+      "copyrightClearance": true,
+      "musicLicensing": true,
+      "auditTrail": true
+    },
+    "metadata": {
+      "createdAt": "2024-01-01T00:00:00Z",
+      "createdBy": "operator-legal-001",
+      "updatedAt": "2024-03-01T09:00:00Z",
+      "updatedBy": "operator-partnerships-001",
+      "approvedAt": "2024-01-05T14:00:00Z",
+      "approvedBy": "director-partnerships-001"
+    }
+  },
+  "distributionObservability": {
+    "observabilityId": "dist-obs-global-001",
+    "version": "1.0.0",
+    "name": "Global Distribution Observability",
+    "scope": {
+      "level": "global",
+      "partnerIds": ["partner-dramabox-001", "partner-realshort-001", "partner-minidrama-001"],
+      "franchiseIds": ["waliin-studio", "waliin-originals"]
+    },
+    "partnerMetrics": {
+      "enabled": true,
+      "collectionFrequency": "hourly",
+      "metrics": [
+        {
+          "metricId": "metric-views",
+          "name": "Total Views",
+          "category": "performance",
+          "type": "counter",
+          "unit": "count",
+          "aggregation": "sum",
+          "enabled": true
+        },
+        {
+          "metricId": "metric-watch-time",
+          "name": "Total Watch Time",
+          "category": "performance",
+          "type": "counter",
+          "unit": "hours",
+          "aggregation": "sum",
+          "enabled": true
+        },
+        {
+          "metricId": "metric-completion-rate",
+          "name": "Completion Rate",
+          "category": "engagement",
+          "type": "gauge",
+          "unit": "percentage",
+          "aggregation": "average",
+          "enabled": true
+        },
+        {
+          "metricId": "metric-revenue",
+          "name": "Gross Revenue",
+          "category": "monetization",
+          "type": "counter",
+          "unit": "currency",
+          "aggregation": "sum",
+          "enabled": true
+        },
+        {
+          "metricId": "metric-error-rate",
+          "name": "Error Rate",
+          "category": "quality",
+          "type": "gauge",
+          "unit": "percentage",
+          "aggregation": "average",
+          "enabled": true
+        },
+        {
+          "metricId": "metric-api-latency",
+          "name": "API Latency",
+          "category": "health",
+          "type": "histogram",
+          "unit": "milliseconds",
+          "aggregation": "p95",
+          "enabled": true
+        }
+      ],
+      "performanceMetrics": {
+        "views": true,
+        "uniqueViewers": true,
+        "watchTime": true,
+        "completionRate": true,
+        "avgViewDuration": true,
+        "peakConcurrentViewers": true,
+        "startupTime": true,
+        "rebufferRatio": true,
+        "playbackFailures": true
+      },
+      "engagementMetrics": {
+        "likes": true,
+        "shares": true,
+        "comments": true,
+        "saves": true,
+        "followsGained": true,
+        "clickThroughRate": true,
+        "conversionRate": true,
+        "subscriptionConversions": true
+      },
+      "monetizationMetrics": {
+        "grossRevenue": true,
+        "netRevenue": true,
+        "revenuePerView": true,
+        "revenuePerUser": true,
+        "adRevenue": true,
+        "subscriptionRevenue": true,
+        "transactionalRevenue": true,
+        "cpm": true,
+        "fillRate": true
+      },
+      "qualityMetrics": {
+        "avgBitrate": true,
+        "bitrateSwitch": true,
+        "bufferingEvents": true,
+        "errorRate": true,
+        "videoStartFailures": true,
+        "playbackExitsBefore25": true
+      },
+      "retentionDays": 365
+    },
+    "syndicationDashboards": {
+      "enabled": true,
+      "dashboards": [
+        {
+          "dashboardId": "dash-overview",
+          "name": "Distribution Overview",
+          "type": "overview",
+          "description": "High-level view of all distribution partner performance",
+          "widgets": [
+            {
+              "widgetId": "widget-total-views",
+              "type": "kpi_card",
+              "title": "Total Views Across Partners",
+              "metric": "views_total",
+              "timeRange": "30d",
+              "refreshInterval": 300
+            },
+            {
+              "widgetId": "widget-revenue",
+              "type": "kpi_card",
+              "title": "Total Revenue",
+              "metric": "revenue_total",
+              "timeRange": "30d",
+              "refreshInterval": 300,
+              "thresholds": {
+                "warning": 80000,
+                "critical": 50000
+              }
+            },
+            {
+              "widgetId": "widget-partner-performance",
+              "type": "bar_chart",
+              "title": "Views by Partner",
+              "metric": "views",
+              "dimensions": ["partner"],
+              "timeRange": "7d",
+              "refreshInterval": 600
+            },
+            {
+              "widgetId": "widget-geo-distribution",
+              "type": "map",
+              "title": "Geographic Distribution",
+              "metric": "views",
+              "dimensions": ["country"],
+              "timeRange": "30d",
+              "refreshInterval": 3600
+            }
+          ],
+          "layout": {
+            "columns": 4,
+            "rows": 3
+          },
+          "refreshInterval": 300,
+          "defaultTimeRange": "30d",
+          "exportFormats": ["pdf", "csv"],
+          "enabled": true
+        },
+        {
+          "dashboardId": "dash-partner-detail",
+          "name": "Partner Performance Detail",
+          "type": "partner_performance",
+          "description": "Detailed metrics for individual partners",
+          "widgets": [
+            {
+              "widgetId": "widget-trend",
+              "type": "line_chart",
+              "title": "Views Trend",
+              "metric": "views",
+              "timeRange": "30d",
+              "refreshInterval": 600
+            },
+            {
+              "widgetId": "widget-retention",
+              "type": "funnel",
+              "title": "Viewer Retention",
+              "metric": "retention",
+              "timeRange": "7d",
+              "refreshInterval": 3600
+            },
+            {
+              "widgetId": "widget-content-leaderboard",
+              "type": "leaderboard",
+              "title": "Top Performing Content",
+              "metric": "views",
+              "dimensions": ["content"],
+              "timeRange": "7d",
+              "refreshInterval": 600
+            }
+          ],
+          "refreshInterval": 600,
+          "defaultTimeRange": "7d",
+          "exportFormats": ["pdf", "csv", "excel"],
+          "enabled": true
+        },
+        {
+          "dashboardId": "dash-errors",
+          "name": "Error Tracking",
+          "type": "error_tracking",
+          "description": "Monitor syndication errors and failures",
+          "widgets": [
+            {
+              "widgetId": "widget-error-rate",
+              "type": "line_chart",
+              "title": "Error Rate Over Time",
+              "metric": "error_rate",
+              "timeRange": "24h",
+              "refreshInterval": 60,
+              "thresholds": {
+                "warning": 2,
+                "critical": 5
+              }
+            },
+            {
+              "widgetId": "widget-error-breakdown",
+              "type": "pie_chart",
+              "title": "Errors by Category",
+              "metric": "errors",
+              "dimensions": ["error_type"],
+              "timeRange": "24h",
+              "refreshInterval": 300
+            },
+            {
+              "widgetId": "widget-partner-health",
+              "type": "status_grid",
+              "title": "Partner Health Status",
+              "metric": "health_status",
+              "timeRange": "1h",
+              "refreshInterval": 60
+            }
+          ],
+          "refreshInterval": 60,
+          "defaultTimeRange": "24h",
+          "exportFormats": ["pdf", "csv"],
+          "enabled": true
+        },
+        {
+          "dashboardId": "dash-real-time",
+          "name": "Real-Time Monitoring",
+          "type": "real_time",
+          "description": "Live syndication and playback monitoring",
+          "widgets": [
+            {
+              "widgetId": "widget-live-views",
+              "type": "kpi_card",
+              "title": "Current Concurrent Viewers",
+              "metric": "concurrent_viewers",
+              "timeRange": "1h",
+              "refreshInterval": 10
+            },
+            {
+              "widgetId": "widget-api-latency",
+              "type": "line_chart",
+              "title": "API Latency",
+              "metric": "api_latency_p95",
+              "timeRange": "1h",
+              "refreshInterval": 10
+            }
+          ],
+          "refreshInterval": 10,
+          "defaultTimeRange": "1h",
+          "enabled": true
+        }
+      ],
+      "defaultDashboard": "dash-overview",
+      "permissions": {
+        "viewRoles": ["operator", "analyst", "partner_manager"],
+        "editRoles": ["admin", "partner_manager"],
+        "adminRoles": ["admin"]
+      }
+    },
+    "errorTracking": {
+      "enabled": true,
+      "errorCategories": [
+        {
+          "categoryId": "err-api",
+          "name": "API Errors",
+          "category": "api_error",
+          "severity": "high",
+          "autoRetry": true,
+          "maxRetries": 3,
+          "escalationPath": ["tech-lead", "engineering-manager"]
+        },
+        {
+          "categoryId": "err-format",
+          "name": "Format Mismatch",
+          "category": "format_mismatch",
+          "severity": "medium",
+          "autoRetry": false,
+          "maxRetries": 0,
+          "escalationPath": ["content-ops", "tech-lead"]
+        },
+        {
+          "categoryId": "err-auth",
+          "name": "Authentication Errors",
+          "category": "auth_error",
+          "severity": "critical",
+          "autoRetry": true,
+          "maxRetries": 1,
+          "escalationPath": ["security-team", "tech-lead"]
+        },
+        {
+          "categoryId": "err-rate-limit",
+          "name": "Rate Limit Exceeded",
+          "category": "rate_limit",
+          "severity": "medium",
+          "autoRetry": true,
+          "maxRetries": 5,
+          "escalationPath": ["tech-lead"]
+        },
+        {
+          "categoryId": "err-geo",
+          "name": "Geo-Restriction Violation",
+          "category": "geo_block",
+          "severity": "high",
+          "autoRetry": false,
+          "maxRetries": 0,
+          "escalationPath": ["compliance-team", "legal"]
+        }
+      ],
+      "alertThresholds": {
+        "errorRatePercent": {
+          "warning": 2,
+          "critical": 5
+        },
+        "errorCountPerHour": {
+          "warning": 50,
+          "critical": 200
+        },
+        "consecutiveFailures": 3
+      },
+      "notifications": {
+        "channels": ["email", "slack", "pagerduty"],
+        "escalation": [
+          {
+            "level": 1,
+            "delayMinutes": 0,
+            "channels": ["slack"],
+            "recipients": ["#distribution-alerts"]
+          },
+          {
+            "level": 2,
+            "delayMinutes": 15,
+            "channels": ["email", "slack"],
+            "recipients": ["tech-lead@sl18.io", "#distribution-critical"]
+          },
+          {
+            "level": 3,
+            "delayMinutes": 30,
+            "channels": ["pagerduty"],
+            "recipients": ["distribution-oncall"]
+          }
+        ],
+        "digestEnabled": true,
+        "digestFrequency": "daily"
+      },
+      "errorAggregation": {
+        "groupBy": ["partner", "error_type", "region"],
+        "timeWindows": ["1h", "24h", "7d"]
+      },
+      "retentionDays": 90
+    },
+    "alerts": {
+      "enabled": true,
+      "alertRules": [
+        {
+          "ruleId": "alert-high-error-rate",
+          "name": "High Error Rate",
+          "description": "Error rate exceeds threshold",
+          "type": "threshold",
+          "metric": "error_rate",
+          "condition": {
+            "operator": "gt",
+            "value": 5,
+            "duration": "5m",
+            "evaluationPeriods": 3
+          },
+          "severity": "critical",
+          "channels": ["slack", "pagerduty"],
+          "cooldownMinutes": 30,
+          "autoResolve": true,
+          "enabled": true
+        },
+        {
+          "ruleId": "alert-revenue-drop",
+          "name": "Revenue Drop",
+          "description": "Revenue dropped significantly compared to previous period",
+          "type": "anomaly",
+          "metric": "revenue",
+          "condition": {
+            "operator": "lt",
+            "value": 0.7
+          },
+          "severity": "high",
+          "channels": ["email", "slack"],
+          "cooldownMinutes": 60,
+          "autoResolve": false,
+          "enabled": true
+        },
+        {
+          "ruleId": "alert-partner-down",
+          "name": "Partner API Down",
+          "description": "Partner API is not responding",
+          "type": "absence",
+          "metric": "health_check_success",
+          "condition": {
+            "duration": "5m",
+            "evaluationPeriods": 5
+          },
+          "severity": "critical",
+          "channels": ["slack", "pagerduty"],
+          "cooldownMinutes": 15,
+          "autoResolve": true,
+          "enabled": true
+        }
+      ],
+      "partnerHealthAlerts": {
+        "apiLatency": {
+          "warningMs": 2000,
+          "criticalMs": 5000
+        },
+        "availability": {
+          "warningPercent": 99,
+          "criticalPercent": 95
+        },
+        "syndicationDelay": {
+          "warningMinutes": 60,
+          "criticalMinutes": 180
+        }
+      },
+      "revenueAlerts": {
+        "dropPercent": {
+          "warning": 20,
+          "critical": 40,
+          "comparisonPeriod": "week_over_week"
+        },
+        "anomalyDetection": true
+      },
+      "complianceAlerts": {
+        "rightsExpiring": {
+          "daysBeforeWarning": 30,
+          "daysBeforeCritical": 7
+        },
+        "geoViolation": true,
+        "contentRatingViolation": true,
+        "qcFailure": true
+      }
+    },
+    "reporting": {
+      "enabled": true,
+      "scheduledReports": [
+        {
+          "reportId": "report-weekly-summary",
+          "name": "Weekly Partner Summary",
+          "type": "partner_summary",
+          "frequency": "weekly",
+          "recipients": ["partnerships@sl18.io", "analytics@sl18.io"],
+          "format": "pdf",
+          "timezone": "UTC",
+          "enabled": true
+        },
+        {
+          "reportId": "report-monthly-revenue",
+          "name": "Monthly Revenue Breakdown",
+          "type": "revenue_breakdown",
+          "frequency": "monthly",
+          "recipients": ["finance@sl18.io", "partnerships@sl18.io"],
+          "format": "excel",
+          "timezone": "UTC",
+          "enabled": true
+        },
+        {
+          "reportId": "report-daily-errors",
+          "name": "Daily Error Summary",
+          "type": "error_summary",
+          "frequency": "daily",
+          "recipients": ["tech@sl18.io"],
+          "format": "csv",
+          "timezone": "UTC",
+          "enabled": true
+        }
+      ],
+      "customReports": true,
+      "apiExport": true
+    },
+    "auditLogging": {
+      "enabled": true,
+      "events": [
+        "connector_created",
+        "connector_updated",
+        "connector_activated",
+        "connector_deactivated",
+        "syndication_started",
+        "syndication_completed",
+        "syndication_failed",
+        "content_published",
+        "content_removed",
+        "rights_granted",
+        "rights_revoked",
+        "revenue_recorded",
+        "error_detected",
+        "alert_triggered",
+        "compliance_violation"
+      ],
+      "retentionDays": 365,
+      "immutable": true,
+      "exportEnabled": true
+    },
+    "integrations": {
+      "datadog": {
+        "enabled": true,
+        "apiKeyRef": "vault://sl18/integrations/datadog/api-key",
+        "metrics": true,
+        "logs": true,
+        "traces": true
+      },
+      "slack": {
+        "enabled": true,
+        "webhookUrlRef": "vault://sl18/integrations/slack/webhook",
+        "channels": {
+          "alerts": "#distribution-alerts",
+          "reports": "#distribution-reports",
+          "errors": "#distribution-errors"
+        }
+      },
+      "pagerduty": {
+        "enabled": true,
+        "integrationKeyRef": "vault://sl18/integrations/pagerduty/key",
+        "serviceName": "SL18 Distribution"
+      }
+    },
+    "status": "active",
+    "metadata": {
+      "createdAt": "2024-01-01T00:00:00Z",
+      "createdBy": "operator-admin-001",
+      "updatedAt": "2024-03-01T08:00:00Z",
+      "updatedBy": "operator-analytics-001"
+    }
+  },
+  "auditLog": {
+    "logId": "log-syndication-001",
+    "timestamp": "2024-03-01T14:00:00Z",
+    "eventType": "syndication_job_completed",
+    "category": "distribution_connectors",
+    "actor": {
+      "type": "automation",
+      "id": "automation-syndication-001",
+      "name": "Syndication Pipeline"
+    },
+    "target": {
+      "type": "syndication_job",
+      "id": "job-dramabox-batch-001",
+      "franchiseId": "waliin-studio"
+    },
+    "details": {
+      "description": "Successfully syndicated 15 short dramas to Drama Box platform",
+      "metadata": {
+        "partnerId": "partner-dramabox-001",
+        "contentCount": 15,
+        "totalDuration": 7200,
+        "processingTime": 1250,
+        "formatConversions": 30,
+        "metadataMappings": 15
+      }
+    },
+    "result": "success",
+    "correlationId": "corr-syndication-batch-001"
+  }
+}
