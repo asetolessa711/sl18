@@ -1,0 +1,698 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PartnerEcosystem",
+  "description": "Schema for partner ecosystem management in SL18 - partner profiles, onboarding flows, compliance checks, and revenue terms",
+  "type": "object",
+  "properties": {
+    "ecosystemId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^ecosystem-[a-z0-9-]+$",
+      "description": "Unique ecosystem identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Ecosystem schema version"
+    },
+    "partner": {
+      "type": "object",
+      "properties": {
+        "partnerId": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 100,
+          "pattern": "^ecopartner-[a-z0-9-]+$",
+          "description": "Unique partner identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 200,
+          "description": "Partner organization name"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["content_distributor", "contributor", "analytics_provider", "monetization_partner", "technology_vendor", "franchise_operator", "creative_agency", "localization_provider", "qc_service", "integration_partner"],
+          "description": "Partner type within ecosystem"
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["founding", "strategic", "premium", "standard", "trial", "community"],
+          "description": "Partnership tier"
+        },
+        "profile": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "website": {
+              "type": "string",
+              "format": "uri"
+            },
+            "logo": {
+              "type": "string",
+              "format": "uri"
+            },
+            "founded": {
+              "type": "string",
+              "format": "date"
+            },
+            "headquarters": {
+              "type": "object",
+              "properties": {
+                "country": { "type": "string" },
+                "city": { "type": "string" },
+                "timezone": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "size": {
+              "type": "string",
+              "enum": ["startup", "small", "medium", "large", "enterprise"]
+            },
+            "languages": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Languages supported by partner"
+            },
+            "regions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Geographic regions served"
+            },
+            "specializations": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["drama", "comedy", "music", "documentary", "news", "sports", "education", "entertainment", "lifestyle", "kids", "animation"]
+              }
+            },
+            "socialMedia": {
+              "type": "object",
+              "properties": {
+                "twitter": { "type": "string" },
+                "linkedin": { "type": "string" },
+                "youtube": { "type": "string" },
+                "instagram": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "contacts": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "email": { "type": "string", "format": "email" },
+                "phone": { "type": "string" },
+                "role": { "type": "string" }
+              },
+              "required": ["name", "email"],
+              "additionalProperties": false
+            },
+            "technical": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "email": { "type": "string", "format": "email" },
+                "phone": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "billing": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "email": { "type": "string", "format": "email" },
+                "address": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "compliance": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "email": { "type": "string", "format": "email" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["primary"],
+          "additionalProperties": false
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending_verification", "pending_compliance", "pending_payment", "onboarding", "active", "suspended", "inactive", "terminated"],
+          "description": "Partner status"
+        }
+      },
+      "required": ["partnerId", "name", "type", "tier", "contacts", "status"],
+      "additionalProperties": false
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "identityVerified": {
+          "type": "boolean"
+        },
+        "identityMethod": {
+          "type": "string",
+          "enum": ["business_registration", "government_id", "bank_verification", "domain_verification", "video_verification", "third_party"]
+        },
+        "identityVerifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "identityVerifiedBy": {
+          "type": "string"
+        },
+        "identityDocuments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "documentRef": { "type": "string" },
+              "uploadedAt": { "type": "string", "format": "date-time" },
+              "verified": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "paymentVerified": {
+          "type": "boolean"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["bank_account", "paypal", "stripe", "wire_transfer", "crypto"]
+        },
+        "paymentVerifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "taxId": {
+          "type": "string"
+        },
+        "taxIdVerified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "onboarding": {
+      "type": "object",
+      "properties": {
+        "flowType": {
+          "type": "string",
+          "enum": ["self_service", "guided", "assisted", "enterprise_custom"],
+          "description": "Onboarding flow type based on partner tier"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stepId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["form", "document_upload", "verification", "training", "integration_setup", "compliance_check", "payment_setup", "review"]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["pending", "in_progress", "completed", "skipped", "failed"]
+              },
+              "completedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "data": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "required": ["stepId", "name", "type", "required", "status"],
+            "additionalProperties": false
+          }
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "assignedTo": {
+          "type": "string",
+          "description": "Account manager assigned"
+        },
+        "percentComplete": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": { "type": "string", "format": "date-time" },
+              "author": { "type": "string" },
+              "note": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["flowType", "steps"],
+      "additionalProperties": false
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "checkId": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["cultural_sensitivity", "qc_prerequisites", "content_policy", "data_privacy", "security_assessment", "legal_review", "financial_review", "brand_alignment"]
+              },
+              "status": {
+                "type": "string",
+                "enum": ["pending", "in_progress", "passed", "failed", "waived", "expired"]
+              },
+              "checkedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "checkedBy": {
+                "type": "string"
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "findings": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "remediationRequired": {
+                "type": "boolean"
+              }
+            },
+            "required": ["checkId", "type", "status"],
+            "additionalProperties": false
+          }
+        },
+        "certifications": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["SOC2", "ISO27001", "PCI-DSS", "GDPR", "CCPA", "HIPAA", "COPPA", "FedRAMP"]
+          }
+        },
+        "dataProcessingAgreement": {
+          "type": "object",
+          "properties": {
+            "signed": { "type": "boolean" },
+            "signedAt": { "type": "string", "format": "date-time" },
+            "version": { "type": "string" },
+            "documentRef": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "termsAccepted": {
+          "type": "boolean"
+        },
+        "termsAcceptedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "termsVersion": {
+          "type": "string"
+        },
+        "overallStatus": {
+          "type": "string",
+          "enum": ["compliant", "non_compliant", "pending_review", "remediation_required", "not_assessed"]
+        },
+        "lastAssessedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextAssessmentDue": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["checks", "overallStatus"],
+      "additionalProperties": false
+    },
+    "access": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": ["ecosystem_admin", "api_developer", "content_manager", "analytics_viewer", "billing_admin", "support_agent"],
+          "description": "Partner access role"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "api_read", "api_write", "api_delete", "api_admin",
+              "content_read", "content_write", "content_publish",
+              "analytics_read", "analytics_export",
+              "billing_read", "billing_manage",
+              "settings_read", "settings_manage",
+              "users_read", "users_manage",
+              "webhooks_manage", "sandbox_access"
+            ]
+          }
+        },
+        "apiKeyCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of active API keys"
+        },
+        "maxApiKeys": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum allowed API keys"
+        },
+        "ipWhitelist": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Whitelisted IP addresses/ranges"
+        },
+        "mfaRequired": {
+          "type": "boolean"
+        },
+        "ssoEnabled": {
+          "type": "boolean"
+        },
+        "ssoProvider": {
+          "type": "string",
+          "enum": ["okta", "azure_ad", "google", "onelogin", "auth0", "custom"]
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sessionTimeout": {
+          "type": "integer",
+          "minimum": 300,
+          "description": "Session timeout in seconds"
+        }
+      },
+      "required": ["role", "permissions"],
+      "additionalProperties": false
+    },
+    "revenue": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": ["percentage", "flat_fee", "tiered", "usage_based", "hybrid", "custom"],
+          "description": "Revenue share model"
+        },
+        "terms": {
+          "type": "object",
+          "properties": {
+            "partnerPercentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "sl18Percentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "flatFee": {
+              "type": "number",
+              "minimum": 0
+            },
+            "minimumGuarantee": {
+              "type": "number",
+              "minimum": 0
+            },
+            "performanceBonus": {
+              "type": "object",
+              "properties": {
+                "threshold": { "type": "number" },
+                "bonusPercentage": { "type": "number" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "tiers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "minRevenue": { "type": "number" },
+              "maxRevenue": { "type": "number" },
+              "partnerPercentage": { "type": "number" },
+              "sl18Percentage": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "currency": {
+          "type": "string",
+          "default": "USD"
+        },
+        "payoutSchedule": {
+          "type": "string",
+          "enum": ["weekly", "biweekly", "monthly", "quarterly", "on_demand"]
+        },
+        "minimumPayout": {
+          "type": "number",
+          "minimum": 0
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["bank_transfer", "paypal", "stripe", "check", "wire_transfer", "crypto"]
+        },
+        "paymentDetails": {
+          "type": "object",
+          "properties": {
+            "accountRef": { "type": "string" },
+            "verified": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "totalEarnings": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pendingPayout": {
+          "type": "number",
+          "minimum": 0
+        },
+        "lastPayoutAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastPayoutAmount": {
+          "type": "number"
+        }
+      },
+      "required": ["model", "currency", "payoutSchedule"],
+      "additionalProperties": false
+    },
+    "capabilities": {
+      "type": "object",
+      "properties": {
+        "contentTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["video", "audio", "text", "image", "subtitle", "metadata"]
+          }
+        },
+        "workflows": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["distribution", "personalization", "monetization", "analytics", "qc", "translation", "transcription", "moderation"]
+          }
+        },
+        "apiAccess": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["content_api", "distribution_api", "analytics_api", "monetization_api", "qc_api", "personalization_api", "insights_api", "governance_api"]
+          }
+        },
+        "integrationTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["rest_api", "graphql", "webhooks", "sdk", "iframe", "widget", "batch_upload"]
+          }
+        },
+        "maxDailyRequests": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxConcurrentConnections": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "storageQuota": {
+          "type": "string",
+          "description": "Storage quota (e.g., '100GB')"
+        },
+        "bandwidthQuota": {
+          "type": "string",
+          "description": "Monthly bandwidth quota"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "totalApiCalls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalRevenue": {
+          "type": "number",
+          "minimum": 0
+        },
+        "totalContentItems": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "averageApiLatency": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average API latency in ms"
+        },
+        "errorRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "healthScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Overall partner health score"
+        },
+        "engagementScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "lastActiveAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "agreement": {
+      "type": "object",
+      "properties": {
+        "contractId": {
+          "type": "string"
+        },
+        "signed": {
+          "type": "boolean"
+        },
+        "signedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "autoRenew": {
+          "type": "boolean"
+        },
+        "terminationNoticeDays": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "documentRef": {
+          "type": "string"
+        },
+        "amendments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amendmentId": { "type": "string" },
+              "description": { "type": "string" },
+              "signedAt": { "type": "string", "format": "date-time" },
+              "documentRef": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "ecosystemId",
+    "version",
+    "partner",
+    "verification",
+    "onboarding",
+    "compliance",
+    "access",
+    "revenue",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

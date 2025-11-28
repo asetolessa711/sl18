@@ -221,13 +221,46 @@
         "wake_word_false_positive",
         "voice_dictation_started",
         "voice_dictation_completed",
-        "voice_language_switched"
+        "voice_language_switched",
+        "ecosystem_partner_registered",
+        "ecosystem_partner_verified",
+        "ecosystem_partner_onboarded",
+        "ecosystem_partner_suspended",
+        "ecosystem_partner_terminated",
+        "ecosystem_compliance_check_passed",
+        "ecosystem_compliance_check_failed",
+        "ecosystem_access_granted",
+        "ecosystem_access_revoked",
+        "ecosystem_revenue_calculated",
+        "ecosystem_payout_initiated",
+        "api_registered",
+        "api_published",
+        "api_updated",
+        "api_deprecated",
+        "api_retired",
+        "api_subscribed",
+        "api_unsubscribed",
+        "api_called",
+        "api_call_failed",
+        "api_rate_limited",
+        "api_quota_exceeded",
+        "api_quota_warning",
+        "api_key_created",
+        "api_key_rotated",
+        "api_key_revoked",
+        "api_webhook_registered",
+        "api_webhook_triggered",
+        "api_webhook_failed",
+        "api_revenue_recorded",
+        "api_payout_calculated",
+        "partner_flagged",
+        "partner_unflagged"
       ],
       "description": "Type of governance event"
     },
     "category": {
       "type": "string",
-      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace", "distribution", "syndication", "partner", "audience_insights", "feedback_loop", "ui", "ai_assistant", "voice_control"],
+      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace", "distribution", "syndication", "partner", "audience_insights", "feedback_loop", "ui", "ai_assistant", "voice_control", "partner_ecosystem", "api_marketplace"],
       "description": "Category of the audit event"
     },
     "actor": {
@@ -255,7 +288,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion", "distribution_channel", "syndication_feed", "partner_integration", "audience_insight", "feedback_loop", "engagement_metric", "sentiment_analysis", "retention_curve", "console", "dashboard", "panel", "widget", "assistant", "voice_control", "voice_command", "recommendation"],
+          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion", "distribution_channel", "syndication_feed", "partner_integration", "audience_insight", "feedback_loop", "engagement_metric", "sentiment_analysis", "retention_curve", "console", "dashboard", "panel", "widget", "assistant", "voice_control", "voice_command", "recommendation", "ecosystem_partner", "api_listing", "api_subscription", "api_key", "api_webhook", "api_quota"],
           "description": "Type of target entity"
         },
         "id": {

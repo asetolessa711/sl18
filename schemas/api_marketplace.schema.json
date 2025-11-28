@@ -1,0 +1,753 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "APIMarketplace",
+  "description": "Schema for API marketplace in SL18 - API listings, usage quotas, pricing tiers, and observability",
+  "type": "object",
+  "properties": {
+    "marketplaceId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^apimarket-[a-z0-9-]+$",
+      "description": "Unique marketplace identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Marketplace schema version"
+    },
+    "api": {
+      "type": "object",
+      "properties": {
+        "apiId": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 100,
+          "pattern": "^api-[a-z0-9-]+$",
+          "description": "Unique API identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 200,
+          "description": "API display name"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 5000
+        },
+        "category": {
+          "type": "string",
+          "enum": ["multilingual", "distribution", "personalization", "monetization", "analytics", "qc", "governance", "content", "insights", "voice", "assistant"],
+          "description": "API category"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^v\\d+(\\.\\d+)?$",
+          "description": "API version (e.g., v1, v2.1)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["alpha", "beta", "ga", "deprecated", "retired"],
+          "description": "API lifecycle status"
+        },
+        "visibility": {
+          "type": "string",
+          "enum": ["public", "partner_only", "enterprise_only", "internal"],
+          "description": "API visibility"
+        },
+        "documentation": {
+          "type": "object",
+          "properties": {
+            "overview": {
+              "type": "string",
+              "format": "uri"
+            },
+            "reference": {
+              "type": "string",
+              "format": "uri"
+            },
+            "quickstart": {
+              "type": "string",
+              "format": "uri"
+            },
+            "changelog": {
+              "type": "string",
+              "format": "uri"
+            },
+            "openApiSpec": {
+              "type": "string",
+              "format": "uri"
+            },
+            "postmanCollection": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "additionalProperties": false
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "endpointId": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string",
+                "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
+              },
+              "description": {
+                "type": "string"
+              },
+              "authentication": {
+                "type": "string",
+                "enum": ["api_key", "oauth2", "jwt", "none"]
+              },
+              "scopes": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "rateLimit": {
+                "type": "integer",
+                "description": "Requests per minute"
+              },
+              "deprecated": {
+                "type": "boolean"
+              },
+              "deprecatedAt": {
+                "type": "string",
+                "format": "date"
+              },
+              "replacedBy": {
+                "type": "string"
+              }
+            },
+            "required": ["endpointId", "path", "method", "description"],
+            "additionalProperties": false
+          }
+        },
+        "authentication": {
+          "type": "object",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["api_key", "oauth2", "jwt", "bearer_token", "basic_auth"]
+              }
+            },
+            "oauth2": {
+              "type": "object",
+              "properties": {
+                "authorizationUrl": { "type": "string", "format": "uri" },
+                "tokenUrl": { "type": "string", "format": "uri" },
+                "scopes": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              },
+              "additionalProperties": false
+            },
+            "apiKey": {
+              "type": "object",
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "enum": ["header", "query", "cookie"]
+                },
+                "name": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "webhooks": {
+          "type": "object",
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "eventType": { "type": "string" },
+                  "description": { "type": "string" },
+                  "schema": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            },
+            "signatureMethod": {
+              "type": "string",
+              "enum": ["hmac_sha256", "hmac_sha512", "rsa_sha256", "none"]
+            },
+            "retryPolicy": {
+              "type": "object",
+              "properties": {
+                "maxRetries": { "type": "integer" },
+                "backoffType": {
+                  "type": "string",
+                  "enum": ["exponential", "linear", "fixed"]
+                },
+                "initialDelay": { "type": "integer" },
+                "maxDelay": { "type": "integer" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "sdks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "language": {
+                "type": "string",
+                "enum": ["javascript", "typescript", "python", "java", "csharp", "go", "ruby", "php", "swift", "kotlin"]
+              },
+              "version": { "type": "string" },
+              "repository": { "type": "string", "format": "uri" },
+              "packageManager": { "type": "string" },
+              "packageName": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "sandbox": {
+          "type": "object",
+          "properties": {
+            "available": { "type": "boolean" },
+            "baseUrl": { "type": "string", "format": "uri" },
+            "testData": {
+              "type": "object",
+              "properties": {
+                "available": { "type": "boolean" },
+                "resetSchedule": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "owner": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["sl18", "partner"]
+            },
+            "partnerId": { "type": "string" },
+            "partnerName": { "type": "string" }
+          },
+          "required": ["type"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["apiId", "name", "category", "version", "status", "visibility", "endpoints"],
+      "additionalProperties": false
+    },
+    "pricing": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": ["free", "freemium", "pay_per_use", "subscription", "tiered", "custom"],
+          "description": "Pricing model"
+        },
+        "tiers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tierId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "price": {
+                "type": "object",
+                "properties": {
+                  "amount": { "type": "number", "minimum": 0 },
+                  "currency": { "type": "string" },
+                  "billingPeriod": {
+                    "type": "string",
+                    "enum": ["monthly", "yearly", "per_request", "per_unit"]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "features": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "limits": {
+                "type": "object",
+                "properties": {
+                  "requestsPerMonth": { "type": "integer" },
+                  "requestsPerMinute": { "type": "integer" },
+                  "requestsPerDay": { "type": "integer" },
+                  "dataTransferGB": { "type": "number" },
+                  "storageGB": { "type": "number" },
+                  "concurrentConnections": { "type": "integer" },
+                  "webhooksPerMonth": { "type": "integer" }
+                },
+                "additionalProperties": false
+              },
+              "support": {
+                "type": "string",
+                "enum": ["community", "email", "priority", "dedicated", "24/7"]
+              },
+              "sla": {
+                "type": "object",
+                "properties": {
+                  "uptime": { "type": "number", "minimum": 0, "maximum": 100 },
+                  "responseTime": { "type": "string" }
+                },
+                "additionalProperties": false
+              },
+              "recommended": {
+                "type": "boolean"
+              },
+              "enterprise": {
+                "type": "boolean"
+              }
+            },
+            "required": ["tierId", "name", "price", "limits"],
+            "additionalProperties": false
+          }
+        },
+        "overagePricing": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "pricePerRequest": { "type": "number" },
+            "pricePerGB": { "type": "number" },
+            "hardLimit": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "freeTrialDays": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "enterpriseContactRequired": {
+          "type": "boolean"
+        }
+      },
+      "required": ["model", "tiers"],
+      "additionalProperties": false
+    },
+    "quota": {
+      "type": "object",
+      "properties": {
+        "partnerId": {
+          "type": "string"
+        },
+        "tierId": {
+          "type": "string"
+        },
+        "period": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "string", "format": "date-time" },
+            "end": { "type": "string", "format": "date-time" }
+          },
+          "additionalProperties": false
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "used": { "type": "integer", "minimum": 0 },
+                "limit": { "type": "integer", "minimum": 0 },
+                "percentUsed": { "type": "number", "minimum": 0, "maximum": 100 }
+              },
+              "additionalProperties": false
+            },
+            "dataTransfer": {
+              "type": "object",
+              "properties": {
+                "usedBytes": { "type": "integer", "minimum": 0 },
+                "limitBytes": { "type": "integer", "minimum": 0 },
+                "percentUsed": { "type": "number", "minimum": 0, "maximum": 100 }
+              },
+              "additionalProperties": false
+            },
+            "storage": {
+              "type": "object",
+              "properties": {
+                "usedBytes": { "type": "integer", "minimum": 0 },
+                "limitBytes": { "type": "integer", "minimum": 0 },
+                "percentUsed": { "type": "number", "minimum": 0, "maximum": 100 }
+              },
+              "additionalProperties": false
+            },
+            "webhooks": {
+              "type": "object",
+              "properties": {
+                "sent": { "type": "integer", "minimum": 0 },
+                "limit": { "type": "integer", "minimum": 0 },
+                "percentUsed": { "type": "number", "minimum": 0, "maximum": 100 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["threshold_warning", "threshold_critical", "quota_exceeded", "rate_limit_hit"]
+              },
+              "threshold": { "type": "number" },
+              "triggeredAt": { "type": "string", "format": "date-time" },
+              "notified": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "overageEnabled": {
+          "type": "boolean"
+        },
+        "overageCharges": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": ["partnerId", "tierId", "period", "usage"],
+      "additionalProperties": false
+    },
+    "subscription": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "pattern": "^sub-[a-z0-9-]+$"
+        },
+        "partnerId": {
+          "type": "string"
+        },
+        "apiId": {
+          "type": "string"
+        },
+        "tierId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "trial", "past_due", "cancelled", "suspended", "expired"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "activatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trialEndsAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "currentPeriodStart": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "currentPeriodEnd": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cancelledAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cancelReason": {
+          "type": "string"
+        },
+        "autoRenew": {
+          "type": "boolean"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["credit_card", "invoice", "paypal", "wire_transfer", "marketplace_credit"]
+        },
+        "billing": {
+          "type": "object",
+          "properties": {
+            "lastInvoiceId": { "type": "string" },
+            "lastInvoiceAmount": { "type": "number" },
+            "lastInvoiceDate": { "type": "string", "format": "date-time" },
+            "nextInvoiceDate": { "type": "string", "format": "date-time" },
+            "totalSpent": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["subscriptionId", "partnerId", "apiId", "tierId", "status", "createdAt"],
+      "additionalProperties": false
+    },
+    "revenueShare": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "model": {
+          "type": "string",
+          "enum": ["percentage", "tiered", "flat_fee", "hybrid"]
+        },
+        "terms": {
+          "type": "object",
+          "properties": {
+            "partnerPercentage": { "type": "number", "minimum": 0, "maximum": 100 },
+            "sl18Percentage": { "type": "number", "minimum": 0, "maximum": 100 },
+            "minimumGuarantee": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "tiers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "minRevenue": { "type": "number" },
+              "maxRevenue": { "type": "number" },
+              "partnerPercentage": { "type": "number" },
+              "sl18Percentage": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "payoutSchedule": {
+          "type": "string",
+          "enum": ["weekly", "biweekly", "monthly", "quarterly"]
+        },
+        "minimumPayout": {
+          "type": "number",
+          "minimum": 0
+        },
+        "totalEarnings": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pendingPayout": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "observability": {
+      "type": "object",
+      "properties": {
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "totalCalls": { "type": "integer", "minimum": 0 },
+            "successfulCalls": { "type": "integer", "minimum": 0 },
+            "failedCalls": { "type": "integer", "minimum": 0 },
+            "averageLatency": { "type": "number", "minimum": 0 },
+            "p50Latency": { "type": "number", "minimum": 0 },
+            "p95Latency": { "type": "number", "minimum": 0 },
+            "p99Latency": { "type": "number", "minimum": 0 },
+            "errorRate": { "type": "number", "minimum": 0, "maximum": 100 },
+            "successRate": { "type": "number", "minimum": 0, "maximum": 100 }
+          },
+          "additionalProperties": false
+        },
+        "endpointMetrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "endpointId": { "type": "string" },
+              "path": { "type": "string" },
+              "method": { "type": "string" },
+              "callCount": { "type": "integer" },
+              "averageLatency": { "type": "number" },
+              "errorRate": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "errorBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "errorCode": { "type": "string" },
+              "errorType": { "type": "string" },
+              "count": { "type": "integer" },
+              "percentage": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "usageByRegion": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "callCount": { "type": "integer" },
+              "percentage": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "usageByPartner": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "partnerId": { "type": "string" },
+              "partnerName": { "type": "string" },
+              "callCount": { "type": "integer" },
+              "percentage": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "trendsDaily": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string", "format": "date" },
+              "callCount": { "type": "integer" },
+              "averageLatency": { "type": "number" },
+              "errorRate": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "alertId": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["high_error_rate", "high_latency", "quota_warning", "service_degradation", "partner_flagged"]
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["info", "warning", "critical"]
+              },
+              "message": { "type": "string" },
+              "triggeredAt": { "type": "string", "format": "date-time" },
+              "resolvedAt": { "type": "string", "format": "date-time" },
+              "acknowledged": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "lastUpdatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "listing": {
+      "type": "object",
+      "properties": {
+        "featured": {
+          "type": "boolean"
+        },
+        "featuredOrder": {
+          "type": "integer"
+        },
+        "rating": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "reviewCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "subscriberCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "screenshots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "string", "format": "uri" },
+              "caption": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "videos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "string", "format": "uri" },
+              "title": { "type": "string" },
+              "duration": { "type": "integer" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "relatedApis": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastUpdatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "marketplaceId",
+    "version",
+    "api",
+    "pricing",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}
