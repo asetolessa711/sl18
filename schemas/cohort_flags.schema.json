@@ -1,0 +1,465 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://beta.waliinstudio.com/schemas/cohort_flags.schema.json",
+  "title": "Cohort Feature Flags Schema",
+  "description": "Schema for feature flags supporting Internal, Closed, and Open beta cohorts",
+  "type": "object",
+  "required": ["cohort_id", "name", "capacity", "features"],
+  "properties": {
+    "cohort_id": {
+      "type": "string",
+      "description": "Unique identifier for the cohort",
+      "enum": ["internal", "closed", "open"]
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the cohort",
+      "maxLength": 100
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the cohort purpose",
+      "maxLength": 500
+    },
+    "capacity": {
+      "type": "object",
+      "description": "User capacity limits for this cohort",
+      "required": ["min", "max"],
+      "properties": {
+        "min": {
+          "type": "integer",
+          "description": "Minimum target user count",
+          "minimum": 0
+        },
+        "max": {
+          "type": "integer",
+          "description": "Maximum allowed user count",
+          "minimum": 1
+        },
+        "current": {
+          "type": "integer",
+          "description": "Current active user count in this cohort",
+          "minimum": 0,
+          "default": 0
+        },
+        "waitlist": {
+          "type": "integer",
+          "description": "Number of users on waitlist for this cohort",
+          "minimum": 0,
+          "default": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "access_level": {
+      "type": "string",
+      "description": "Overall access level for the cohort",
+      "enum": ["full", "standard", "limited"],
+      "default": "standard"
+    },
+    "features": {
+      "type": "object",
+      "description": "Feature flags specific to this cohort",
+      "properties": {
+        "core_features": {
+          "type": "object",
+          "description": "Core application features",
+          "properties": {
+            "dashboard_access": {
+              "type": "boolean",
+              "description": "Access to main dashboard",
+              "default": true
+            },
+            "api_access": {
+              "type": "boolean",
+              "description": "Access to public API endpoints",
+              "default": false
+            },
+            "export_data": {
+              "type": "boolean",
+              "description": "Ability to export personal data",
+              "default": false
+            },
+            "integrations": {
+              "type": "boolean",
+              "description": "Access to third-party integrations",
+              "default": false
+            }
+          },
+          "additionalProperties": true
+        },
+        "beta_features": {
+          "type": "object",
+          "description": "Experimental beta features",
+          "properties": {
+            "new_ui": {
+              "type": "boolean",
+              "description": "Access to new UI redesign",
+              "default": false
+            },
+            "ai_assistant": {
+              "type": "boolean",
+              "description": "Access to AI-powered features",
+              "default": false
+            },
+            "advanced_analytics": {
+              "type": "boolean",
+              "description": "Access to advanced analytics dashboard",
+              "default": false
+            },
+            "collaborative_editing": {
+              "type": "boolean",
+              "description": "Real-time collaborative editing",
+              "default": false
+            }
+          },
+          "additionalProperties": true
+        },
+        "debug_features": {
+          "type": "object",
+          "description": "Debug and development features (internal only)",
+          "properties": {
+            "debug_mode": {
+              "type": "boolean",
+              "description": "Enable debug mode with verbose logging",
+              "default": false
+            },
+            "feature_preview": {
+              "type": "boolean",
+              "description": "Access to feature previews before release",
+              "default": false
+            },
+            "admin_panel": {
+              "type": "boolean",
+              "description": "Access to admin control panel",
+              "default": false
+            },
+            "impersonation": {
+              "type": "boolean",
+              "description": "Ability to impersonate other users for testing",
+              "default": false
+            }
+          },
+          "additionalProperties": true
+        },
+        "limits": {
+          "type": "object",
+          "description": "Usage limits for this cohort",
+          "properties": {
+            "api_requests_per_day": {
+              "type": "integer",
+              "description": "Maximum API requests per day",
+              "minimum": 0,
+              "default": 1000
+            },
+            "storage_mb": {
+              "type": "integer",
+              "description": "Maximum storage in megabytes",
+              "minimum": 0,
+              "default": 100
+            },
+            "projects_max": {
+              "type": "integer",
+              "description": "Maximum number of projects",
+              "minimum": 0,
+              "default": 5
+            },
+            "team_members_max": {
+              "type": "integer",
+              "description": "Maximum team members (0 = no teams)",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "enrollment": {
+      "type": "object",
+      "description": "Enrollment settings for the cohort",
+      "properties": {
+        "open": {
+          "type": "boolean",
+          "description": "Whether new users can join this cohort",
+          "default": false
+        },
+        "requires_invite": {
+          "type": "boolean",
+          "description": "Whether an invite token is required",
+          "default": true
+        },
+        "requires_approval": {
+          "type": "boolean",
+          "description": "Whether admin approval is required after signup",
+          "default": false
+        },
+        "auto_promote": {
+          "type": "boolean",
+          "description": "Automatically promote to next cohort when capacity is reached",
+          "default": false
+        },
+        "promotion_target": {
+          "type": ["string", "null"],
+          "description": "Target cohort for auto-promotion",
+          "enum": ["internal", "closed", "open", null]
+        }
+      },
+      "additionalProperties": false
+    },
+    "feedback": {
+      "type": "object",
+      "description": "Feedback collection settings",
+      "properties": {
+        "surveys_enabled": {
+          "type": "boolean",
+          "description": "Enable in-app surveys",
+          "default": true
+        },
+        "bug_reports_enabled": {
+          "type": "boolean",
+          "description": "Enable bug reporting",
+          "default": true
+        },
+        "feature_requests_enabled": {
+          "type": "boolean",
+          "description": "Enable feature request submissions",
+          "default": true
+        },
+        "nps_frequency_days": {
+          "type": "integer",
+          "description": "Days between NPS survey prompts (0 = disabled)",
+          "minimum": 0,
+          "default": 14
+        }
+      },
+      "additionalProperties": false
+    },
+    "notifications": {
+      "type": "object",
+      "description": "Notification preferences for cohort",
+      "properties": {
+        "release_notes": {
+          "type": "boolean",
+          "description": "Receive release notes notifications",
+          "default": true
+        },
+        "maintenance_alerts": {
+          "type": "boolean",
+          "description": "Receive maintenance window alerts",
+          "default": true
+        },
+        "feature_announcements": {
+          "type": "boolean",
+          "description": "Receive new feature announcements",
+          "default": true
+        },
+        "survey_reminders": {
+          "type": "boolean",
+          "description": "Receive survey completion reminders",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when cohort was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when cohort was last updated"
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether this cohort is currently active",
+      "default": true
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "cohort_id": "internal",
+      "name": "Internal",
+      "description": "Internal team and stakeholders with full access",
+      "capacity": {
+        "min": 50,
+        "max": 100,
+        "current": 25,
+        "waitlist": 0
+      },
+      "access_level": "full",
+      "features": {
+        "core_features": {
+          "dashboard_access": true,
+          "api_access": true,
+          "export_data": true,
+          "integrations": true
+        },
+        "beta_features": {
+          "new_ui": true,
+          "ai_assistant": true,
+          "advanced_analytics": true,
+          "collaborative_editing": true
+        },
+        "debug_features": {
+          "debug_mode": true,
+          "feature_preview": true,
+          "admin_panel": true,
+          "impersonation": true
+        },
+        "limits": {
+          "api_requests_per_day": 100000,
+          "storage_mb": 10000,
+          "projects_max": 100,
+          "team_members_max": 50
+        }
+      },
+      "enrollment": {
+        "open": false,
+        "requires_invite": true,
+        "requires_approval": true,
+        "auto_promote": false,
+        "promotion_target": null
+      },
+      "feedback": {
+        "surveys_enabled": true,
+        "bug_reports_enabled": true,
+        "feature_requests_enabled": true,
+        "nps_frequency_days": 7
+      },
+      "notifications": {
+        "release_notes": true,
+        "maintenance_alerts": true,
+        "feature_announcements": true,
+        "survey_reminders": true
+      },
+      "created_at": "2025-11-28T12:00:00Z",
+      "updated_at": "2025-11-28T12:00:00Z",
+      "active": true
+    },
+    {
+      "cohort_id": "closed",
+      "name": "Closed Beta",
+      "description": "Selected external testers with standard access",
+      "capacity": {
+        "min": 500,
+        "max": 1000,
+        "current": 150,
+        "waitlist": 200
+      },
+      "access_level": "standard",
+      "features": {
+        "core_features": {
+          "dashboard_access": true,
+          "api_access": true,
+          "export_data": true,
+          "integrations": false
+        },
+        "beta_features": {
+          "new_ui": true,
+          "ai_assistant": true,
+          "advanced_analytics": false,
+          "collaborative_editing": false
+        },
+        "debug_features": {
+          "debug_mode": false,
+          "feature_preview": false,
+          "admin_panel": false,
+          "impersonation": false
+        },
+        "limits": {
+          "api_requests_per_day": 10000,
+          "storage_mb": 1000,
+          "projects_max": 20,
+          "team_members_max": 5
+        }
+      },
+      "enrollment": {
+        "open": false,
+        "requires_invite": true,
+        "requires_approval": false,
+        "auto_promote": true,
+        "promotion_target": "open"
+      },
+      "feedback": {
+        "surveys_enabled": true,
+        "bug_reports_enabled": true,
+        "feature_requests_enabled": true,
+        "nps_frequency_days": 14
+      },
+      "notifications": {
+        "release_notes": true,
+        "maintenance_alerts": true,
+        "feature_announcements": true,
+        "survey_reminders": true
+      },
+      "created_at": "2025-11-28T12:00:00Z",
+      "updated_at": "2025-11-28T12:00:00Z",
+      "active": true
+    },
+    {
+      "cohort_id": "open",
+      "name": "Open Beta",
+      "description": "Public beta testers with limited access",
+      "capacity": {
+        "min": 10000,
+        "max": 25000,
+        "current": 0,
+        "waitlist": 5000
+      },
+      "access_level": "limited",
+      "features": {
+        "core_features": {
+          "dashboard_access": true,
+          "api_access": false,
+          "export_data": false,
+          "integrations": false
+        },
+        "beta_features": {
+          "new_ui": true,
+          "ai_assistant": false,
+          "advanced_analytics": false,
+          "collaborative_editing": false
+        },
+        "debug_features": {
+          "debug_mode": false,
+          "feature_preview": false,
+          "admin_panel": false,
+          "impersonation": false
+        },
+        "limits": {
+          "api_requests_per_day": 1000,
+          "storage_mb": 100,
+          "projects_max": 5,
+          "team_members_max": 0
+        }
+      },
+      "enrollment": {
+        "open": true,
+        "requires_invite": false,
+        "requires_approval": false,
+        "auto_promote": false,
+        "promotion_target": null
+      },
+      "feedback": {
+        "surveys_enabled": true,
+        "bug_reports_enabled": true,
+        "feature_requests_enabled": false,
+        "nps_frequency_days": 30
+      },
+      "notifications": {
+        "release_notes": true,
+        "maintenance_alerts": true,
+        "feature_announcements": false,
+        "survey_reminders": false
+      },
+      "created_at": "2025-11-28T12:00:00Z",
+      "updated_at": "2025-11-28T12:00:00Z",
+      "active": true
+    }
+  ]
+}
