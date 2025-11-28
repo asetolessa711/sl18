@@ -1,0 +1,776 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DisasterRecovery",
+  "description": "Schema for disaster recovery in SL18 - recovery plans, backup policies, RTO/RPO targets, and incident playbooks",
+  "type": "object",
+  "properties": {
+    "planId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^dr-[a-z0-9-]+$",
+      "description": "Unique disaster recovery plan identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Plan version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable plan name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "region", "service", "data_tier", "application"],
+          "description": "Disaster recovery scope"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Services covered by this plan"
+        },
+        "dataTiers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low", "archive"]
+          },
+          "description": "Data tiers covered"
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["production", "staging", "development"]
+          }
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "objectives": {
+      "type": "object",
+      "properties": {
+        "rto": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Recovery Time Objective in minutes"
+            },
+            "maximum": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Maximum acceptable RTO in minutes"
+            },
+            "tier": {
+              "type": "string",
+              "enum": ["critical", "high", "medium", "low"],
+              "description": "RTO tier classification"
+            }
+          },
+          "required": ["target"],
+          "additionalProperties": false
+        },
+        "rpo": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Recovery Point Objective in minutes"
+            },
+            "maximum": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Maximum acceptable RPO in minutes"
+            },
+            "tier": {
+              "type": "string",
+              "enum": ["zero", "near_zero", "short", "medium", "long"],
+              "description": "RPO tier classification"
+            }
+          },
+          "required": ["target"],
+          "additionalProperties": false
+        },
+        "mtpd": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum Tolerable Period of Disruption in hours"
+        },
+        "mbco": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Minimum Business Continuity Objective percentage"
+        }
+      },
+      "required": ["rto", "rpo"],
+      "additionalProperties": false
+    },
+    "backupPolicy": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "schedules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scheduleId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["full", "incremental", "differential", "continuous", "snapshot"]
+              },
+              "frequency": {
+                "type": "string",
+                "enum": ["continuous", "hourly", "daily", "weekly", "monthly"]
+              },
+              "cronExpression": {
+                "type": "string",
+                "description": "Cron expression for custom schedules"
+              },
+              "retention": {
+                "type": "object",
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Number of backups to retain"
+                  },
+                  "days": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Days to retain backups"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["scheduleId", "name", "type", "frequency", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "targetId": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["database", "object_storage", "file_system", "configuration", "secrets", "logs"]
+              },
+              "location": {
+                "type": "string"
+              },
+              "encryption": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "algorithm": {
+                    "type": "string",
+                    "enum": ["AES-256-GCM", "AES-256-CBC"]
+                  },
+                  "keyManagement": {
+                    "type": "string",
+                    "enum": ["aws_kms", "azure_keyvault", "gcp_kms", "hashicorp_vault"]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "replication": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "destinations": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Backup replication destinations"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": ["targetId", "type", "location"],
+            "additionalProperties": false
+          }
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "frequency": {
+              "type": "string",
+              "enum": ["every_backup", "daily", "weekly", "monthly"]
+            },
+            "methods": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["checksum", "restore_test", "integrity_check", "data_sampling"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "immutability": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "retentionPeriod": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Immutability period in days"
+            },
+            "legalHold": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "recoveryProcedures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "procedureId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "scenario": {
+            "type": "string",
+            "enum": [
+              "region_outage",
+              "zone_outage",
+              "service_failure",
+              "database_corruption",
+              "ransomware_attack",
+              "data_breach",
+              "network_failure",
+              "storage_failure",
+              "complete_site_loss",
+              "partial_data_loss",
+              "configuration_drift",
+              "human_error"
+            ]
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "description": "Priority level (1 = highest)"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "stepNumber": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "responsible": {
+                  "type": "string",
+                  "enum": ["automation", "on_call_engineer", "platform_team", "security_team", "management", "vendor"]
+                },
+                "estimatedTime": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Estimated time in minutes"
+                },
+                "automated": {
+                  "type": "boolean"
+                },
+                "runbook": {
+                  "type": "string",
+                  "description": "Link to detailed runbook"
+                },
+                "validationCriteria": {
+                  "type": "string"
+                }
+              },
+              "required": ["stepNumber", "name", "description", "responsible"],
+              "additionalProperties": false
+            }
+          },
+          "estimatedRecoveryTime": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total estimated recovery time in minutes"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Dependent procedures or services"
+          },
+          "rollbackProcedure": {
+            "type": "string",
+            "description": "Reference to rollback procedure"
+          }
+        },
+        "required": ["procedureId", "name", "scenario", "priority", "steps"],
+        "additionalProperties": false
+      }
+    },
+    "playbooks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playbookId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "scenario": {
+            "type": "string"
+          },
+          "triggerConditions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "conditionId": {
+                  "type": "string"
+                },
+                "metric": {
+                  "type": "string"
+                },
+                "operator": {
+                  "type": "string",
+                  "enum": ["gt", "gte", "lt", "lte", "eq", "neq"]
+                },
+                "threshold": {
+                  "type": "number"
+                },
+                "duration": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Duration in seconds"
+                }
+              },
+              "required": ["conditionId", "metric", "operator", "threshold"],
+              "additionalProperties": false
+            }
+          },
+          "automationLevel": {
+            "type": "string",
+            "enum": ["fully_automated", "semi_automated", "manual_approval", "manual"]
+          },
+          "escalation": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "levels": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "level": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "delay": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "Delay before escalation in minutes"
+                    },
+                    "contacts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "channels": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": ["email", "sms", "slack", "pagerduty", "phone", "teams"]
+                      }
+                    }
+                  },
+                  "required": ["level", "delay", "contacts", "channels"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "communicationPlan": {
+            "type": "object",
+            "properties": {
+              "internalChannels": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "externalChannels": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "statusPageUpdate": {
+                "type": "boolean"
+              },
+              "customerNotification": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["playbookId", "name", "scenario", "automationLevel", "enabled"],
+        "additionalProperties": false
+      }
+    },
+    "chaosTesting": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "provider": {
+          "type": "string",
+          "enum": ["chaos_monkey", "gremlin", "litmus", "chaos_mesh", "custom"]
+        },
+        "experiments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "experimentId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "instance_termination",
+                  "network_partition",
+                  "latency_injection",
+                  "disk_failure",
+                  "cpu_stress",
+                  "memory_stress",
+                  "dns_failure",
+                  "az_failure",
+                  "region_failover",
+                  "database_failover"
+                ]
+              },
+              "scope": {
+                "type": "string",
+                "enum": ["single_instance", "percentage", "availability_zone", "region"]
+              },
+              "schedule": {
+                "type": "string",
+                "description": "Cron expression or 'manual'"
+              },
+              "duration": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Experiment duration in minutes"
+              },
+              "safeguards": {
+                "type": "object",
+                "properties": {
+                  "autoRollback": {
+                    "type": "boolean"
+                  },
+                  "maxImpact": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Maximum acceptable impact percentage"
+                  },
+                  "excludedServices": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "maintenanceWindowOnly": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "lastRun": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastResult": {
+                "type": "string",
+                "enum": ["success", "failure", "partial", "aborted"]
+              }
+            },
+            "required": ["experimentId", "name", "type", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "schedule": {
+          "type": "object",
+          "properties": {
+            "gameDay": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "frequency": {
+                  "type": "string",
+                  "enum": ["monthly", "quarterly", "yearly"]
+                },
+                "lastGameDay": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "nextGameDay": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "dataProtection": {
+      "type": "object",
+      "properties": {
+        "classification": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tier": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "dataTypes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rpo": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "RPO in minutes for this tier"
+              },
+              "retention": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Retention in days"
+              },
+              "replicationMode": {
+                "type": "string",
+                "enum": ["synchronous", "asynchronous", "eventual"]
+              }
+            },
+            "required": ["tier", "dataTypes", "rpo"],
+            "additionalProperties": false
+          }
+        },
+        "encryption": {
+          "type": "object",
+          "properties": {
+            "atRest": {
+              "type": "boolean"
+            },
+            "inTransit": {
+              "type": "boolean"
+            },
+            "backups": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "frameworks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["ISO22301", "SOC2", "NIST", "COBIT", "ITIL", "custom"]
+          }
+        },
+        "auditSchedule": {
+          "type": "string",
+          "enum": ["quarterly", "semi_annually", "annually"]
+        },
+        "lastAudit": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextAudit": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "drillSchedule": {
+          "type": "string",
+          "enum": ["monthly", "quarterly", "semi_annually", "annually"]
+        },
+        "lastDrill": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextDrill": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "actualRto": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Actual RTO achieved in last recovery"
+        },
+        "actualRpo": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Actual RPO achieved in last recovery"
+        },
+        "backupSuccessRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "recoverySuccessRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "chaosTestsCompleted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "chaosTestsSuccessful": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "drillsCompleted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lastBackupTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastRecoveryTest": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "testing", "recovery_in_progress", "maintenance", "disabled"],
+      "description": "Current DR plan status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    },
+    "approvedBy": {
+      "type": "string"
+    },
+    "approvedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "planId",
+    "version",
+    "name",
+    "scope",
+    "objectives",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

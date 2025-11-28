@@ -1,0 +1,1005 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InfrastructureMonitoring",
+  "description": "Schema for infrastructure monitoring in SL18 - metrics, alerts, dashboards, synthetic tests, and SLA tracking",
+  "type": "object",
+  "properties": {
+    "monitoringId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^mon-[a-z0-9-]+$",
+      "description": "Unique monitoring configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable configuration name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "region", "cluster", "service", "endpoint"],
+          "description": "Monitoring scope level"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Services being monitored"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["production", "staging", "development", "testing"]
+          }
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "metricsCollection": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "providerId": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["prometheus", "datadog", "cloudwatch", "azure_monitor", "stackdriver", "influxdb", "custom"]
+              },
+              "endpoint": {
+                "type": "string",
+                "format": "uri"
+              },
+              "scrapeInterval": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Scrape interval in seconds"
+              },
+              "retentionDays": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["providerId", "type", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metricId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["gauge", "counter", "histogram", "summary"]
+              },
+              "category": {
+                "type": "string",
+                "enum": ["infrastructure", "application", "business", "security", "cost"]
+              },
+              "unit": {
+                "type": "string",
+                "enum": ["percent", "milliseconds", "seconds", "bytes", "requests", "errors", "count", "custom"]
+              },
+              "aggregation": {
+                "type": "string",
+                "enum": ["avg", "sum", "min", "max", "p50", "p90", "p95", "p99", "count", "rate"]
+              },
+              "labels": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["metricId", "name", "type", "category", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "customMetrics": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "maxMetrics": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "namingPattern": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "alerting": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "metric": {
+                "type": "string"
+              },
+              "condition": {
+                "type": "object",
+                "properties": {
+                  "operator": {
+                    "type": "string",
+                    "enum": ["gt", "gte", "lt", "lte", "eq", "neq", "absent", "present"]
+                  },
+                  "threshold": {
+                    "type": "number"
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Duration in seconds before alert fires"
+                  },
+                  "aggregation": {
+                    "type": "string",
+                    "enum": ["avg", "sum", "min", "max", "count"]
+                  }
+                },
+                "required": ["operator", "threshold"],
+                "additionalProperties": false
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low", "info"]
+              },
+              "notifications": {
+                "type": "object",
+                "properties": {
+                  "channels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["email", "slack", "pagerduty", "opsgenie", "webhook", "sms", "teams", "mobile_push"]
+                    }
+                  },
+                  "recipients": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "suppressDuplicates": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Suppress duplicate alerts for N seconds"
+                  },
+                  "groupBy": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "runbook": {
+                "type": "string",
+                "description": "Link to runbook"
+              },
+              "autoRemediation": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": ["restart_service", "scale_up", "failover", "clear_cache", "custom_script"]
+                  },
+                  "maxAttempts": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "cooldown": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Cooldown between attempts in seconds"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["ruleId", "name", "metric", "condition", "severity", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "escalation": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "policies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "policyId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "levels": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "level": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "delay": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Delay before escalation in minutes"
+                        },
+                        "notifyChannels": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": ["level", "delay", "notifyChannels"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["policyId", "name", "levels"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "maintenance": {
+          "type": "object",
+          "properties": {
+            "windows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "windowId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "schedule": {
+                    "type": "string",
+                    "description": "Cron expression"
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Duration in minutes"
+                  },
+                  "suppressAlerts": {
+                    "type": "boolean"
+                  },
+                  "affectedServices": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["windowId", "name", "schedule", "duration"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "syntheticTests": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "testId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["http", "api", "browser", "tcp", "dns", "ssl", "grpc", "websocket"]
+              },
+              "endpoint": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string",
+                "enum": ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "string"
+              },
+              "assertions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["status_code", "response_time", "body_contains", "header_contains", "json_path", "ssl_valid"]
+                    },
+                    "operator": {
+                      "type": "string",
+                      "enum": ["eq", "neq", "gt", "lt", "contains", "not_contains", "matches"]
+                    },
+                    "value": {}
+                  },
+                  "required": ["type", "operator", "value"],
+                  "additionalProperties": false
+                }
+              },
+              "locations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Monitoring locations/regions"
+              },
+              "frequency": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Test frequency in seconds"
+              },
+              "timeout": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Timeout in seconds"
+              },
+              "retries": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["testId", "name", "type", "endpoint", "frequency", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "multiStepTests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "testId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "stepNumber": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": ["navigate", "click", "type", "wait", "assert", "extract", "api_call"]
+                    },
+                    "target": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    },
+                    "timeout": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": ["stepNumber", "name", "action"],
+                  "additionalProperties": false
+                }
+              },
+              "frequency": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["testId", "name", "steps", "frequency", "enabled"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "dashboards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "dashboardId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["infrastructure_overview", "service_health", "incident_tracker", "sla_compliance", "capacity_planning", "cost_analysis", "custom"]
+          },
+          "widgets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "widgetId": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["line_chart", "bar_chart", "gauge", "single_stat", "table", "heatmap", "logs", "status_map", "topology"]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "metrics": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "timeRange": {
+                  "type": "string",
+                  "enum": ["1h", "6h", "12h", "24h", "7d", "30d", "custom"]
+                },
+                "refreshInterval": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Refresh interval in seconds"
+                },
+                "thresholds": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "number"
+                      },
+                      "color": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["value", "color"],
+                    "additionalProperties": false
+                  }
+                },
+                "position": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "y": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "width": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "height": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": ["x", "y", "width", "height"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["widgetId", "type", "title"],
+              "additionalProperties": false
+            }
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["dropdown", "text", "date_range", "multi_select"]
+                },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "default": {
+                  "type": "string"
+                }
+              },
+              "required": ["name", "type"],
+              "additionalProperties": false
+            }
+          },
+          "refreshInterval": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "visibility": {
+            "type": "string",
+            "enum": ["public", "team", "private"]
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["dashboardId", "name", "type", "enabled"],
+        "additionalProperties": false
+      }
+    },
+    "slaTracking": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "slas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "slaId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "service": {
+                "type": "string"
+              },
+              "targets": {
+                "type": "object",
+                "properties": {
+                  "availability": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Target availability percentage"
+                  },
+                  "responseTime": {
+                    "type": "object",
+                    "properties": {
+                      "p50": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "p95": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "p99": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "errorRate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Maximum error rate percentage"
+                  },
+                  "throughput": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Minimum throughput (requests/second)"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "calculation": {
+                "type": "object",
+                "properties": {
+                  "window": {
+                    "type": "string",
+                    "enum": ["rolling_30d", "calendar_month", "calendar_quarter"]
+                  },
+                  "excludeMaintenanceWindows": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "currentStatus": {
+                "type": "object",
+                "properties": {
+                  "availability": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "responseTimeP50": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "responseTimeP95": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "responseTimeP99": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "errorRate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["meeting", "at_risk", "breached"]
+                  },
+                  "lastUpdated": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "breachNotification": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "warningThreshold": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Percentage of error budget consumed to trigger warning"
+                  },
+                  "channels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["slaId", "name", "service", "targets", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "errorBudgets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "budgetId": {
+                "type": "string"
+              },
+              "slaId": {
+                "type": "string"
+              },
+              "monthly": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Monthly error budget in minutes"
+              },
+              "consumed": {
+                "type": "number",
+                "minimum": 0
+              },
+              "remaining": {
+                "type": "number",
+                "minimum": 0
+              },
+              "burnRate": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Current burn rate multiplier"
+              },
+              "projectedExhaustion": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": ["budgetId", "slaId", "monthly", "consumed", "remaining"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "logging": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "providerId": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["elasticsearch", "splunk", "cloudwatch_logs", "stackdriver", "loki", "custom"]
+              },
+              "endpoint": {
+                "type": "string"
+              },
+              "retentionDays": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["providerId", "type", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "logLevels": {
+          "type": "object",
+          "properties": {
+            "default": {
+              "type": "string",
+              "enum": ["debug", "info", "warn", "error", "fatal"]
+            },
+            "overrides": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "enum": ["debug", "info", "warn", "error", "fatal"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "structuredLogging": {
+          "type": "boolean"
+        },
+        "sampling": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Sampling rate percentage"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "tracing": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "provider": {
+          "type": "string",
+          "enum": ["jaeger", "zipkin", "xray", "datadog_apm", "new_relic", "lightstep", "custom"]
+        },
+        "samplingRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "propagation": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["b3", "w3c", "jaeger", "datadog"]
+          }
+        },
+        "serviceMap": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "alertsTriggered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "alertsResolved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mttr": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Mean Time To Resolve in minutes"
+        },
+        "mttd": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Mean Time To Detect in minutes"
+        },
+        "syntheticTestsRun": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "syntheticTestsPassed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "slasInCompliance": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "slasAtRisk": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "slasBreached": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "degraded", "maintenance", "disabled"],
+      "description": "Current monitoring status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "monitoringId",
+    "version",
+    "name",
+    "scope",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

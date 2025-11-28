@@ -1,0 +1,1312 @@
+{
+  "infrastructureResilience": {
+    "resilienceId": "infra-sl18-production-global",
+    "version": "1.0.0",
+    "name": "SL18 Production Global Resilience",
+    "scope": {
+      "level": "global",
+      "services": ["api-gateway", "content-service", "persona-service", "distribution-service", "analytics-service"],
+      "regions": ["us-east-1", "eu-west-1", "ap-southeast-1"],
+      "environments": ["production"]
+    },
+    "multiRegion": {
+      "enabled": true,
+      "topology": "active_active",
+      "primaryRegion": "us-east-1",
+      "regions": [
+        {
+          "regionId": "us-east-1",
+          "name": "US East (Virginia)",
+          "provider": "aws",
+          "zones": ["us-east-1a", "us-east-1b", "us-east-1c"],
+          "role": "primary",
+          "priority": 1,
+          "status": "active",
+          "capacity": {
+            "maxInstances": 100,
+            "currentInstances": 45,
+            "targetUtilization": 70
+          },
+          "latency": {
+            "toPrimary": 0,
+            "threshold": 100
+          }
+        },
+        {
+          "regionId": "eu-west-1",
+          "name": "EU West (Ireland)",
+          "provider": "aws",
+          "zones": ["eu-west-1a", "eu-west-1b", "eu-west-1c"],
+          "role": "secondary",
+          "priority": 2,
+          "status": "active",
+          "capacity": {
+            "maxInstances": 80,
+            "currentInstances": 35,
+            "targetUtilization": 70
+          },
+          "latency": {
+            "toPrimary": 85,
+            "threshold": 150
+          }
+        },
+        {
+          "regionId": "ap-southeast-1",
+          "name": "Asia Pacific (Singapore)",
+          "provider": "aws",
+          "zones": ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"],
+          "role": "secondary",
+          "priority": 3,
+          "status": "active",
+          "capacity": {
+            "maxInstances": 60,
+            "currentInstances": 25,
+            "targetUtilization": 70
+          },
+          "latency": {
+            "toPrimary": 220,
+            "threshold": 300
+          }
+        }
+      ],
+      "dataReplication": {
+        "mode": "asynchronous",
+        "lagThreshold": 5,
+        "conflictResolution": "last_write_wins"
+      },
+      "dnsRouting": {
+        "strategy": "latency_based",
+        "healthCheck": {
+          "enabled": true,
+          "protocol": "https",
+          "path": "/health",
+          "interval": 10,
+          "threshold": 3
+        }
+      }
+    },
+    "failover": {
+      "enabled": true,
+      "mode": "automatic",
+      "triggers": [
+        {
+          "triggerId": "trigger-health-failure",
+          "name": "Health Check Failure",
+          "condition": "health_check_failure",
+          "consecutiveFailures": 3,
+          "enabled": true
+        },
+        {
+          "triggerId": "trigger-error-rate",
+          "name": "Error Rate Threshold",
+          "condition": "error_rate_threshold",
+          "threshold": 5,
+          "duration": 60,
+          "enabled": true
+        },
+        {
+          "triggerId": "trigger-latency",
+          "name": "Latency Threshold",
+          "condition": "latency_threshold",
+          "threshold": 2000,
+          "duration": 120,
+          "enabled": true
+        }
+      ],
+      "failoverTime": {
+        "target": 60,
+        "maximum": 300
+      },
+      "failback": {
+        "enabled": true,
+        "mode": "manual",
+        "delay": 1800,
+        "healthCheckDuration": 300
+      },
+      "circuitBreaker": {
+        "enabled": true,
+        "errorThreshold": 50,
+        "openDuration": 30,
+        "halfOpenRequests": 5
+      }
+    },
+    "loadBalancing": {
+      "enabled": true,
+      "type": "global",
+      "algorithm": "least_response_time",
+      "healthCheck": {
+        "protocol": "https",
+        "path": "/health",
+        "port": 443,
+        "interval": 10,
+        "timeout": 5,
+        "healthyThreshold": 2,
+        "unhealthyThreshold": 3
+      },
+      "stickySession": {
+        "enabled": false,
+        "type": "cookie",
+        "duration": 3600
+      },
+      "connectionDraining": {
+        "enabled": true,
+        "timeout": 300
+      }
+    },
+    "scaling": {
+      "enabled": true,
+      "horizontal": {
+        "enabled": true,
+        "minInstances": 3,
+        "maxInstances": 100,
+        "targetUtilization": 70,
+        "scaleUpCooldown": 60,
+        "scaleDownCooldown": 300,
+        "metrics": [
+          {
+            "name": "cpu",
+            "targetValue": 70,
+            "scaleUpThreshold": 80,
+            "scaleDownThreshold": 40
+          },
+          {
+            "name": "requests_per_second",
+            "targetValue": 1000,
+            "scaleUpThreshold": 1200,
+            "scaleDownThreshold": 500
+          }
+        ]
+      },
+      "vertical": {
+        "enabled": true,
+        "minCpu": "500m",
+        "maxCpu": "4000m",
+        "minMemory": "512Mi",
+        "maxMemory": "8Gi",
+        "updateMode": "auto"
+      },
+      "predictive": {
+        "enabled": true,
+        "algorithm": "ml_forecast",
+        "lookAhead": 30,
+        "scheduledEvents": [
+          {
+            "eventId": "event-premiere-scaling",
+            "name": "Premiere Night Scaling",
+            "schedule": "0 18 * * 5",
+            "targetInstances": 80,
+            "duration": 240
+          }
+        ]
+      },
+      "burstCapacity": {
+        "enabled": true,
+        "maxBurstInstances": 50,
+        "burstThreshold": 90,
+        "burstDuration": 300
+      }
+    },
+    "edgeNodes": {
+      "enabled": true,
+      "provider": "cloudflare",
+      "nodes": [
+        {
+          "nodeId": "edge-us-west",
+          "location": "Los Angeles, US",
+          "status": "active",
+          "cacheHitRate": 94.5
+        },
+        {
+          "nodeId": "edge-eu-central",
+          "location": "Frankfurt, DE",
+          "status": "active",
+          "cacheHitRate": 92.3
+        },
+        {
+          "nodeId": "edge-ap-south",
+          "location": "Mumbai, IN",
+          "status": "active",
+          "cacheHitRate": 89.7
+        }
+      ],
+      "cacheTtl": {
+        "static": 86400,
+        "dynamic": 300,
+        "api": 60
+      }
+    },
+    "serviceDiscovery": {
+      "enabled": true,
+      "provider": "kubernetes",
+      "healthCheck": {
+        "interval": 10,
+        "timeout": 5,
+        "deregisterCriticalAfter": 60
+      }
+    },
+    "sla": {
+      "targetUptime": 99.95,
+      "maxDowntime": {
+        "monthly": 22,
+        "yearly": 262
+      },
+      "latencyTargets": {
+        "p50": 100,
+        "p95": 300,
+        "p99": 500
+      },
+      "errorBudget": {
+        "monthly": 0.05,
+        "consumed": 0.012
+      }
+    },
+    "metrics": {
+      "currentUptime": 99.98,
+      "activeRegions": 3,
+      "totalInstances": 105,
+      "healthyInstances": 105,
+      "failoversThisMonth": 0,
+      "avgLatency": 85,
+      "lastIncident": "2024-10-15T08:30:00Z",
+      "lastUpdated": "2024-11-28T04:00:00Z"
+    },
+    "status": "active",
+    "createdAt": "2024-01-15T00:00:00Z",
+    "updatedAt": "2024-11-28T04:00:00Z",
+    "createdBy": "platform-team"
+  },
+  "disasterRecovery": {
+    "planId": "dr-sl18-production",
+    "version": "2.1.0",
+    "name": "SL18 Production Disaster Recovery Plan",
+    "scope": {
+      "level": "global",
+      "services": ["api-gateway", "content-service", "persona-service", "distribution-service", "analytics-service", "database-cluster"],
+      "dataTiers": ["critical", "high", "medium"],
+      "environments": ["production"]
+    },
+    "objectives": {
+      "rto": {
+        "target": 15,
+        "maximum": 30,
+        "tier": "critical"
+      },
+      "rpo": {
+        "target": 5,
+        "maximum": 15,
+        "tier": "near_zero"
+      },
+      "mtpd": 4,
+      "mbco": 80
+    },
+    "backupPolicy": {
+      "enabled": true,
+      "schedules": [
+        {
+          "scheduleId": "backup-continuous",
+          "name": "Continuous Replication",
+          "type": "continuous",
+          "frequency": "continuous",
+          "retention": {
+            "count": 1,
+            "days": 1
+          },
+          "enabled": true
+        },
+        {
+          "scheduleId": "backup-hourly",
+          "name": "Hourly Snapshots",
+          "type": "snapshot",
+          "frequency": "hourly",
+          "cronExpression": "0 * * * *",
+          "retention": {
+            "count": 24,
+            "days": 1
+          },
+          "enabled": true
+        },
+        {
+          "scheduleId": "backup-daily",
+          "name": "Daily Full Backup",
+          "type": "full",
+          "frequency": "daily",
+          "cronExpression": "0 2 * * *",
+          "retention": {
+            "count": 30,
+            "days": 30
+          },
+          "enabled": true
+        },
+        {
+          "scheduleId": "backup-weekly",
+          "name": "Weekly Archive",
+          "type": "full",
+          "frequency": "weekly",
+          "cronExpression": "0 3 * * 0",
+          "retention": {
+            "count": 12,
+            "days": 90
+          },
+          "enabled": true
+        }
+      ],
+      "targets": [
+        {
+          "targetId": "target-primary-db",
+          "type": "database",
+          "location": "s3://sl18-backups-us-east-1/databases/",
+          "encryption": {
+            "enabled": true,
+            "algorithm": "AES-256-GCM",
+            "keyManagement": "aws_kms"
+          },
+          "replication": {
+            "enabled": true,
+            "destinations": ["s3://sl18-backups-eu-west-1/databases/", "s3://sl18-backups-ap-southeast-1/databases/"]
+          }
+        },
+        {
+          "targetId": "target-content",
+          "type": "object_storage",
+          "location": "s3://sl18-backups-us-east-1/content/",
+          "encryption": {
+            "enabled": true,
+            "algorithm": "AES-256-GCM",
+            "keyManagement": "aws_kms"
+          },
+          "replication": {
+            "enabled": true,
+            "destinations": ["s3://sl18-backups-eu-west-1/content/"]
+          }
+        },
+        {
+          "targetId": "target-config",
+          "type": "configuration",
+          "location": "s3://sl18-backups-us-east-1/config/",
+          "encryption": {
+            "enabled": true,
+            "algorithm": "AES-256-GCM",
+            "keyManagement": "hashicorp_vault"
+          },
+          "replication": {
+            "enabled": true,
+            "destinations": ["s3://sl18-backups-eu-west-1/config/", "s3://sl18-backups-ap-southeast-1/config/"]
+          }
+        }
+      ],
+      "validation": {
+        "enabled": true,
+        "frequency": "daily",
+        "methods": ["checksum", "restore_test", "integrity_check"]
+      },
+      "immutability": {
+        "enabled": true,
+        "retentionPeriod": 30,
+        "legalHold": false
+      }
+    },
+    "recoveryProcedures": [
+      {
+        "procedureId": "proc-region-outage",
+        "name": "Region Outage Recovery",
+        "scenario": "region_outage",
+        "priority": 1,
+        "steps": [
+          {
+            "stepNumber": 1,
+            "name": "Detect Outage",
+            "description": "Automated detection via health checks and monitoring alerts",
+            "responsible": "automation",
+            "estimatedTime": 1,
+            "automated": true,
+            "runbook": "https://docs.sl18.io/runbooks/region-outage-detection",
+            "validationCriteria": "Alert triggered and acknowledged"
+          },
+          {
+            "stepNumber": 2,
+            "name": "Initiate Failover",
+            "description": "Automatic DNS failover to secondary region",
+            "responsible": "automation",
+            "estimatedTime": 2,
+            "automated": true,
+            "runbook": "https://docs.sl18.io/runbooks/dns-failover",
+            "validationCriteria": "DNS records updated, traffic routing to secondary"
+          },
+          {
+            "stepNumber": 3,
+            "name": "Verify Services",
+            "description": "Validate all services are healthy in secondary region",
+            "responsible": "on_call_engineer",
+            "estimatedTime": 5,
+            "automated": false,
+            "runbook": "https://docs.sl18.io/runbooks/service-verification",
+            "validationCriteria": "All health checks passing"
+          },
+          {
+            "stepNumber": 4,
+            "name": "Notify Stakeholders",
+            "description": "Send status update to internal teams and update status page",
+            "responsible": "on_call_engineer",
+            "estimatedTime": 2,
+            "automated": true,
+            "runbook": "https://docs.sl18.io/runbooks/incident-communication",
+            "validationCriteria": "Notifications sent, status page updated"
+          }
+        ],
+        "estimatedRecoveryTime": 10,
+        "dependencies": ["dns-service", "load-balancer"],
+        "rollbackProcedure": "proc-region-failback"
+      },
+      {
+        "procedureId": "proc-database-corruption",
+        "name": "Database Corruption Recovery",
+        "scenario": "database_corruption",
+        "priority": 1,
+        "steps": [
+          {
+            "stepNumber": 1,
+            "name": "Isolate Affected Database",
+            "description": "Stop writes to corrupted database, switch to replica",
+            "responsible": "automation",
+            "estimatedTime": 2,
+            "automated": true,
+            "runbook": "https://docs.sl18.io/runbooks/db-isolation",
+            "validationCriteria": "Traffic routed to healthy replica"
+          },
+          {
+            "stepNumber": 2,
+            "name": "Assess Corruption Extent",
+            "description": "Run integrity checks to determine scope of corruption",
+            "responsible": "platform_team",
+            "estimatedTime": 10,
+            "automated": false,
+            "runbook": "https://docs.sl18.io/runbooks/db-integrity-check",
+            "validationCriteria": "Corruption scope identified"
+          },
+          {
+            "stepNumber": 3,
+            "name": "Point-in-Time Recovery",
+            "description": "Restore from last known good backup with transaction log replay",
+            "responsible": "platform_team",
+            "estimatedTime": 15,
+            "automated": false,
+            "runbook": "https://docs.sl18.io/runbooks/pitr-restore",
+            "validationCriteria": "Database restored to consistent state"
+          },
+          {
+            "stepNumber": 4,
+            "name": "Validate Data Integrity",
+            "description": "Run validation queries and consistency checks",
+            "responsible": "platform_team",
+            "estimatedTime": 10,
+            "automated": true,
+            "runbook": "https://docs.sl18.io/runbooks/data-validation",
+            "validationCriteria": "All validation checks pass"
+          }
+        ],
+        "estimatedRecoveryTime": 37,
+        "dependencies": ["backup-service", "replica-database"],
+        "rollbackProcedure": "proc-db-rollback"
+      }
+    ],
+    "playbooks": [
+      {
+        "playbookId": "playbook-auto-failover",
+        "name": "Automated Regional Failover",
+        "scenario": "region_outage",
+        "triggerConditions": [
+          {
+            "conditionId": "cond-health-failure",
+            "metric": "region_health_score",
+            "operator": "lt",
+            "threshold": 50,
+            "duration": 60
+          },
+          {
+            "conditionId": "cond-error-rate",
+            "metric": "error_rate_5xx",
+            "operator": "gt",
+            "threshold": 20,
+            "duration": 120
+          }
+        ],
+        "automationLevel": "fully_automated",
+        "escalation": {
+          "enabled": true,
+          "levels": [
+            {
+              "level": 1,
+              "delay": 0,
+              "contacts": ["on-call-engineer"],
+              "channels": ["pagerduty", "slack"]
+            },
+            {
+              "level": 2,
+              "delay": 15,
+              "contacts": ["platform-lead", "sre-manager"],
+              "channels": ["pagerduty", "slack", "phone"]
+            },
+            {
+              "level": 3,
+              "delay": 30,
+              "contacts": ["vp-engineering", "cto"],
+              "channels": ["phone", "sms"]
+            }
+          ]
+        },
+        "communicationPlan": {
+          "internalChannels": ["#incident-response", "#platform-alerts"],
+          "externalChannels": ["status.sl18.io"],
+          "statusPageUpdate": true,
+          "customerNotification": true
+        },
+        "enabled": true
+      }
+    ],
+    "chaosTesting": {
+      "enabled": true,
+      "provider": "gremlin",
+      "experiments": [
+        {
+          "experimentId": "chaos-instance-termination",
+          "name": "Random Instance Termination",
+          "type": "instance_termination",
+          "scope": "percentage",
+          "schedule": "0 10 * * 3",
+          "duration": 30,
+          "safeguards": {
+            "autoRollback": true,
+            "maxImpact": 10,
+            "excludedServices": ["database-primary"],
+            "maintenanceWindowOnly": false
+          },
+          "enabled": true,
+          "lastRun": "2024-11-20T10:00:00Z",
+          "lastResult": "success"
+        },
+        {
+          "experimentId": "chaos-network-latency",
+          "name": "Network Latency Injection",
+          "type": "latency_injection",
+          "scope": "availability_zone",
+          "schedule": "0 14 * * 4",
+          "duration": 15,
+          "safeguards": {
+            "autoRollback": true,
+            "maxImpact": 20,
+            "excludedServices": [],
+            "maintenanceWindowOnly": false
+          },
+          "enabled": true,
+          "lastRun": "2024-11-21T14:00:00Z",
+          "lastResult": "success"
+        },
+        {
+          "experimentId": "chaos-region-failover",
+          "name": "Simulated Region Failover",
+          "type": "region_failover",
+          "scope": "region",
+          "schedule": "manual",
+          "duration": 60,
+          "safeguards": {
+            "autoRollback": true,
+            "maxImpact": 5,
+            "excludedServices": [],
+            "maintenanceWindowOnly": true
+          },
+          "enabled": true,
+          "lastRun": "2024-10-15T02:00:00Z",
+          "lastResult": "success"
+        }
+      ],
+      "schedule": {
+        "gameDay": {
+          "enabled": true,
+          "frequency": "quarterly",
+          "lastGameDay": "2024-09-15T00:00:00Z",
+          "nextGameDay": "2024-12-15T00:00:00Z"
+        }
+      }
+    },
+    "dataProtection": {
+      "classification": [
+        {
+          "tier": "critical",
+          "dataTypes": ["user_credentials", "payment_data", "pii"],
+          "rpo": 1,
+          "retention": 365,
+          "replicationMode": "synchronous"
+        },
+        {
+          "tier": "high",
+          "dataTypes": ["content_metadata", "persona_profiles", "franchise_data"],
+          "rpo": 5,
+          "retention": 180,
+          "replicationMode": "asynchronous"
+        },
+        {
+          "tier": "medium",
+          "dataTypes": ["analytics", "logs", "metrics"],
+          "rpo": 60,
+          "retention": 90,
+          "replicationMode": "eventual"
+        }
+      ],
+      "encryption": {
+        "atRest": true,
+        "inTransit": true,
+        "backups": true
+      }
+    },
+    "compliance": {
+      "frameworks": ["ISO22301", "SOC2"],
+      "auditSchedule": "annually",
+      "lastAudit": "2024-03-15T00:00:00Z",
+      "nextAudit": "2025-03-15T00:00:00Z",
+      "drillSchedule": "quarterly",
+      "lastDrill": "2024-09-15T00:00:00Z",
+      "nextDrill": "2024-12-15T00:00:00Z"
+    },
+    "metrics": {
+      "actualRto": 8,
+      "actualRpo": 3,
+      "backupSuccessRate": 99.9,
+      "recoverySuccessRate": 100,
+      "chaosTestsCompleted": 24,
+      "chaosTestsSuccessful": 23,
+      "drillsCompleted": 4,
+      "lastBackupTime": "2024-11-28T03:00:00Z",
+      "lastRecoveryTest": "2024-11-20T00:00:00Z",
+      "lastUpdated": "2024-11-28T04:00:00Z"
+    },
+    "status": "active",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-11-28T04:00:00Z",
+    "createdBy": "platform-team",
+    "approvedBy": "cto",
+    "approvedAt": "2024-01-15T00:00:00Z"
+  },
+  "infrastructureMonitoring": {
+    "monitoringId": "mon-sl18-production",
+    "version": "1.0.0",
+    "name": "SL18 Production Infrastructure Monitoring",
+    "scope": {
+      "level": "global",
+      "services": ["api-gateway", "content-service", "persona-service", "distribution-service", "analytics-service"],
+      "regions": ["us-east-1", "eu-west-1", "ap-southeast-1"],
+      "environments": ["production"]
+    },
+    "metricsCollection": {
+      "enabled": true,
+      "providers": [
+        {
+          "providerId": "prometheus-primary",
+          "type": "prometheus",
+          "endpoint": "https://prometheus.sl18.io",
+          "scrapeInterval": 15,
+          "retentionDays": 30,
+          "enabled": true
+        },
+        {
+          "providerId": "datadog-apm",
+          "type": "datadog",
+          "endpoint": "https://api.datadoghq.com",
+          "scrapeInterval": 10,
+          "retentionDays": 90,
+          "enabled": true
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": "metric-uptime",
+          "name": "Service Uptime",
+          "type": "gauge",
+          "category": "infrastructure",
+          "unit": "percent",
+          "aggregation": "avg",
+          "labels": ["service", "region"],
+          "enabled": true
+        },
+        {
+          "metricId": "metric-latency-p99",
+          "name": "Request Latency P99",
+          "type": "histogram",
+          "category": "application",
+          "unit": "milliseconds",
+          "aggregation": "p99",
+          "labels": ["service", "endpoint", "region"],
+          "enabled": true
+        },
+        {
+          "metricId": "metric-error-rate",
+          "name": "Error Rate",
+          "type": "counter",
+          "category": "application",
+          "unit": "percent",
+          "aggregation": "rate",
+          "labels": ["service", "error_code", "region"],
+          "enabled": true
+        },
+        {
+          "metricId": "metric-requests",
+          "name": "Requests Per Second",
+          "type": "counter",
+          "category": "application",
+          "unit": "requests",
+          "aggregation": "rate",
+          "labels": ["service", "endpoint", "method"],
+          "enabled": true
+        }
+      ],
+      "customMetrics": {
+        "enabled": true,
+        "maxMetrics": 500,
+        "namingPattern": "sl18.custom.*"
+      }
+    },
+    "alerting": {
+      "enabled": true,
+      "rules": [
+        {
+          "ruleId": "alert-high-error-rate",
+          "name": "High Error Rate",
+          "description": "Error rate exceeds 1% for 5 minutes",
+          "metric": "error_rate_5xx",
+          "condition": {
+            "operator": "gt",
+            "threshold": 1,
+            "duration": 300,
+            "aggregation": "avg"
+          },
+          "severity": "critical",
+          "notifications": {
+            "channels": ["pagerduty", "slack"],
+            "recipients": ["on-call-engineer", "#platform-alerts"],
+            "suppressDuplicates": 300,
+            "groupBy": ["service", "region"]
+          },
+          "runbook": "https://docs.sl18.io/runbooks/high-error-rate",
+          "autoRemediation": {
+            "enabled": true,
+            "action": "restart_service",
+            "maxAttempts": 2,
+            "cooldown": 300
+          },
+          "enabled": true,
+          "tags": ["critical", "sla-impacting"]
+        },
+        {
+          "ruleId": "alert-high-latency",
+          "name": "High Latency",
+          "description": "P99 latency exceeds 500ms for 3 minutes",
+          "metric": "request_latency_p99",
+          "condition": {
+            "operator": "gt",
+            "threshold": 500,
+            "duration": 180,
+            "aggregation": "avg"
+          },
+          "severity": "high",
+          "notifications": {
+            "channels": ["slack", "email"],
+            "recipients": ["#platform-alerts", "platform-team@sl18.io"],
+            "suppressDuplicates": 600,
+            "groupBy": ["service"]
+          },
+          "runbook": "https://docs.sl18.io/runbooks/high-latency",
+          "autoRemediation": {
+            "enabled": true,
+            "action": "scale_up",
+            "maxAttempts": 1,
+            "cooldown": 600
+          },
+          "enabled": true,
+          "tags": ["performance"]
+        },
+        {
+          "ruleId": "alert-low-uptime",
+          "name": "Low Service Uptime",
+          "description": "Service uptime below 99.9%",
+          "metric": "service_uptime",
+          "condition": {
+            "operator": "lt",
+            "threshold": 99.9,
+            "duration": 60,
+            "aggregation": "avg"
+          },
+          "severity": "critical",
+          "notifications": {
+            "channels": ["pagerduty", "slack", "sms"],
+            "recipients": ["on-call-engineer", "platform-lead"],
+            "suppressDuplicates": 60,
+            "groupBy": ["service"]
+          },
+          "runbook": "https://docs.sl18.io/runbooks/service-down",
+          "autoRemediation": {
+            "enabled": false
+          },
+          "enabled": true,
+          "tags": ["critical", "sla-impacting"]
+        }
+      ],
+      "escalation": {
+        "enabled": true,
+        "policies": [
+          {
+            "policyId": "escalation-critical",
+            "name": "Critical Alert Escalation",
+            "levels": [
+              {
+                "level": 1,
+                "delay": 0,
+                "notifyChannels": ["pagerduty"]
+              },
+              {
+                "level": 2,
+                "delay": 15,
+                "notifyChannels": ["pagerduty", "phone"]
+              },
+              {
+                "level": 3,
+                "delay": 30,
+                "notifyChannels": ["phone", "sms"]
+              }
+            ]
+          }
+        ]
+      },
+      "maintenance": {
+        "windows": [
+          {
+            "windowId": "maint-weekly",
+            "name": "Weekly Maintenance Window",
+            "schedule": "0 2 * * 0",
+            "duration": 120,
+            "suppressAlerts": true,
+            "affectedServices": ["all"]
+          }
+        ]
+      }
+    },
+    "syntheticTests": {
+      "enabled": true,
+      "tests": [
+        {
+          "testId": "synthetic-api-health",
+          "name": "API Health Check",
+          "type": "http",
+          "endpoint": "https://api.sl18.io/health",
+          "method": "GET",
+          "assertions": [
+            {
+              "type": "status_code",
+              "operator": "eq",
+              "value": 200
+            },
+            {
+              "type": "response_time",
+              "operator": "lt",
+              "value": 500
+            }
+          ],
+          "locations": ["us-east-1", "eu-west-1", "ap-southeast-1"],
+          "frequency": 30,
+          "timeout": 10,
+          "retries": 2,
+          "enabled": true,
+          "tags": ["critical", "api"]
+        },
+        {
+          "testId": "synthetic-cdn-content",
+          "name": "CDN Content Delivery",
+          "type": "http",
+          "endpoint": "https://cdn.sl18.io/test-asset.mp4",
+          "method": "HEAD",
+          "assertions": [
+            {
+              "type": "status_code",
+              "operator": "eq",
+              "value": 200
+            },
+            {
+              "type": "response_time",
+              "operator": "lt",
+              "value": 200
+            },
+            {
+              "type": "header_contains",
+              "operator": "contains",
+              "value": "hit"
+            }
+          ],
+          "locations": ["us-west-2", "eu-central-1", "ap-south-1", "sa-east-1"],
+          "frequency": 60,
+          "timeout": 15,
+          "retries": 1,
+          "enabled": true,
+          "tags": ["cdn", "content"]
+        },
+        {
+          "testId": "synthetic-ssl-check",
+          "name": "SSL Certificate Validation",
+          "type": "ssl",
+          "endpoint": "api.sl18.io:443",
+          "assertions": [
+            {
+              "type": "ssl_valid",
+              "operator": "eq",
+              "value": true
+            }
+          ],
+          "locations": ["us-east-1"],
+          "frequency": 3600,
+          "timeout": 30,
+          "retries": 0,
+          "enabled": true,
+          "tags": ["security", "ssl"]
+        }
+      ],
+      "multiStepTests": [
+        {
+          "testId": "synthetic-user-journey",
+          "name": "Content Discovery Journey",
+          "steps": [
+            {
+              "stepNumber": 1,
+              "name": "Load Homepage",
+              "action": "navigate",
+              "target": "https://app.sl18.io",
+              "timeout": 10
+            },
+            {
+              "stepNumber": 2,
+              "name": "Search Content",
+              "action": "type",
+              "target": "#search-input",
+              "value": "drama series",
+              "timeout": 5
+            },
+            {
+              "stepNumber": 3,
+              "name": "Click Search",
+              "action": "click",
+              "target": "#search-button",
+              "timeout": 5
+            },
+            {
+              "stepNumber": 4,
+              "name": "Verify Results",
+              "action": "assert",
+              "target": ".search-results",
+              "value": "exists",
+              "timeout": 10
+            }
+          ],
+          "frequency": 300,
+          "enabled": true
+        }
+      ]
+    },
+    "dashboards": [
+      {
+        "dashboardId": "dash-infra-overview",
+        "name": "Infrastructure Overview",
+        "type": "infrastructure_overview",
+        "widgets": [
+          {
+            "widgetId": "widget-uptime",
+            "type": "gauge",
+            "title": "Global Uptime",
+            "metrics": ["service_uptime"],
+            "timeRange": "24h",
+            "refreshInterval": 60,
+            "thresholds": [
+              {"value": 99.9, "color": "green", "label": "Healthy"},
+              {"value": 99.5, "color": "yellow", "label": "Degraded"},
+              {"value": 0, "color": "red", "label": "Critical"}
+            ],
+            "position": {"x": 0, "y": 0, "width": 4, "height": 2}
+          },
+          {
+            "widgetId": "widget-latency",
+            "type": "line_chart",
+            "title": "Request Latency",
+            "metrics": ["request_latency_p50", "request_latency_p95", "request_latency_p99"],
+            "timeRange": "6h",
+            "refreshInterval": 30,
+            "position": {"x": 4, "y": 0, "width": 8, "height": 2}
+          },
+          {
+            "widgetId": "widget-errors",
+            "type": "bar_chart",
+            "title": "Error Rate by Service",
+            "metrics": ["error_rate_5xx"],
+            "timeRange": "24h",
+            "refreshInterval": 60,
+            "position": {"x": 0, "y": 2, "width": 6, "height": 2}
+          },
+          {
+            "widgetId": "widget-regions",
+            "type": "status_map",
+            "title": "Regional Health",
+            "metrics": ["region_health_score"],
+            "timeRange": "1h",
+            "refreshInterval": 30,
+            "position": {"x": 6, "y": 2, "width": 6, "height": 2}
+          }
+        ],
+        "filters": [
+          {
+            "name": "Region",
+            "type": "dropdown",
+            "options": ["all", "us-east-1", "eu-west-1", "ap-southeast-1"],
+            "default": "all"
+          },
+          {
+            "name": "Service",
+            "type": "multi_select",
+            "options": ["api-gateway", "content-service", "persona-service", "distribution-service"],
+            "default": "all"
+          }
+        ],
+        "refreshInterval": 60,
+        "visibility": "team",
+        "enabled": true
+      },
+      {
+        "dashboardId": "dash-sla-compliance",
+        "name": "SLA Compliance",
+        "type": "sla_compliance",
+        "widgets": [
+          {
+            "widgetId": "widget-sla-status",
+            "type": "table",
+            "title": "SLA Status by Service",
+            "metrics": ["sla_availability", "sla_latency", "sla_error_rate"],
+            "timeRange": "30d",
+            "refreshInterval": 300,
+            "position": {"x": 0, "y": 0, "width": 12, "height": 3}
+          },
+          {
+            "widgetId": "widget-error-budget",
+            "type": "gauge",
+            "title": "Error Budget Remaining",
+            "metrics": ["error_budget_remaining"],
+            "timeRange": "30d",
+            "refreshInterval": 60,
+            "thresholds": [
+              {"value": 50, "color": "green", "label": "Healthy"},
+              {"value": 20, "color": "yellow", "label": "Caution"},
+              {"value": 0, "color": "red", "label": "Exhausted"}
+            ],
+            "position": {"x": 0, "y": 3, "width": 4, "height": 2}
+          }
+        ],
+        "refreshInterval": 300,
+        "visibility": "team",
+        "enabled": true
+      }
+    ],
+    "slaTracking": {
+      "enabled": true,
+      "slas": [
+        {
+          "slaId": "sla-api-availability",
+          "name": "API Availability",
+          "service": "api-gateway",
+          "targets": {
+            "availability": 99.95,
+            "responseTime": {
+              "p50": 100,
+              "p95": 300,
+              "p99": 500
+            },
+            "errorRate": 0.1,
+            "throughput": 10000
+          },
+          "calculation": {
+            "window": "rolling_30d",
+            "excludeMaintenanceWindows": true
+          },
+          "currentStatus": {
+            "availability": 99.98,
+            "responseTimeP50": 85,
+            "responseTimeP95": 245,
+            "responseTimeP99": 420,
+            "errorRate": 0.05,
+            "status": "meeting",
+            "lastUpdated": "2024-11-28T04:00:00Z"
+          },
+          "breachNotification": {
+            "enabled": true,
+            "warningThreshold": 70,
+            "channels": ["slack", "pagerduty", "email"]
+          },
+          "enabled": true
+        },
+        {
+          "slaId": "sla-content-delivery",
+          "name": "Content Delivery",
+          "service": "content-service",
+          "targets": {
+            "availability": 99.9,
+            "responseTime": {
+              "p50": 200,
+              "p95": 500,
+              "p99": 1000
+            },
+            "errorRate": 0.5
+          },
+          "calculation": {
+            "window": "rolling_30d",
+            "excludeMaintenanceWindows": true
+          },
+          "currentStatus": {
+            "availability": 99.95,
+            "responseTimeP50": 150,
+            "responseTimeP95": 380,
+            "responseTimeP99": 750,
+            "errorRate": 0.2,
+            "status": "meeting",
+            "lastUpdated": "2024-11-28T04:00:00Z"
+          },
+          "breachNotification": {
+            "enabled": true,
+            "warningThreshold": 80,
+            "channels": ["slack", "email"]
+          },
+          "enabled": true
+        }
+      ],
+      "errorBudgets": [
+        {
+          "budgetId": "budget-api",
+          "slaId": "sla-api-availability",
+          "monthly": 21.6,
+          "consumed": 4.3,
+          "remaining": 17.3,
+          "burnRate": 0.8,
+          "projectedExhaustion": "2025-02-15T00:00:00Z"
+        },
+        {
+          "budgetId": "budget-content",
+          "slaId": "sla-content-delivery",
+          "monthly": 43.2,
+          "consumed": 12.1,
+          "remaining": 31.1,
+          "burnRate": 1.1,
+          "projectedExhaustion": "2025-01-20T00:00:00Z"
+        }
+      ]
+    },
+    "logging": {
+      "enabled": true,
+      "providers": [
+        {
+          "providerId": "elastic-logs",
+          "type": "elasticsearch",
+          "endpoint": "https://logs.sl18.io:9200",
+          "retentionDays": 30,
+          "enabled": true
+        }
+      ],
+      "logLevels": {
+        "default": "info",
+        "overrides": {
+          "security-service": "debug",
+          "payment-service": "debug"
+        }
+      },
+      "structuredLogging": true,
+      "sampling": {
+        "enabled": true,
+        "rate": 100
+      }
+    },
+    "tracing": {
+      "enabled": true,
+      "provider": "datadog_apm",
+      "samplingRate": 10,
+      "propagation": ["w3c", "datadog"],
+      "serviceMap": true
+    },
+    "metrics": {
+      "alertsTriggered": 45,
+      "alertsResolved": 43,
+      "mttr": 8.5,
+      "mttd": 2.3,
+      "syntheticTestsRun": 288000,
+      "syntheticTestsPassed": 287424,
+      "slasInCompliance": 5,
+      "slasAtRisk": 0,
+      "slasBreached": 0,
+      "lastUpdated": "2024-11-28T04:00:00Z"
+    },
+    "status": "active",
+    "createdAt": "2024-01-15T00:00:00Z",
+    "updatedAt": "2024-11-28T04:00:00Z",
+    "createdBy": "platform-team"
+  },
+  "auditLogEvents": [
+    "resilience_config_created",
+    "resilience_config_updated",
+    "resilience_config_activated",
+    "failover_triggered",
+    "failover_completed",
+    "failover_failed",
+    "failback_triggered",
+    "failback_completed",
+    "region_activated",
+    "region_deactivated",
+    "region_draining",
+    "scaling_triggered",
+    "scaling_completed",
+    "burst_capacity_activated",
+    "circuit_breaker_opened",
+    "circuit_breaker_closed",
+    "health_check_failed",
+    "health_check_recovered",
+    "dr_plan_created",
+    "dr_plan_updated",
+    "dr_plan_activated",
+    "dr_plan_tested",
+    "backup_started",
+    "backup_completed",
+    "backup_failed",
+    "backup_validated",
+    "recovery_started",
+    "recovery_completed",
+    "recovery_failed",
+    "chaos_experiment_started",
+    "chaos_experiment_completed",
+    "chaos_experiment_failed",
+    "chaos_experiment_aborted",
+    "game_day_started",
+    "game_day_completed",
+    "dr_drill_started",
+    "dr_drill_completed",
+    "monitoring_config_created",
+    "monitoring_config_updated",
+    "alert_rule_created",
+    "alert_rule_updated",
+    "alert_triggered",
+    "alert_acknowledged",
+    "alert_resolved",
+    "alert_escalated",
+    "auto_remediation_triggered",
+    "auto_remediation_completed",
+    "auto_remediation_failed",
+    "synthetic_test_created",
+    "synthetic_test_passed",
+    "synthetic_test_failed",
+    "sla_breach_warning",
+    "sla_breached",
+    "sla_recovered",
+    "error_budget_warning",
+    "error_budget_exhausted",
+    "maintenance_window_started",
+    "maintenance_window_ended",
+    "dashboard_created",
+    "dashboard_viewed"
+  ]
+}
