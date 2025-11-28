@@ -1,0 +1,389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AudienceComments",
+  "description": "Schema for audience comments and reactions in SL18 - threaded comments, emoji reactions, moderation workflows",
+  "type": "object",
+  "properties": {
+    "commentId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique comment identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "contentId": {
+      "type": "string",
+      "description": "Content identifier the comment is on"
+    },
+    "contentType": {
+      "type": "string",
+      "enum": ["movie", "episode", "series", "short_drama", "trailer", "behind_the_scenes"],
+      "description": "Type of content"
+    },
+    "parentCommentId": {
+      "type": "string",
+      "description": "Parent comment ID for threaded replies"
+    },
+    "threadDepth": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 5,
+      "default": 0,
+      "description": "Depth in comment thread (0 = top level)"
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "User identifier"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "avatarUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "personaId": {
+          "type": "string",
+          "description": "Associated SL18 persona for persona-aligned avatars"
+        },
+        "badges": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["verified", "subscriber", "premium", "vip", "early_adopter", "top_contributor", "moderator"]
+          }
+        },
+        "memberSince": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "isAnonymous": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": ["userId"],
+      "additionalProperties": false
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "description": "Comment text"
+        },
+        "language": {
+          "type": "string",
+          "description": "Detected language of comment"
+        },
+        "mentions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "userId": { "type": "string" },
+              "displayName": { "type": "string" },
+              "startIndex": { "type": "integer" },
+              "endIndex": { "type": "integer" }
+            },
+            "required": ["userId", "displayName"],
+            "additionalProperties": false
+          }
+        },
+        "hashtags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "timestamp": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Timestamp in content where comment was made (for timestamped comments)"
+        },
+        "spoilerMarked": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether comment is marked as containing spoilers"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["image", "gif", "sticker"] },
+              "url": { "type": "string", "format": "uri" },
+              "thumbnailUrl": { "type": "string", "format": "uri" },
+              "altText": { "type": "string" }
+            },
+            "required": ["type", "url"],
+            "additionalProperties": false
+          },
+          "maxItems": 3
+        }
+      },
+      "required": ["text"],
+      "additionalProperties": false
+    },
+    "reactions": {
+      "type": "object",
+      "properties": {
+        "totalCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total reaction count"
+        },
+        "breakdown": {
+          "type": "object",
+          "properties": {
+            "like": { "type": "integer", "minimum": 0, "default": 0 },
+            "love": { "type": "integer", "minimum": 0, "default": 0 },
+            "wow": { "type": "integer", "minimum": 0, "default": 0 },
+            "sad": { "type": "integer", "minimum": 0, "default": 0 },
+            "angry": { "type": "integer", "minimum": 0, "default": 0 },
+            "laugh": { "type": "integer", "minimum": 0, "default": 0 },
+            "fire": { "type": "integer", "minimum": 0, "default": 0 },
+            "heart_eyes": { "type": "integer", "minimum": 0, "default": 0 }
+          },
+          "additionalProperties": false
+        },
+        "userReaction": {
+          "type": "string",
+          "enum": ["like", "love", "wow", "sad", "angry", "laugh", "fire", "heart_eyes"],
+          "description": "Current user's reaction (if any)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "engagement": {
+      "type": "object",
+      "properties": {
+        "replyCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "viewCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "shareCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "reportCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "isPinned": {
+          "type": "boolean",
+          "default": false
+        },
+        "isHighlighted": {
+          "type": "boolean",
+          "default": false
+        },
+        "highlightReason": {
+          "type": "string",
+          "enum": ["staff_pick", "top_comment", "creator_response", "most_helpful"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "moderation": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected", "flagged", "hidden", "deleted"],
+          "default": "approved"
+        },
+        "autoModerationResult": {
+          "type": "object",
+          "properties": {
+            "passed": { "type": "boolean" },
+            "flags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["profanity", "hate_speech", "spam", "harassment", "adult_content", "violence", "misinformation", "personal_info", "cultural_sensitivity"]
+              }
+            },
+            "confidenceScore": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "suggestedAction": {
+              "type": "string",
+              "enum": ["approve", "flag_review", "auto_hide", "auto_delete"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "manualReview": {
+          "type": "object",
+          "properties": {
+            "reviewedBy": { "type": "string" },
+            "reviewedAt": { "type": "string", "format": "date-time" },
+            "decision": { "type": "string", "enum": ["approved", "rejected", "edited"] },
+            "reason": { "type": "string" },
+            "editedContent": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "reports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "reportId": { "type": "string" },
+              "reporterId": { "type": "string" },
+              "reason": {
+                "type": "string",
+                "enum": ["spam", "harassment", "hate_speech", "misinformation", "spoiler", "off_topic", "inappropriate", "other"]
+              },
+              "details": { "type": "string" },
+              "reportedAt": { "type": "string", "format": "date-time" },
+              "status": { "type": "string", "enum": ["pending", "reviewed", "dismissed", "actioned"] }
+            },
+            "required": ["reportId", "reporterId", "reason", "reportedAt"],
+            "additionalProperties": false
+          }
+        },
+        "culturalSensitivity": {
+          "type": "object",
+          "properties": {
+            "flagged": { "type": "boolean", "default": false },
+            "regions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Regions where comment may be sensitive"
+            },
+            "sensitivityType": {
+              "type": "string",
+              "enum": ["religious", "political", "social", "historical", "linguistic"]
+            },
+            "reviewRequired": { "type": "boolean", "default": false }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "visibility": {
+      "type": "object",
+      "properties": {
+        "isPublic": {
+          "type": "boolean",
+          "default": true
+        },
+        "visibleToAuthor": {
+          "type": "boolean",
+          "default": true
+        },
+        "regionRestrictions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Regions where comment is hidden"
+        },
+        "ageRestricted": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "sentimentAnalysis": {
+      "type": "object",
+      "properties": {
+        "sentiment": {
+          "type": "string",
+          "enum": ["very_positive", "positive", "neutral", "negative", "very_negative"]
+        },
+        "sentimentScore": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "emotions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "emotion": { "type": "string", "enum": ["joy", "sadness", "anger", "fear", "surprise", "disgust", "anticipation", "trust"] },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "topics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Detected topics in comment"
+        },
+        "analyzedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "insightsIntegration": {
+      "type": "object",
+      "properties": {
+        "feedToAudienceInsights": {
+          "type": "boolean",
+          "default": true,
+          "description": "Feed comment data to Phase 20 Audience Insights"
+        },
+        "contributesToSentiment": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include in overall sentiment analysis"
+        },
+        "feedbackSignalWeight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.3,
+          "description": "Weight of this comment in feedback signals"
+        }
+      },
+      "additionalProperties": false
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deletedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Soft delete timestamp"
+    }
+  },
+  "required": [
+    "commentId",
+    "franchiseId",
+    "contentId",
+    "contentType",
+    "author",
+    "content",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

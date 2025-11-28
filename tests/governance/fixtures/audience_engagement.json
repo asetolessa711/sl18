@@ -1,0 +1,733 @@
+{
+  "validPolls": [
+    {
+      "pollId": "poll-001-story-choice",
+      "franchiseId": "waliin-001",
+      "contentId": "episode-waliin-s01e05",
+      "seriesId": "series-waliin-001",
+      "pollType": "story_choice",
+      "pollConfig": {
+        "question": "What should Amara do next?",
+        "questionLocalized": {
+          "sw": "Amara afanye nini sasa?",
+          "am": "አማራ ቀጥሎ ምን ማድረግ አለባት?"
+        },
+        "options": [
+          { "optionId": "opt-1", "text": "Confront her rival", "textLocalized": { "sw": "Mkabiliane na mpinzani wake" } },
+          { "optionId": "opt-2", "text": "Seek help from a friend", "textLocalized": { "sw": "Tafuta msaada kutoka kwa rafiki" } },
+          { "optionId": "opt-3", "text": "Leave town secretly", "textLocalized": { "sw": "Ondoka mjini kwa siri" } }
+        ],
+        "allowMultipleChoices": false,
+        "showResultsAfterVoting": true,
+        "anonymousVoting": true
+      },
+      "displaySettings": {
+        "triggerPoint": "in_episode",
+        "triggerTimestamp": 1245,
+        "displayDuration": 30,
+        "position": "overlay_bottom",
+        "theme": "dark",
+        "animation": "slide_in",
+        "pausePlayback": false
+      },
+      "scheduling": {
+        "startDate": "2024-01-15T00:00:00Z",
+        "endDate": "2024-02-15T23:59:59Z",
+        "timezone": "Africa/Nairobi"
+      },
+      "targeting": {
+        "regions": ["EA", "WA"],
+        "languages": ["en", "sw", "am"],
+        "minWatchProgress": 80
+      },
+      "results": {
+        "totalVotes": 15420,
+        "uniqueVoters": 14890,
+        "optionResults": [
+          { "optionId": "opt-1", "voteCount": 7850, "percentage": 50.9 },
+          { "optionId": "opt-2", "voteCount": 4630, "percentage": 30.0 },
+          { "optionId": "opt-3", "voteCount": 2940, "percentage": 19.1 }
+        ],
+        "demographicBreakdown": {
+          "byRegion": [
+            { "region": "EA", "voteCount": 9250, "topChoice": "opt-1" },
+            { "region": "WA", "voteCount": 6170, "topChoice": "opt-2" }
+          ]
+        },
+        "lastUpdated": "2024-01-20T14:30:00Z"
+      },
+      "insightsIntegration": {
+        "feedToAudienceInsights": true,
+        "sentimentTracking": true,
+        "influencePersonalization": true,
+        "personalizationWeight": 0.3
+      },
+      "storyInfluence": {
+        "influenceEnabled": true,
+        "outcomeMapping": [
+          { "optionId": "opt-1", "outcomeId": "outcome-confrontation", "outcomeDescription": "Amara confronts her rival in episode 6" },
+          { "optionId": "opt-2", "outcomeId": "outcome-alliance", "outcomeDescription": "Amara forms new alliance in episode 6" }
+        ],
+        "thresholdForOutcome": 40
+      },
+      "status": "active",
+      "createdBy": "operator-001",
+      "createdAt": "2024-01-10T09:00:00Z",
+      "updatedAt": "2024-01-20T14:30:00Z"
+    },
+    {
+      "pollId": "poll-002-sentiment",
+      "franchiseId": "waliin-001",
+      "contentId": "episode-waliin-s01e03",
+      "pollType": "sentiment_slider",
+      "pollConfig": {
+        "question": "How intense was this episode?",
+        "sliderConfig": {
+          "minValue": 0,
+          "maxValue": 100,
+          "step": 1,
+          "leftLabel": "Calm",
+          "rightLabel": "Intense",
+          "leftLabelLocalized": { "sw": "Tulivu" },
+          "rightLabelLocalized": { "sw": "Kali" }
+        }
+      },
+      "displaySettings": {
+        "triggerPoint": "episode_end",
+        "displayDuration": 20,
+        "position": "overlay_center"
+      },
+      "results": {
+        "totalVotes": 8500,
+        "uniqueVoters": 8500,
+        "sliderResults": {
+          "average": 78.5,
+          "median": 82,
+          "mode": 85,
+          "distribution": [
+            { "rangeStart": 0, "rangeEnd": 25, "count": 425, "percentage": 5.0 },
+            { "rangeStart": 26, "rangeEnd": 50, "count": 850, "percentage": 10.0 },
+            { "rangeStart": 51, "rangeEnd": 75, "count": 2125, "percentage": 25.0 },
+            { "rangeStart": 76, "rangeEnd": 100, "count": 5100, "percentage": 60.0 }
+          ]
+        }
+      },
+      "status": "closed",
+      "createdBy": "operator-001",
+      "createdAt": "2024-01-08T09:00:00Z",
+      "updatedAt": "2024-01-15T23:59:59Z"
+    }
+  ],
+  "invalidPolls": [
+    {
+      "description": "Missing pollId",
+      "data": {
+        "franchiseId": "waliin-001",
+        "contentId": "episode-001",
+        "pollType": "story_choice",
+        "pollConfig": { "question": "Test?" },
+        "status": "draft"
+      }
+    },
+    {
+      "description": "Invalid poll type",
+      "data": {
+        "pollId": "poll-invalid",
+        "franchiseId": "waliin-001",
+        "contentId": "episode-001",
+        "pollType": "invalid_type",
+        "pollConfig": { "question": "Test?" },
+        "status": "draft"
+      }
+    },
+    {
+      "description": "Missing question in config",
+      "data": {
+        "pollId": "poll-invalid-2",
+        "franchiseId": "waliin-001",
+        "contentId": "episode-001",
+        "pollType": "story_choice",
+        "pollConfig": { "options": [] },
+        "status": "draft"
+      }
+    }
+  ],
+  "validComments": [
+    {
+      "commentId": "comment-001-thread-start",
+      "franchiseId": "waliin-001",
+      "contentId": "episode-waliin-s01e05",
+      "contentType": "episode",
+      "threadDepth": 0,
+      "author": {
+        "userId": "user-12345",
+        "displayName": "MovieFan2024",
+        "badges": ["subscriber", "early_adopter"],
+        "memberSince": "2023-06-15T00:00:00Z",
+        "isAnonymous": false
+      },
+      "content": {
+        "text": "This episode was absolutely amazing! The plot twist at the end completely caught me off guard. Can't wait for the next one! 🔥",
+        "language": "en",
+        "hashtags": ["WaliinStudio", "BestDrama"],
+        "spoilerMarked": false
+      },
+      "reactions": {
+        "totalCount": 342,
+        "breakdown": {
+          "like": 180,
+          "love": 95,
+          "fire": 67
+        }
+      },
+      "engagement": {
+        "replyCount": 28,
+        "viewCount": 1520,
+        "shareCount": 12,
+        "isPinned": true,
+        "isHighlighted": true,
+        "highlightReason": "top_comment"
+      },
+      "moderation": {
+        "status": "approved",
+        "autoModerationResult": {
+          "passed": true,
+          "flags": [],
+          "confidenceScore": 0.98,
+          "suggestedAction": "approve"
+        }
+      },
+      "sentimentAnalysis": {
+        "sentiment": "very_positive",
+        "sentimentScore": 0.92,
+        "emotions": [
+          { "emotion": "joy", "confidence": 0.85 },
+          { "emotion": "anticipation", "confidence": 0.78 }
+        ],
+        "topics": ["plot", "suspense", "excitement"],
+        "analyzedAt": "2024-01-20T10:30:00Z"
+      },
+      "insightsIntegration": {
+        "feedToAudienceInsights": true,
+        "contributesToSentiment": true,
+        "feedbackSignalWeight": 0.4
+      },
+      "createdAt": "2024-01-20T10:25:00Z",
+      "updatedAt": "2024-01-20T10:30:00Z"
+    },
+    {
+      "commentId": "comment-002-reply",
+      "franchiseId": "waliin-001",
+      "contentId": "episode-waliin-s01e05",
+      "contentType": "episode",
+      "parentCommentId": "comment-001-thread-start",
+      "threadDepth": 1,
+      "author": {
+        "userId": "user-67890",
+        "displayName": "DramaLover",
+        "badges": ["premium"],
+        "isAnonymous": false
+      },
+      "content": {
+        "text": "I totally agree! The acting was incredible too.",
+        "language": "en",
+        "mentions": [
+          { "userId": "user-12345", "displayName": "MovieFan2024", "startIndex": 0, "endIndex": 0 }
+        ]
+      },
+      "reactions": {
+        "totalCount": 45,
+        "breakdown": {
+          "like": 38,
+          "love": 7
+        }
+      },
+      "moderation": {
+        "status": "approved"
+      },
+      "createdAt": "2024-01-20T10:35:00Z"
+    }
+  ],
+  "invalidComments": [
+    {
+      "description": "Missing commentId",
+      "data": {
+        "franchiseId": "waliin-001",
+        "contentId": "episode-001",
+        "contentType": "episode",
+        "author": { "userId": "user-1" },
+        "content": { "text": "Test" },
+        "createdAt": "2024-01-20T10:00:00Z"
+      }
+    },
+    {
+      "description": "Invalid content type",
+      "data": {
+        "commentId": "comment-invalid",
+        "franchiseId": "waliin-001",
+        "contentId": "episode-001",
+        "contentType": "invalid_type",
+        "author": { "userId": "user-1" },
+        "content": { "text": "Test" },
+        "createdAt": "2024-01-20T10:00:00Z"
+      }
+    }
+  ],
+  "validPersonalizations": [
+    {
+      "personalizationId": "pers-001-user-12345",
+      "customerId": "customer-12345",
+      "profileId": "profile-main",
+      "franchiseId": "waliin-001",
+      "preferences": {
+        "genres": [
+          { "genre": "drama", "affinity": 0.92, "explicitPreference": true, "viewCount": 45, "avgCompletionRate": 88.5 },
+          { "genre": "thriller", "affinity": 0.78, "viewCount": 23, "avgCompletionRate": 75.2 },
+          { "genre": "romance", "affinity": 0.65, "viewCount": 18, "avgCompletionRate": 82.0 }
+        ],
+        "personas": [
+          { "personaId": "persona-amara", "personaName": "Amara", "affinity": 0.88, "interactionCount": 156 },
+          { "personaId": "persona-kofi", "personaName": "Kofi", "affinity": 0.72, "interactionCount": 89 }
+        ],
+        "contentFormats": {
+          "shortDrama": 0.85,
+          "movie": 0.65,
+          "series": 0.90,
+          "documentary": 0.35
+        },
+        "languages": {
+          "preferredAudio": ["sw", "en"],
+          "preferredSubtitles": ["en"],
+          "autoSelectSubtitles": true,
+          "dubbingPreferred": false
+        },
+        "viewingTimes": {
+          "preferredDays": ["friday", "saturday", "sunday"],
+          "preferredTimeSlots": ["evening", "late_night"],
+          "avgSessionDuration": 95
+        }
+      },
+      "watchingPatterns": {
+        "bingeWatcher": true,
+        "avgEpisodesPerSession": 4.2,
+        "skipIntro": true,
+        "skipCredits": false,
+        "watchesTrailers": true,
+        "completionTendency": "high_completer",
+        "rewatch": false,
+        "devicePreference": "tv"
+      },
+      "recommendations": {
+        "algorithm": "hybrid",
+        "forYouQueue": [
+          { "contentId": "movie-waliin-003", "score": 0.94, "reason": "genre_match", "position": 1, "addedAt": "2024-01-20T00:00:00Z" },
+          { "contentId": "series-waliin-002", "score": 0.89, "reason": "persona_match", "position": 2, "addedAt": "2024-01-20T00:00:00Z" },
+          { "contentId": "episode-waliin-s02e01", "score": 0.87, "reason": "continue_watching", "position": 3, "addedAt": "2024-01-20T00:00:00Z" }
+        ],
+        "continueWatching": [
+          { "contentId": "series-waliin-001", "episodeId": "episode-waliin-s01e06", "progress": 45.5, "lastWatched": "2024-01-19T22:30:00Z", "nextEpisodeId": "episode-waliin-s01e07" }
+        ],
+        "lastRefreshed": "2024-01-20T06:00:00Z",
+        "refreshInterval": 6
+      },
+      "adaptiveUI": {
+        "heroBanner": {
+          "personalizedSelection": true,
+          "preferredStyle": "action_focused",
+          "autoplayTrailer": true
+        },
+        "categoryOrder": [
+          { "categoryId": "continue_watching", "position": 1, "weight": 1.0 },
+          { "categoryId": "for_you", "position": 2, "weight": 0.95 },
+          { "categoryId": "trending", "position": 3, "weight": 0.8 }
+        ],
+        "displayDensity": "normal",
+        "thumbnailStyle": "adaptive"
+      },
+      "engagementHistory": {
+        "pollsParticipated": 28,
+        "commentsPosted": 15,
+        "reactionsGiven": 145,
+        "contentRated": 32,
+        "shareCount": 8,
+        "engagementScore": 78.5,
+        "engagementTier": "active"
+      },
+      "insightsIntegration": {
+        "feedToPersonalizationEngine": true,
+        "feedToAudienceInsights": true,
+        "feedbackLoopEnabled": true
+      },
+      "status": "active",
+      "createdAt": "2023-06-15T00:00:00Z",
+      "updatedAt": "2024-01-20T06:00:00Z",
+      "lastActiveAt": "2024-01-19T22:45:00Z"
+    }
+  ],
+  "invalidPersonalizations": [
+    {
+      "description": "Missing personalizationId",
+      "data": {
+        "customerId": "customer-1",
+        "franchiseId": "waliin-001",
+        "status": "active"
+      }
+    },
+    {
+      "description": "Invalid status",
+      "data": {
+        "personalizationId": "pers-invalid",
+        "customerId": "customer-1",
+        "franchiseId": "waliin-001",
+        "status": "invalid_status"
+      }
+    }
+  ],
+  "validEngagements": [
+    {
+      "engagementId": "engagement-001-s01e05",
+      "franchiseId": "waliin-001",
+      "contentId": "episode-waliin-s01e05",
+      "contentType": "episode",
+      "periodStart": "2024-01-15T00:00:00Z",
+      "periodEnd": "2024-01-21T23:59:59Z",
+      "pollEngagement": {
+        "totalPolls": 3,
+        "totalVotes": 24500,
+        "uniqueVoters": 22100,
+        "participationRate": 42.5,
+        "avgVotesPerPoll": 8167,
+        "pollBreakdown": [
+          { "pollId": "poll-001", "pollType": "story_choice", "voteCount": 15420, "participationRate": 45.2, "avgTimeToVote": 8.5 },
+          { "pollId": "poll-002", "pollType": "sentiment_slider", "voteCount": 8500, "participationRate": 38.1 }
+        ],
+        "pollTypePerformance": {
+          "story_choice": 45.2,
+          "sentiment_slider": 38.1,
+          "character_vote": 52.0
+        }
+      },
+      "commentEngagement": {
+        "totalComments": 3420,
+        "uniqueCommenters": 2850,
+        "avgCommentsPerViewer": 0.066,
+        "totalReplies": 1580,
+        "avgThreadDepth": 1.8,
+        "commentRate": 5.5,
+        "topComments": [
+          { "commentId": "comment-001", "reactionCount": 342, "replyCount": 28, "sentiment": "very_positive" }
+        ],
+        "moderationStats": {
+          "totalFlagged": 45,
+          "totalRemoved": 12,
+          "flagRate": 1.3,
+          "avgReviewTime": 15.5
+        },
+        "timestampedComments": {
+          "count": 890,
+          "hotspots": [
+            { "timestamp": 1245, "commentCount": 156, "avgSentiment": 0.82 },
+            { "timestamp": 2100, "commentCount": 98, "avgSentiment": 0.65 }
+          ]
+        }
+      },
+      "reactionEngagement": {
+        "totalReactions": 45200,
+        "uniqueReactors": 28500,
+        "reactionRate": 54.8,
+        "reactionBreakdown": {
+          "like": 18500,
+          "love": 12300,
+          "fire": 8200,
+          "wow": 4100,
+          "sad": 1500,
+          "laugh": 600
+        },
+        "sentimentFromReactions": 0.78
+      },
+      "regionalEngagement": {
+        "heatmapData": [
+          { "region": "EA", "country": "KE", "engagementScore": 82.5, "pollParticipation": 48.2, "commentRate": 6.8, "viewerCount": 25000, "sentiment": 0.85 },
+          { "region": "EA", "country": "TZ", "engagementScore": 75.3, "pollParticipation": 42.1, "commentRate": 5.2, "viewerCount": 18000, "sentiment": 0.72 },
+          { "region": "WA", "country": "NG", "engagementScore": 68.9, "pollParticipation": 35.5, "commentRate": 4.5, "viewerCount": 9000, "sentiment": 0.68 }
+        ],
+        "topRegions": ["EA"],
+        "culturalSensitivityAlerts": []
+      },
+      "overallMetrics": {
+        "engagementScore": 78.5,
+        "engagementTier": "high",
+        "activeViewers": 32500,
+        "passiveViewers": 19500,
+        "engagementRatio": 62.5,
+        "viralCoefficient": 0.15,
+        "communityHealth": "thriving"
+      },
+      "trendAnalysis": {
+        "engagementTrend": "increasing",
+        "trendPercentage": 12.5,
+        "weekOverWeek": [
+          { "week": "2024-W02", "engagementScore": 72.0, "pollParticipation": 38.5, "commentRate": 4.8 },
+          { "week": "2024-W03", "engagementScore": 78.5, "pollParticipation": 42.5, "commentRate": 5.5 }
+        ],
+        "seasonalPatterns": {
+          "peakDays": ["friday", "saturday"],
+          "peakHours": [20, 21, 22],
+          "lowEngagementPeriods": ["monday_morning", "tuesday_morning"]
+        }
+      },
+      "alerts": {
+        "activeAlerts": [],
+        "alertThresholds": {
+          "engagementDropThreshold": 20,
+          "moderationBacklogThreshold": 100,
+          "sentimentShiftThreshold": 0.3
+        }
+      },
+      "operatorDashboard": {
+        "widgets": [
+          { "widgetId": "widget-kpi-engagement", "widgetType": "kpi_card", "title": "Engagement Score", "metric": "engagementScore" },
+          { "widgetId": "widget-chart-polls", "widgetType": "bar_chart", "title": "Poll Participation", "metric": "pollParticipation" },
+          { "widgetId": "widget-heatmap-regional", "widgetType": "heatmap", "title": "Regional Engagement", "metric": "regionalEngagement" }
+        ],
+        "defaultView": "overview",
+        "exportFormats": ["csv", "pdf", "xlsx"]
+      },
+      "insightsIntegration": {
+        "feedToAudienceInsights": true,
+        "feedToFeedbackLoop": true,
+        "triggerPersonalizationUpdate": true,
+        "triggerContentOptimization": false
+      },
+      "status": "ready",
+      "dataQuality": {
+        "completeness": 98.5,
+        "reliability": "high",
+        "sampleSize": 52000,
+        "lastUpdated": "2024-01-21T06:00:00Z"
+      },
+      "createdAt": "2024-01-15T00:00:00Z",
+      "updatedAt": "2024-01-21T06:00:00Z"
+    }
+  ],
+  "invalidEngagements": [
+    {
+      "description": "Missing engagementId",
+      "data": {
+        "franchiseId": "waliin-001",
+        "contentId": "episode-001",
+        "periodStart": "2024-01-15T00:00:00Z",
+        "periodEnd": "2024-01-21T23:59:59Z",
+        "status": "ready"
+      }
+    },
+    {
+      "description": "Invalid status",
+      "data": {
+        "engagementId": "engagement-invalid",
+        "franchiseId": "waliin-001",
+        "contentId": "episode-001",
+        "periodStart": "2024-01-15T00:00:00Z",
+        "periodEnd": "2024-01-21T23:59:59Z",
+        "status": "invalid_status"
+      }
+    }
+  ],
+  "pollCalculationTests": [
+    {
+      "description": "Calculate poll participation rate",
+      "input": { "totalVotes": 15420, "totalViewers": 52000 },
+      "expectedRate": 29.7
+    },
+    {
+      "description": "High participation poll",
+      "input": { "totalVotes": 35000, "totalViewers": 52000 },
+      "expectedRate": 67.3
+    },
+    {
+      "description": "Low participation poll",
+      "input": { "totalVotes": 2600, "totalViewers": 52000 },
+      "expectedRate": 5.0
+    }
+  ],
+  "engagementScoreTests": [
+    {
+      "description": "High engagement - all metrics strong",
+      "input": { "pollRate": 45, "commentRate": 8, "reactionRate": 60 },
+      "expectedScore": 75.3,
+      "expectedTier": "high"
+    },
+    {
+      "description": "Viral engagement - exceptional metrics",
+      "input": { "pollRate": 65, "commentRate": 12, "reactionRate": 85 },
+      "expectedScore": 110.3,
+      "expectedTier": "viral"
+    },
+    {
+      "description": "Low engagement - weak metrics",
+      "input": { "pollRate": 10, "commentRate": 1, "reactionRate": 15 },
+      "expectedScore": 13.5,
+      "expectedTier": "minimal"
+    }
+  ],
+  "moderationTests": [
+    {
+      "description": "Auto-approve clean comment",
+      "input": {
+        "text": "Great episode! Love the storyline.",
+        "flags": [],
+        "confidenceScore": 0.98
+      },
+      "expectedResult": {
+        "passed": true,
+        "suggestedAction": "approve"
+      }
+    },
+    {
+      "description": "Flag for review - potential profanity",
+      "input": {
+        "text": "This show is damn good!",
+        "flags": ["profanity"],
+        "confidenceScore": 0.65
+      },
+      "expectedResult": {
+        "passed": false,
+        "suggestedAction": "flag_review"
+      }
+    },
+    {
+      "description": "Auto-hide - hate speech detected",
+      "input": {
+        "text": "[offensive content]",
+        "flags": ["hate_speech"],
+        "confidenceScore": 0.92
+      },
+      "expectedResult": {
+        "passed": false,
+        "suggestedAction": "auto_hide"
+      }
+    }
+  ],
+  "personalizationTests": [
+    {
+      "description": "Calculate recommendation score for genre match",
+      "input": {
+        "userGenreAffinity": 0.92,
+        "contentGenre": "drama",
+        "popularityScore": 0.75
+      },
+      "expectedScore": 0.88
+    },
+    {
+      "description": "Calculate recommendation for persona match",
+      "input": {
+        "userPersonaAffinity": 0.85,
+        "contentPersona": "persona-amara",
+        "interactionCount": 156
+      },
+      "expectedScore": 0.82
+    }
+  ],
+  "alertTests": [
+    {
+      "description": "Trigger engagement drop alert",
+      "input": {
+        "previousScore": 78.5,
+        "currentScore": 55.2,
+        "threshold": 20
+      },
+      "expectedAlert": {
+        "shouldTrigger": true,
+        "alertType": "engagement_drop",
+        "severity": "warning"
+      }
+    },
+    {
+      "description": "Trigger moderation backlog alert",
+      "input": {
+        "pendingItems": 150,
+        "threshold": 100
+      },
+      "expectedAlert": {
+        "shouldTrigger": true,
+        "alertType": "moderation_backlog",
+        "severity": "warning"
+      }
+    },
+    {
+      "description": "Trigger cultural sensitivity alert",
+      "input": {
+        "region": "EA",
+        "sentimentDrop": 0.45,
+        "negativeFeedbackCount": 250
+      },
+      "expectedAlert": {
+        "shouldTrigger": true,
+        "alertType": "cultural_issue",
+        "severity": "critical"
+      }
+    }
+  ],
+  "auditLogTestData": [
+    {
+      "logId": "audit-poll-001",
+      "timestamp": "2024-01-20T10:30:00Z",
+      "eventType": "poll_created",
+      "category": "audience_engagement",
+      "actor": { "type": "user", "id": "operator-001", "name": "Content Operator" },
+      "target": { "type": "poll", "id": "poll-001-story-choice", "franchiseId": "waliin-001" },
+      "details": { "description": "Story choice poll created for episode S01E05" },
+      "result": "success"
+    },
+    {
+      "logId": "audit-comment-001",
+      "timestamp": "2024-01-20T10:25:00Z",
+      "eventType": "comment_posted",
+      "category": "audience_engagement",
+      "actor": { "type": "user", "id": "user-12345", "name": "MovieFan2024" },
+      "target": { "type": "comment", "id": "comment-001", "franchiseId": "waliin-001" },
+      "details": { "description": "Comment posted on episode S01E05" },
+      "result": "success"
+    },
+    {
+      "logId": "audit-reaction-001",
+      "timestamp": "2024-01-20T10:26:00Z",
+      "eventType": "reaction_added",
+      "category": "audience_engagement",
+      "actor": { "type": "user", "id": "user-67890", "name": "DramaLover" },
+      "target": { "type": "comment", "id": "comment-001", "franchiseId": "waliin-001" },
+      "details": { "description": "Love reaction added to comment", "metadata": { "reactionType": "love" } },
+      "result": "success"
+    },
+    {
+      "logId": "audit-moderation-001",
+      "timestamp": "2024-01-20T11:00:00Z",
+      "eventType": "comment_moderated",
+      "category": "audience_engagement",
+      "actor": { "type": "system", "id": "auto-moderator", "name": "Auto Moderation" },
+      "target": { "type": "comment", "id": "comment-flagged-001", "franchiseId": "waliin-001" },
+      "details": { "description": "Comment flagged for manual review", "metadata": { "flags": ["potential_spoiler"] } },
+      "result": "success"
+    },
+    {
+      "logId": "audit-personalization-001",
+      "timestamp": "2024-01-20T06:00:00Z",
+      "eventType": "personalization_updated",
+      "category": "audience_personalization",
+      "actor": { "type": "system", "id": "recommendation-engine", "name": "Recommendation Engine" },
+      "target": { "type": "personalization", "id": "pers-001-user-12345", "franchiseId": "waliin-001" },
+      "details": { "description": "Personalization profile updated with new recommendations" },
+      "result": "success"
+    },
+    {
+      "logId": "audit-engagement-alert-001",
+      "timestamp": "2024-01-21T08:00:00Z",
+      "eventType": "engagement_alert_triggered",
+      "category": "audience_engagement",
+      "actor": { "type": "system", "id": "engagement-monitor", "name": "Engagement Monitor" },
+      "target": { "type": "engagement_analytics", "id": "engagement-001-s01e05", "franchiseId": "waliin-001" },
+      "details": { "description": "Engagement spike detected for episode S01E05", "metadata": { "alertType": "engagement_spike" } },
+      "result": "success"
+    }
+  ]
+}
