@@ -1,0 +1,635 @@
+{
+  "operatorConsoles": {
+    "valid": [
+      {
+        "consoleId": "console-main-001",
+        "version": "1.0.0",
+        "operator": {
+          "operatorId": "op-kenya-001",
+          "displayName": "Kenya Operator",
+          "role": "operator",
+          "permissions": ["view:dashboard", "manage:languages", "manage:distribution"],
+          "mfaEnabled": true
+        },
+        "context": {
+          "franchiseId": "kenya-001",
+          "seriesId": "series-drama-001",
+          "language": "en",
+          "region": "africa-east",
+          "timezone": "Africa/Nairobi"
+        },
+        "navigation": {
+          "primaryModules": [
+            {
+              "moduleId": "dashboard",
+              "label": "Dashboard",
+              "icon": "📊",
+              "path": "/dashboard"
+            },
+            {
+              "moduleId": "languages",
+              "label": "Languages",
+              "icon": "🌐",
+              "path": "/languages",
+              "badge": { "count": 3, "type": "info" }
+            },
+            {
+              "moduleId": "insights",
+              "label": "Insights",
+              "icon": "📈",
+              "path": "/insights"
+            }
+          ],
+          "quickActions": [
+            {
+              "actionId": "new-episode",
+              "label": "New Episode",
+              "icon": "➕",
+              "shortcut": "Ctrl+N",
+              "action": "modal",
+              "target": "create-episode-modal"
+            }
+          ],
+          "recentItems": [
+            {
+              "itemType": "episode",
+              "itemId": "ep-001",
+              "label": "Episode 1: The Beginning",
+              "path": "/episodes/ep-001",
+              "accessedAt": "2025-01-15T10:30:00Z"
+            }
+          ]
+        },
+        "layout": {
+          "sidebarCollapsed": false,
+          "theme": "system",
+          "density": "normal",
+          "defaultView": "dashboard"
+        },
+        "notifications": {
+          "enabled": true,
+          "channels": ["in_app", "email"],
+          "alertLevels": ["warning", "critical"]
+        },
+        "dashboardWidgets": [
+          {
+            "widgetId": "widget-revenue-001",
+            "widgetType": "kpi_card",
+            "title": "Total Revenue",
+            "dataSource": "revenue",
+            "position": { "row": 0, "col": 0, "width": 3, "height": 1 },
+            "refreshInterval": 60
+          },
+          {
+            "widgetId": "widget-engagement-001",
+            "widgetType": "chart_line",
+            "title": "Engagement Trend",
+            "dataSource": "engagement",
+            "position": { "row": 1, "col": 0, "width": 6, "height": 2 },
+            "filters": { "timeRange": "last_7_days" }
+          }
+        ],
+        "createdAt": "2025-01-01T00:00:00Z",
+        "updatedAt": "2025-01-15T12:00:00Z"
+      }
+    ],
+    "invalid": [
+      {
+        "_description": "Missing required consoleId",
+        "version": "1.0.0",
+        "operator": {
+          "operatorId": "op-001",
+          "role": "operator"
+        }
+      },
+      {
+        "_description": "Invalid console ID pattern",
+        "consoleId": "invalid_console_id",
+        "version": "1.0.0",
+        "operator": {
+          "operatorId": "op-001",
+          "role": "operator"
+        }
+      },
+      {
+        "_description": "Invalid operator role",
+        "consoleId": "console-test-001",
+        "version": "1.0.0",
+        "operator": {
+          "operatorId": "op-001",
+          "role": "invalid_role"
+        }
+      }
+    ]
+  },
+  "dashboards": {
+    "valid": [
+      {
+        "dashboardId": "dash-overview-001",
+        "name": "Main Overview Dashboard",
+        "type": "overview",
+        "scope": {
+          "franchiseIds": ["kenya-001", "ethiopia-001"],
+          "regions": ["africa-east"],
+          "languages": ["en", "sw", "am"],
+          "dateRange": {
+            "preset": "last_30_days"
+          }
+        },
+        "sections": [
+          {
+            "sectionId": "section-kpis",
+            "title": "Key Metrics",
+            "collapsed": false,
+            "columns": 4,
+            "widgets": ["widget-revenue", "widget-franchises", "widget-qc", "widget-engagement"]
+          }
+        ],
+        "kpis": [
+          {
+            "kpiId": "kpi-revenue-001",
+            "title": "Total Revenue",
+            "metric": "total_revenue",
+            "value": 125000,
+            "previousValue": 115000,
+            "changePercent": 8.7,
+            "trend": "up",
+            "format": "currency",
+            "icon": "💰",
+            "color": "#10b981"
+          },
+          {
+            "kpiId": "kpi-engagement-001",
+            "title": "Engagement Rate",
+            "metric": "engagement_rate",
+            "value": 18.5,
+            "previousValue": 16.2,
+            "changePercent": 14.2,
+            "trend": "up",
+            "format": "percent",
+            "icon": "📈",
+            "color": "#3b82f6"
+          }
+        ],
+        "charts": [
+          {
+            "chartId": "chart-revenue-trend",
+            "title": "Revenue Trend",
+            "chartType": "line",
+            "dataSource": "revenue",
+            "dimensions": ["date"],
+            "measures": ["amount"],
+            "showLegend": true,
+            "showTooltip": true
+          }
+        ],
+        "tables": [
+          {
+            "tableId": "table-franchises",
+            "title": "Active Franchises",
+            "dataSource": "franchises",
+            "columns": [
+              { "field": "name", "header": "Franchise", "sortable": true },
+              { "field": "status", "header": "Status", "sortable": true },
+              { "field": "revenue", "header": "Revenue", "format": "currency" }
+            ],
+            "pagination": {
+              "enabled": true,
+              "pageSize": 10
+            }
+          }
+        ],
+        "alerts": {
+          "showSummary": true,
+          "maxItems": 5,
+          "severityFilter": ["warning", "critical"],
+          "autoRefresh": true
+        },
+        "refreshConfig": {
+          "autoRefresh": true,
+          "intervalSeconds": 60
+        },
+        "isDefault": true,
+        "isShared": true,
+        "createdBy": "op-kenya-001",
+        "createdAt": "2025-01-01T00:00:00Z",
+        "updatedAt": "2025-01-15T12:00:00Z"
+      },
+      {
+        "dashboardId": "dash-multilingual-001",
+        "name": "Multilingual QC Dashboard",
+        "type": "multilingual",
+        "scope": {
+          "languages": ["en", "sw", "am", "om"]
+        },
+        "kpis": [
+          {
+            "kpiId": "kpi-translation-001",
+            "title": "Translation Accuracy",
+            "metric": "translation_accuracy",
+            "value": 95.5,
+            "format": "percent"
+          },
+          {
+            "kpiId": "kpi-persona-001",
+            "title": "Persona Consistency",
+            "metric": "persona_consistency",
+            "value": 92.3,
+            "format": "percent"
+          }
+        ],
+        "isDefault": false,
+        "createdAt": "2025-01-05T00:00:00Z"
+      }
+    ],
+    "invalid": [
+      {
+        "_description": "Missing required dashboardId",
+        "name": "Test Dashboard",
+        "type": "overview"
+      },
+      {
+        "_description": "Invalid dashboard type",
+        "dashboardId": "dash-test-001",
+        "name": "Test Dashboard",
+        "type": "invalid_type"
+      }
+    ]
+  },
+  "panels": {
+    "languageSelection": {
+      "valid": {
+        "panelId": "panel-lang-001",
+        "panelType": "language_selection",
+        "title": "Language Selection",
+        "description": "Select and configure languages for your workspace",
+        "icon": "🌐",
+        "config": {
+          "searchEnabled": true,
+          "searchFields": ["code", "displayName", "nativeName"],
+          "multiSelect": true,
+          "showPrimarySecondary": true,
+          "showRegistryBrowser": true,
+          "previewEnabled": true,
+          "dynamicSwitchingEnabled": true,
+          "qcIntegration": {
+            "showQcStatus": true,
+            "showTranslationAccuracy": true,
+            "showPersonaConsistency": true,
+            "sideBySideComparison": true
+          },
+          "supportedLanguages": ["en", "fr", "es", "ar", "zh-CN", "it", "om", "am", "sw"]
+        },
+        "permissions": ["manage:languages"],
+        "enabled": true
+      }
+    },
+    "seriesWorkspace": {
+      "valid": {
+        "panelId": "panel-series-001",
+        "panelType": "series_workspace",
+        "title": "Series Workspace",
+        "description": "Manage multi-episode arcs and continuity",
+        "icon": "📺",
+        "config": {
+          "showEpisodeTimeline": true,
+          "showContinuityTracker": true,
+          "showPlotThreads": true,
+          "showPersonaProfiles": true,
+          "crossFormatQc": {
+            "enabled": true,
+            "personaConsistency": true,
+            "brandConsistency": true,
+            "voiceConsistency": true
+          },
+          "hybridPublishing": {
+            "enabled": true,
+            "showShortFormPanel": true,
+            "showSerializedPanel": true,
+            "crossPromotion": true
+          }
+        },
+        "permissions": ["manage:series"],
+        "enabled": true
+      }
+    },
+    "governanceConsole": {
+      "valid": {
+        "panelId": "panel-gov-001",
+        "panelType": "governance_console",
+        "title": "Governance Console",
+        "description": "Manage roles, policies, and audit trails",
+        "icon": "🛡️",
+        "config": {
+          "roleManagement": {
+            "enabled": true,
+            "showRoleAssignment": true,
+            "showRoleHistory": true
+          },
+          "policyManagement": {
+            "enabled": true,
+            "showPolicyList": true,
+            "showComplianceStatus": true
+          },
+          "auditTrailViewer": {
+            "enabled": true,
+            "maxEntries": 100,
+            "filters": ["category", "actor", "target", "timestamp"],
+            "exportEnabled": true
+          },
+          "mfaSettings": {
+            "showMfaStatus": true,
+            "enforcementRules": true
+          }
+        },
+        "permissions": ["manage:governance", "view:audit"],
+        "enabled": true
+      }
+    },
+    "marketplacePortal": {
+      "valid": {
+        "panelId": "panel-market-001",
+        "panelType": "marketplace_portal",
+        "title": "Contributor Marketplace",
+        "description": "Browse and manage contributor listings",
+        "icon": "🛒",
+        "config": {
+          "listingsView": {
+            "enabled": true,
+            "showGrid": true,
+            "showList": true,
+            "filters": ["category", "skill", "language", "rating"],
+            "sorting": ["relevance", "rating", "price"]
+          },
+          "onboardingWizard": {
+            "enabled": true,
+            "steps": ["profile", "skills", "portfolio", "verification", "agreement", "pricing"]
+          },
+          "revenueSplitConfig": {
+            "showSplitCalculator": true,
+            "showPayoutHistory": true,
+            "showProjectedEarnings": true
+          },
+          "qcBadges": {
+            "enabled": true,
+            "badgeTypes": ["verified", "top_rated", "multilingual", "qc_certified"]
+          }
+        },
+        "permissions": ["view:marketplace"],
+        "enabled": true
+      }
+    },
+    "partnerIntegration": {
+      "valid": {
+        "panelId": "panel-partner-001",
+        "panelType": "partner_integration",
+        "title": "Partner Integrations",
+        "description": "Manage API keys and partner connections",
+        "icon": "🤝",
+        "config": {
+          "apiKeyManagement": {
+            "enabled": true,
+            "showKeyList": true,
+            "showKeyRotation": true,
+            "showUsageMetrics": true
+          },
+          "complianceWorkflows": {
+            "enabled": true,
+            "showCertifications": true,
+            "showSlaStatus": true
+          },
+          "syndicationPreviews": {
+            "enabled": true,
+            "feedTypes": ["rss", "atom", "json", "mrss"]
+          },
+          "healthMonitoring": {
+            "enabled": true,
+            "showUptimeStatus": true,
+            "showLatencyMetrics": true,
+            "showErrorRates": true
+          }
+        },
+        "permissions": ["manage:partners"],
+        "enabled": true
+      }
+    },
+    "personalizationUI": {
+      "valid": {
+        "panelId": "panel-personal-001",
+        "panelType": "personalization_ui",
+        "title": "Personalization Controls",
+        "description": "Configure viewer personalization and recommendations",
+        "icon": "🎯",
+        "config": {
+          "viewerProfileSimulator": {
+            "enabled": true,
+            "editableFields": ["language", "region", "genre", "engagement_history"]
+          },
+          "adaptiveRenderingPreview": {
+            "enabled": true,
+            "showSubtitlePreview": true,
+            "showVoiceSelection": true,
+            "showTeaserGeneration": true
+          },
+          "qcEnforcementPanel": {
+            "enabled": true,
+            "showBrandContinuity": true,
+            "showPersonaContinuity": true,
+            "showCulturalSensitivity": true
+          },
+          "recommendationEngine": {
+            "showRecommendations": true,
+            "showConfidenceScores": true,
+            "showReasoning": true
+          }
+        },
+        "permissions": ["manage:personalization"],
+        "enabled": true
+      }
+    },
+    "monetizationControls": {
+      "valid": {
+        "panelId": "panel-monet-001",
+        "panelType": "monetization_controls",
+        "title": "Monetization Controls",
+        "description": "Manage pricing, tiers, and retention",
+        "icon": "💰",
+        "config": {
+          "tierManagement": {
+            "enabled": true,
+            "showTierList": true,
+            "showTierComparison": true,
+            "showSubscriberCounts": true
+          },
+          "pricingPreviews": {
+            "enabled": true,
+            "showRegionalPricing": true,
+            "showDynamicAdjustments": true,
+            "showPricingHistory": true
+          },
+          "retentionActions": {
+            "enabled": true,
+            "actionTypes": ["discount_offer", "tier_upgrade_prompt", "loyalty_reward"],
+            "showChurnRisk": true
+          },
+          "revenueAnalytics": {
+            "showRevenueTrends": true,
+            "showConversionFunnel": true,
+            "showRegionalBreakdown": true
+          }
+        },
+        "permissions": ["manage:monetization"],
+        "enabled": true
+      }
+    },
+    "insightsDashboard": {
+      "valid": {
+        "panelId": "panel-insights-001",
+        "panelType": "insights_dashboard",
+        "title": "Audience Insights",
+        "description": "View engagement, sentiment, and demographics",
+        "icon": "📈",
+        "config": {
+          "engagementCharts": {
+            "enabled": true,
+            "metrics": ["watch_time", "likes", "shares", "comments"],
+            "chartTypes": ["line", "bar", "area"]
+          },
+          "sentimentAnalysis": {
+            "enabled": true,
+            "showOverallSentiment": true,
+            "showCulturalReactions": true,
+            "showTrendChanges": true
+          },
+          "retentionCurves": {
+            "enabled": true,
+            "showDropOffPoints": true,
+            "showPeakMoments": true,
+            "showBingePatterns": true
+          },
+          "demographicBreakdowns": {
+            "enabled": true,
+            "dimensions": ["region", "age", "language", "device"]
+          }
+        },
+        "permissions": ["view:insights"],
+        "enabled": true
+      }
+    },
+    "feedbackLoop": {
+      "valid": {
+        "panelId": "panel-feedback-001",
+        "panelType": "feedback_loop",
+        "title": "Feedback Loops",
+        "description": "Monitor and configure feedback triggers",
+        "icon": "🔄",
+        "config": {
+          "notifications": {
+            "enabled": true,
+            "showRealTime": true,
+            "triggerTypes": ["engagement_threshold", "sentiment_change", "retention_drop", "churn_risk"]
+          },
+          "adjustmentLogs": {
+            "enabled": true,
+            "showPersonalizationAdjustments": true,
+            "showMonetizationAdjustments": true,
+            "showQcAlerts": true
+          },
+          "culturalSensitivityAlerts": {
+            "enabled": true,
+            "showAlertDetails": true,
+            "showResolutionSteps": true
+          },
+          "impactMetrics": {
+            "showBeforeAfter": true,
+            "showImprovementPercent": true
+          }
+        },
+        "permissions": ["view:feedback", "manage:feedback"],
+        "enabled": true
+      }
+    },
+    "qcDashboard": {
+      "valid": {
+        "panelId": "panel-qc-001",
+        "panelType": "qc_dashboard",
+        "title": "QC Dashboard",
+        "description": "Quality control status and actions",
+        "icon": "✅",
+        "config": {
+          "overallStatus": {
+            "showPassRate": true,
+            "showFailureBreakdown": true,
+            "showTrends": true
+          },
+          "perLanguageQc": {
+            "enabled": true,
+            "sideBySideView": true,
+            "showTranslationAccuracy": true,
+            "showPersonaConsistency": true
+          },
+          "perSeriesQc": {
+            "enabled": true,
+            "showContinuityChecks": true,
+            "showBrandConsistency": true
+          },
+          "actionItems": {
+            "showPendingReviews": true,
+            "showFailedItems": true,
+            "showResubmissions": true
+          }
+        },
+        "permissions": ["view:qc", "manage:qc"],
+        "enabled": true
+      }
+    }
+  },
+  "auditEvents": {
+    "uiEvents": [
+      {
+        "eventType": "console_accessed",
+        "category": "ui",
+        "actor": { "type": "operator", "id": "op-kenya-001" },
+        "target": { "type": "console", "id": "console-main-001" },
+        "timestamp": "2025-01-15T10:00:00Z",
+        "metadata": {
+          "context": { "franchise": "kenya-001", "language": "en" }
+        }
+      },
+      {
+        "eventType": "dashboard_viewed",
+        "category": "ui",
+        "actor": { "type": "operator", "id": "op-kenya-001" },
+        "target": { "type": "dashboard", "id": "dash-overview-001" },
+        "timestamp": "2025-01-15T10:05:00Z"
+      },
+      {
+        "eventType": "panel_accessed",
+        "category": "ui",
+        "actor": { "type": "operator", "id": "op-kenya-001" },
+        "target": { "type": "panel", "id": "panel-lang-001" },
+        "timestamp": "2025-01-15T10:10:00Z"
+      },
+      {
+        "eventType": "widget_configured",
+        "category": "ui",
+        "actor": { "type": "operator", "id": "op-kenya-001" },
+        "target": { "type": "widget", "id": "widget-revenue-001" },
+        "timestamp": "2025-01-15T10:15:00Z",
+        "metadata": {
+          "changes": { "refreshInterval": { "from": 60, "to": 30 } }
+        }
+      },
+      {
+        "eventType": "language_switched",
+        "category": "ui",
+        "actor": { "type": "operator", "id": "op-kenya-001" },
+        "target": { "type": "language", "id": "sw" },
+        "timestamp": "2025-01-15T10:20:00Z",
+        "metadata": {
+          "previousLanguage": "en"
+        }
+      }
+    ]
+  }
+}

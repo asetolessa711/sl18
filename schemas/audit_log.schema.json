@@ -179,13 +179,32 @@
         "upgrade_potential_detected",
         "binge_pattern_detected",
         "retention_drop_detected",
-        "regional_performance_alert"
+        "regional_performance_alert",
+        "console_accessed",
+        "console_configured",
+        "dashboard_viewed",
+        "dashboard_created",
+        "dashboard_updated",
+        "dashboard_deleted",
+        "panel_accessed",
+        "panel_configured",
+        "widget_added",
+        "widget_removed",
+        "widget_configured",
+        "language_switched",
+        "theme_changed",
+        "layout_changed",
+        "navigation_used",
+        "quick_action_triggered",
+        "search_performed",
+        "filter_applied",
+        "export_requested"
       ],
       "description": "Type of governance event"
     },
     "category": {
       "type": "string",
-      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace", "distribution", "syndication", "partner", "audience_insights", "feedback_loop"],
+      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace", "distribution", "syndication", "partner", "audience_insights", "feedback_loop", "ui"],
       "description": "Category of the audit event"
     },
     "actor": {
@@ -213,7 +232,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion", "distribution_channel", "syndication_feed", "partner_integration", "audience_insight", "feedback_loop", "engagement_metric", "sentiment_analysis", "retention_curve"],
+          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion", "distribution_channel", "syndication_feed", "partner_integration", "audience_insight", "feedback_loop", "engagement_metric", "sentiment_analysis", "retention_curve", "console", "dashboard", "panel", "widget"],
           "description": "Type of target entity"
         },
         "id": {
