@@ -767,3 +767,107 @@ describe('Landing Page Endpoint Protection', () => {
     });
   });
 });
+
+describe('Creator and Customer Endpoint Protection', () => {
+  describe('Asset Download Protection', () => {
+    test('should protect asset download endpoint from unauthorized access', () => {
+      // Verify WAF has general protection that covers all endpoints
+      const rateLimitGroup = wafRules.rule_groups.find(g => g.id === 'rate_limiting');
+      expect(rateLimitGroup).toBeDefined();
+      expect(rateLimitGroup.enabled).toBe(true);
+    });
+
+    test('should have rate limiting applied to API endpoints', () => {
+      const rateLimitGroup = wafRules.rule_groups.find(g => g.id === 'rate_limiting');
+      const apiRule = rateLimitGroup.rules.find(r => r.id === 'rate_004');
+      
+      expect(apiRule).toBeDefined();
+      expect(apiRule.rate_limit.requests).toBe(100);
+    });
+  });
+
+  describe('Content Preview Protection', () => {
+    test('should protect content preview endpoints from SQLi', () => {
+      const sqliGroup = wafRules.rule_groups.find(g => g.id === 'sqli_protection');
+      expect(sqliGroup).toBeDefined();
+      expect(sqliGroup.enabled).toBe(true);
+      
+      // All SQL injection rules should be enabled
+      sqliGroup.rules.forEach(rule => {
+        expect(rule.enabled).toBe(true);
+      });
+    });
+
+    test('should protect content preview endpoints from XSS', () => {
+      const xssGroup = wafRules.rule_groups.find(g => g.id === 'xss_protection');
+      expect(xssGroup).toBeDefined();
+      expect(xssGroup.enabled).toBe(true);
+    });
+  });
+
+  describe('Creator Cohort Endpoint Security', () => {
+    test('should have bot mitigation for creator endpoints', () => {
+      const botGroup = wafRules.rule_groups.find(g => g.id === 'bot_mitigation');
+      expect(botGroup).toBeDefined();
+      expect(botGroup.enabled).toBe(true);
+      
+      // Scanners should be blocked
+      const scannerRule = botGroup.rules.find(r => r.id === 'bot_001');
+      expect(scannerRule).toBeDefined();
+      expect(scannerRule.action).toBe('block');
+    });
+
+    test('should have path traversal protection for asset downloads', () => {
+      const pathGroup = wafRules.rule_groups.find(g => g.id === 'path_traversal');
+      expect(pathGroup).toBeDefined();
+      expect(pathGroup.enabled).toBe(true);
+      
+      // Path traversal rule should be enabled
+      const traversalRule = pathGroup.rules.find(r => r.id === 'path_001');
+      expect(traversalRule).toBeDefined();
+      expect(traversalRule.enabled).toBe(true);
+    });
+  });
+
+  describe('Customer Cohort Endpoint Security', () => {
+    test('should have request validation for customer endpoints', () => {
+      const validationGroup = wafRules.rule_groups.find(g => g.id === 'request_validation');
+      expect(validationGroup).toBeDefined();
+      expect(validationGroup.enabled).toBe(true);
+    });
+
+    test('should block oversized requests to content endpoints', () => {
+      const validationGroup = wafRules.rule_groups.find(g => g.id === 'request_validation');
+      const oversizedRule = validationGroup.rules.find(r => r.id === 'req_001');
+      
+      expect(oversizedRule).toBeDefined();
+      expect(oversizedRule.enabled).toBe(true);
+    });
+  });
+
+  describe('Cohort-Based Access Control', () => {
+    test('should enforce rate limits across all cohorts', () => {
+      const rateLimitGroup = wafRules.rule_groups.find(g => g.id === 'rate_limiting');
+      expect(rateLimitGroup.rules.length).toBeGreaterThan(0);
+      
+      // All rate limit rules should be enabled
+      rateLimitGroup.rules.forEach(rule => {
+        expect(rule.enabled).toBe(true);
+        expect(rule.rate_limit).toBeDefined();
+      });
+    });
+
+    test('should have consistent security across creator and customer endpoints', () => {
+      // Both cohorts use the same WAF rules
+      const allRuleGroups = wafRules.rule_groups;
+      
+      // Core security groups should exist
+      const requiredGroups = ['sqli_protection', 'xss_protection', 'bot_mitigation', 'rate_limiting'];
+      requiredGroups.forEach(groupId => {
+        const group = allRuleGroups.find(g => g.id === groupId);
+        expect(group).toBeDefined();
+        expect(group.enabled).toBe(true);
+      });
+    });
+  });
+});

@@ -17,7 +17,7 @@
     "cohort_id": {
       "type": "string",
       "description": "Target cohort for the invited user",
-      "enum": ["internal", "closed", "open"],
+      "enum": ["internal", "closed", "open", "creator", "customer"],
       "default": "closed"
     },
     "created_at": {

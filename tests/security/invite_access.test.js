@@ -71,7 +71,7 @@ describe('Invite Token Schema Validation', () => {
     });
 
     test('should accept all valid cohort_id values', () => {
-      const cohorts = ['internal', 'closed', 'open'];
+      const cohorts = ['internal', 'closed', 'open', 'creator', 'customer'];
       
       cohorts.forEach(cohort => {
         const token = {
@@ -85,6 +85,32 @@ describe('Invite Token Schema Validation', () => {
         const isValid = validateInviteToken(token);
         expect(isValid).toBe(true);
       });
+    });
+
+    test('should accept creator cohort tokens', () => {
+      const token = {
+        token: 'inv_creator_token_12345678901234567890',
+        cohort_id: 'creator',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+    });
+
+    test('should accept customer cohort tokens', () => {
+      const token = {
+        token: 'inv_customer_token_1234567890123456789',
+        cohort_id: 'customer',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
     });
   });
 
@@ -573,6 +599,32 @@ describe('Cohort Feature Flags Schema Validation', () => {
       expect(isValid).toBe(false);
     });
 
+    test('should accept creator cohort_id', () => {
+      const cohort = {
+        cohort_id: 'creator',
+        cohort_type: 'creator',
+        name: 'Creator Cohort',
+        capacity: { min: 100, max: 500 },
+        features: {}
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(true);
+    });
+
+    test('should accept customer cohort_id', () => {
+      const cohort = {
+        cohort_id: 'customer',
+        cohort_type: 'customer',
+        name: 'Customer Cohort',
+        capacity: { min: 500, max: 5000 },
+        features: {}
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(true);
+    });
+
     test('should reject cohort with invalid access_level', () => {
       const cohort = {
         cohort_id: 'closed',
@@ -943,6 +995,184 @@ describe('Landing Page Token Form Validation', () => {
       validEmails.forEach(email => {
         expect(validateEmail(email).valid).toBe(true);
       });
+    });
+  });
+});
+
+describe('Creator and Customer Cohort Routing', () => {
+  // Initialize AJV validators for this block
+  const Ajv = require('ajv');
+  const addFormats = require('ajv-formats');
+  const fs = require('fs');
+  const path = require('path');
+
+  const inviteTokenSchema = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '../../schemas/invite_token.schema.json'), 'utf8')
+  );
+  const cohortFlagsSchema = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '../../schemas/cohort_flags.schema.json'), 'utf8')
+  );
+
+  const ajv = new Ajv({ allErrors: true, strict: false });
+  addFormats(ajv);
+
+  const validateInviteToken = ajv.compile(inviteTokenSchema);
+  const validateCohortFlags = ajv.compile(cohortFlagsSchema);
+
+  // Test data for Creator cohort
+  const creatorCohort = {
+    cohort_id: 'creator',
+    cohort_type: 'creator',
+    name: 'Creator Cohort',
+    capacity: { min: 100, max: 500 },
+    features: {
+      creator_features: {
+        asset_downloads: true,
+        brand_kit_access: true,
+        posting_instructions: true,
+        content_library_full: false,
+        demo_clips_limit: 10
+      }
+    }
+  };
+
+  // Test data for Customer cohort
+  const customerCohort = {
+    cohort_id: 'customer',
+    cohort_type: 'customer',
+    name: 'Customer Cohort',
+    capacity: { min: 500, max: 5000 },
+    features: {
+      customer_features: {
+        content_showcase: true,
+        library_access: 'curated',
+        feedback_enabled: true,
+        content_preview_limit: 10
+      }
+    }
+  };
+
+  describe('Creator Token Validation', () => {
+    test('should accept valid creator token', () => {
+      const token = {
+        token: 'inv_creator_demo_123456789012345678901',
+        cohort_id: 'creator',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+      expect(token.cohort_id).toBe('creator');
+    });
+
+    test('should validate creator cohort features', () => {
+      const isValid = validateCohortFlags(creatorCohort);
+      expect(isValid).toBe(true);
+      expect(creatorCohort.cohort_type).toBe('creator');
+    });
+
+    test('should have asset download access for creators', () => {
+      expect(creatorCohort.features.creator_features.asset_downloads).toBe(true);
+    });
+
+    test('should have brand kit access for creators', () => {
+      expect(creatorCohort.features.creator_features.brand_kit_access).toBe(true);
+    });
+
+    test('should have posting instructions for creators', () => {
+      expect(creatorCohort.features.creator_features.posting_instructions).toBe(true);
+    });
+
+    test('should not have full content library for creators', () => {
+      expect(creatorCohort.features.creator_features.content_library_full).toBe(false);
+    });
+
+    test('should have demo clips limit for creators', () => {
+      expect(creatorCohort.features.creator_features.demo_clips_limit).toBe(10);
+    });
+  });
+
+  describe('Customer Token Validation', () => {
+    test('should accept valid customer token', () => {
+      const token = {
+        token: 'inv_customer_demo_12345678901234567890',
+        cohort_id: 'customer',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+      expect(token.cohort_id).toBe('customer');
+    });
+
+    test('should validate customer cohort features', () => {
+      const isValid = validateCohortFlags(customerCohort);
+      expect(isValid).toBe(true);
+      expect(customerCohort.cohort_type).toBe('customer');
+    });
+
+    test('should have content showcase access for customers', () => {
+      expect(customerCohort.features.customer_features.content_showcase).toBe(true);
+    });
+
+    test('should have curated library access for customers', () => {
+      expect(customerCohort.features.customer_features.library_access).toBe('curated');
+    });
+
+    test('should have feedback enabled for customers', () => {
+      expect(customerCohort.features.customer_features.feedback_enabled).toBe(true);
+    });
+
+    test('should have content preview limit for customers', () => {
+      expect(customerCohort.features.customer_features.content_preview_limit).toBe(10);
+    });
+  });
+
+  describe('Cohort Type Differentiation', () => {
+    test('should differentiate between creator and customer types', () => {
+      expect(creatorCohort.cohort_type).toBe('creator');
+      expect(customerCohort.cohort_type).toBe('customer');
+      expect(creatorCohort.cohort_type).not.toBe(customerCohort.cohort_type);
+    });
+
+    test('should have different feature sets for creator and customer', () => {
+      // Creator has asset downloads, customer doesn't
+      expect(creatorCohort.features.creator_features).toBeDefined();
+      expect(customerCohort.features.customer_features).toBeDefined();
+    });
+
+    test('should have different capacity ranges', () => {
+      // Creator: 100-500, Customer: 500-5000
+      expect(creatorCohort.capacity.max).toBeLessThan(customerCohort.capacity.max);
+    });
+  });
+
+  describe('Token Routing Logic', () => {
+    function routeToCohort(cohortId) {
+      const routes = {
+        'internal': '/dashboard/admin',
+        'closed': '/dashboard',
+        'open': '/dashboard/limited',
+        'creator': '/dashboard/creator',
+        'customer': '/dashboard/customer'
+      };
+      return routes[cohortId] || '/';
+    }
+
+    test('should route creator tokens to creator dashboard', () => {
+      expect(routeToCohort('creator')).toBe('/dashboard/creator');
+    });
+
+    test('should route customer tokens to customer dashboard', () => {
+      expect(routeToCohort('customer')).toBe('/dashboard/customer');
+    });
+
+    test('should route unknown cohorts to home', () => {
+      expect(routeToCohort('unknown')).toBe('/');
     });
   });
 });

@@ -28,6 +28,7 @@
       name: 'Internal',
       icon: '👑',
       description: 'Full access to all features including debug tools and admin panel.',
+      cohort_type: 'general',
       capacity: { min: 50, max: 100 },
       access_level: 'full',
       features: {
@@ -50,6 +51,7 @@
       name: 'Closed Beta',
       icon: '⭐',
       description: 'Standard access with core features and API access.',
+      cohort_type: 'general',
       capacity: { min: 500, max: 1000 },
       access_level: 'standard',
       features: {
@@ -72,6 +74,7 @@
       name: 'Open Beta',
       icon: '🌟',
       description: 'Limited access to core features.',
+      cohort_type: 'general',
       capacity: { min: 10000, max: 25000 },
       access_level: 'limited',
       features: {
@@ -84,6 +87,63 @@
         advanced_analytics: false,
         debug_mode: false,
         admin_panel: false
+      },
+      limits: {
+        api_requests_per_day: 1000,
+        storage_mb: 100
+      }
+    },
+    creator: {
+      name: 'Creator Cohort',
+      icon: '🎥',
+      description: 'Social media post creators with access to demo clips, brand kit, and posting guidelines.',
+      cohort_type: 'creator',
+      capacity: { min: 100, max: 500 },
+      access_level: 'standard',
+      features: {
+        dashboard_access: true,
+        api_access: false,
+        export_data: true,
+        integrations: false,
+        new_ui: true,
+        ai_assistant: false,
+        advanced_analytics: false,
+        debug_mode: false,
+        admin_panel: false,
+        // Creator-specific features
+        asset_downloads: true,
+        brand_kit_access: true,
+        posting_instructions: true,
+        content_library_full: false,
+        demo_clips_limit: 10
+      },
+      limits: {
+        api_requests_per_day: 5000,
+        storage_mb: 500
+      }
+    },
+    customer: {
+      name: 'Customer Cohort',
+      icon: '👤',
+      description: 'Content consumers with access to content showcase, samples, and feedback options.',
+      cohort_type: 'customer',
+      capacity: { min: 500, max: 5000 },
+      access_level: 'limited',
+      features: {
+        dashboard_access: true,
+        api_access: false,
+        export_data: false,
+        integrations: false,
+        new_ui: true,
+        ai_assistant: false,
+        advanced_analytics: false,
+        debug_mode: false,
+        admin_panel: false,
+        // Customer-specific features
+        content_showcase: true,
+        library_access: 'curated',
+        feedback_enabled: true,
+        content_preview_limit: 10
       },
       limits: {
         api_requests_per_day: 1000,
@@ -187,7 +247,9 @@
         const demoTokens = {
           'inv_internal_demo_12345678901234567890': { cohort_id: 'internal', valid: true },
           'inv_closed_beta_demo_123456789012345678': { cohort_id: 'closed', valid: true },
-          'inv_open_beta_demo_1234567890123456789a': { cohort_id: 'open', valid: true }
+          'inv_open_beta_demo_1234567890123456789a': { cohort_id: 'open', valid: true },
+          'inv_creator_demo_123456789012345678901': { cohort_id: 'creator', valid: true },
+          'inv_customer_demo_12345678901234567890': { cohort_id: 'customer', valid: true }
         };
 
         if (demoTokens[token]) {
@@ -328,13 +390,42 @@
     }
 
     if (features) {
-      const featureList = Object.entries(cohort.features)
-        .map(([key, enabled]) => {
-          const name = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-          const icon = enabled ? '✅' : '❌';
-          return `<li>${icon} ${name}</li>`;
-        })
-        .join('');
+      // Determine which features to display based on cohort type
+      let featureList = '';
+      
+      if (cohort.cohort_type === 'creator') {
+        // Show creator-specific features
+        featureList = `
+          <li>✅ Dashboard Access</li>
+          <li>${cohort.features.asset_downloads ? '✅' : '❌'} Asset Downloads</li>
+          <li>${cohort.features.brand_kit_access ? '✅' : '❌'} Brand Kit Access</li>
+          <li>${cohort.features.posting_instructions ? '✅' : '❌'} Posting Instructions</li>
+          <li>${cohort.features.export_data ? '✅' : '❌'} Data Export</li>
+          <li>${cohort.features.content_library_full ? '✅' : '❌'} Full Content Library</li>
+          <li>📊 ${cohort.features.demo_clips_limit || 0} Demo Clips Available</li>
+        `;
+      } else if (cohort.cohort_type === 'customer') {
+        // Show customer-specific features
+        featureList = `
+          <li>✅ Dashboard Access</li>
+          <li>${cohort.features.content_showcase ? '✅' : '❌'} Content Showcase</li>
+          <li>📚 Library Access: ${cohort.features.library_access || 'none'}</li>
+          <li>${cohort.features.feedback_enabled ? '✅' : '❌'} Feedback Enabled</li>
+          <li>🎬 ${cohort.features.content_preview_limit || 0} Content Previews</li>
+        `;
+      } else {
+        // Show general features for internal/closed/open cohorts
+        featureList = Object.entries(cohort.features)
+          .filter(([key]) => !['asset_downloads', 'brand_kit_access', 'posting_instructions', 
+                              'content_library_full', 'demo_clips_limit', 'content_showcase',
+                              'library_access', 'feedback_enabled', 'content_preview_limit'].includes(key))
+          .map(([key, enabled]) => {
+            const name = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            const icon = enabled ? '✅' : '❌';
+            return `<li>${icon} ${name}</li>`;
+          })
+          .join('');
+      }
       
       features.innerHTML = `<ul>${featureList}</ul>`;
     }
@@ -342,7 +433,7 @@
     hideModal('tokenModal');
     showModal('cohortModal');
     
-    logEvent('cohort_assigned', { cohort_id: cohortId });
+    logEvent('cohort_assigned', { cohort_id: cohortId, cohort_type: cohort.cohort_type });
   }
 
   /**

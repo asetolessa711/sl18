@@ -9,7 +9,13 @@
     "cohort_id": {
       "type": "string",
       "description": "Unique identifier for the cohort",
-      "enum": ["internal", "closed", "open"]
+      "enum": ["internal", "closed", "open", "creator", "customer"]
+    },
+    "cohort_type": {
+      "type": "string",
+      "description": "Type of cohort - creator (social media post creators) or customer (content consumers)",
+      "enum": ["creator", "customer", "general"],
+      "default": "general"
     },
     "name": {
       "type": "string",
@@ -172,6 +178,68 @@
             }
           },
           "additionalProperties": true
+        },
+        "creator_features": {
+          "type": "object",
+          "description": "Features specific to Creator cohort (social media post creators)",
+          "properties": {
+            "asset_downloads": {
+              "type": "boolean",
+              "description": "Access to downloadable demo clips and teasers",
+              "default": false
+            },
+            "brand_kit_access": {
+              "type": "boolean",
+              "description": "Access to brand kit (logos, hashtags, social guidelines)",
+              "default": false
+            },
+            "posting_instructions": {
+              "type": "boolean",
+              "description": "Access to posting instructions and guidelines",
+              "default": false
+            },
+            "content_library_full": {
+              "type": "boolean",
+              "description": "Full access to content library",
+              "default": false
+            },
+            "demo_clips_limit": {
+              "type": "integer",
+              "description": "Number of demo clips available for download",
+              "minimum": 0,
+              "default": 5
+            }
+          },
+          "additionalProperties": true
+        },
+        "customer_features": {
+          "type": "object",
+          "description": "Features specific to Customer cohort (content consumers)",
+          "properties": {
+            "content_showcase": {
+              "type": "boolean",
+              "description": "Access to content showcase (pilot episodes, samples)",
+              "default": false
+            },
+            "library_access": {
+              "type": "string",
+              "description": "Level of content library access",
+              "enum": ["none", "teaser", "curated", "full"],
+              "default": "none"
+            },
+            "feedback_enabled": {
+              "type": "boolean",
+              "description": "Can submit feedback on content",
+              "default": true
+            },
+            "content_preview_limit": {
+              "type": "integer",
+              "description": "Number of content previews available",
+              "minimum": 0,
+              "default": 3
+            }
+          },
+          "additionalProperties": true
         }
       },
       "additionalProperties": true
@@ -203,7 +271,7 @@
         "promotion_target": {
           "type": ["string", "null"],
           "description": "Target cohort for auto-promotion",
-          "enum": ["internal", "closed", "open", null]
+          "enum": ["internal", "closed", "open", "creator", "customer", null]
         }
       },
       "additionalProperties": false
@@ -455,6 +523,154 @@
         "release_notes": true,
         "maintenance_alerts": true,
         "feature_announcements": false,
+        "survey_reminders": false
+      },
+      "created_at": "2025-11-28T12:00:00Z",
+      "updated_at": "2025-11-28T12:00:00Z",
+      "active": true
+    },
+    {
+      "cohort_id": "creator",
+      "cohort_type": "creator",
+      "name": "Creator Cohort",
+      "description": "Social media post creators with access to demo clips, brand kit, and posting guidelines",
+      "capacity": {
+        "min": 100,
+        "max": 500,
+        "current": 0,
+        "waitlist": 50
+      },
+      "access_level": "standard",
+      "features": {
+        "core_features": {
+          "dashboard_access": true,
+          "api_access": false,
+          "export_data": true,
+          "integrations": false
+        },
+        "beta_features": {
+          "new_ui": true,
+          "ai_assistant": false,
+          "advanced_analytics": false,
+          "collaborative_editing": false
+        },
+        "debug_features": {
+          "debug_mode": false,
+          "feature_preview": false,
+          "admin_panel": false,
+          "impersonation": false
+        },
+        "limits": {
+          "api_requests_per_day": 5000,
+          "storage_mb": 500,
+          "projects_max": 10,
+          "team_members_max": 0
+        },
+        "creator_features": {
+          "asset_downloads": true,
+          "brand_kit_access": true,
+          "posting_instructions": true,
+          "content_library_full": false,
+          "demo_clips_limit": 10
+        },
+        "customer_features": {
+          "content_showcase": false,
+          "library_access": "none",
+          "feedback_enabled": true,
+          "content_preview_limit": 0
+        }
+      },
+      "enrollment": {
+        "open": false,
+        "requires_invite": true,
+        "requires_approval": false,
+        "auto_promote": false,
+        "promotion_target": null
+      },
+      "feedback": {
+        "surveys_enabled": true,
+        "bug_reports_enabled": true,
+        "feature_requests_enabled": true,
+        "nps_frequency_days": 14
+      },
+      "notifications": {
+        "release_notes": true,
+        "maintenance_alerts": true,
+        "feature_announcements": true,
+        "survey_reminders": true
+      },
+      "created_at": "2025-11-28T12:00:00Z",
+      "updated_at": "2025-11-28T12:00:00Z",
+      "active": true
+    },
+    {
+      "cohort_id": "customer",
+      "cohort_type": "customer",
+      "name": "Customer Cohort",
+      "description": "Content consumers with access to content showcase, samples, and feedback options",
+      "capacity": {
+        "min": 500,
+        "max": 5000,
+        "current": 0,
+        "waitlist": 200
+      },
+      "access_level": "limited",
+      "features": {
+        "core_features": {
+          "dashboard_access": true,
+          "api_access": false,
+          "export_data": false,
+          "integrations": false
+        },
+        "beta_features": {
+          "new_ui": true,
+          "ai_assistant": false,
+          "advanced_analytics": false,
+          "collaborative_editing": false
+        },
+        "debug_features": {
+          "debug_mode": false,
+          "feature_preview": false,
+          "admin_panel": false,
+          "impersonation": false
+        },
+        "limits": {
+          "api_requests_per_day": 1000,
+          "storage_mb": 100,
+          "projects_max": 3,
+          "team_members_max": 0
+        },
+        "creator_features": {
+          "asset_downloads": false,
+          "brand_kit_access": false,
+          "posting_instructions": false,
+          "content_library_full": false,
+          "demo_clips_limit": 0
+        },
+        "customer_features": {
+          "content_showcase": true,
+          "library_access": "curated",
+          "feedback_enabled": true,
+          "content_preview_limit": 10
+        }
+      },
+      "enrollment": {
+        "open": false,
+        "requires_invite": true,
+        "requires_approval": false,
+        "auto_promote": false,
+        "promotion_target": null
+      },
+      "feedback": {
+        "surveys_enabled": true,
+        "bug_reports_enabled": true,
+        "feature_requests_enabled": false,
+        "nps_frequency_days": 21
+      },
+      "notifications": {
+        "release_notes": true,
+        "maintenance_alerts": true,
+        "feature_announcements": true,
         "survey_reminders": false
       },
       "created_at": "2025-11-28T12:00:00Z",

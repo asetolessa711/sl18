@@ -111,6 +111,8 @@ For testing purposes only, the following demo tokens are available:
 | `inv_internal_demo_12345678901234567890` | Internal | Full |
 | `inv_closed_beta_demo_123456789012345678` | Closed | Standard |
 | `inv_open_beta_demo_1234567890123456789a` | Open | Limited |
+| `inv_creator_demo_123456789012345678901` | Creator | Standard (Creator) |
+| `inv_customer_demo_12345678901234567890` | Customer | Limited (Customer) |
 
 > ⚠️ **Note**: Demo tokens are for testing the landing page flow only and do not grant actual beta access.
 
@@ -149,7 +151,7 @@ Access to the beta environment requires a valid invite token. Here's how the sys
 
 ## Cohort Tiers
 
-Beta testers are organized into three cohorts with different access levels:
+Beta testers are organized into five cohorts with different access levels:
 
 ### Internal (50-100 users)
 - **Who**: Internal team and stakeholders
@@ -169,17 +171,117 @@ Beta testers are organized into three cohorts with different access levels:
 - **Features**: Core features only
 - **Limits**: 1,000 API requests/day, 100MB storage
 
+### Creator Cohort (100-500 users) 🎥
+- **Who**: Social media post creators and influencers
+- **Access Level**: Standard
+- **Type**: Content Creator
+- **Features**: 
+  - Downloadable demo clips (up to 10)
+  - Brand kit access (logos, hashtags)
+  - Posting instructions and guidelines
+  - Data export for metrics tracking
+- **Limits**: 5,000 API requests/day, 500MB storage
+- **Purpose**: Help spread the word about Waliin Studio on social media
+- **Guidelines**: Use #WaliinBeta #SL18Launch #WaliinStudio when posting
+
+### Customer Cohort (500-5,000 users) 👤
+- **Who**: Content consumers and early adopters
+- **Access Level**: Limited
+- **Type**: Content Consumer
+- **Features**:
+  - Content showcase (pilot episodes, samples)
+  - Library access (curated content based on tier)
+  - Feedback submission
+  - Up to 10 content previews
+- **Limits**: 1,000 API requests/day, 100MB storage
+- **Purpose**: Preview and provide feedback on content library
+
 ### Feature Availability by Cohort
 
-| Feature | Internal | Closed | Open |
-|---------|:--------:|:------:|:----:|
-| Dashboard Access | ✅ | ✅ | ✅ |
-| API Access | ✅ | ✅ | ❌ |
-| Data Export | ✅ | ✅ | ❌ |
-| Integrations | ✅ | ❌ | ❌ |
-| AI Assistant | ✅ | ✅ | ❌ |
-| Debug Mode | ✅ | ❌ | ❌ |
-| Admin Panel | ✅ | ❌ | ❌ |
+| Feature | Internal | Closed | Open | Creator | Customer |
+|---------|:--------:|:------:|:----:|:-------:|:--------:|
+| Dashboard Access | ✅ | ✅ | ✅ | ✅ | ✅ |
+| API Access | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Data Export | ✅ | ✅ | ❌ | ✅ | ❌ |
+| Integrations | ✅ | ❌ | ❌ | ❌ | ❌ |
+| AI Assistant | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Debug Mode | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Admin Panel | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Asset Downloads | ✅ | ❌ | ❌ | ✅ | ❌ |
+| Brand Kit | ✅ | ❌ | ❌ | ✅ | ❌ |
+| Content Showcase | ✅ | ✅ | Limited | ❌ | ✅ |
+| Feedback | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+### Content Library Access by Cohort
+
+| Cohort | Library Access Level |
+|--------|---------------------|
+| Internal | Full library |
+| Closed | Curated set |
+| Open | Teaser content only |
+| Creator | Demo clips only |
+| Customer | Curated set (Closed tier) / Teaser (Open tier) |
+
+---
+
+## Creator Cohort Guidelines
+
+### Getting Started as a Creator
+
+1. Apply for Creator access: email `creators@waliinstudio.com` with your social media handles
+2. Receive your Creator invite token
+3. Access the Creator section of the landing page
+4. Download demo clips and brand kit assets
+5. Start posting with the required hashtags
+
+### Available Creator Assets
+
+| Asset Type | Description | Download |
+|------------|-------------|----------|
+| Demo Clips | Short teasers and trailers for social sharing | Up to 10 clips |
+| Brand Kit | Logos, hashtags, and social guidelines | Full kit |
+| Posting Instructions | Guidelines for effective posts | PDF guide |
+
+### Hashtag Requirements
+
+When posting about Waliin Studio, always include:
+- **Primary**: #WaliinBeta
+- **Launch**: #SL18Launch
+- **Brand**: #WaliinStudio
+
+### Creator Restrictions
+
+- ❌ No access to full content library (demo clips only)
+- ❌ Cannot modify or redistribute assets without permission
+- ❌ Must follow brand guidelines for all posts
+- ✅ May use demo clips in original content
+
+---
+
+## Customer Cohort Guidelines
+
+### Getting Started as a Customer
+
+1. Receive your Customer invite token
+2. Access the Customer section of the landing page
+3. Browse the content showcase
+4. Provide feedback on content you preview
+5. Report any issues via the feedback form
+
+### Available Content
+
+| Content Type | Description | Access |
+|--------------|-------------|--------|
+| Short Drama Pilot | First episode of drama series | Preview |
+| Music Samples | Original tracks from library | 3 samples |
+| Comedy Clips | Short-form comedy content | 5 clips |
+
+### Customer Restrictions
+
+- ❌ No asset downloads (content viewing only)
+- ❌ No brand kit access
+- ❌ Library access depends on tier level
+- ✅ Full feedback and reporting capabilities
 
 ---
 
