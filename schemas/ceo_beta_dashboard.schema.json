@@ -1,0 +1,996 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CEOBetaDashboard",
+  "description": "Schema for CEO Beta Rollout Dashboard Blueprint - command center for monitoring Phase 33 Beta rollout with 8 dashboard sections and daily usage flow",
+  "type": "object",
+  "properties": {
+    "dashboardId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^ceo-dashboard-[a-z0-9-]+$",
+      "description": "Unique dashboard identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "dashboardName": {
+      "type": "string",
+      "description": "Human-readable dashboard name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Dashboard purpose and scope"
+    },
+    "sections": {
+      "type": "object",
+      "description": "Dashboard sections organized by functional area",
+      "properties": {
+        "cohortOverview": {
+          "type": "object",
+          "description": "Section 1: Cohort Overview - Active users, regional distribution, engagement",
+          "properties": {
+            "sectionId": { "type": "string", "default": "section-cohort-overview" },
+            "name": { "type": "string", "default": "Cohort Overview" },
+            "order": { "type": "integer", "default": 1 },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "metricId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "unit": { "type": "string" },
+                  "dataSource": { "type": "string" },
+                  "refreshInterval": {
+                    "type": "string",
+                    "enum": ["real_time", "5_minutes", "15_minutes", "hourly", "daily"]
+                  }
+                },
+                "required": ["metricId", "name", "dataSource"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "metricId": "cohort-users-internal", "name": "Internal Beta Users", "description": "Active users in internal beta", "unit": "users", "dataSource": "cohort_analytics", "refreshInterval": "real_time" },
+                { "metricId": "cohort-users-closed", "name": "Closed Beta Users", "description": "Active users in closed beta", "unit": "users", "dataSource": "cohort_analytics", "refreshInterval": "real_time" },
+                { "metricId": "cohort-users-open", "name": "Open Beta Users", "description": "Active users in open beta", "unit": "users", "dataSource": "cohort_analytics", "refreshInterval": "real_time" },
+                { "metricId": "cohort-regional-distribution", "name": "Regional Distribution", "description": "User distribution by region", "unit": "percent", "dataSource": "geo_analytics", "refreshInterval": "hourly" },
+                { "metricId": "cohort-engagement-rate", "name": "Engagement Rate", "description": "Overall engagement rate across cohorts", "unit": "percent", "dataSource": "engagement_analytics", "refreshInterval": "15_minutes" }
+              ]
+            },
+            "visuals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "visualId": { "type": "string" },
+                  "type": {
+                    "type": "string",
+                    "enum": ["timeline_bar", "heatmap", "pie_chart", "bar_chart", "line_chart", "gauge", "kpi_card", "table", "funnel"]
+                  },
+                  "title": { "type": "string" },
+                  "dataSource": { "type": "string" }
+                },
+                "required": ["visualId", "type", "title"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "visualId": "cohort-timeline", "type": "timeline_bar", "title": "Cohort Phase Timeline", "dataSource": "cohort_phases" },
+                { "visualId": "cohort-heatmap", "type": "heatmap", "title": "Geographic User Heatmap", "dataSource": "geo_analytics" }
+              ]
+            },
+            "alerts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "alertId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "condition": { "type": "string" },
+                  "threshold": { "type": "number" },
+                  "severity": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["alertId", "name", "condition"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "alertId": "cohort-threshold-exceeded", "name": "Cohort Threshold Exceeded", "condition": "open_beta_users > 10000", "threshold": 10000, "severity": "high" },
+                { "alertId": "cohort-engagement-drop", "name": "Engagement Rate Drop", "condition": "engagement_rate < 20", "threshold": 20, "severity": "medium" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "audienceFlows": {
+          "type": "object",
+          "description": "Section 2: Audience Flows - Signup, personalization, conversions",
+          "properties": {
+            "sectionId": { "type": "string", "default": "section-audience-flows" },
+            "name": { "type": "string", "default": "Audience Flows" },
+            "order": { "type": "integer", "default": 2 },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "metricId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "unit": { "type": "string" },
+                  "dataSource": { "type": "string" },
+                  "refreshInterval": {
+                    "type": "string",
+                    "enum": ["real_time", "5_minutes", "15_minutes", "hourly", "daily"]
+                  }
+                },
+                "required": ["metricId", "name", "dataSource"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "metricId": "signup-success-rate", "name": "Signup Success Rate", "description": "Percentage of successful signups", "unit": "percent", "dataSource": "auth_analytics", "refreshInterval": "15_minutes" },
+                { "metricId": "personalization-accuracy", "name": "Personalization Accuracy", "description": "Accuracy of personalized recommendations", "unit": "percent", "dataSource": "personalization_engine", "refreshInterval": "hourly" },
+                { "metricId": "subscription-conversions", "name": "Subscription Conversions", "description": "Free to paid tier conversions", "unit": "count", "dataSource": "monetization_analytics", "refreshInterval": "15_minutes" },
+                { "metricId": "funnel-drop-rate", "name": "Funnel Drop Rate", "description": "Drop-off rate at each funnel stage", "unit": "percent", "dataSource": "funnel_analytics", "refreshInterval": "hourly" }
+              ]
+            },
+            "visuals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "visualId": { "type": "string" },
+                  "type": {
+                    "type": "string",
+                    "enum": ["funnel", "bar_chart", "line_chart", "kpi_card", "table"]
+                  },
+                  "title": { "type": "string" },
+                  "dataSource": { "type": "string" }
+                },
+                "required": ["visualId", "type", "title"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "visualId": "audience-funnel", "type": "funnel", "title": "Signup → Watch → Engage → Convert", "dataSource": "funnel_analytics" },
+                { "visualId": "conversion-trend", "type": "line_chart", "title": "Conversion Trend (7d)", "dataSource": "monetization_analytics" }
+              ]
+            },
+            "alerts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "alertId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "condition": { "type": "string" },
+                  "threshold": { "type": "number" },
+                  "severity": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["alertId", "name", "condition"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "alertId": "funnel-conversion-drop", "name": "Funnel Conversion Drop", "condition": "conversion_drop > 15", "threshold": 15, "severity": "high" },
+                { "alertId": "signup-failure-spike", "name": "Signup Failure Spike", "condition": "signup_failure_rate > 5", "threshold": 5, "severity": "critical" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "creatorFlows": {
+          "type": "object",
+          "description": "Section 3: Creator Flows - Upload, sync, revenue attribution",
+          "properties": {
+            "sectionId": { "type": "string", "default": "section-creator-flows" },
+            "name": { "type": "string", "default": "Creator Flows" },
+            "order": { "type": "integer", "default": 3 },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "metricId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "unit": { "type": "string" },
+                  "dataSource": { "type": "string" },
+                  "refreshInterval": {
+                    "type": "string",
+                    "enum": ["real_time", "5_minutes", "15_minutes", "hourly", "daily"]
+                  }
+                },
+                "required": ["metricId", "name", "dataSource"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "metricId": "upload-success-rate", "name": "Upload Success Rate", "description": "Percentage of successful uploads", "unit": "percent", "dataSource": "ingest_pipeline", "refreshInterval": "15_minutes" },
+                { "metricId": "cross-platform-sync", "name": "Cross-Platform Sync Completion", "description": "Successful sync to YouTube, TikTok, etc.", "unit": "percent", "dataSource": "distribution_connectors", "refreshInterval": "hourly" },
+                { "metricId": "revenue-attribution-accuracy", "name": "Revenue Attribution Accuracy", "description": "Accuracy of revenue attribution to creators", "unit": "percent", "dataSource": "monetization_analytics", "refreshInterval": "daily" },
+                { "metricId": "pending-uploads", "name": "Pending Uploads", "description": "Uploads in processing queue", "unit": "count", "dataSource": "ingest_pipeline", "refreshInterval": "real_time" }
+              ]
+            },
+            "visuals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "visualId": { "type": "string" },
+                  "type": {
+                    "type": "string",
+                    "enum": ["status_board", "bar_chart", "line_chart", "kpi_card", "table"]
+                  },
+                  "title": { "type": "string" },
+                  "dataSource": { "type": "string" }
+                },
+                "required": ["visualId", "type", "title"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "visualId": "publishing-pipeline", "type": "status_board", "title": "Publishing Pipeline Status", "dataSource": "distribution_connectors" },
+                { "visualId": "sync-success-chart", "type": "bar_chart", "title": "Sync Success by Platform", "dataSource": "distribution_connectors" }
+              ]
+            },
+            "alerts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "alertId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "condition": { "type": "string" },
+                  "threshold": { "type": "number" },
+                  "severity": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["alertId", "name", "condition"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "alertId": "sync-failure", "name": "Cross-Platform Sync Failure", "condition": "sync_failure_count > 10", "threshold": 10, "severity": "high" },
+                { "alertId": "revenue-mismatch", "name": "Revenue Attribution Mismatch", "condition": "revenue_mismatch > 5", "threshold": 5, "severity": "critical" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "monetization": {
+          "type": "object",
+          "description": "Section 4: Monetization - Subscription revenue, ad RPM/CPM, fan funding",
+          "properties": {
+            "sectionId": { "type": "string", "default": "section-monetization" },
+            "name": { "type": "string", "default": "Monetization" },
+            "order": { "type": "integer", "default": 4 },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "metricId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "unit": { "type": "string" },
+                  "dataSource": { "type": "string" },
+                  "refreshInterval": {
+                    "type": "string",
+                    "enum": ["real_time", "5_minutes", "15_minutes", "hourly", "daily"]
+                  }
+                },
+                "required": ["metricId", "name", "dataSource"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "metricId": "subscription-revenue-free", "name": "Free Tier Revenue", "description": "Revenue from free tier (ads)", "unit": "usd", "dataSource": "monetization_analytics", "refreshInterval": "hourly" },
+                { "metricId": "subscription-revenue-basic", "name": "Basic Tier Revenue", "description": "Revenue from basic subscriptions", "unit": "usd", "dataSource": "monetization_analytics", "refreshInterval": "hourly" },
+                { "metricId": "subscription-revenue-premium", "name": "Premium Tier Revenue", "description": "Revenue from premium subscriptions", "unit": "usd", "dataSource": "monetization_analytics", "refreshInterval": "hourly" },
+                { "metricId": "subscription-revenue-vip", "name": "VIP Tier Revenue", "description": "Revenue from VIP subscriptions", "unit": "usd", "dataSource": "monetization_analytics", "refreshInterval": "hourly" },
+                { "metricId": "ad-rpm-global", "name": "Global Ad RPM", "description": "Revenue per mille (ad)", "unit": "usd", "dataSource": "ad_analytics", "refreshInterval": "hourly" },
+                { "metricId": "ad-cpm-global", "name": "Global Ad CPM", "description": "Cost per mille (ad)", "unit": "usd", "dataSource": "ad_analytics", "refreshInterval": "hourly" },
+                { "metricId": "ad-rpm-by-region", "name": "Ad RPM by Region", "description": "RPM segmented by region", "unit": "usd", "dataSource": "ad_analytics", "refreshInterval": "daily" },
+                { "metricId": "fan-funding-total", "name": "Fan Funding Total", "description": "Total from Super Chat, gifts, etc.", "unit": "usd", "dataSource": "fan_funding_analytics", "refreshInterval": "hourly" }
+              ]
+            },
+            "visuals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "visualId": { "type": "string" },
+                  "type": {
+                    "type": "string",
+                    "enum": ["stacked_bar", "pie_chart", "line_chart", "kpi_card", "table", "heatmap"]
+                  },
+                  "title": { "type": "string" },
+                  "dataSource": { "type": "string" }
+                },
+                "required": ["visualId", "type", "title"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "visualId": "revenue-by-source", "type": "stacked_bar", "title": "Revenue by Source", "dataSource": "monetization_analytics" },
+                { "visualId": "rpm-heatmap", "type": "heatmap", "title": "RPM by Region", "dataSource": "ad_analytics" },
+                { "visualId": "tier-breakdown", "type": "pie_chart", "title": "Subscription Tier Breakdown", "dataSource": "subscription_analytics" }
+              ]
+            },
+            "alerts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "alertId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "condition": { "type": "string" },
+                  "threshold": { "type": "number" },
+                  "severity": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["alertId", "name", "condition"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "alertId": "payment-gateway-error", "name": "Payment Gateway Error", "condition": "payment_errors > 5", "threshold": 5, "severity": "critical" },
+                { "alertId": "rpm-drop", "name": "RPM Drop > 20%", "condition": "rpm_drop_percent > 20", "threshold": 20, "severity": "high" },
+                { "alertId": "churn-spike", "name": "Churn Rate Spike", "condition": "churn_rate > 5", "threshold": 5, "severity": "high" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "governance": {
+          "type": "object",
+          "description": "Section 5: Governance - Moderation, copyright, disclosures",
+          "properties": {
+            "sectionId": { "type": "string", "default": "section-governance" },
+            "name": { "type": "string", "default": "Governance" },
+            "order": { "type": "integer", "default": 5 },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "metricId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "unit": { "type": "string" },
+                  "dataSource": { "type": "string" },
+                  "refreshInterval": {
+                    "type": "string",
+                    "enum": ["real_time", "5_minutes", "15_minutes", "hourly", "daily"]
+                  }
+                },
+                "required": ["metricId", "name", "dataSource"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "metricId": "moderation-events", "name": "Moderation Events", "description": "Total moderation actions taken", "unit": "count", "dataSource": "governance_analytics", "refreshInterval": "real_time" },
+                { "metricId": "copyright-claims", "name": "Copyright Claims", "description": "Active copyright claims", "unit": "count", "dataSource": "copyright_system", "refreshInterval": "hourly" },
+                { "metricId": "disclosure-compliance", "name": "Disclosure Compliance Rate", "description": "Percentage of content with proper disclosures", "unit": "percent", "dataSource": "governance_analytics", "refreshInterval": "daily" },
+                { "metricId": "escalation-queue", "name": "Escalation Queue Size", "description": "Items pending escalation review", "unit": "count", "dataSource": "moderation_queue", "refreshInterval": "real_time" },
+                { "metricId": "cultural-sensitivity-flags", "name": "Cultural Sensitivity Flags", "description": "Content flagged for cultural review", "unit": "count", "dataSource": "cultural_qc", "refreshInterval": "hourly" }
+              ]
+            },
+            "visuals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "visualId": { "type": "string" },
+                  "type": {
+                    "type": "string",
+                    "enum": ["scorecard", "table", "line_chart", "bar_chart", "feed"]
+                  },
+                  "title": { "type": "string" },
+                  "dataSource": { "type": "string" }
+                },
+                "required": ["visualId", "type", "title"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "visualId": "compliance-scorecard", "type": "scorecard", "title": "Compliance Scorecard", "dataSource": "governance_analytics" },
+                { "visualId": "audit-log-feed", "type": "feed", "title": "Audit Log Feed", "dataSource": "audit_log" }
+              ]
+            },
+            "alerts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "alertId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "condition": { "type": "string" },
+                  "threshold": { "type": "number" },
+                  "severity": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["alertId", "name", "condition"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "alertId": "escalation-backlog", "name": "Escalation Queue Backlog", "condition": "escalation_queue > 50", "threshold": 50, "severity": "high" },
+                { "alertId": "copyright-claim-spike", "name": "Copyright Claim Spike", "condition": "copyright_claims > 10", "threshold": 10, "severity": "critical" },
+                { "alertId": "cultural-flag-spike", "name": "Cultural Sensitivity Flag Spike", "condition": "cultural_flags > 20", "threshold": 20, "severity": "high" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "analyticsAttribution": {
+          "type": "object",
+          "description": "Section 6: Analytics & Attribution - Funnel, attribution models, RPM alignment",
+          "properties": {
+            "sectionId": { "type": "string", "default": "section-analytics-attribution" },
+            "name": { "type": "string", "default": "Analytics & Attribution" },
+            "order": { "type": "integer", "default": 6 },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "metricId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "unit": { "type": "string" },
+                  "dataSource": { "type": "string" },
+                  "refreshInterval": {
+                    "type": "string",
+                    "enum": ["real_time", "5_minutes", "15_minutes", "hourly", "daily"]
+                  }
+                },
+                "required": ["metricId", "name", "dataSource"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "metricId": "funnel-awareness", "name": "Funnel: Awareness", "description": "Users at awareness stage", "unit": "count", "dataSource": "funnel_analytics", "refreshInterval": "hourly" },
+                { "metricId": "funnel-interest", "name": "Funnel: Interest", "description": "Users at interest stage", "unit": "count", "dataSource": "funnel_analytics", "refreshInterval": "hourly" },
+                { "metricId": "funnel-consideration", "name": "Funnel: Consideration", "description": "Users at consideration stage", "unit": "count", "dataSource": "funnel_analytics", "refreshInterval": "hourly" },
+                { "metricId": "funnel-intent", "name": "Funnel: Intent", "description": "Users at intent stage", "unit": "count", "dataSource": "funnel_analytics", "refreshInterval": "hourly" },
+                { "metricId": "funnel-purchase", "name": "Funnel: Purchase", "description": "Users at purchase stage", "unit": "count", "dataSource": "funnel_analytics", "refreshInterval": "hourly" },
+                { "metricId": "funnel-retention", "name": "Funnel: Retention", "description": "Users at retention stage", "unit": "count", "dataSource": "funnel_analytics", "refreshInterval": "hourly" },
+                { "metricId": "attribution-last-click", "name": "Attribution: Last Click", "description": "Last click attribution performance", "unit": "percent", "dataSource": "attribution_analytics", "refreshInterval": "daily" },
+                { "metricId": "attribution-first-click", "name": "Attribution: First Click", "description": "First click attribution performance", "unit": "percent", "dataSource": "attribution_analytics", "refreshInterval": "daily" },
+                { "metricId": "attribution-linear", "name": "Attribution: Linear", "description": "Linear attribution performance", "unit": "percent", "dataSource": "attribution_analytics", "refreshInterval": "daily" },
+                { "metricId": "attribution-time-decay", "name": "Attribution: Time Decay", "description": "Time decay attribution performance", "unit": "percent", "dataSource": "attribution_analytics", "refreshInterval": "daily" },
+                { "metricId": "attribution-data-driven", "name": "Attribution: Data Driven", "description": "Data driven attribution performance", "unit": "percent", "dataSource": "attribution_analytics", "refreshInterval": "daily" },
+                { "metricId": "regional-rpm-alignment", "name": "Regional RPM Alignment", "description": "RPM alignment with regional pricing", "unit": "percent", "dataSource": "regional_analytics", "refreshInterval": "daily" }
+              ]
+            },
+            "visuals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "visualId": { "type": "string" },
+                  "type": {
+                    "type": "string",
+                    "enum": ["funnel", "table", "bar_chart", "line_chart", "comparison_table"]
+                  },
+                  "title": { "type": "string" },
+                  "dataSource": { "type": "string" }
+                },
+                "required": ["visualId", "type", "title"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "visualId": "funnel-progression", "type": "funnel", "title": "Funnel Progression Chart", "dataSource": "funnel_analytics" },
+                { "visualId": "attribution-comparison", "type": "comparison_table", "title": "Attribution Model Comparison", "dataSource": "attribution_analytics" }
+              ]
+            },
+            "alerts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "alertId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "condition": { "type": "string" },
+                  "threshold": { "type": "number" },
+                  "severity": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["alertId", "name", "condition"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "alertId": "attribution-anomaly", "name": "Attribution Anomaly", "condition": "attribution_variance > 25", "threshold": 25, "severity": "high" },
+                { "alertId": "funnel-bottleneck", "name": "Funnel Bottleneck Detected", "condition": "stage_drop_rate > 50", "threshold": 50, "severity": "medium" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "infrastructure": {
+          "type": "object",
+          "description": "Section 7: Infrastructure - Concurrent users, latency, error rate",
+          "properties": {
+            "sectionId": { "type": "string", "default": "section-infrastructure" },
+            "name": { "type": "string", "default": "Infrastructure" },
+            "order": { "type": "integer", "default": 7 },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "metricId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "unit": { "type": "string" },
+                  "dataSource": { "type": "string" },
+                  "refreshInterval": {
+                    "type": "string",
+                    "enum": ["real_time", "5_minutes", "15_minutes", "hourly", "daily"]
+                  },
+                  "threshold": {
+                    "type": "object",
+                    "properties": {
+                      "warning": { "type": "number" },
+                      "critical": { "type": "number" }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "required": ["metricId", "name", "dataSource"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "metricId": "concurrent-users", "name": "Concurrent Users", "description": "Active concurrent sessions", "unit": "count", "dataSource": "infrastructure_monitoring", "refreshInterval": "real_time" },
+                { "metricId": "response-latency-p50", "name": "Response Latency (P50)", "description": "50th percentile response time", "unit": "ms", "dataSource": "infrastructure_monitoring", "refreshInterval": "real_time", "threshold": { "warning": 300, "critical": 500 } },
+                { "metricId": "response-latency-p99", "name": "Response Latency (P99)", "description": "99th percentile response time", "unit": "ms", "dataSource": "infrastructure_monitoring", "refreshInterval": "real_time", "threshold": { "warning": 500, "critical": 1000 } },
+                { "metricId": "error-rate", "name": "Error Rate", "description": "Percentage of failed requests", "unit": "percent", "dataSource": "infrastructure_monitoring", "refreshInterval": "real_time", "threshold": { "warning": 1, "critical": 2 } },
+                { "metricId": "uptime", "name": "System Uptime", "description": "System availability percentage", "unit": "percent", "dataSource": "infrastructure_monitoring", "refreshInterval": "5_minutes", "threshold": { "warning": 99.9, "critical": 99.5 } },
+                { "metricId": "cpu-utilization", "name": "CPU Utilization", "description": "Average CPU usage across nodes", "unit": "percent", "dataSource": "infrastructure_monitoring", "refreshInterval": "real_time" },
+                { "metricId": "memory-utilization", "name": "Memory Utilization", "description": "Average memory usage across nodes", "unit": "percent", "dataSource": "infrastructure_monitoring", "refreshInterval": "real_time" }
+              ]
+            },
+            "visuals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "visualId": { "type": "string" },
+                  "type": {
+                    "type": "string",
+                    "enum": ["gauge", "line_chart", "status_grid", "kpi_card", "table"]
+                  },
+                  "title": { "type": "string" },
+                  "dataSource": { "type": "string" }
+                },
+                "required": ["visualId", "type", "title"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "visualId": "performance-thresholds", "type": "gauge", "title": "Performance Thresholds", "dataSource": "infrastructure_monitoring" },
+                { "visualId": "latency-trend", "type": "line_chart", "title": "Latency Trend (24h)", "dataSource": "infrastructure_monitoring" },
+                { "visualId": "chaos-test-results", "type": "status_grid", "title": "Chaos Test Simulation Results", "dataSource": "chaos_testing" }
+              ]
+            },
+            "alerts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "alertId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "condition": { "type": "string" },
+                  "threshold": { "type": "number" },
+                  "severity": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["alertId", "name", "condition"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "alertId": "latency-critical", "name": "Latency > 500ms", "condition": "p99_latency > 500", "threshold": 500, "severity": "critical" },
+                { "alertId": "error-rate-critical", "name": "Error Rate > 2%", "condition": "error_rate > 2", "threshold": 2, "severity": "critical" },
+                { "alertId": "uptime-warning", "name": "Uptime < 99.9%", "condition": "uptime < 99.9", "threshold": 99.9, "severity": "high" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "campaignCalendar": {
+          "type": "object",
+          "description": "Section 8: Campaign Calendar Execution - Content cadence, milestones, engagement",
+          "properties": {
+            "sectionId": { "type": "string", "default": "section-campaign-calendar" },
+            "name": { "type": "string", "default": "Campaign Calendar Execution" },
+            "order": { "type": "integer", "default": 8 },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "metricId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "unit": { "type": "string" },
+                  "dataSource": { "type": "string" },
+                  "refreshInterval": {
+                    "type": "string",
+                    "enum": ["real_time", "5_minutes", "15_minutes", "hourly", "daily"]
+                  }
+                },
+                "required": ["metricId", "name", "dataSource"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "metricId": "content-cadence-adherence", "name": "Content Cadence Adherence", "description": "Percentage of scheduled content published on time", "unit": "percent", "dataSource": "campaign_calendar", "refreshInterval": "daily" },
+                { "metricId": "premiere-milestones-completed", "name": "Premiere Milestones Completed", "description": "Number of premiere milestones hit", "unit": "count", "dataSource": "campaign_calendar", "refreshInterval": "daily" },
+                { "metricId": "engagement-spikes", "name": "Engagement Spikes", "description": "Content pieces causing engagement spikes", "unit": "count", "dataSource": "engagement_analytics", "refreshInterval": "hourly" },
+                { "metricId": "upcoming-premieres", "name": "Upcoming Premieres", "description": "Premieres scheduled in next 7 days", "unit": "count", "dataSource": "campaign_calendar", "refreshInterval": "daily" },
+                { "metricId": "campaign-kpi-target-hit", "name": "Campaign KPI Target Hit Rate", "description": "Percentage of campaign KPIs hitting target", "unit": "percent", "dataSource": "campaign_analytics", "refreshInterval": "daily" }
+              ]
+            },
+            "visuals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "visualId": { "type": "string" },
+                  "type": {
+                    "type": "string",
+                    "enum": ["calendar_timeline", "kpi_tracker", "bar_chart", "line_chart", "table"]
+                  },
+                  "title": { "type": "string" },
+                  "dataSource": { "type": "string" }
+                },
+                "required": ["visualId", "type", "title"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "visualId": "campaign-timeline", "type": "calendar_timeline", "title": "Campaign Calendar Timeline", "dataSource": "campaign_calendar" },
+                { "visualId": "campaign-kpi-tracker", "type": "kpi_tracker", "title": "Campaign KPI Tracker", "dataSource": "campaign_analytics" }
+              ]
+            },
+            "alerts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "alertId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "condition": { "type": "string" },
+                  "threshold": { "type": "number" },
+                  "severity": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["alertId", "name", "condition"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "alertId": "missed-milestone", "name": "Missed Campaign Milestone", "condition": "milestone_missed = true", "severity": "high" },
+                { "alertId": "cadence-deviation", "name": "Cadence Deviation", "condition": "cadence_adherence < 80", "threshold": 80, "severity": "medium" },
+                { "alertId": "premiere-at-risk", "name": "Premiere At Risk", "condition": "premiere_prep_incomplete = true", "severity": "critical" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "dailyUsageFlow": {
+      "type": "object",
+      "description": "Mock daily usage flow for CEO dashboard operations",
+      "properties": {
+        "morningReview": {
+          "type": "object",
+          "properties": {
+            "time": { "type": "string", "default": "07:00" },
+            "duration": { "type": "string", "default": "15 minutes" },
+            "tasks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taskId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "section": { "type": "string" },
+                  "action": { "type": "string" },
+                  "priority": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["taskId", "name", "section"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "taskId": "morning-1", "name": "Review overnight alerts", "section": "All Sections", "action": "Check critical alerts triggered overnight", "priority": "critical" },
+                { "taskId": "morning-2", "name": "Check cohort health", "section": "Cohort Overview", "action": "Review active users and engagement rate", "priority": "high" },
+                { "taskId": "morning-3", "name": "Review revenue snapshot", "section": "Monetization", "action": "Check subscription + ad revenue vs targets", "priority": "high" },
+                { "taskId": "morning-4", "name": "Verify infrastructure health", "section": "Infrastructure", "action": "Confirm uptime, latency within thresholds", "priority": "high" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "middayCheckIn": {
+          "type": "object",
+          "properties": {
+            "time": { "type": "string", "default": "12:00" },
+            "duration": { "type": "string", "default": "10 minutes" },
+            "tasks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taskId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "section": { "type": "string" },
+                  "action": { "type": "string" },
+                  "priority": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["taskId", "name", "section"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "taskId": "midday-1", "name": "Check funnel progression", "section": "Audience Flows", "action": "Review signup → conversion funnel", "priority": "high" },
+                { "taskId": "midday-2", "name": "Review moderation queue", "section": "Governance", "action": "Ensure escalation queue is manageable", "priority": "medium" },
+                { "taskId": "midday-3", "name": "Check campaign execution", "section": "Campaign Calendar", "action": "Verify scheduled content published", "priority": "medium" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "eveningWrapUp": {
+          "type": "object",
+          "properties": {
+            "time": { "type": "string", "default": "18:00" },
+            "duration": { "type": "string", "default": "15 minutes" },
+            "tasks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taskId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "section": { "type": "string" },
+                  "action": { "type": "string" },
+                  "priority": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["taskId", "name", "section"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "taskId": "evening-1", "name": "Review daily KPIs", "section": "All Sections", "action": "Compare daily metrics to targets", "priority": "high" },
+                { "taskId": "evening-2", "name": "Check attribution performance", "section": "Analytics & Attribution", "action": "Review attribution model comparisons", "priority": "medium" },
+                { "taskId": "evening-3", "name": "Review creator flow status", "section": "Creator Flows", "action": "Ensure uploads and syncs completed", "priority": "medium" },
+                { "taskId": "evening-4", "name": "Set overnight alert thresholds", "section": "Infrastructure", "action": "Confirm monitoring active for overnight period", "priority": "high" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "weeklyDeepDive": {
+          "type": "object",
+          "properties": {
+            "day": { "type": "string", "default": "Monday" },
+            "time": { "type": "string", "default": "10:00" },
+            "duration": { "type": "string", "default": "45 minutes" },
+            "tasks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taskId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "section": { "type": "string" },
+                  "action": { "type": "string" },
+                  "priority": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  }
+                },
+                "required": ["taskId", "name", "section"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "taskId": "weekly-1", "name": "Review cohort phase progression", "section": "Cohort Overview", "action": "Assess readiness for next cohort phase", "priority": "critical" },
+                { "taskId": "weekly-2", "name": "Analyze revenue trends", "section": "Monetization", "action": "Week-over-week revenue comparison", "priority": "high" },
+                { "taskId": "weekly-3", "name": "Review governance scorecard", "section": "Governance", "action": "Check compliance metrics and trends", "priority": "high" },
+                { "taskId": "weekly-4", "name": "Assess campaign performance", "section": "Campaign Calendar", "action": "Review campaign KPI achievements", "priority": "high" },
+                { "taskId": "weekly-5", "name": "Infrastructure capacity review", "section": "Infrastructure", "action": "Plan for upcoming load based on growth", "priority": "medium" },
+                { "taskId": "weekly-6", "name": "Funnel optimization review", "section": "Analytics & Attribution", "action": "Identify bottlenecks and optimization opportunities", "priority": "medium" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "alertConfiguration": {
+      "type": "object",
+      "description": "Global alert configuration for CEO dashboard",
+      "properties": {
+        "ceoEscalationChannels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["sms", "phone", "slack", "email", "pagerduty"]
+          },
+          "default": ["sms", "slack"]
+        },
+        "alertPrioritization": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "responseTimeMinutes": { "type": "integer" },
+              "notifyChannels": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["sms", "phone", "slack", "email", "pagerduty"]
+                }
+              },
+              "escalateToCeo": { "type": "boolean" }
+            },
+            "required": ["severity", "responseTimeMinutes"],
+            "additionalProperties": false
+          },
+          "default": [
+            { "severity": "critical", "responseTimeMinutes": 15, "notifyChannels": ["sms", "slack", "pagerduty"], "escalateToCeo": true },
+            { "severity": "high", "responseTimeMinutes": 60, "notifyChannels": ["slack", "email"], "escalateToCeo": true },
+            { "severity": "medium", "responseTimeMinutes": 240, "notifyChannels": ["slack"], "escalateToCeo": false },
+            { "severity": "low", "responseTimeMinutes": 1440, "notifyChannels": ["email"], "escalateToCeo": false }
+          ]
+        },
+        "dailyDigest": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "deliveryTime": { "type": "string", "default": "07:00" },
+            "channels": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["email", "slack"] },
+              "default": ["email", "slack"]
+            },
+            "includeMetrics": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["dau", "revenue", "conversions", "nps", "uptime", "critical_issues", "campaign_progress"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "integrations": {
+      "type": "object",
+      "description": "Data source integrations for dashboard",
+      "properties": {
+        "betaCohortPlaybook": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "beta_cohort_playbook.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "betaE2ETesting": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "beta_e2e_testing.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "campaignCalendar": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "campaign_calendar.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "socialAnalytics": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "social_analytics.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "monetizationAnalytics": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "monetization_analytics.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "infrastructureMonitoring": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "infrastructure_monitoring.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "governanceSuite": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "governance_suite.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "accessControl": {
+      "type": "object",
+      "description": "Access control for dashboard",
+      "properties": {
+        "authorizedRoles": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["ceo", "coo", "cto", "vp_product", "vp_engineering"]
+        },
+        "readOnlyRoles": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["product_manager", "engineering_lead", "qa_lead"]
+        },
+        "mfaRequired": { "type": "boolean", "default": true },
+        "sessionTimeoutMinutes": { "type": "integer", "default": 30 }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "paused", "archived"],
+      "default": "draft"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "dashboardId",
+    "version",
+    "dashboardName",
+    "sections",
+    "dailyUsageFlow",
+    "status"
+  ],
+  "additionalProperties": false
+}

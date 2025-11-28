@@ -1,0 +1,646 @@
+{
+  "validDashboard": {
+    "dashboardId": "ceo-dashboard-waliin-beta-2024",
+    "version": "1.0.0",
+    "dashboardName": "Waliin Studio CEO Beta Dashboard",
+    "description": "Command center dashboard for CEO to monitor Phase 33 Beta rollout",
+    "sections": {
+      "cohortOverview": {
+        "sectionId": "section-cohort-overview",
+        "name": "Cohort Overview",
+        "order": 1,
+        "metrics": [
+          {
+            "metricId": "cohort-users-internal",
+            "name": "Internal Beta Users",
+            "description": "Active users in internal beta",
+            "unit": "users",
+            "dataSource": "cohort_analytics",
+            "refreshInterval": "real_time"
+          },
+          {
+            "metricId": "cohort-users-closed",
+            "name": "Closed Beta Users",
+            "description": "Active users in closed beta",
+            "unit": "users",
+            "dataSource": "cohort_analytics",
+            "refreshInterval": "real_time"
+          },
+          {
+            "metricId": "cohort-engagement-rate",
+            "name": "Engagement Rate",
+            "description": "Overall engagement rate across cohorts",
+            "unit": "percent",
+            "dataSource": "engagement_analytics",
+            "refreshInterval": "15_minutes"
+          }
+        ],
+        "visuals": [
+          {
+            "visualId": "cohort-timeline",
+            "type": "timeline_bar",
+            "title": "Cohort Phase Timeline",
+            "dataSource": "cohort_phases"
+          },
+          {
+            "visualId": "cohort-heatmap",
+            "type": "heatmap",
+            "title": "Geographic User Heatmap",
+            "dataSource": "geo_analytics"
+          }
+        ],
+        "alerts": [
+          {
+            "alertId": "cohort-threshold-exceeded",
+            "name": "Cohort Threshold Exceeded",
+            "condition": "open_beta_users > 10000",
+            "threshold": 10000,
+            "severity": "high"
+          }
+        ]
+      },
+      "audienceFlows": {
+        "sectionId": "section-audience-flows",
+        "name": "Audience Flows",
+        "order": 2,
+        "metrics": [
+          {
+            "metricId": "signup-success-rate",
+            "name": "Signup Success Rate",
+            "description": "Percentage of successful signups",
+            "unit": "percent",
+            "dataSource": "auth_analytics",
+            "refreshInterval": "15_minutes"
+          },
+          {
+            "metricId": "subscription-conversions",
+            "name": "Subscription Conversions",
+            "description": "Free to paid tier conversions",
+            "unit": "count",
+            "dataSource": "monetization_analytics",
+            "refreshInterval": "15_minutes"
+          }
+        ],
+        "visuals": [
+          {
+            "visualId": "audience-funnel",
+            "type": "funnel",
+            "title": "Signup → Watch → Engage → Convert",
+            "dataSource": "funnel_analytics"
+          }
+        ],
+        "alerts": [
+          {
+            "alertId": "funnel-conversion-drop",
+            "name": "Funnel Conversion Drop",
+            "condition": "conversion_drop > 15",
+            "threshold": 15,
+            "severity": "high"
+          }
+        ]
+      },
+      "creatorFlows": {
+        "sectionId": "section-creator-flows",
+        "name": "Creator Flows",
+        "order": 3,
+        "metrics": [
+          {
+            "metricId": "upload-success-rate",
+            "name": "Upload Success Rate",
+            "description": "Percentage of successful uploads",
+            "unit": "percent",
+            "dataSource": "ingest_pipeline",
+            "refreshInterval": "15_minutes"
+          }
+        ],
+        "visuals": [
+          {
+            "visualId": "publishing-pipeline",
+            "type": "status_board",
+            "title": "Publishing Pipeline Status",
+            "dataSource": "distribution_connectors"
+          }
+        ],
+        "alerts": [
+          {
+            "alertId": "sync-failure",
+            "name": "Cross-Platform Sync Failure",
+            "condition": "sync_failure_count > 10",
+            "threshold": 10,
+            "severity": "high"
+          }
+        ]
+      },
+      "monetization": {
+        "sectionId": "section-monetization",
+        "name": "Monetization",
+        "order": 4,
+        "metrics": [
+          {
+            "metricId": "subscription-revenue-premium",
+            "name": "Premium Tier Revenue",
+            "description": "Revenue from premium subscriptions",
+            "unit": "usd",
+            "dataSource": "monetization_analytics",
+            "refreshInterval": "hourly"
+          },
+          {
+            "metricId": "ad-rpm-global",
+            "name": "Global Ad RPM",
+            "description": "Revenue per mille (ad)",
+            "unit": "usd",
+            "dataSource": "ad_analytics",
+            "refreshInterval": "hourly"
+          }
+        ],
+        "visuals": [
+          {
+            "visualId": "revenue-by-source",
+            "type": "stacked_bar",
+            "title": "Revenue by Source",
+            "dataSource": "monetization_analytics"
+          }
+        ],
+        "alerts": [
+          {
+            "alertId": "payment-gateway-error",
+            "name": "Payment Gateway Error",
+            "condition": "payment_errors > 5",
+            "threshold": 5,
+            "severity": "critical"
+          }
+        ]
+      },
+      "governance": {
+        "sectionId": "section-governance",
+        "name": "Governance",
+        "order": 5,
+        "metrics": [
+          {
+            "metricId": "moderation-events",
+            "name": "Moderation Events",
+            "description": "Total moderation actions taken",
+            "unit": "count",
+            "dataSource": "governance_analytics",
+            "refreshInterval": "real_time"
+          },
+          {
+            "metricId": "escalation-queue",
+            "name": "Escalation Queue Size",
+            "description": "Items pending escalation review",
+            "unit": "count",
+            "dataSource": "moderation_queue",
+            "refreshInterval": "real_time"
+          }
+        ],
+        "visuals": [
+          {
+            "visualId": "compliance-scorecard",
+            "type": "scorecard",
+            "title": "Compliance Scorecard",
+            "dataSource": "governance_analytics"
+          }
+        ],
+        "alerts": [
+          {
+            "alertId": "escalation-backlog",
+            "name": "Escalation Queue Backlog",
+            "condition": "escalation_queue > 50",
+            "threshold": 50,
+            "severity": "high"
+          }
+        ]
+      },
+      "analyticsAttribution": {
+        "sectionId": "section-analytics-attribution",
+        "name": "Analytics & Attribution",
+        "order": 6,
+        "metrics": [
+          {
+            "metricId": "funnel-awareness",
+            "name": "Funnel: Awareness",
+            "description": "Users at awareness stage",
+            "unit": "count",
+            "dataSource": "funnel_analytics",
+            "refreshInterval": "hourly"
+          },
+          {
+            "metricId": "attribution-last-click",
+            "name": "Attribution: Last Click",
+            "description": "Last click attribution performance",
+            "unit": "percent",
+            "dataSource": "attribution_analytics",
+            "refreshInterval": "daily"
+          }
+        ],
+        "visuals": [
+          {
+            "visualId": "funnel-progression",
+            "type": "funnel",
+            "title": "Funnel Progression Chart",
+            "dataSource": "funnel_analytics"
+          }
+        ],
+        "alerts": [
+          {
+            "alertId": "attribution-anomaly",
+            "name": "Attribution Anomaly",
+            "condition": "attribution_variance > 25",
+            "threshold": 25,
+            "severity": "high"
+          }
+        ]
+      },
+      "infrastructure": {
+        "sectionId": "section-infrastructure",
+        "name": "Infrastructure",
+        "order": 7,
+        "metrics": [
+          {
+            "metricId": "concurrent-users",
+            "name": "Concurrent Users",
+            "description": "Active concurrent sessions",
+            "unit": "count",
+            "dataSource": "infrastructure_monitoring",
+            "refreshInterval": "real_time"
+          },
+          {
+            "metricId": "response-latency-p99",
+            "name": "Response Latency (P99)",
+            "description": "99th percentile response time",
+            "unit": "ms",
+            "dataSource": "infrastructure_monitoring",
+            "refreshInterval": "real_time",
+            "threshold": {
+              "warning": 500,
+              "critical": 1000
+            }
+          },
+          {
+            "metricId": "error-rate",
+            "name": "Error Rate",
+            "description": "Percentage of failed requests",
+            "unit": "percent",
+            "dataSource": "infrastructure_monitoring",
+            "refreshInterval": "real_time",
+            "threshold": {
+              "warning": 1,
+              "critical": 2
+            }
+          }
+        ],
+        "visuals": [
+          {
+            "visualId": "performance-thresholds",
+            "type": "gauge",
+            "title": "Performance Thresholds",
+            "dataSource": "infrastructure_monitoring"
+          }
+        ],
+        "alerts": [
+          {
+            "alertId": "latency-critical",
+            "name": "Latency > 500ms",
+            "condition": "p99_latency > 500",
+            "threshold": 500,
+            "severity": "critical"
+          },
+          {
+            "alertId": "error-rate-critical",
+            "name": "Error Rate > 2%",
+            "condition": "error_rate > 2",
+            "threshold": 2,
+            "severity": "critical"
+          }
+        ]
+      },
+      "campaignCalendar": {
+        "sectionId": "section-campaign-calendar",
+        "name": "Campaign Calendar Execution",
+        "order": 8,
+        "metrics": [
+          {
+            "metricId": "content-cadence-adherence",
+            "name": "Content Cadence Adherence",
+            "description": "Percentage of scheduled content published on time",
+            "unit": "percent",
+            "dataSource": "campaign_calendar",
+            "refreshInterval": "daily"
+          },
+          {
+            "metricId": "premiere-milestones-completed",
+            "name": "Premiere Milestones Completed",
+            "description": "Number of premiere milestones hit",
+            "unit": "count",
+            "dataSource": "campaign_calendar",
+            "refreshInterval": "daily"
+          }
+        ],
+        "visuals": [
+          {
+            "visualId": "campaign-timeline",
+            "type": "calendar_timeline",
+            "title": "Campaign Calendar Timeline",
+            "dataSource": "campaign_calendar"
+          }
+        ],
+        "alerts": [
+          {
+            "alertId": "missed-milestone",
+            "name": "Missed Campaign Milestone",
+            "condition": "milestone_missed = true",
+            "severity": "high"
+          }
+        ]
+      }
+    },
+    "dailyUsageFlow": {
+      "morningReview": {
+        "time": "07:00",
+        "duration": "15 minutes",
+        "tasks": [
+          {
+            "taskId": "morning-1",
+            "name": "Review overnight alerts",
+            "section": "All Sections",
+            "action": "Check critical alerts triggered overnight",
+            "priority": "critical"
+          },
+          {
+            "taskId": "morning-2",
+            "name": "Check cohort health",
+            "section": "Cohort Overview",
+            "action": "Review active users and engagement rate",
+            "priority": "high"
+          },
+          {
+            "taskId": "morning-3",
+            "name": "Review revenue snapshot",
+            "section": "Monetization",
+            "action": "Check subscription + ad revenue vs targets",
+            "priority": "high"
+          }
+        ]
+      },
+      "middayCheckIn": {
+        "time": "12:00",
+        "duration": "10 minutes",
+        "tasks": [
+          {
+            "taskId": "midday-1",
+            "name": "Check funnel progression",
+            "section": "Audience Flows",
+            "action": "Review signup → conversion funnel",
+            "priority": "high"
+          },
+          {
+            "taskId": "midday-2",
+            "name": "Review moderation queue",
+            "section": "Governance",
+            "action": "Ensure escalation queue is manageable",
+            "priority": "medium"
+          }
+        ]
+      },
+      "eveningWrapUp": {
+        "time": "18:00",
+        "duration": "15 minutes",
+        "tasks": [
+          {
+            "taskId": "evening-1",
+            "name": "Review daily KPIs",
+            "section": "All Sections",
+            "action": "Compare daily metrics to targets",
+            "priority": "high"
+          },
+          {
+            "taskId": "evening-2",
+            "name": "Set overnight alert thresholds",
+            "section": "Infrastructure",
+            "action": "Confirm monitoring active for overnight period",
+            "priority": "high"
+          }
+        ]
+      },
+      "weeklyDeepDive": {
+        "day": "Monday",
+        "time": "10:00",
+        "duration": "45 minutes",
+        "tasks": [
+          {
+            "taskId": "weekly-1",
+            "name": "Review cohort phase progression",
+            "section": "Cohort Overview",
+            "action": "Assess readiness for next cohort phase",
+            "priority": "critical"
+          },
+          {
+            "taskId": "weekly-2",
+            "name": "Analyze revenue trends",
+            "section": "Monetization",
+            "action": "Week-over-week revenue comparison",
+            "priority": "high"
+          },
+          {
+            "taskId": "weekly-3",
+            "name": "Review governance scorecard",
+            "section": "Governance",
+            "action": "Check compliance metrics and trends",
+            "priority": "high"
+          }
+        ]
+      }
+    },
+    "alertConfiguration": {
+      "ceoEscalationChannels": ["sms", "slack"],
+      "alertPrioritization": [
+        {
+          "severity": "critical",
+          "responseTimeMinutes": 15,
+          "notifyChannels": ["sms", "slack", "pagerduty"],
+          "escalateToCeo": true
+        },
+        {
+          "severity": "high",
+          "responseTimeMinutes": 60,
+          "notifyChannels": ["slack", "email"],
+          "escalateToCeo": true
+        },
+        {
+          "severity": "medium",
+          "responseTimeMinutes": 240,
+          "notifyChannels": ["slack"],
+          "escalateToCeo": false
+        }
+      ],
+      "dailyDigest": {
+        "enabled": true,
+        "deliveryTime": "07:00",
+        "channels": ["email", "slack"],
+        "includeMetrics": ["dau", "revenue", "conversions", "nps", "uptime", "critical_issues"]
+      }
+    },
+    "integrations": {
+      "betaCohortPlaybook": {
+        "schemaRef": "beta_cohort_playbook.schema.json",
+        "syncEnabled": true
+      },
+      "betaE2ETesting": {
+        "schemaRef": "beta_e2e_testing.schema.json",
+        "syncEnabled": true
+      },
+      "campaignCalendar": {
+        "schemaRef": "campaign_calendar.schema.json",
+        "syncEnabled": true
+      },
+      "monetizationAnalytics": {
+        "schemaRef": "monetization_analytics.schema.json",
+        "syncEnabled": true
+      },
+      "infrastructureMonitoring": {
+        "schemaRef": "infrastructure_monitoring.schema.json",
+        "syncEnabled": true
+      }
+    },
+    "accessControl": {
+      "authorizedRoles": ["ceo", "coo", "cto", "vp_product"],
+      "readOnlyRoles": ["product_manager", "engineering_lead"],
+      "mfaRequired": true,
+      "sessionTimeoutMinutes": 30
+    },
+    "status": "active",
+    "metadata": {
+      "createdAt": "2024-01-15T10:00:00Z",
+      "createdBy": "waliin-admin",
+      "updatedAt": "2024-01-20T14:30:00Z",
+      "updatedBy": "waliin-admin"
+    }
+  },
+  "visualTypes": [
+    "timeline_bar",
+    "heatmap",
+    "pie_chart",
+    "bar_chart",
+    "line_chart",
+    "gauge",
+    "kpi_card",
+    "table",
+    "funnel",
+    "stacked_bar",
+    "scorecard",
+    "feed",
+    "comparison_table",
+    "status_grid",
+    "calendar_timeline",
+    "kpi_tracker",
+    "status_board"
+  ],
+  "refreshIntervals": [
+    "real_time",
+    "5_minutes",
+    "15_minutes",
+    "hourly",
+    "daily"
+  ],
+  "alertSeverities": [
+    "critical",
+    "high",
+    "medium",
+    "low"
+  ],
+  "taskPriorities": [
+    "critical",
+    "high",
+    "medium",
+    "low"
+  ],
+  "dashboardSections": [
+    "cohortOverview",
+    "audienceFlows",
+    "creatorFlows",
+    "monetization",
+    "governance",
+    "analyticsAttribution",
+    "infrastructure",
+    "campaignCalendar"
+  ],
+  "dailyUsageFlowPeriods": [
+    "morningReview",
+    "middayCheckIn",
+    "eveningWrapUp",
+    "weeklyDeepDive"
+  ],
+  "escalationChannels": [
+    "sms",
+    "phone",
+    "slack",
+    "email",
+    "pagerduty"
+  ],
+  "testMetrics": {
+    "cohortMetrics": [
+      "cohort-users-internal",
+      "cohort-users-closed",
+      "cohort-users-open",
+      "cohort-regional-distribution",
+      "cohort-engagement-rate"
+    ],
+    "audienceMetrics": [
+      "signup-success-rate",
+      "personalization-accuracy",
+      "subscription-conversions",
+      "funnel-drop-rate"
+    ],
+    "creatorMetrics": [
+      "upload-success-rate",
+      "cross-platform-sync",
+      "revenue-attribution-accuracy",
+      "pending-uploads"
+    ],
+    "monetizationMetrics": [
+      "subscription-revenue-free",
+      "subscription-revenue-basic",
+      "subscription-revenue-premium",
+      "subscription-revenue-vip",
+      "ad-rpm-global",
+      "ad-cpm-global",
+      "fan-funding-total"
+    ],
+    "governanceMetrics": [
+      "moderation-events",
+      "copyright-claims",
+      "disclosure-compliance",
+      "escalation-queue",
+      "cultural-sensitivity-flags"
+    ],
+    "analyticsMetrics": [
+      "funnel-awareness",
+      "funnel-interest",
+      "funnel-consideration",
+      "funnel-intent",
+      "funnel-purchase",
+      "funnel-retention",
+      "attribution-last-click",
+      "attribution-first-click",
+      "attribution-linear",
+      "attribution-time-decay",
+      "attribution-data-driven"
+    ],
+    "infrastructureMetrics": [
+      "concurrent-users",
+      "response-latency-p50",
+      "response-latency-p99",
+      "error-rate",
+      "uptime",
+      "cpu-utilization",
+      "memory-utilization"
+    ],
+    "campaignMetrics": [
+      "content-cadence-adherence",
+      "premiere-milestones-completed",
+      "engagement-spikes",
+      "upcoming-premieres",
+      "campaign-kpi-target-hit"
+    ]
+  }
+}
