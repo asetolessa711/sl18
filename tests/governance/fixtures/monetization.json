@@ -1,0 +1,413 @@
+{
+  "validSubscriptionTiers": [
+    {
+      "tierId": "tier-free-001",
+      "franchiseId": "waliin-001",
+      "tierName": "free",
+      "tierDisplayName": "Free",
+      "tierDescription": "Ad-supported access to limited content",
+      "tierLocalizations": {
+        "displayNames": { "sw": "Bure", "am": "ነፃ" },
+        "descriptions": { "sw": "Ufikiaji wa maudhui yenye matangazo", "am": "ማስታወቂያ የተደገፈ ይዘት" }
+      },
+      "pricing": {
+        "baseCurrency": "USD",
+        "monthlyPrice": 0,
+        "annualPrice": 0,
+        "trialPeriodDays": 0,
+        "regionalPricing": [
+          { "region": "EA", "country": "KE", "currency": "KES", "monthlyPrice": 0, "pppAdjustment": 0.3 },
+          { "region": "EA", "country": "ET", "currency": "ETB", "monthlyPrice": 0, "pppAdjustment": 0.25 }
+        ]
+      },
+      "features": {
+        "contentAccess": { "fullCatalog": false, "limitedCatalog": true, "premiumContent": false },
+        "streamingQuality": { "maxResolution": "720p", "hdr": false, "simultaneousStreams": 1 },
+        "downloads": { "enabled": false, "maxDownloads": 0 },
+        "profiles": { "maxProfiles": 1, "kidsMode": false, "personalizedRecommendations": true },
+        "ads": { "adSupported": true, "adFrequency": "high", "skipAdsAfter": 5 },
+        "interactiveFeatures": { "pollVoting": true, "pollInfluence": false, "commenting": true, "reactions": true }
+      },
+      "upgradeDowngrade": { "canUpgradeTo": ["tier-basic-001", "tier-standard-001"], "prorateOnUpgrade": true },
+      "eligibility": { "regions": ["EA", "WA", "NA", "EU"], "requiresVerification": false },
+      "status": "active",
+      "sortOrder": 1,
+      "isDefault": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-15T10:00:00Z"
+    },
+    {
+      "tierId": "tier-premium-001",
+      "franchiseId": "waliin-001",
+      "tierName": "premium",
+      "tierDisplayName": "Premium",
+      "tierDescription": "Full catalog access with 4K streaming and downloads",
+      "pricing": {
+        "baseCurrency": "USD",
+        "monthlyPrice": 14.99,
+        "annualPrice": 149.99,
+        "annualDiscount": 17,
+        "trialPeriodDays": 14,
+        "regionalPricing": [
+          { "region": "EA", "country": "KE", "currency": "KES", "monthlyPrice": 499, "annualPrice": 4999, "pppAdjustment": 0.3 },
+          { "region": "EA", "country": "ET", "currency": "ETB", "monthlyPrice": 399, "annualPrice": 3999, "pppAdjustment": 0.25 }
+        ],
+        "promotionalPricing": {
+          "enabled": true,
+          "discountPercentage": 50,
+          "discountCode": "LAUNCH50",
+          "validFrom": "2024-01-01T00:00:00Z",
+          "validUntil": "2024-03-31T23:59:59Z",
+          "maxRedemptions": 10000
+        }
+      },
+      "features": {
+        "contentAccess": { "fullCatalog": true, "premiumContent": true, "exclusivePreviews": true, "behindTheScenes": true, "earlyAccess": true, "earlyAccessDays": 7 },
+        "streamingQuality": { "maxResolution": "4K", "hdr": true, "dolbyAtmos": true, "simultaneousStreams": 4 },
+        "downloads": { "enabled": true, "maxDownloads": 25, "downloadQuality": "ultra", "offlineRetentionDays": 30 },
+        "profiles": { "maxProfiles": 6, "kidsMode": true, "personalizedRecommendations": true },
+        "ads": { "adSupported": false, "adFrequency": "none" },
+        "interactiveFeatures": { "pollVoting": true, "pollInfluence": true, "commenting": true, "reactions": true, "prioritySupport": true },
+        "exclusivePerks": [
+          { "perkId": "perk-early-access", "perkName": "Early Access", "description": "Watch new releases 7 days early" },
+          { "perkId": "perk-vip-support", "perkName": "Priority Support", "description": "24/7 VIP customer support" }
+        ]
+      },
+      "upgradeDowngrade": { "canUpgradeTo": ["tier-vip-001"], "canDowngradeTo": ["tier-standard-001", "tier-basic-001"], "prorateOnUpgrade": true, "refundOnDowngrade": false },
+      "retention": {
+        "churnRiskThreshold": 0.7,
+        "retentionOffers": [
+          { "offerId": "retention-discount", "offerType": "discount", "value": 30, "validDays": 30 },
+          { "offerId": "retention-free-month", "offerType": "free_month", "value": 1, "validDays": 7 }
+        ],
+        "winbackCampaignEnabled": true
+      },
+      "status": "active",
+      "sortOrder": 4,
+      "isDefault": false,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-15T10:00:00Z"
+    }
+  ],
+  "validTransactionalModels": [
+    {
+      "modelId": "model-tvod-001",
+      "franchiseId": "waliin-001",
+      "contentId": "movie-premiere-001",
+      "modelType": "tvod",
+      "modelConfig": {
+        "tvod": {
+          "enabled": true,
+          "rentalPrice": 4.99,
+          "rentalPeriodHours": 48,
+          "hdUpchargePercentage": 20,
+          "uhd4kUpchargePercentage": 50,
+          "regionalPricing": [
+            { "region": "EA", "currency": "KES", "rentalPrice": 200 },
+            { "region": "WA", "currency": "NGN", "rentalPrice": 1500 }
+          ]
+        }
+      },
+      "windowManagement": {
+        "windows": [
+          { "windowId": "pvod-window", "windowName": "Premium Early Access", "windowType": "pvod", "priority": 1, "startDate": "2024-02-01T00:00:00Z", "endDate": "2024-02-15T00:00:00Z", "daysAfterRelease": 0 },
+          { "windowId": "tvod-window", "windowName": "Rental Window", "windowType": "tvod", "priority": 2, "startDate": "2024-02-15T00:00:00Z", "endDate": "2024-05-01T00:00:00Z", "daysAfterRelease": 14 },
+          { "windowId": "svod-window", "windowName": "Subscription Window", "windowType": "svod", "priority": 3, "startDate": "2024-05-01T00:00:00Z", "daysAfterRelease": 90 }
+        ],
+        "cascadeRules": [
+          { "fromWindow": "pvod-window", "toWindow": "tvod-window", "transitionType": "automatic" },
+          { "fromWindow": "tvod-window", "toWindow": "svod-window", "transitionType": "automatic" }
+        ]
+      },
+      "revenueSettings": { "platformFeePercentage": 30, "creatorSplitPercentage": 70, "paymentProcessingFee": 2.9 },
+      "status": "active",
+      "createdAt": "2024-01-15T00:00:00Z",
+      "updatedAt": "2024-01-20T10:00:00Z"
+    },
+    {
+      "modelId": "model-hybrid-001",
+      "franchiseId": "waliin-001",
+      "contentId": "series-waliin-001",
+      "modelType": "hybrid",
+      "modelConfig": {
+        "svod": { "enabled": true, "includedInTiers": ["standard", "premium", "vip"] },
+        "avod": {
+          "enabled": true,
+          "adLoadConfiguration": { "preRollEnabled": true, "preRollMaxSeconds": 30, "midRollEnabled": true, "midRollIntervalMinutes": 15 },
+          "adFreeTierUpgrade": "tier-standard-001"
+        },
+        "hybrid": {
+          "enabled": true,
+          "baseModel": "svod",
+          "addOns": [
+            { "addOnId": "addon-early-episode", "addOnType": "pvod", "price": 1.99, "description": "Watch next episode early" },
+            { "addOnId": "addon-ad-free", "addOnType": "ad_removal", "price": 2.99, "description": "Remove all ads for this content" }
+          ]
+        }
+      },
+      "promotions": [
+        { "promotionId": "promo-binge", "promotionType": "bundle_upgrade", "value": 25, "promoCode": "BINGE25", "validFrom": "2024-01-01T00:00:00Z", "validUntil": "2024-02-28T23:59:59Z" }
+      ],
+      "status": "active",
+      "createdAt": "2024-01-10T00:00:00Z",
+      "updatedAt": "2024-01-20T10:00:00Z"
+    }
+  ],
+  "validAdConfigurations": [
+    {
+      "adConfigId": "ad-config-001",
+      "franchiseId": "waliin-001",
+      "configType": "franchise",
+      "ssaiConfig": {
+        "enabled": true,
+        "provider": "aws_mediatailor",
+        "adServerUrl": "https://ads.waliin.example.com/vast",
+        "manifestManipulation": true,
+        "beaconTracking": true,
+        "personalizedAds": true
+      },
+      "adPlacements": {
+        "preRoll": { "enabled": true, "maxDurationSeconds": 30, "maxAdCount": 2, "skipAfterSeconds": 5, "skipEnabled": true },
+        "midRoll": { "enabled": true, "intervalMinutes": 12, "maxDurationSeconds": 60, "maxAdCount": 3, "naturalBreakDetection": true },
+        "rewarded": { "enabled": true, "rewardType": "unlock_content", "rewardValue": 1, "requiredWatchPercentage": 100 }
+      },
+      "targeting": {
+        "demographicTargeting": { "enabled": true, "ageGroups": ["18-24", "25-34", "35-44"] },
+        "geoTargeting": { "enabled": true, "regions": ["EA", "WA"], "countries": ["KE", "ET", "NG"] },
+        "behavioralTargeting": { "enabled": true, "genreAffinities": ["drama", "thriller"], "watchingPatterns": ["binge_watcher", "primetime_only"] },
+        "deviceTargeting": { "enabled": true, "deviceTypes": ["mobile", "tablet", "smart_tv"] }
+      },
+      "sponsorship": {
+        "enabled": true,
+        "sponsors": [
+          {
+            "sponsorId": "sponsor-safaricom",
+            "sponsorName": "Safaricom",
+            "sponsorshipType": "presenting",
+            "placements": [
+              { "placementType": "intro_card", "duration": 5, "assetUrl": "https://cdn.waliin.example.com/sponsors/safaricom-intro.mp4" }
+            ],
+            "contractStart": "2024-01-01T00:00:00Z",
+            "contractEnd": "2024-12-31T23:59:59Z",
+            "revenueModel": "flat_fee"
+          }
+        ]
+      },
+      "frequencyCapping": { "enabled": true, "maxImpressionsPerHour": 8, "maxImpressionsPerDay": 40, "maxSameAdPerSession": 2 },
+      "compliance": {
+        "gdprCompliant": true,
+        "coppaCompliant": true,
+        "ccpaCompliant": true,
+        "culturalSensitivityFilters": true,
+        "adCategoriesBlocked": ["alcohol", "tobacco", "gambling"]
+      },
+      "revenueTracking": { "trackImpressions": true, "trackClicks": true, "trackCompletions": true, "cpmFloor": 3.0, "fillRateTarget": 85 },
+      "status": "active",
+      "createdAt": "2024-01-05T00:00:00Z",
+      "updatedAt": "2024-01-18T10:00:00Z"
+    }
+  ],
+  "validRegionalPricing": [
+    {
+      "pricingConfigId": "pricing-ea-001",
+      "franchiseId": "waliin-001",
+      "configScope": "regional",
+      "baseCurrency": "USD",
+      "regionalTiers": [
+        {
+          "tierId": "tier-ea-kenya",
+          "region": "EA",
+          "countries": ["KE"],
+          "currency": "KES",
+          "exchangeRate": 155.5,
+          "exchangeRateSource": "live_api",
+          "pppMultiplier": 0.35,
+          "affordabilityIndex": 0.4,
+          "subscriptionPricing": {
+            "free": { "monthly": 0, "annual": 0 },
+            "basic": { "monthly": 199, "annual": 1999 },
+            "standard": { "monthly": 399, "annual": 3999 },
+            "premium": { "monthly": 599, "annual": 5999 }
+          },
+          "tvodPricing": { "rentalPrice": 150, "hdUpcharge": 30, "uhd4kUpcharge": 75 }
+        },
+        {
+          "tierId": "tier-ea-ethiopia",
+          "region": "EA",
+          "countries": ["ET"],
+          "currency": "ETB",
+          "exchangeRate": 56.5,
+          "pppMultiplier": 0.25,
+          "affordabilityIndex": 0.3,
+          "subscriptionPricing": {
+            "free": { "monthly": 0, "annual": 0 },
+            "basic": { "monthly": 99, "annual": 999 },
+            "standard": { "monthly": 199, "annual": 1999 },
+            "premium": { "monthly": 299, "annual": 2999 }
+          }
+        }
+      ],
+      "paymentGateways": [
+        {
+          "gatewayId": "gateway-mpesa",
+          "gatewayType": "mpesa",
+          "gatewayName": "M-Pesa Kenya",
+          "supportedRegions": ["EA"],
+          "supportedCountries": ["KE"],
+          "supportedCurrencies": ["KES"],
+          "paymentMethods": ["mobile_money"],
+          "processingFeePercentage": 1.5,
+          "settlementDays": 2,
+          "priority": 1,
+          "enabled": true
+        },
+        {
+          "gatewayId": "gateway-stripe-ea",
+          "gatewayType": "stripe",
+          "gatewayName": "Stripe East Africa",
+          "supportedRegions": ["EA"],
+          "supportedCountries": ["KE", "ET", "TZ", "UG"],
+          "supportedCurrencies": ["KES", "ETB", "TZS", "UGX", "USD"],
+          "paymentMethods": ["credit_card", "debit_card"],
+          "processingFeePercentage": 2.9,
+          "processingFeeFixed": 0.30,
+          "settlementDays": 7,
+          "priority": 2,
+          "enabled": true
+        }
+      ],
+      "taxCompliance": {
+        "autoCalculateTax": true,
+        "taxProvider": "avalara",
+        "defaultTaxBehavior": "inclusive",
+        "taxRules": [
+          { "ruleId": "vat-ke", "country": "KE", "taxType": "vat", "taxRate": 16, "taxName": "Kenya VAT", "applicableTo": ["subscription", "tvod"] },
+          { "ruleId": "vat-et", "country": "ET", "taxType": "vat", "taxRate": 15, "taxName": "Ethiopia VAT", "applicableTo": ["subscription", "tvod"] }
+        ]
+      },
+      "fraudDetection": {
+        "enabled": true,
+        "provider": "stripe_radar",
+        "riskThresholds": { "block": 85, "review": 60, "allow": 30 },
+        "checks": { "vpnDetection": true, "proxyDetection": true, "velocityChecks": true, "deviceFingerprinting": true }
+      },
+      "currencyConversion": {
+        "provider": "openexchangerates",
+        "updateFrequency": "daily",
+        "markupPercentage": 1,
+        "roundingStrategy": "psychological"
+      },
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-20T10:00:00Z"
+    }
+  ],
+  "validMonetizationAnalytics": [
+    {
+      "analyticsId": "analytics-jan-2024",
+      "franchiseId": "waliin-001",
+      "periodStart": "2024-01-01T00:00:00Z",
+      "periodEnd": "2024-01-31T23:59:59Z",
+      "periodType": "monthly",
+      "subscriptionMetrics": {
+        "totalSubscribers": 125000,
+        "newSubscribers": 18500,
+        "cancelledSubscribers": 3200,
+        "netChange": 15300,
+        "churnRate": 2.56,
+        "retentionRate": 97.44,
+        "mrr": 850000,
+        "arr": 10200000,
+        "arpu": 6.80,
+        "ltv": 81.60,
+        "tierBreakdown": [
+          { "tier": "free", "subscribers": 45000, "percentage": 36, "revenue": 0, "churnRate": 5.2 },
+          { "tier": "basic", "subscribers": 35000, "percentage": 28, "revenue": 174650, "churnRate": 2.8 },
+          { "tier": "standard", "subscribers": 30000, "percentage": 24, "revenue": 299700, "churnRate": 1.9 },
+          { "tier": "premium", "subscribers": 15000, "percentage": 12, "revenue": 224850, "churnRate": 1.2 }
+        ],
+        "trialConversions": { "trialsStarted": 8500, "trialsConverted": 5100, "conversionRate": 60, "avgTimeToConvertDays": 5.2 },
+        "upgrades": 4200,
+        "downgrades": 850
+      },
+      "transactionMetrics": {
+        "totalTransactions": 142500,
+        "totalRevenue": 1250000,
+        "avgTransactionValue": 8.77,
+        "revenueByType": {
+          "subscription": 850000,
+          "tvod": 125000,
+          "pvod": 45000,
+          "ads": 180000,
+          "sponsorship": 50000
+        },
+        "revenueByRegion": [
+          { "region": "EA", "revenue": 625000, "percentage": 50, "currency": "USD" },
+          { "region": "WA", "revenue": 375000, "percentage": 30, "currency": "USD" },
+          { "region": "NA", "revenue": 187500, "percentage": 15, "currency": "USD" },
+          { "region": "EU", "revenue": 62500, "percentage": 5, "currency": "USD" }
+        ],
+        "paymentMethodBreakdown": [
+          { "method": "mobile_money", "transactions": 85500, "revenue": 450000, "percentage": 60 },
+          { "method": "credit_card", "transactions": 42750, "revenue": 600000, "percentage": 30 },
+          { "method": "wallet", "transactions": 14250, "revenue": 200000, "percentage": 10 }
+        ],
+        "failedTransactions": { "count": 2850, "failureRate": 2.0, "failureReasons": [{ "reason": "insufficient_funds", "count": 1500 }, { "reason": "card_declined", "count": 850 }] },
+        "refunds": { "count": 420, "totalAmount": 3780, "refundRate": 0.3 }
+      },
+      "adMetrics": {
+        "totalImpressions": 45000000,
+        "totalClicks": 450000,
+        "ctr": 1.0,
+        "totalAdRevenue": 180000,
+        "cpm": 4.0,
+        "ecpm": 4.5,
+        "fillRate": 92,
+        "revenueByPlacement": { "preRoll": 90000, "midRoll": 72000, "rewarded": 18000 },
+        "completionRates": { "preRoll": 85, "midRoll": 78, "rewarded": 95 },
+        "viewability": 88
+      },
+      "contentPerformance": [
+        { "contentId": "movie-premiere-001", "contentTitle": "Waliin: The Beginning", "contentType": "movie", "revenue": 125000, "transactions": 28500, "adRevenue": 35000, "revenueRank": 1 },
+        { "contentId": "series-waliin-s01", "contentTitle": "Waliin Season 1", "contentType": "series", "revenue": 85000, "subscribers": 45000, "adRevenue": 55000, "revenueRank": 2 }
+      ],
+      "forecasting": {
+        "revenueProjection": { "nextMonth": 1350000, "nextQuarter": 4200000, "nextYear": 18000000, "confidenceLevel": 85 },
+        "subscriberProjection": { "nextMonth": 145000, "nextQuarter": 200000, "nextYear": 500000, "growthRate": 12 },
+        "churnPrediction": { "atRiskSubscribers": 8500, "predictedChurnRate": 2.8, "revenueAtRisk": 57800 }
+      },
+      "alerts": [
+        { "alertId": "alert-target-achieved", "alertType": "target_achieved", "severity": "info", "message": "Monthly revenue target achieved: 125% of goal", "value": 1250000, "threshold": 1000000, "triggeredAt": "2024-01-28T10:00:00Z", "acknowledged": true }
+      ],
+      "operatorDashboard": {
+        "kpis": [
+          { "kpiId": "kpi-mrr", "kpiName": "Monthly Recurring Revenue", "value": 850000, "previousValue": 780000, "changePercentage": 8.97, "trend": "up", "target": 800000, "targetAchieved": true },
+          { "kpiId": "kpi-arpu", "kpiName": "Average Revenue Per User", "value": 6.80, "previousValue": 6.50, "changePercentage": 4.62, "trend": "up" }
+        ],
+        "defaultView": "overview",
+        "exportFormats": ["csv", "pdf", "xlsx"]
+      },
+      "integrations": { "feedToAudienceInsights": true, "feedToPersonalization": true, "feedToFeedbackLoop": true },
+      "status": "ready",
+      "dataQuality": { "completeness": 98, "reliability": "high", "lastUpdated": "2024-02-01T06:00:00Z" },
+      "createdAt": "2024-02-01T00:00:00Z",
+      "updatedAt": "2024-02-01T06:00:00Z"
+    }
+  ],
+  "invalidSubscriptionTiers": [
+    {
+      "tierId": "",
+      "franchiseId": "waliin-001",
+      "tierName": "invalid_tier",
+      "pricing": { "monthlyPrice": -10 },
+      "status": "unknown"
+    }
+  ],
+  "invalidTransactionalModels": [
+    {
+      "modelId": "invalid",
+      "modelType": "unknown_type",
+      "status": "invalid"
+    }
+  ]
+}

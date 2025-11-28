@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RegionalPricing",
+  "description": "Schema for regional pricing in SL18 + Waliin Studio - geo-based pricing, currency conversion, PPP adjustments, payment gateways, and tax compliance",
+  "type": "object",
+  "properties": {
+    "pricingConfigId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique pricing configuration identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "configScope": {
+      "type": "string",
+      "enum": ["global", "regional", "country", "franchise"],
+      "description": "Scope of pricing configuration"
+    },
+    "baseCurrency": {
+      "type": "string",
+      "default": "USD",
+      "description": "Base currency for all pricing calculations"
+    },
+    "regionalTiers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tierId": { "type": "string" },
+          "region": { "type": "string" },
+          "countries": { "type": "array", "items": { "type": "string" } },
+          "currency": { "type": "string" },
+          "exchangeRate": { "type": "number", "minimum": 0 },
+          "exchangeRateSource": { "type": "string", "enum": ["fixed", "live_api", "manual"] },
+          "pppMultiplier": { "type": "number", "minimum": 0, "maximum": 2, "default": 1, "description": "Purchasing Power Parity multiplier" },
+          "affordabilityIndex": { "type": "number", "minimum": 0, "maximum": 1 },
+          "subscriptionPricing": {
+            "type": "object",
+            "properties": {
+              "free": { "type": "object", "properties": { "monthly": { "type": "number" }, "annual": { "type": "number" } }, "additionalProperties": false },
+              "basic": { "type": "object", "properties": { "monthly": { "type": "number" }, "annual": { "type": "number" } }, "additionalProperties": false },
+              "standard": { "type": "object", "properties": { "monthly": { "type": "number" }, "annual": { "type": "number" } }, "additionalProperties": false },
+              "premium": { "type": "object", "properties": { "monthly": { "type": "number" }, "annual": { "type": "number" } }, "additionalProperties": false },
+              "vip": { "type": "object", "properties": { "monthly": { "type": "number" }, "annual": { "type": "number" } }, "additionalProperties": false },
+              "family": { "type": "object", "properties": { "monthly": { "type": "number" }, "annual": { "type": "number" } }, "additionalProperties": false }
+            },
+            "additionalProperties": false
+          },
+          "tvodPricing": {
+            "type": "object",
+            "properties": {
+              "rentalPrice": { "type": "number", "minimum": 0 },
+              "hdUpcharge": { "type": "number", "minimum": 0 },
+              "uhd4kUpcharge": { "type": "number", "minimum": 0 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["tierId", "region", "currency"],
+        "additionalProperties": false
+      }
+    },
+    "paymentGateways": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "gatewayId": { "type": "string" },
+          "gatewayType": { "type": "string", "enum": ["stripe", "paypal", "adyen", "razorpay", "flutterwave", "mpesa", "apple_pay", "google_pay", "amazon_pay", "local_wallet"] },
+          "gatewayName": { "type": "string" },
+          "supportedRegions": { "type": "array", "items": { "type": "string" } },
+          "supportedCountries": { "type": "array", "items": { "type": "string" } },
+          "supportedCurrencies": { "type": "array", "items": { "type": "string" } },
+          "paymentMethods": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["credit_card", "debit_card", "bank_transfer", "mobile_money", "wallet", "direct_carrier_billing", "cash_on_delivery", "crypto"] }
+          },
+          "processingFeePercentage": { "type": "number", "minimum": 0, "maximum": 10 },
+          "processingFeeFixed": { "type": "number", "minimum": 0 },
+          "settlementDays": { "type": "integer", "minimum": 1 },
+          "priority": { "type": "integer", "minimum": 1 },
+          "enabled": { "type": "boolean", "default": true },
+          "credentials": {
+            "type": "object",
+            "properties": {
+              "publicKey": { "type": "string" },
+              "secretKeyRef": { "type": "string", "description": "Reference to secret in vault" },
+              "webhookSecret": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["gatewayId", "gatewayType", "supportedRegions"],
+        "additionalProperties": false
+      }
+    },
+    "taxCompliance": {
+      "type": "object",
+      "properties": {
+        "autoCalculateTax": { "type": "boolean", "default": true },
+        "taxProvider": { "type": "string", "enum": ["avalara", "taxjar", "stripe_tax", "manual"] },
+        "defaultTaxBehavior": { "type": "string", "enum": ["inclusive", "exclusive"], "default": "exclusive" },
+        "taxRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": { "type": "string" },
+              "country": { "type": "string" },
+              "region": { "type": "string" },
+              "taxType": { "type": "string", "enum": ["vat", "gst", "sales_tax", "withholding", "digital_services_tax"] },
+              "taxRate": { "type": "number", "minimum": 0, "maximum": 100 },
+              "taxName": { "type": "string" },
+              "applicableTo": { "type": "array", "items": { "type": "string", "enum": ["subscription", "tvod", "est", "ads"] } },
+              "effectiveFrom": { "type": "string", "format": "date-time" },
+              "effectiveTo": { "type": "string", "format": "date-time" }
+            },
+            "required": ["ruleId", "country", "taxType", "taxRate"],
+            "additionalProperties": false
+          }
+        },
+        "vatValidation": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "reverseChargeEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "invoiceGeneration": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "autoGenerate": { "type": "boolean", "default": true },
+            "template": { "type": "string" },
+            "includeBreakdown": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "fraudDetection": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "provider": { "type": "string", "enum": ["stripe_radar", "sift", "forter", "signifyd", "custom"] },
+        "riskThresholds": {
+          "type": "object",
+          "properties": {
+            "block": { "type": "number", "minimum": 0, "maximum": 100, "default": 80 },
+            "review": { "type": "number", "minimum": 0, "maximum": 100, "default": 50 },
+            "allow": { "type": "number", "minimum": 0, "maximum": 100, "default": 20 }
+          },
+          "additionalProperties": false
+        },
+        "checks": {
+          "type": "object",
+          "properties": {
+            "vpnDetection": { "type": "boolean", "default": true },
+            "proxyDetection": { "type": "boolean", "default": true },
+            "velocityChecks": { "type": "boolean", "default": true },
+            "cardBinChecks": { "type": "boolean", "default": true },
+            "addressVerification": { "type": "boolean", "default": true },
+            "deviceFingerprinting": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "blockedCountries": { "type": "array", "items": { "type": "string" } },
+        "blockedPaymentMethods": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "currencyConversion": {
+      "type": "object",
+      "properties": {
+        "provider": { "type": "string", "enum": ["openexchangerates", "xe", "fixer", "currencylayer", "manual"] },
+        "updateFrequency": { "type": "string", "enum": ["realtime", "hourly", "daily", "weekly"] },
+        "markupPercentage": { "type": "number", "minimum": 0, "maximum": 10, "default": 0 },
+        "roundingStrategy": { "type": "string", "enum": ["nearest", "up", "down", "psychological"], "default": "nearest" },
+        "fallbackRates": {
+          "type": "object",
+          "additionalProperties": { "type": "number", "minimum": 0 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "promotionalPricing": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "campaigns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "campaignId": { "type": "string" },
+              "campaignName": { "type": "string" },
+              "campaignType": { "type": "string", "enum": ["launch", "seasonal", "holiday", "partnership", "loyalty", "winback"] },
+              "discountType": { "type": "string", "enum": ["percentage", "fixed_amount", "free_trial_extension"] },
+              "discountValue": { "type": "number", "minimum": 0 },
+              "applicableRegions": { "type": "array", "items": { "type": "string" } },
+              "applicableTiers": { "type": "array", "items": { "type": "string" } },
+              "promoCode": { "type": "string" },
+              "startDate": { "type": "string", "format": "date-time" },
+              "endDate": { "type": "string", "format": "date-time" },
+              "maxRedemptions": { "type": "integer", "minimum": 1 }
+            },
+            "required": ["campaignId", "campaignType", "discountType", "discountValue"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "paused", "archived"],
+      "description": "Current status of the pricing configuration"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "pricingConfigId",
+    "franchiseId",
+    "configScope",
+    "baseCurrency",
+    "status"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AdInsertion",
+  "description": "Schema for ad insertion and sponsorship in SL18 + Waliin Studio - SSAI, targeting, compliance, and sponsorship",
+  "type": "object",
+  "properties": {
+    "adConfigId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique ad configuration identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "contentId": {
+      "type": "string",
+      "description": "Associated content identifier (optional for global config)"
+    },
+    "configType": {
+      "type": "string",
+      "enum": ["global", "franchise", "content", "campaign"],
+      "description": "Scope of the ad configuration"
+    },
+    "ssaiConfig": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "provider": { "type": "string", "enum": ["aws_mediatailor", "google_ad_manager", "brightcove", "springserve", "freewheel", "custom"] },
+        "adServerUrl": { "type": "string", "format": "uri" },
+        "manifestManipulation": { "type": "boolean", "default": true },
+        "beaconTracking": { "type": "boolean", "default": true },
+        "personalizedAds": { "type": "boolean", "default": true },
+        "fallbackAdEnabled": { "type": "boolean", "default": true },
+        "fallbackAdUrl": { "type": "string", "format": "uri" }
+      },
+      "additionalProperties": false
+    },
+    "adPlacements": {
+      "type": "object",
+      "properties": {
+        "preRoll": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "maxDurationSeconds": { "type": "integer", "minimum": 0, "default": 30 },
+            "maxAdCount": { "type": "integer", "minimum": 1, "default": 2 },
+            "skipAfterSeconds": { "type": "integer", "minimum": 0, "default": 5 },
+            "skipEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "midRoll": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "intervalMinutes": { "type": "integer", "minimum": 1, "default": 10 },
+            "maxDurationSeconds": { "type": "integer", "minimum": 0, "default": 60 },
+            "maxAdCount": { "type": "integer", "minimum": 1, "default": 3 },
+            "naturalBreakDetection": { "type": "boolean", "default": true },
+            "cuePoints": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "timestamp": { "type": "integer", "minimum": 0, "description": "Timestamp in seconds" },
+                  "adDuration": { "type": "integer", "minimum": 0 }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "postRoll": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "maxDurationSeconds": { "type": "integer", "minimum": 0, "default": 15 },
+            "maxAdCount": { "type": "integer", "minimum": 1, "default": 1 }
+          },
+          "additionalProperties": false
+        },
+        "rewarded": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "rewardType": { "type": "string", "enum": ["unlock_content", "extend_trial", "virtual_currency", "premium_preview"] },
+            "rewardValue": { "type": "number", "minimum": 0 },
+            "requiredWatchPercentage": { "type": "number", "minimum": 0, "maximum": 100, "default": 100 }
+          },
+          "additionalProperties": false
+        },
+        "overlay": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "position": { "type": "string", "enum": ["bottom_banner", "side_panel", "corner_badge"] },
+            "maxDurationSeconds": { "type": "integer", "minimum": 0 },
+            "dismissable": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "targeting": {
+      "type": "object",
+      "properties": {
+        "demographicTargeting": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "ageGroups": { "type": "array", "items": { "type": "string", "enum": ["13-17", "18-24", "25-34", "35-44", "45-54", "55-64", "65+"] } },
+            "genders": { "type": "array", "items": { "type": "string", "enum": ["male", "female", "other", "unknown"] } }
+          },
+          "additionalProperties": false
+        },
+        "geoTargeting": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "regions": { "type": "array", "items": { "type": "string" } },
+            "countries": { "type": "array", "items": { "type": "string" } },
+            "cities": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "behavioralTargeting": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "genreAffinities": { "type": "array", "items": { "type": "string" } },
+            "watchingPatterns": { "type": "array", "items": { "type": "string", "enum": ["binge_watcher", "casual_viewer", "primetime_only", "mobile_first"] } },
+            "contentPreferences": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "contextualTargeting": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "contentGenre": { "type": "array", "items": { "type": "string" } },
+            "contentRating": { "type": "array", "items": { "type": "string" } },
+            "mood": { "type": "array", "items": { "type": "string", "enum": ["uplifting", "dramatic", "action", "romantic", "comedic", "thriller"] } }
+          },
+          "additionalProperties": false
+        },
+        "deviceTargeting": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "deviceTypes": { "type": "array", "items": { "type": "string", "enum": ["mobile", "tablet", "desktop", "smart_tv", "gaming_console", "streaming_device"] } },
+            "osTypes": { "type": "array", "items": { "type": "string", "enum": ["ios", "android", "windows", "macos", "webos", "tizen", "roku_os", "fire_os"] } }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "sponsorship": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "sponsors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sponsorId": { "type": "string" },
+              "sponsorName": { "type": "string" },
+              "sponsorshipType": { "type": "string", "enum": ["presenting", "exclusive", "branded_content", "product_placement", "banner"] },
+              "placements": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "placementType": { "type": "string", "enum": ["intro_card", "outro_card", "banner", "watermark", "branded_integration"] },
+                    "duration": { "type": "integer", "minimum": 0 },
+                    "position": { "type": "string" },
+                    "assetUrl": { "type": "string", "format": "uri" }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "contractStart": { "type": "string", "format": "date-time" },
+              "contractEnd": { "type": "string", "format": "date-time" },
+              "revenueModel": { "type": "string", "enum": ["flat_fee", "cpm", "revenue_share", "hybrid"] }
+            },
+            "required": ["sponsorId", "sponsorName", "sponsorshipType"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "frequencyCapping": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "maxImpressionsPerHour": { "type": "integer", "minimum": 1, "default": 10 },
+        "maxImpressionsPerDay": { "type": "integer", "minimum": 1, "default": 50 },
+        "maxSameAdPerSession": { "type": "integer", "minimum": 1, "default": 3 },
+        "cooldownMinutes": { "type": "integer", "minimum": 0, "default": 30 }
+      },
+      "additionalProperties": false
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "gdprCompliant": { "type": "boolean", "default": true },
+        "coppaCompliant": { "type": "boolean", "default": true },
+        "ccpaCompliant": { "type": "boolean", "default": true },
+        "consentRequired": { "type": "boolean", "default": true },
+        "noPersonalizedAdsOption": { "type": "boolean", "default": true },
+        "culturalSensitivityFilters": { "type": "boolean", "default": true },
+        "adCategoriesBlocked": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["alcohol", "tobacco", "gambling", "adult", "political", "religious", "pharmaceutical", "weapons"] }
+        }
+      },
+      "additionalProperties": false
+    },
+    "revenueTracking": {
+      "type": "object",
+      "properties": {
+        "trackImpressions": { "type": "boolean", "default": true },
+        "trackClicks": { "type": "boolean", "default": true },
+        "trackCompletions": { "type": "boolean", "default": true },
+        "trackRevenue": { "type": "boolean", "default": true },
+        "cpmFloor": { "type": "number", "minimum": 0, "default": 2.0 },
+        "fillRateTarget": { "type": "number", "minimum": 0, "maximum": 100, "default": 90 }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "paused", "archived"],
+      "description": "Current status of the ad configuration"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "adConfigId",
+    "franchiseId",
+    "configType",
+    "status"
+  ],
+  "additionalProperties": false
+}

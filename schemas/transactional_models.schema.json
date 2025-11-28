@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TransactionalModels",
+  "description": "Schema for transactional monetization models in SL18 + Waliin Studio - TVOD, PVOD, SVOD, AVOD, and hybrid models",
+  "type": "object",
+  "properties": {
+    "modelId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique transactional model identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "contentId": {
+      "type": "string",
+      "description": "Associated content identifier"
+    },
+    "modelType": {
+      "type": "string",
+      "enum": ["tvod", "pvod", "svod", "avod", "est", "hybrid"],
+      "description": "Type of transactional model"
+    },
+    "modelConfig": {
+      "type": "object",
+      "properties": {
+        "tvod": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "rentalPrice": { "type": "number", "minimum": 0 },
+            "rentalPeriodHours": { "type": "integer", "minimum": 1, "default": 48 },
+            "hdUpchargePercentage": { "type": "number", "minimum": 0, "maximum": 100, "default": 0 },
+            "uhd4kUpchargePercentage": { "type": "number", "minimum": 0, "maximum": 100, "default": 0 },
+            "regionalPricing": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "region": { "type": "string" },
+                  "currency": { "type": "string" },
+                  "rentalPrice": { "type": "number", "minimum": 0 }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "pvod": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "premiumPrice": { "type": "number", "minimum": 0 },
+            "earlyAccessDays": { "type": "integer", "minimum": 1, "default": 14 },
+            "windowStart": { "type": "string", "format": "date-time" },
+            "windowEnd": { "type": "string", "format": "date-time" },
+            "includesDownload": { "type": "boolean", "default": false }
+          },
+          "additionalProperties": false
+        },
+        "svod": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "includedInTiers": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Subscription tiers that include this content"
+            },
+            "svodWindowStart": { "type": "string", "format": "date-time" },
+            "svodWindowEnd": { "type": "string", "format": "date-time" }
+          },
+          "additionalProperties": false
+        },
+        "avod": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "adLoadConfiguration": {
+              "type": "object",
+              "properties": {
+                "preRollEnabled": { "type": "boolean", "default": true },
+                "preRollMaxSeconds": { "type": "integer", "minimum": 0, "default": 30 },
+                "midRollEnabled": { "type": "boolean", "default": true },
+                "midRollIntervalMinutes": { "type": "integer", "minimum": 1, "default": 10 },
+                "midRollMaxSeconds": { "type": "integer", "minimum": 0, "default": 30 },
+                "postRollEnabled": { "type": "boolean", "default": false },
+                "rewardedAdsEnabled": { "type": "boolean", "default": false }
+              },
+              "additionalProperties": false
+            },
+            "adFreeTierUpgrade": { "type": "string", "description": "Tier that removes ads" },
+            "avodWindowStart": { "type": "string", "format": "date-time" },
+            "avodWindowEnd": { "type": "string", "format": "date-time" }
+          },
+          "additionalProperties": false
+        },
+        "est": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "purchasePrice": { "type": "number", "minimum": 0 },
+            "hdPurchasePrice": { "type": "number", "minimum": 0 },
+            "uhd4kPurchasePrice": { "type": "number", "minimum": 0 },
+            "includesDownload": { "type": "boolean", "default": true },
+            "downloadRetentionDays": { "type": "integer", "minimum": -1, "default": -1, "description": "-1 for permanent" }
+          },
+          "additionalProperties": false
+        },
+        "hybrid": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "baseModel": { "type": "string", "enum": ["svod", "avod"] },
+            "addOns": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "addOnId": { "type": "string" },
+                  "addOnType": { "type": "string", "enum": ["tvod", "pvod", "est", "ad_removal", "premium_quality"] },
+                  "price": { "type": "number", "minimum": 0 },
+                  "description": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "windowManagement": {
+      "type": "object",
+      "properties": {
+        "windows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "windowId": { "type": "string" },
+              "windowName": { "type": "string" },
+              "windowType": { "type": "string", "enum": ["theatrical", "pvod", "tvod", "svod", "avod", "fvod", "library"] },
+              "priority": { "type": "integer", "minimum": 1 },
+              "startDate": { "type": "string", "format": "date-time" },
+              "endDate": { "type": "string", "format": "date-time" },
+              "daysAfterRelease": { "type": "integer", "minimum": 0 },
+              "regions": { "type": "array", "items": { "type": "string" } },
+              "exclusivity": { "type": "string", "enum": ["exclusive", "non_exclusive", "co_exclusive"] }
+            },
+            "required": ["windowId", "windowType", "priority"],
+            "additionalProperties": false
+          }
+        },
+        "cascadeRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fromWindow": { "type": "string" },
+              "toWindow": { "type": "string" },
+              "transitionType": { "type": "string", "enum": ["automatic", "manual", "conditional"] },
+              "condition": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "bundling": {
+      "type": "object",
+      "properties": {
+        "bundleEnabled": { "type": "boolean", "default": false },
+        "bundleType": { "type": "string", "enum": ["season", "series", "collection", "franchise"] },
+        "bundleDiscount": { "type": "number", "minimum": 0, "maximum": 100 },
+        "bundledContentIds": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "promotions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "promotionId": { "type": "string" },
+          "promotionType": { "type": "string", "enum": ["discount", "free_episode", "bundle_upgrade", "loyalty_reward"] },
+          "value": { "type": "number" },
+          "promoCode": { "type": "string" },
+          "validFrom": { "type": "string", "format": "date-time" },
+          "validUntil": { "type": "string", "format": "date-time" },
+          "maxRedemptions": { "type": "integer", "minimum": 1 },
+          "conditions": {
+            "type": "object",
+            "properties": {
+              "firstTimeOnly": { "type": "boolean" },
+              "requiredTier": { "type": "string" },
+              "minPurchaseAmount": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["promotionId", "promotionType"],
+        "additionalProperties": false
+      }
+    },
+    "revenueSettings": {
+      "type": "object",
+      "properties": {
+        "platformFeePercentage": { "type": "number", "minimum": 0, "maximum": 100, "default": 30 },
+        "creatorSplitPercentage": { "type": "number", "minimum": 0, "maximum": 100, "default": 70 },
+        "paymentProcessingFee": { "type": "number", "minimum": 0, "maximum": 10, "default": 2.9 },
+        "minimumPayout": { "type": "number", "minimum": 0, "default": 50 }
+      },
+      "additionalProperties": false
+    },
+    "complianceIntegration": {
+      "type": "object",
+      "properties": {
+        "taxComplianceRequired": { "type": "boolean", "default": true },
+        "gdprCompliant": { "type": "boolean", "default": true },
+        "ccpaCompliant": { "type": "boolean", "default": true },
+        "pcidssCompliant": { "type": "boolean", "default": true }
+      },
+      "additionalProperties": false
+    },
+    "analyticsTracking": {
+      "type": "object",
+      "properties": {
+        "trackPurchases": { "type": "boolean", "default": true },
+        "trackConversions": { "type": "boolean", "default": true },
+        "trackChurnPrediction": { "type": "boolean", "default": true },
+        "feedToPersonalization": { "type": "boolean", "default": true }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "paused", "expired", "archived"],
+      "description": "Current status of the transactional model"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "modelId",
+    "franchiseId",
+    "modelType",
+    "modelConfig",
+    "status"
+  ],
+  "additionalProperties": false
+}

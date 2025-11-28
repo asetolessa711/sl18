@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SubscriptionTiers",
+  "description": "Schema for subscription tiers in SL18 + Waliin Studio - flexible tier configuration with feature access, pricing, and family profiles",
+  "type": "object",
+  "properties": {
+    "tierId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique subscription tier identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "tierName": {
+      "type": "string",
+      "enum": ["free", "basic", "standard", "premium", "vip", "family", "student", "enterprise"],
+      "description": "Name of the subscription tier"
+    },
+    "tierDisplayName": {
+      "type": "string",
+      "description": "Display name for the tier"
+    },
+    "tierDescription": {
+      "type": "string",
+      "description": "Marketing description of the tier"
+    },
+    "tierLocalizations": {
+      "type": "object",
+      "properties": {
+        "displayNames": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "descriptions": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "pricing": {
+      "type": "object",
+      "properties": {
+        "baseCurrency": {
+          "type": "string",
+          "default": "USD",
+          "description": "Base currency for pricing"
+        },
+        "monthlyPrice": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Monthly subscription price"
+        },
+        "annualPrice": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Annual subscription price"
+        },
+        "annualDiscount": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage discount for annual billing"
+        },
+        "trialPeriodDays": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 7,
+          "description": "Free trial period in days"
+        },
+        "regionalPricing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "country": { "type": "string" },
+              "currency": { "type": "string" },
+              "monthlyPrice": { "type": "number", "minimum": 0 },
+              "annualPrice": { "type": "number", "minimum": 0 },
+              "pppAdjustment": { "type": "number", "minimum": 0, "maximum": 1, "description": "Purchasing Power Parity adjustment factor" }
+            },
+            "required": ["region", "currency", "monthlyPrice"],
+            "additionalProperties": false
+          }
+        },
+        "promotionalPricing": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "discountPercentage": { "type": "number", "minimum": 0, "maximum": 100 },
+            "discountCode": { "type": "string" },
+            "validFrom": { "type": "string", "format": "date-time" },
+            "validUntil": { "type": "string", "format": "date-time" },
+            "maxRedemptions": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["baseCurrency", "monthlyPrice"],
+      "additionalProperties": false
+    },
+    "features": {
+      "type": "object",
+      "properties": {
+        "contentAccess": {
+          "type": "object",
+          "properties": {
+            "fullCatalog": { "type": "boolean", "default": false },
+            "limitedCatalog": { "type": "boolean", "default": true },
+            "premiumContent": { "type": "boolean", "default": false },
+            "exclusivePreviews": { "type": "boolean", "default": false },
+            "behindTheScenes": { "type": "boolean", "default": false },
+            "earlyAccess": { "type": "boolean", "default": false },
+            "earlyAccessDays": { "type": "integer", "minimum": 0, "default": 0 }
+          },
+          "additionalProperties": false
+        },
+        "streamingQuality": {
+          "type": "object",
+          "properties": {
+            "maxResolution": { "type": "string", "enum": ["480p", "720p", "1080p", "4K", "8K"], "default": "720p" },
+            "hdr": { "type": "boolean", "default": false },
+            "dolbyAtmos": { "type": "boolean", "default": false },
+            "simultaneousStreams": { "type": "integer", "minimum": 1, "maximum": 10, "default": 1 }
+          },
+          "additionalProperties": false
+        },
+        "downloads": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "maxDownloads": { "type": "integer", "minimum": 0, "default": 0 },
+            "downloadQuality": { "type": "string", "enum": ["standard", "high", "ultra"] },
+            "offlineRetentionDays": { "type": "integer", "minimum": 1, "default": 30 }
+          },
+          "additionalProperties": false
+        },
+        "profiles": {
+          "type": "object",
+          "properties": {
+            "maxProfiles": { "type": "integer", "minimum": 1, "maximum": 10, "default": 1 },
+            "kidsMode": { "type": "boolean", "default": false },
+            "personalizedRecommendations": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "ads": {
+          "type": "object",
+          "properties": {
+            "adSupported": { "type": "boolean", "default": true },
+            "adFrequency": { "type": "string", "enum": ["none", "low", "medium", "high"], "default": "medium" },
+            "skipAdsAfter": { "type": "integer", "minimum": 0, "description": "Seconds before skip is allowed" }
+          },
+          "additionalProperties": false
+        },
+        "interactiveFeatures": {
+          "type": "object",
+          "properties": {
+            "pollVoting": { "type": "boolean", "default": true },
+            "pollInfluence": { "type": "boolean", "default": false },
+            "commenting": { "type": "boolean", "default": true },
+            "reactions": { "type": "boolean", "default": true },
+            "prioritySupport": { "type": "boolean", "default": false }
+          },
+          "additionalProperties": false
+        },
+        "exclusivePerks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "perkId": { "type": "string" },
+              "perkName": { "type": "string" },
+              "description": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "upgradeDowngrade": {
+      "type": "object",
+      "properties": {
+        "canUpgradeTo": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tier IDs this tier can upgrade to"
+        },
+        "canDowngradeTo": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tier IDs this tier can downgrade to"
+        },
+        "prorateOnUpgrade": { "type": "boolean", "default": true },
+        "refundOnDowngrade": { "type": "boolean", "default": false },
+        "minimumCommitmentDays": { "type": "integer", "minimum": 0, "default": 0 }
+      },
+      "additionalProperties": false
+    },
+    "eligibility": {
+      "type": "object",
+      "properties": {
+        "regions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Regions where this tier is available"
+        },
+        "countries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Countries where this tier is available"
+        },
+        "requiresVerification": { "type": "boolean", "default": false },
+        "verificationTypes": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["student_id", "employee_id", "age_verification"] }
+        },
+        "minAge": { "type": "integer", "minimum": 0 },
+        "maxAge": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "retention": {
+      "type": "object",
+      "properties": {
+        "churnRiskThreshold": { "type": "number", "minimum": 0, "maximum": 1 },
+        "retentionOffers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "offerId": { "type": "string" },
+              "offerType": { "type": "string", "enum": ["discount", "free_month", "tier_extension", "exclusive_content"] },
+              "value": { "type": "number" },
+              "validDays": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "winbackCampaignEnabled": { "type": "boolean", "default": false }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated", "archived"],
+      "description": "Current status of the tier"
+    },
+    "sortOrder": {
+      "type": "integer",
+      "description": "Display order in tier selection UI"
+    },
+    "isDefault": {
+      "type": "boolean",
+      "default": false,
+      "description": "Default tier for new signups"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "tierId",
+    "franchiseId",
+    "tierName",
+    "pricing",
+    "features",
+    "status"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,441 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MonetizationAnalytics",
+  "description": "Schema for monetization analytics in SL18 + Waliin Studio - revenue dashboards, subscription metrics, transaction tracking, and forecasting",
+  "type": "object",
+  "properties": {
+    "analyticsId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique monetization analytics identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "periodStart": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Start of the analytics period"
+    },
+    "periodEnd": {
+      "type": "string",
+      "format": "date-time",
+      "description": "End of the analytics period"
+    },
+    "periodType": {
+      "type": "string",
+      "enum": ["hourly", "daily", "weekly", "monthly", "quarterly", "yearly"],
+      "description": "Granularity of the analytics period"
+    },
+    "subscriptionMetrics": {
+      "type": "object",
+      "properties": {
+        "totalSubscribers": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total active subscribers"
+        },
+        "newSubscribers": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "New subscribers in period"
+        },
+        "cancelledSubscribers": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Cancelled subscribers in period"
+        },
+        "netChange": {
+          "type": "integer",
+          "description": "Net subscriber change"
+        },
+        "churnRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Churn rate percentage"
+        },
+        "retentionRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Retention rate percentage"
+        },
+        "mrr": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Monthly Recurring Revenue"
+        },
+        "arr": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Annual Recurring Revenue"
+        },
+        "arpu": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average Revenue Per User"
+        },
+        "ltv": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Customer Lifetime Value"
+        },
+        "tierBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tier": { "type": "string" },
+              "subscribers": { "type": "integer", "minimum": 0 },
+              "percentage": { "type": "number", "minimum": 0, "maximum": 100 },
+              "revenue": { "type": "number", "minimum": 0 },
+              "churnRate": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["tier", "subscribers"],
+            "additionalProperties": false
+          }
+        },
+        "trialConversions": {
+          "type": "object",
+          "properties": {
+            "trialsStarted": { "type": "integer", "minimum": 0 },
+            "trialsConverted": { "type": "integer", "minimum": 0 },
+            "conversionRate": { "type": "number", "minimum": 0, "maximum": 100 },
+            "avgTimeToConvertDays": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "upgrades": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tier upgrades in period"
+        },
+        "downgrades": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tier downgrades in period"
+        }
+      },
+      "additionalProperties": false
+    },
+    "transactionMetrics": {
+      "type": "object",
+      "properties": {
+        "totalTransactions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalRevenue": {
+          "type": "number",
+          "minimum": 0
+        },
+        "avgTransactionValue": {
+          "type": "number",
+          "minimum": 0
+        },
+        "revenueByType": {
+          "type": "object",
+          "properties": {
+            "subscription": { "type": "number", "minimum": 0 },
+            "tvod": { "type": "number", "minimum": 0 },
+            "pvod": { "type": "number", "minimum": 0 },
+            "est": { "type": "number", "minimum": 0 },
+            "ads": { "type": "number", "minimum": 0 },
+            "sponsorship": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "revenueByRegion": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "revenue": { "type": "number", "minimum": 0 },
+              "percentage": { "type": "number", "minimum": 0, "maximum": 100 },
+              "currency": { "type": "string" }
+            },
+            "required": ["region", "revenue"],
+            "additionalProperties": false
+          }
+        },
+        "paymentMethodBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "method": { "type": "string" },
+              "transactions": { "type": "integer", "minimum": 0 },
+              "revenue": { "type": "number", "minimum": 0 },
+              "percentage": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "failedTransactions": {
+          "type": "object",
+          "properties": {
+            "count": { "type": "integer", "minimum": 0 },
+            "failureRate": { "type": "number", "minimum": 0, "maximum": 100 },
+            "failureReasons": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "reason": { "type": "string" },
+                  "count": { "type": "integer", "minimum": 0 }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "refunds": {
+          "type": "object",
+          "properties": {
+            "count": { "type": "integer", "minimum": 0 },
+            "totalAmount": { "type": "number", "minimum": 0 },
+            "refundRate": { "type": "number", "minimum": 0, "maximum": 100 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "adMetrics": {
+      "type": "object",
+      "properties": {
+        "totalImpressions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalClicks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ctr": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Click-through rate"
+        },
+        "totalAdRevenue": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cpm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Cost per mille (thousand impressions)"
+        },
+        "ecpm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Effective CPM"
+        },
+        "fillRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "revenueByPlacement": {
+          "type": "object",
+          "properties": {
+            "preRoll": { "type": "number", "minimum": 0 },
+            "midRoll": { "type": "number", "minimum": 0 },
+            "postRoll": { "type": "number", "minimum": 0 },
+            "overlay": { "type": "number", "minimum": 0 },
+            "rewarded": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "completionRates": {
+          "type": "object",
+          "properties": {
+            "preRoll": { "type": "number", "minimum": 0, "maximum": 100 },
+            "midRoll": { "type": "number", "minimum": 0, "maximum": 100 },
+            "rewarded": { "type": "number", "minimum": 0, "maximum": 100 }
+          },
+          "additionalProperties": false
+        },
+        "viewability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of ads that were viewable"
+        }
+      },
+      "additionalProperties": false
+    },
+    "contentPerformance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "contentId": { "type": "string" },
+          "contentTitle": { "type": "string" },
+          "contentType": { "type": "string" },
+          "revenue": { "type": "number", "minimum": 0 },
+          "transactions": { "type": "integer", "minimum": 0 },
+          "subscribers": { "type": "integer", "minimum": 0 },
+          "adRevenue": { "type": "number", "minimum": 0 },
+          "revenueRank": { "type": "integer", "minimum": 1 }
+        },
+        "required": ["contentId", "revenue"],
+        "additionalProperties": false
+      },
+      "description": "Top performing content by revenue"
+    },
+    "forecasting": {
+      "type": "object",
+      "properties": {
+        "revenueProjection": {
+          "type": "object",
+          "properties": {
+            "nextMonth": { "type": "number" },
+            "nextQuarter": { "type": "number" },
+            "nextYear": { "type": "number" },
+            "confidenceLevel": { "type": "number", "minimum": 0, "maximum": 100 }
+          },
+          "additionalProperties": false
+        },
+        "subscriberProjection": {
+          "type": "object",
+          "properties": {
+            "nextMonth": { "type": "integer" },
+            "nextQuarter": { "type": "integer" },
+            "nextYear": { "type": "integer" },
+            "growthRate": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "churnPrediction": {
+          "type": "object",
+          "properties": {
+            "atRiskSubscribers": { "type": "integer", "minimum": 0 },
+            "predictedChurnRate": { "type": "number", "minimum": 0, "maximum": 100 },
+            "revenueAtRisk": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "seasonalTrends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": { "type": "string" },
+              "expectedRevenue": { "type": "number" },
+              "expectedSubscribers": { "type": "integer" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "alerts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "alertId": { "type": "string" },
+          "alertType": { "type": "string", "enum": ["revenue_drop", "churn_spike", "payment_failures", "fraud_detected", "tax_compliance", "target_achieved", "forecast_deviation"] },
+          "severity": { "type": "string", "enum": ["info", "warning", "critical"] },
+          "message": { "type": "string" },
+          "value": { "type": "number" },
+          "threshold": { "type": "number" },
+          "triggeredAt": { "type": "string", "format": "date-time" },
+          "acknowledged": { "type": "boolean", "default": false }
+        },
+        "required": ["alertId", "alertType", "severity", "message", "triggeredAt"],
+        "additionalProperties": false
+      }
+    },
+    "operatorDashboard": {
+      "type": "object",
+      "properties": {
+        "kpis": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kpiId": { "type": "string" },
+              "kpiName": { "type": "string" },
+              "value": { "type": "number" },
+              "previousValue": { "type": "number" },
+              "changePercentage": { "type": "number" },
+              "trend": { "type": "string", "enum": ["up", "down", "stable"] },
+              "target": { "type": "number" },
+              "targetAchieved": { "type": "boolean" }
+            },
+            "required": ["kpiId", "kpiName", "value"],
+            "additionalProperties": false
+          }
+        },
+        "charts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "chartId": { "type": "string" },
+              "chartType": { "type": "string", "enum": ["line", "bar", "pie", "area", "funnel", "cohort", "heatmap"] },
+              "title": { "type": "string" },
+              "metric": { "type": "string" },
+              "dataPoints": { "type": "array", "items": { "type": "object" } }
+            },
+            "required": ["chartId", "chartType", "title"],
+            "additionalProperties": false
+          }
+        },
+        "defaultView": { "type": "string", "enum": ["overview", "subscriptions", "transactions", "ads", "content", "forecasting"] },
+        "exportFormats": { "type": "array", "items": { "type": "string", "enum": ["csv", "pdf", "xlsx", "json"] } }
+      },
+      "additionalProperties": false
+    },
+    "integrations": {
+      "type": "object",
+      "properties": {
+        "feedToAudienceInsights": { "type": "boolean", "default": true },
+        "feedToPersonalization": { "type": "boolean", "default": true },
+        "feedToFeedbackLoop": { "type": "boolean", "default": true },
+        "exportToBI": { "type": "boolean", "default": false },
+        "biPlatform": { "type": "string", "enum": ["tableau", "powerbi", "looker", "metabase", "custom"] }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["collecting", "processing", "ready", "stale", "error"],
+      "description": "Current status of the analytics"
+    },
+    "dataQuality": {
+      "type": "object",
+      "properties": {
+        "completeness": { "type": "number", "minimum": 0, "maximum": 100 },
+        "reliability": { "type": "string", "enum": ["high", "medium", "low"] },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "analyticsId",
+    "franchiseId",
+    "periodStart",
+    "periodEnd",
+    "status"
+  ],
+  "additionalProperties": false
+}
