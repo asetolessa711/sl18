@@ -10,7 +10,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node tests/governance/governance.test.js && node tests/governance/globalization.test.js && node tests/governance/language_registry.test.js && node tests/governance/observability.test.js && node tests/governance/personalization.test.js && node tests/governance/governance_scaling.test.js && node tests/governance/distribution.test.js && node tests/governance/audience_insights.test.js && node tests/governance/ui_frontend.test.js && node tests/governance/mobile_crossplatform.test.js",
+    "test": "node tests/governance/governance.test.js && node tests/governance/globalization.test.js && node tests/governance/language_registry.test.js && node tests/governance/observability.test.js && node tests/governance/personalization.test.js && node tests/governance/governance_scaling.test.js && node tests/governance/distribution.test.js && node tests/governance/audience_insights.test.js && node tests/governance/ui_frontend.test.js && node tests/governance/mobile_crossplatform.test.js && node tests/governance/ai_assistant.test.js",
     "test:governance": "node tests/governance/governance.test.js",
     "test:globalization": "node tests/governance/globalization.test.js",
     "test:language-registry": "node tests/governance/language_registry.test.js",
@@ -20,7 +20,8 @@
     "test:distribution": "node tests/governance/distribution.test.js",
     "test:audience-insights": "node tests/governance/audience_insights.test.js",
     "test:ui-frontend": "node tests/governance/ui_frontend.test.js",
-    "test:mobile-crossplatform": "node tests/governance/mobile_crossplatform.test.js"
+    "test:mobile-crossplatform": "node tests/governance/mobile_crossplatform.test.js",
+    "test:ai-assistant": "node tests/governance/ai_assistant.test.js"
   },
   "keywords": [],
   "author": "",

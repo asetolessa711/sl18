@@ -1,0 +1,533 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sl18.io/schemas/voice_control.schema.json",
+  "title": "Voice Control Schema",
+  "description": "Schema for SL18 voice control configuration with wake words, voice commands, multilingual recognition, and accessibility support",
+  "type": "object",
+  "properties": {
+    "voiceControlId": {
+      "type": "string",
+      "description": "Unique voice control instance identifier",
+      "pattern": "^voice-[a-z0-9-]+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Voice control version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "operatorId": {
+      "type": "string",
+      "description": "Associated operator identifier"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether voice control is enabled"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["inactive", "listening", "processing", "speaking", "error", "disabled"],
+      "description": "Current voice control status"
+    },
+    "wakeWord": {
+      "type": "object",
+      "description": "Wake word configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "phrase": {
+          "type": "string",
+          "default": "Hey SL18",
+          "description": "Wake word phrase"
+        },
+        "alternatives": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Alternative wake phrases"
+        },
+        "sensitivity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.5,
+          "description": "Wake word detection sensitivity"
+        },
+        "confirmationSound": {
+          "type": "boolean",
+          "default": true,
+          "description": "Play sound when wake word detected"
+        },
+        "visualIndicator": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show visual indicator when listening"
+        }
+      }
+    },
+    "recognition": {
+      "type": "object",
+      "description": "Speech recognition configuration",
+      "properties": {
+        "engine": {
+          "type": "string",
+          "enum": ["native", "google", "azure", "aws", "whisper"],
+          "default": "native",
+          "description": "Speech recognition engine"
+        },
+        "primaryLanguage": {
+          "type": "string",
+          "description": "Primary recognition language (ISO 639-1)",
+          "default": "en"
+        },
+        "supportedLanguages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "All supported recognition languages",
+          "default": ["en", "fr", "es", "ar", "zh", "it", "am", "sw", "om"]
+        },
+        "autoDetectLanguage": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically detect spoken language"
+        },
+        "continuousListening": {
+          "type": "boolean",
+          "default": false,
+          "description": "Continue listening after command"
+        },
+        "interimResults": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show partial recognition results"
+        },
+        "maxSilenceMs": {
+          "type": "integer",
+          "minimum": 500,
+          "maximum": 10000,
+          "default": 2000,
+          "description": "Max silence before stopping listening"
+        },
+        "maxRecordingMs": {
+          "type": "integer",
+          "minimum": 5000,
+          "maximum": 60000,
+          "default": 15000,
+          "description": "Max recording duration"
+        },
+        "confidenceThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.7,
+          "description": "Minimum confidence for command recognition"
+        },
+        "noiseReduction": {
+          "type": "boolean",
+          "default": true
+        },
+        "echoCancellation": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "synthesis": {
+      "type": "object",
+      "description": "Speech synthesis configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable voice responses"
+        },
+        "engine": {
+          "type": "string",
+          "enum": ["native", "google", "azure", "aws", "elevenlabs"],
+          "default": "native"
+        },
+        "voice": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "language": { "type": "string" },
+            "gender": { "type": "string", "enum": ["male", "female", "neutral"] }
+          }
+        },
+        "rate": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 2,
+          "default": 1,
+          "description": "Speech rate"
+        },
+        "pitch": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 2,
+          "default": 1,
+          "description": "Speech pitch"
+        },
+        "volume": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1,
+          "description": "Speech volume"
+        },
+        "readAlerts": {
+          "type": "boolean",
+          "default": false,
+          "description": "Read alerts aloud"
+        },
+        "confirmActions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Verbally confirm executed actions"
+        }
+      }
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/voiceCommand"
+      },
+      "description": "Supported voice commands"
+    },
+    "commandCategories": {
+      "type": "object",
+      "description": "Voice command categories and their enabled status",
+      "properties": {
+        "navigation": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "confirmationRequired": { "type": "boolean", "default": false }
+          }
+        },
+        "alerts": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "confirmationRequired": { "type": "boolean", "default": false }
+          }
+        },
+        "qcActions": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "confirmationRequired": { "type": "boolean", "default": true }
+          }
+        },
+        "distribution": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "confirmationRequired": { "type": "boolean", "default": true }
+          }
+        },
+        "settings": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "confirmationRequired": { "type": "boolean", "default": true }
+          }
+        },
+        "help": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "confirmationRequired": { "type": "boolean", "default": false }
+          }
+        }
+      }
+    },
+    "accessibility": {
+      "type": "object",
+      "description": "Accessibility features for voice control",
+      "properties": {
+        "speechToTextEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable speech-to-text for text input fields"
+        },
+        "voiceNavigationEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Navigate UI elements by voice"
+        },
+        "screenReaderIntegration": {
+          "type": "boolean",
+          "default": true,
+          "description": "Integrate with screen readers"
+        },
+        "dictationMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Dictation mode for long text input"
+        },
+        "slowSpeechMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Slower speech for better comprehension"
+        },
+        "repeatEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable 'repeat that' command"
+        },
+        "spellingMode": {
+          "type": "boolean",
+          "default": true,
+          "description": "Spell out words on request"
+        }
+      }
+    },
+    "deviceIntegration": {
+      "type": "object",
+      "description": "Device-specific voice integration",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "enum": ["ios", "android", "web", "desktop"],
+          "description": "Platform for voice control"
+        },
+        "microphonePermission": {
+          "type": "string",
+          "enum": ["granted", "denied", "prompt"],
+          "description": "Microphone permission status"
+        },
+        "backgroundListening": {
+          "type": "boolean",
+          "default": false,
+          "description": "Listen in background (requires permission)"
+        },
+        "bluetoothMicSupport": {
+          "type": "boolean",
+          "default": true
+        },
+        "siriIntegration": {
+          "type": "boolean",
+          "default": false,
+          "description": "iOS Siri Shortcuts integration"
+        },
+        "googleAssistantIntegration": {
+          "type": "boolean",
+          "default": false,
+          "description": "Android Google Assistant integration"
+        }
+      }
+    },
+    "multilingualConfig": {
+      "type": "object",
+      "description": "Multilingual voice control settings",
+      "properties": {
+        "commandLanguages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string" },
+              "displayName": { "type": "string" },
+              "nativeName": { "type": "string" },
+              "voiceId": { "type": "string" },
+              "commandMappings": { 
+                "type": "object",
+                "additionalProperties": { "type": "string" }
+              }
+            }
+          },
+          "description": "Language-specific command configurations"
+        },
+        "fallbackLanguage": {
+          "type": "string",
+          "default": "en",
+          "description": "Fallback language for unrecognized commands"
+        },
+        "mixedLanguageSupport": {
+          "type": "boolean",
+          "default": false,
+          "description": "Support mixed-language commands"
+        },
+        "rtlLanguageSupport": {
+          "type": "boolean",
+          "default": true,
+          "description": "Support RTL languages (Arabic, Amharic)"
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "description": "Privacy settings for voice control",
+      "properties": {
+        "localProcessing": {
+          "type": "boolean",
+          "default": false,
+          "description": "Process voice locally when possible"
+        },
+        "recordingRetention": {
+          "type": "string",
+          "enum": ["none", "session", "day", "week"],
+          "default": "none",
+          "description": "How long to retain voice recordings"
+        },
+        "transcriptRetention": {
+          "type": "string",
+          "enum": ["none", "session", "day", "week", "month"],
+          "default": "session"
+        },
+        "anonymizeVoiceData": {
+          "type": "boolean",
+          "default": true
+        },
+        "shareVoiceDataForImprovement": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Voice control usage metrics",
+      "properties": {
+        "totalVoiceCommands": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "successfulCommands": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "failedRecognitions": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "averageConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "mostUsedCommands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "command": { "type": "string" },
+              "count": { "type": "integer" }
+            }
+          }
+        },
+        "languageUsage": {
+          "type": "object",
+          "additionalProperties": { "type": "integer" }
+        },
+        "wakeWordActivations": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "falseWakeWordActivations": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["voiceControlId", "version", "operatorId", "status"],
+  "definitions": {
+    "voiceCommand": {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "description": "Unique command identifier"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["navigation", "alerts", "qc", "distribution", "settings", "help", "accessibility"],
+          "description": "Command category"
+        },
+        "phrases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Voice phrases that trigger this command"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this command does"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["string", "number", "language", "panel", "alert", "franchise", "series"] },
+              "required": { "type": "boolean" },
+              "examples": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "action": {
+          "type": "object",
+          "properties": {
+            "type": { 
+              "type": "string", 
+              "enum": ["navigate", "api_call", "modal", "toggle", "acknowledge", "approve", "reject", "speak"] 
+            },
+            "target": { "type": "string" },
+            "payload": { "type": "object" }
+          }
+        },
+        "confirmationRequired": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require verbal confirmation before executing"
+        },
+        "confirmationPhrase": {
+          "type": "string",
+          "description": "Phrase to speak asking for confirmation"
+        },
+        "successResponse": {
+          "type": "string",
+          "description": "Response when command succeeds"
+        },
+        "failureResponse": {
+          "type": "string",
+          "description": "Response when command fails"
+        },
+        "offlineSupported": {
+          "type": "boolean",
+          "default": false
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "multilingualPhrases": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "description": "Language-specific phrase variants"
+        }
+      },
+      "required": ["commandId", "category", "phrases", "action"]
+    }
+  }
+}

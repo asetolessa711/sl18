@@ -198,13 +198,36 @@
         "quick_action_triggered",
         "search_performed",
         "filter_applied",
-        "export_requested"
+        "export_requested",
+        "assistant_activated",
+        "assistant_deactivated",
+        "assistant_query_processed",
+        "assistant_action_executed",
+        "assistant_recommendation_generated",
+        "assistant_recommendation_accepted",
+        "assistant_recommendation_dismissed",
+        "assistant_proactive_alert",
+        "assistant_help_requested",
+        "assistant_flow_started",
+        "assistant_flow_completed",
+        "voice_control_enabled",
+        "voice_control_disabled",
+        "voice_command_recognized",
+        "voice_command_executed",
+        "voice_command_failed",
+        "voice_command_confirmed",
+        "voice_command_cancelled",
+        "wake_word_activated",
+        "wake_word_false_positive",
+        "voice_dictation_started",
+        "voice_dictation_completed",
+        "voice_language_switched"
       ],
       "description": "Type of governance event"
     },
     "category": {
       "type": "string",
-      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace", "distribution", "syndication", "partner", "audience_insights", "feedback_loop", "ui"],
+      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace", "distribution", "syndication", "partner", "audience_insights", "feedback_loop", "ui", "ai_assistant", "voice_control"],
       "description": "Category of the audit event"
     },
     "actor": {
@@ -232,7 +255,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion", "distribution_channel", "syndication_feed", "partner_integration", "audience_insight", "feedback_loop", "engagement_metric", "sentiment_analysis", "retention_curve", "console", "dashboard", "panel", "widget"],
+          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion", "distribution_channel", "syndication_feed", "partner_integration", "audience_insight", "feedback_loop", "engagement_metric", "sentiment_analysis", "retention_curve", "console", "dashboard", "panel", "widget", "assistant", "voice_control", "voice_command", "recommendation"],
           "description": "Type of target entity"
         },
         "id": {
