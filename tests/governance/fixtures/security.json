@@ -1,0 +1,1556 @@
+{
+  "securityFrameworks": {
+    "valid": [
+      {
+        "frameworkId": "secfw-sl18-global-v1",
+        "version": "1.0.0",
+        "name": "SL18 Global Security Framework",
+        "scope": {
+          "level": "global",
+          "services": ["api", "web", "mobile", "data", "partner"],
+          "regions": ["US", "EU", "APAC", "MEA", "LATAM"],
+          "environments": ["production", "staging", "development"]
+        },
+        "encryptionStandards": {
+          "dataAtRest": {
+            "algorithm": "AES-256-GCM",
+            "keyLength": 256,
+            "keyRotationDays": 90,
+            "keyManagement": "aws_kms"
+          },
+          "dataInTransit": {
+            "protocol": "TLS_1_3",
+            "minimumTlsVersion": "1.3",
+            "cipherSuites": [
+              "TLS_AES_256_GCM_SHA384",
+              "TLS_CHACHA20_POLY1305_SHA256",
+              "TLS_AES_128_GCM_SHA256"
+            ],
+            "certificateType": "ev_ssl",
+            "certificateProvider": "DigiCert",
+            "hsts": {
+              "enabled": true,
+              "maxAge": 31536000,
+              "includeSubdomains": true,
+              "preload": true
+            }
+          },
+          "fieldLevelEncryption": {
+            "enabled": true,
+            "sensitiveFields": ["ssn", "payment_card", "bank_account", "password", "api_key"],
+            "tokenization": {
+              "enabled": true,
+              "format": "uuid"
+            }
+          }
+        },
+        "accessControl": {
+          "model": "rbac",
+          "authentication": {
+            "methods": ["password", "mfa_totp", "mfa_push", "sso_oidc", "api_key", "jwt"],
+            "mfaRequired": true,
+            "mfaContextual": {
+              "enabled": true,
+              "triggers": ["new_device", "new_location", "high_risk_action", "failed_attempts"],
+              "riskThreshold": 70
+            },
+            "passwordPolicy": {
+              "minLength": 12,
+              "requireUppercase": true,
+              "requireLowercase": true,
+              "requireNumbers": true,
+              "requireSymbols": true,
+              "expirationDays": 90,
+              "historyCount": 12,
+              "lockoutThreshold": 5,
+              "lockoutDuration": 30
+            },
+            "sessionPolicy": {
+              "maxDuration": 480,
+              "idleTimeout": 30,
+              "concurrentSessions": 3,
+              "deviceBinding": true,
+              "geoBinding": false
+            }
+          },
+          "authorization": {
+            "roles": [
+              {
+                "roleId": "role-security-admin",
+                "name": "Security Administrator",
+                "permissions": [
+                  "view_policies",
+                  "create_policies",
+                  "edit_policies",
+                  "delete_policies",
+                  "approve_policies",
+                  "enforce_policies",
+                  "view_compliance",
+                  "manage_compliance",
+                  "view_audit_logs",
+                  "export_audit_logs",
+                  "manage_roles",
+                  "block_content",
+                  "suspend_accounts"
+                ],
+                "mfaRequired": true,
+                "approvalRequired": false
+              },
+              {
+                "roleId": "role-security-analyst",
+                "name": "Security Analyst",
+                "permissions": [
+                  "view_policies",
+                  "view_compliance",
+                  "view_audit_logs",
+                  "export_audit_logs"
+                ],
+                "mfaRequired": true,
+                "approvalRequired": false
+              },
+              {
+                "roleId": "role-incident-responder",
+                "name": "Incident Responder",
+                "permissions": [
+                  "view_policies",
+                  "view_audit_logs",
+                  "block_content",
+                  "suspend_accounts"
+                ],
+                "constraints": {
+                  "timeWindows": [
+                    {
+                      "dayOfWeek": [0, 1, 2, 3, 4, 5, 6],
+                      "startHour": 0,
+                      "endHour": 23
+                    }
+                  ]
+                },
+                "mfaRequired": true,
+                "approvalRequired": true
+              }
+            ],
+            "policies": [
+              {
+                "policyId": "pol-admin-access",
+                "name": "Admin Access Policy",
+                "resource": "/admin/*",
+                "actions": ["read", "write", "create", "delete", "admin"],
+                "effect": "allow",
+                "conditions": [
+                  {
+                    "attribute": "role",
+                    "operator": "in",
+                    "value": ["security_admin", "ecosystem_admin"]
+                  },
+                  {
+                    "attribute": "mfa_verified",
+                    "operator": "eq",
+                    "value": true
+                  }
+                ]
+              },
+              {
+                "policyId": "pol-api-access",
+                "name": "API Access Policy",
+                "resource": "/api/*",
+                "actions": ["read", "write", "create"],
+                "effect": "allow",
+                "conditions": [
+                  {
+                    "attribute": "api_key_valid",
+                    "operator": "eq",
+                    "value": true
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "zeroTrust": {
+          "enabled": true,
+          "principles": [
+            "never_trust_always_verify",
+            "least_privilege",
+            "assume_breach",
+            "verify_explicitly",
+            "continuous_validation",
+            "micro_segmentation"
+          ],
+          "networkSegmentation": {
+            "enabled": true,
+            "segments": [
+              {
+                "segmentId": "seg-public",
+                "name": "Public Services",
+                "services": ["api-gateway", "cdn"],
+                "allowedConnections": ["seg-application"]
+              },
+              {
+                "segmentId": "seg-application",
+                "name": "Application Services",
+                "services": ["web-app", "mobile-backend", "partner-api"],
+                "allowedConnections": ["seg-data", "seg-security"]
+              },
+              {
+                "segmentId": "seg-data",
+                "name": "Data Services",
+                "services": ["database", "cache", "storage"],
+                "allowedConnections": []
+              },
+              {
+                "segmentId": "seg-security",
+                "name": "Security Services",
+                "services": ["auth", "vault", "logging"],
+                "allowedConnections": ["seg-application", "seg-data"]
+              }
+            ]
+          },
+          "deviceTrust": {
+            "enabled": true,
+            "complianceChecks": ["os_version", "security_patches", "antivirus", "disk_encryption", "screen_lock"],
+            "minimumTrustScore": 80
+          },
+          "identityVerification": {
+            "continuousAuth": true,
+            "behavioralAnalysis": true,
+            "riskScoring": true,
+            "stepUpAuth": {
+              "enabled": true,
+              "triggers": ["sensitive_data", "financial_action", "admin_action", "high_risk_score"]
+            }
+          }
+        },
+        "credentialManagement": {
+          "vault": {
+            "provider": "hashicorp_vault",
+            "enabled": true,
+            "autoRotation": true,
+            "rotationInterval": 30
+          },
+          "apiKeys": {
+            "format": "prefixed",
+            "expirationDays": 90,
+            "rateLimiting": {
+              "enabled": true,
+              "requestsPerMinute": 1000,
+              "requestsPerHour": 10000
+            }
+          },
+          "serviceAccounts": {
+            "minimumPrivilege": true,
+            "rotationRequired": true,
+            "auditRequired": true
+          }
+        },
+        "compliance": {
+          "frameworks": ["SOC2", "ISO27001", "GDPR", "PCI_DSS"],
+          "lastAudit": "2024-09-15T00:00:00Z",
+          "nextAudit": "2025-03-15T00:00:00Z",
+          "certifications": [
+            {
+              "name": "SOC 2 Type II",
+              "issueDate": "2024-09-15",
+              "expirationDate": "2025-09-15",
+              "status": "active"
+            },
+            {
+              "name": "ISO 27001",
+              "issueDate": "2024-06-01",
+              "expirationDate": "2027-06-01",
+              "status": "active"
+            }
+          ]
+        },
+        "metrics": {
+          "securityScore": 94,
+          "vulnerabilitiesOpen": 3,
+          "vulnerabilitiesClosed": 127,
+          "incidentsThisMonth": 2,
+          "meanTimeToDetect": 15,
+          "meanTimeToRespond": 45,
+          "complianceScore": 98,
+          "lastUpdated": "2024-11-28T04:00:00Z"
+        },
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-11-28T04:00:00Z",
+        "createdBy": "security-admin-001"
+      }
+    ],
+    "invalid": [
+      {
+        "frameworkId": "invalid-id",
+        "version": "1.0.0",
+        "name": "Invalid Framework",
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "createdBy": "admin"
+      },
+      {
+        "version": "1.0.0",
+        "name": "Missing Framework ID",
+        "scope": {
+          "level": "global"
+        },
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "createdBy": "admin"
+      }
+    ]
+  },
+  "threatDetection": {
+    "valid": [
+      {
+        "detectionId": "threat-sl18-global-v1",
+        "version": "1.0.0",
+        "name": "SL18 Global Threat Detection",
+        "scope": {
+          "level": "global",
+          "services": ["api", "web", "mobile", "partner"],
+          "regions": ["US", "EU", "APAC", "MEA", "LATAM"]
+        },
+        "threatCategories": [
+          {
+            "categoryId": "cat-fraud",
+            "name": "Financial Fraud",
+            "type": "fraud",
+            "severity": "critical",
+            "indicators": [
+              {
+                "indicatorId": "ind-velocity",
+                "name": "Transaction Velocity Anomaly",
+                "type": "transactional",
+                "description": "Unusual number of transactions in short time",
+                "weight": 0.8
+              },
+              {
+                "indicatorId": "ind-amount",
+                "name": "Unusual Transaction Amount",
+                "type": "transactional",
+                "description": "Transaction amount significantly differs from baseline",
+                "weight": 0.7
+              },
+              {
+                "indicatorId": "ind-geo",
+                "name": "Geographic Anomaly",
+                "type": "geographic",
+                "description": "Transaction from unexpected location",
+                "weight": 0.6
+              }
+            ],
+            "enabled": true
+          },
+          {
+            "categoryId": "cat-ato",
+            "name": "Account Takeover",
+            "type": "account_takeover",
+            "severity": "critical",
+            "indicators": [
+              {
+                "indicatorId": "ind-credential-stuff",
+                "name": "Credential Stuffing Pattern",
+                "type": "behavioral",
+                "description": "Multiple failed logins followed by success",
+                "weight": 0.9
+              },
+              {
+                "indicatorId": "ind-device-change",
+                "name": "Device Change After Login",
+                "type": "identity",
+                "description": "Account accessed from new device post-login",
+                "weight": 0.7
+              }
+            ],
+            "enabled": true
+          },
+          {
+            "categoryId": "cat-bot",
+            "name": "Bot Abuse",
+            "type": "bot_abuse",
+            "severity": "high",
+            "indicators": [
+              {
+                "indicatorId": "ind-rate",
+                "name": "Request Rate Anomaly",
+                "type": "network",
+                "description": "Abnormally high request rate",
+                "weight": 0.8
+              },
+              {
+                "indicatorId": "ind-pattern",
+                "name": "Non-Human Pattern",
+                "type": "behavioral",
+                "description": "Interaction patterns indicate automation",
+                "weight": 0.75
+              }
+            ],
+            "enabled": true
+          },
+          {
+            "categoryId": "cat-api-misuse",
+            "name": "API Misuse",
+            "type": "api_misuse",
+            "severity": "high",
+            "indicators": [
+              {
+                "indicatorId": "ind-quota",
+                "name": "Quota Abuse",
+                "type": "transactional",
+                "description": "Attempts to exceed API quotas",
+                "weight": 0.7
+              },
+              {
+                "indicatorId": "ind-scraping",
+                "name": "Data Scraping Pattern",
+                "type": "behavioral",
+                "description": "Systematic data extraction attempts",
+                "weight": 0.85
+              }
+            ],
+            "enabled": true
+          },
+          {
+            "categoryId": "cat-insider",
+            "name": "Insider Risk",
+            "type": "insider_risk",
+            "severity": "high",
+            "indicators": [
+              {
+                "indicatorId": "ind-bulk-access",
+                "name": "Bulk Data Access",
+                "type": "behavioral",
+                "description": "Unusual volume of data access",
+                "weight": 0.8
+              },
+              {
+                "indicatorId": "ind-offhours",
+                "name": "Off-Hours Activity",
+                "type": "temporal",
+                "description": "Activity during unusual hours",
+                "weight": 0.5
+              }
+            ],
+            "enabled": true
+          }
+        ],
+        "detectionRules": [
+          {
+            "ruleId": "rule-velocity-spike",
+            "name": "Transaction Velocity Spike",
+            "description": "Detect sudden increase in transaction frequency",
+            "category": "cat-fraud",
+            "type": "threshold",
+            "condition": {
+              "metric": "transaction_count",
+              "operator": "gt",
+              "value": 10,
+              "timeWindow": 60,
+              "aggregation": "count"
+            },
+            "severity": "high",
+            "actions": ["alert", "throttle", "notify"],
+            "cooldownPeriod": 300,
+            "enabled": true,
+            "priority": 1
+          },
+          {
+            "ruleId": "rule-credential-stuffing",
+            "name": "Credential Stuffing Detection",
+            "description": "Detect credential stuffing attacks",
+            "category": "cat-ato",
+            "type": "pattern",
+            "condition": {
+              "metric": "failed_logins_same_ip",
+              "operator": "gt",
+              "value": 5,
+              "timeWindow": 60,
+              "aggregation": "count"
+            },
+            "severity": "critical",
+            "actions": ["block", "alert", "capture_evidence", "notify"],
+            "cooldownPeriod": 600,
+            "enabled": true,
+            "priority": 1
+          },
+          {
+            "ruleId": "rule-bot-detection",
+            "name": "Bot Traffic Detection",
+            "description": "Detect automated bot traffic",
+            "category": "cat-bot",
+            "type": "anomaly",
+            "condition": {
+              "metric": "request_rate_per_session",
+              "operator": "gt",
+              "value": 100,
+              "timeWindow": 60,
+              "aggregation": "rate"
+            },
+            "severity": "medium",
+            "actions": ["throttle", "alert"],
+            "cooldownPeriod": 120,
+            "enabled": true,
+            "priority": 2
+          },
+          {
+            "ruleId": "rule-data-exfil",
+            "name": "Data Exfiltration Detection",
+            "description": "Detect potential data exfiltration",
+            "category": "cat-insider",
+            "type": "ml_model",
+            "condition": {
+              "metric": "data_download_volume",
+              "operator": "gt",
+              "value": 1000000000,
+              "timeWindow": 3600,
+              "aggregation": "sum"
+            },
+            "severity": "critical",
+            "actions": ["alert", "block", "escalate", "capture_evidence"],
+            "cooldownPeriod": 0,
+            "enabled": true,
+            "priority": 1
+          }
+        ],
+        "anomalyDetection": {
+          "enabled": true,
+          "behavioral": {
+            "enabled": true,
+            "metrics": [
+              "login_frequency",
+              "session_duration",
+              "action_patterns",
+              "api_usage_patterns",
+              "data_access_patterns",
+              "time_of_activity"
+            ],
+            "baselinePeriod": 30,
+            "sensitivityLevel": "high"
+          },
+          "transactional": {
+            "enabled": true,
+            "metrics": [
+              "transaction_velocity",
+              "transaction_amount",
+              "transaction_frequency",
+              "payment_method_changes",
+              "geographic_spread"
+            ],
+            "thresholds": {
+              "velocityLimit": 50,
+              "amountLimit": 10000,
+              "dailyLimit": 50000
+            }
+          },
+          "network": {
+            "enabled": true,
+            "metrics": [
+              "request_rate",
+              "bandwidth_usage",
+              "connection_patterns",
+              "geographic_anomalies"
+            ]
+          }
+        },
+        "mlModels": {
+          "enabled": true,
+          "models": [
+            {
+              "modelId": "ml-fraud-v3",
+              "name": "Fraud Detection Neural Network",
+              "type": "neural_network",
+              "purpose": "fraud_detection",
+              "version": "3.2.1",
+              "accuracy": 0.97,
+              "lastTrained": "2024-11-01T00:00:00Z",
+              "enabled": true
+            },
+            {
+              "modelId": "ml-ato-v2",
+              "name": "Account Takeover Classifier",
+              "type": "classification",
+              "purpose": "account_takeover",
+              "version": "2.1.0",
+              "accuracy": 0.95,
+              "lastTrained": "2024-10-15T00:00:00Z",
+              "enabled": true
+            },
+            {
+              "modelId": "ml-bot-v1",
+              "name": "Bot Detection Ensemble",
+              "type": "ensemble",
+              "purpose": "bot_detection",
+              "version": "1.5.0",
+              "accuracy": 0.92,
+              "lastTrained": "2024-11-10T00:00:00Z",
+              "enabled": true
+            }
+          ],
+          "riskScoring": {
+            "enabled": true,
+            "factors": [
+              {
+                "factorId": "factor-velocity",
+                "name": "Transaction Velocity",
+                "weight": 0.25,
+                "thresholds": {
+                  "low": 20,
+                  "medium": 50,
+                  "high": 80,
+                  "critical": 95
+                }
+              },
+              {
+                "factorId": "factor-behavior",
+                "name": "Behavioral Anomaly",
+                "weight": 0.3,
+                "thresholds": {
+                  "low": 30,
+                  "medium": 60,
+                  "high": 85,
+                  "critical": 95
+                }
+              },
+              {
+                "factorId": "factor-device",
+                "name": "Device Trust",
+                "weight": 0.2,
+                "thresholds": {
+                  "low": 25,
+                  "medium": 55,
+                  "high": 80,
+                  "critical": 95
+                }
+              },
+              {
+                "factorId": "factor-geo",
+                "name": "Geographic Risk",
+                "weight": 0.25,
+                "thresholds": {
+                  "low": 20,
+                  "medium": 50,
+                  "high": 75,
+                  "critical": 90
+                }
+              }
+            ],
+            "overallThresholds": {
+              "block": 90,
+              "mfaRequired": 70,
+              "alert": 50,
+              "log": 30
+            }
+          }
+        },
+        "responseWorkflows": [
+          {
+            "workflowId": "wf-critical-threat",
+            "name": "Critical Threat Response",
+            "triggerCategories": ["cat-fraud", "cat-ato"],
+            "triggerSeverity": ["critical"],
+            "steps": [
+              {
+                "stepId": "step-1",
+                "order": 1,
+                "action": "block_request",
+                "delay": 0
+              },
+              {
+                "stepId": "step-2",
+                "order": 2,
+                "action": "capture_evidence",
+                "delay": 0
+              },
+              {
+                "stepId": "step-3",
+                "order": 3,
+                "action": "create_incident",
+                "parameters": {
+                  "severity": "critical",
+                  "autoAssign": true
+                },
+                "delay": 0
+              },
+              {
+                "stepId": "step-4",
+                "order": 4,
+                "action": "notify_security",
+                "parameters": {
+                  "channels": ["pagerduty", "slack"]
+                },
+                "delay": 0
+              },
+              {
+                "stepId": "step-5",
+                "order": 5,
+                "action": "require_mfa",
+                "delay": 60,
+                "condition": "user.session_active == true"
+              }
+            ],
+            "escalation": {
+              "enabled": true,
+              "timeout": 15,
+              "path": ["security_analyst", "security_admin", "ciso"]
+            },
+            "sla": {
+              "responseTime": 5,
+              "resolutionTime": 60
+            },
+            "enabled": true
+          },
+          {
+            "workflowId": "wf-high-threat",
+            "name": "High Threat Response",
+            "triggerCategories": ["cat-bot", "cat-api-misuse", "cat-insider"],
+            "triggerSeverity": ["high"],
+            "steps": [
+              {
+                "stepId": "step-1",
+                "order": 1,
+                "action": "throttle_rate",
+                "parameters": {
+                  "reduction": 0.5
+                },
+                "delay": 0
+              },
+              {
+                "stepId": "step-2",
+                "order": 2,
+                "action": "log_forensic",
+                "delay": 0
+              },
+              {
+                "stepId": "step-3",
+                "order": 3,
+                "action": "create_incident",
+                "parameters": {
+                  "severity": "high"
+                },
+                "delay": 0
+              },
+              {
+                "stepId": "step-4",
+                "order": 4,
+                "action": "notify_security",
+                "parameters": {
+                  "channels": ["slack", "email"]
+                },
+                "delay": 5
+              }
+            ],
+            "escalation": {
+              "enabled": true,
+              "timeout": 30,
+              "path": ["security_analyst", "security_admin"]
+            },
+            "sla": {
+              "responseTime": 15,
+              "resolutionTime": 240
+            },
+            "enabled": true
+          }
+        ],
+        "realTimeMonitoring": {
+          "enabled": true,
+          "streamProcessing": {
+            "enabled": true,
+            "engine": "kafka_streams",
+            "latencyTarget": 100
+          },
+          "alerting": {
+            "enabled": true,
+            "channels": ["slack", "pagerduty", "email", "in_app"],
+            "severityRouting": {
+              "critical": ["pagerduty", "slack", "email"],
+              "high": ["slack", "email"],
+              "medium": ["slack", "in_app"],
+              "low": ["in_app"]
+            },
+            "quietHours": {
+              "enabled": true,
+              "start": "22:00",
+              "end": "07:00",
+              "criticalBypass": true
+            }
+          }
+        },
+        "metrics": {
+          "threatsDetected": 1523,
+          "threatsBlocked": 1498,
+          "falsePositives": 47,
+          "truePositiveRate": 96.9,
+          "avgDetectionTime": 2.5,
+          "avgResponseTime": 8.3,
+          "activeIncidents": 3,
+          "lastUpdated": "2024-11-28T04:00:00Z"
+        },
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-11-28T04:00:00Z",
+        "createdBy": "security-admin-001"
+      }
+    ],
+    "invalid": [
+      {
+        "detectionId": "invalid-threat",
+        "version": "1.0.0",
+        "name": "Invalid Threat Detection",
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "createdBy": "admin"
+      }
+    ]
+  },
+  "securityObservability": {
+    "valid": [
+      {
+        "observabilityId": "secobs-sl18-global-v1",
+        "version": "1.0.0",
+        "name": "SL18 Global Security Observability",
+        "dashboards": [
+          {
+            "dashboardId": "dash-security-overview",
+            "name": "Security Overview",
+            "type": "security_overview",
+            "refreshInterval": 30,
+            "widgets": [
+              {
+                "widgetId": "widget-security-score",
+                "name": "Security Score",
+                "type": "gauge",
+                "dataSource": "security_metrics",
+                "query": "SELECT security_score FROM metrics WHERE time > now() - 1h",
+                "visualization": {
+                  "thresholds": [
+                    { "value": 0, "color": "#dc3545", "label": "Critical" },
+                    { "value": 50, "color": "#ffc107", "label": "Warning" },
+                    { "value": 80, "color": "#28a745", "label": "Good" }
+                  ]
+                }
+              },
+              {
+                "widgetId": "widget-active-threats",
+                "name": "Active Threats",
+                "type": "metric",
+                "dataSource": "threat_detection",
+                "query": "SELECT COUNT(*) FROM threats WHERE status = 'active'"
+              },
+              {
+                "widgetId": "widget-threat-timeline",
+                "name": "Threat Timeline",
+                "type": "timeline",
+                "dataSource": "threat_detection",
+                "query": "SELECT * FROM threats WHERE time > now() - 24h ORDER BY time DESC"
+              },
+              {
+                "widgetId": "widget-incidents-chart",
+                "name": "Incidents by Severity",
+                "type": "chart",
+                "dataSource": "incidents",
+                "visualization": {
+                  "chartType": "pie",
+                  "colors": ["#dc3545", "#fd7e14", "#ffc107", "#28a745"]
+                }
+              }
+            ],
+            "filters": [
+              {
+                "field": "region",
+                "type": "multi_select"
+              },
+              {
+                "field": "time_range",
+                "type": "date_range",
+                "defaultValue": "24h"
+              }
+            ],
+            "accessRoles": ["security_admin", "security_analyst", "ecosystem_admin"],
+            "enabled": true
+          },
+          {
+            "dashboardId": "dash-threat-landscape",
+            "name": "Threat Landscape",
+            "type": "threat_landscape",
+            "refreshInterval": 60,
+            "widgets": [
+              {
+                "widgetId": "widget-threat-map",
+                "name": "Threat Geographic Distribution",
+                "type": "map",
+                "dataSource": "threat_detection"
+              },
+              {
+                "widgetId": "widget-threat-categories",
+                "name": "Threats by Category",
+                "type": "chart",
+                "dataSource": "threat_detection",
+                "visualization": {
+                  "chartType": "bar"
+                }
+              },
+              {
+                "widgetId": "widget-attack-vectors",
+                "name": "Attack Vectors",
+                "type": "table",
+                "dataSource": "threat_detection"
+              }
+            ],
+            "accessRoles": ["security_admin", "security_analyst"],
+            "enabled": true
+          },
+          {
+            "dashboardId": "dash-incident-tracker",
+            "name": "Incident Tracker",
+            "type": "incident_timeline",
+            "refreshInterval": 15,
+            "widgets": [
+              {
+                "widgetId": "widget-open-incidents",
+                "name": "Open Incidents",
+                "type": "table",
+                "dataSource": "incidents"
+              },
+              {
+                "widgetId": "widget-mttr",
+                "name": "Mean Time to Respond",
+                "type": "metric",
+                "dataSource": "incidents"
+              },
+              {
+                "widgetId": "widget-incident-trend",
+                "name": "Incident Trend",
+                "type": "chart",
+                "dataSource": "incidents",
+                "visualization": {
+                  "chartType": "area"
+                }
+              }
+            ],
+            "accessRoles": ["security_admin", "security_analyst", "incident_responder"],
+            "enabled": true
+          }
+        ],
+        "incidentTracking": {
+          "enabled": true,
+          "severityLevels": [
+            {
+              "level": "critical",
+              "responseTimeSla": 5,
+              "resolutionTimeSla": 60,
+              "notificationChannels": ["pagerduty", "slack", "email", "sms"],
+              "escalationPath": ["security_analyst", "security_admin", "ciso"]
+            },
+            {
+              "level": "high",
+              "responseTimeSla": 15,
+              "resolutionTimeSla": 240,
+              "notificationChannels": ["slack", "email"],
+              "escalationPath": ["security_analyst", "security_admin"]
+            },
+            {
+              "level": "medium",
+              "responseTimeSla": 60,
+              "resolutionTimeSla": 480,
+              "notificationChannels": ["slack", "email"],
+              "escalationPath": ["security_analyst"]
+            },
+            {
+              "level": "low",
+              "responseTimeSla": 240,
+              "resolutionTimeSla": 1440,
+              "notificationChannels": ["email"],
+              "escalationPath": []
+            }
+          ],
+          "statuses": ["detected", "triaging", "investigating", "containing", "eradicating", "recovering", "closed"],
+          "incidentTypes": [
+            {
+              "typeId": "type-security-breach",
+              "name": "Security Breach",
+              "category": "security",
+              "playbookId": "pb-security-breach"
+            },
+            {
+              "typeId": "type-data-breach",
+              "name": "Data Breach",
+              "category": "data_breach",
+              "playbookId": "pb-data-breach"
+            },
+            {
+              "typeId": "type-fraud",
+              "name": "Fraud Incident",
+              "category": "fraud",
+              "playbookId": "pb-fraud"
+            },
+            {
+              "typeId": "type-unauthorized",
+              "name": "Unauthorized Access",
+              "category": "unauthorized_access",
+              "playbookId": "pb-unauthorized-access"
+            }
+          ],
+          "fields": [
+            {
+              "fieldId": "field-root-cause",
+              "name": "Root Cause",
+              "type": "select",
+              "required": true,
+              "options": ["human_error", "system_failure", "external_attack", "insider_threat", "configuration_error"]
+            },
+            {
+              "fieldId": "field-impact",
+              "name": "Business Impact",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "fieldId": "field-affected-systems",
+              "name": "Affected Systems",
+              "type": "multi_select",
+              "required": true
+            }
+          ],
+          "automation": {
+            "autoCreate": true,
+            "autoAssign": true,
+            "autoEscalate": true,
+            "autoClose": {
+              "enabled": true,
+              "afterDays": 30
+            }
+          }
+        },
+        "forensicLogging": {
+          "enabled": true,
+          "immutableLogs": true,
+          "storage": {
+            "type": "elasticsearch",
+            "retentionDays": 365,
+            "encryption": true,
+            "compression": true
+          },
+          "logTypes": [
+            {
+              "typeId": "log-auth",
+              "name": "Authentication Logs",
+              "category": "authentication",
+              "fields": ["user_id", "ip_address", "device_id", "auth_method", "result", "timestamp"],
+              "retention": 365,
+              "enabled": true
+            },
+            {
+              "typeId": "log-access",
+              "name": "Data Access Logs",
+              "category": "data_access",
+              "fields": ["user_id", "resource", "action", "ip_address", "timestamp", "data_classification"],
+              "retention": 365,
+              "enabled": true
+            },
+            {
+              "typeId": "log-api",
+              "name": "API Audit Logs",
+              "category": "api_calls",
+              "fields": ["api_key", "endpoint", "method", "ip_address", "response_code", "latency", "timestamp"],
+              "retention": 180,
+              "enabled": true
+            },
+            {
+              "typeId": "log-admin",
+              "name": "Admin Actions Logs",
+              "category": "admin_actions",
+              "fields": ["admin_id", "action", "target", "previous_value", "new_value", "timestamp"],
+              "retention": 730,
+              "enabled": true
+            },
+            {
+              "typeId": "log-security",
+              "name": "Security Events Logs",
+              "category": "security_events",
+              "fields": ["event_type", "severity", "source", "target", "details", "timestamp"],
+              "retention": 730,
+              "enabled": true
+            }
+          ],
+          "correlation": {
+            "enabled": true,
+            "correlationFields": ["correlationId", "sessionId", "userId", "requestId"],
+            "crossServiceCorrelation": true
+          },
+          "chainOfCustody": {
+            "enabled": true,
+            "hashAlgorithm": "SHA-256",
+            "timestamping": true,
+            "digitalSignature": true
+          }
+        },
+        "securityMetrics": {
+          "kpis": [
+            {
+              "kpiId": "kpi-security-score",
+              "name": "Security Score",
+              "description": "Overall security posture score",
+              "formula": "weighted_avg(compliance, vulnerabilities, incidents)",
+              "unit": "score",
+              "target": 90,
+              "thresholds": {
+                "good": 85,
+                "warning": 70,
+                "critical": 50
+              },
+              "trending": "higher_better"
+            },
+            {
+              "kpiId": "kpi-mttd",
+              "name": "Mean Time to Detect",
+              "description": "Average time to detect threats",
+              "formula": "avg(detection_time)",
+              "unit": "time_minutes",
+              "target": 15,
+              "thresholds": {
+                "good": 15,
+                "warning": 30,
+                "critical": 60
+              },
+              "trending": "lower_better"
+            },
+            {
+              "kpiId": "kpi-mttr",
+              "name": "Mean Time to Respond",
+              "description": "Average time to respond to incidents",
+              "formula": "avg(response_time)",
+              "unit": "time_minutes",
+              "target": 30,
+              "thresholds": {
+                "good": 30,
+                "warning": 60,
+                "critical": 120
+              },
+              "trending": "lower_better"
+            },
+            {
+              "kpiId": "kpi-patch-compliance",
+              "name": "Patch Compliance",
+              "description": "Percentage of systems with up-to-date patches",
+              "formula": "patched_systems / total_systems * 100",
+              "unit": "percentage",
+              "target": 98,
+              "thresholds": {
+                "good": 95,
+                "warning": 85,
+                "critical": 70
+              },
+              "trending": "higher_better"
+            }
+          ],
+          "currentValues": {
+            "securityScore": 94,
+            "mttd": 12,
+            "mttr": 28,
+            "mttc": 45,
+            "incidentsOpen": 3,
+            "incidentsClosed": 127,
+            "vulnerabilitiesCritical": 0,
+            "vulnerabilitiesHigh": 3,
+            "patchCompliance": 98.5,
+            "mfaAdoption": 99.2,
+            "phishingClickRate": 2.3,
+            "lastUpdated": "2024-11-28T04:00:00Z"
+          },
+          "trends": [
+            {
+              "metricId": "kpi-security-score",
+              "period": "monthly",
+              "values": [
+                { "date": "2024-09-01", "value": 91 },
+                { "date": "2024-10-01", "value": 93 },
+                { "date": "2024-11-01", "value": 94 }
+              ],
+              "trend": "improving"
+            },
+            {
+              "metricId": "kpi-mttd",
+              "period": "monthly",
+              "values": [
+                { "date": "2024-09-01", "value": 18 },
+                { "date": "2024-10-01", "value": 15 },
+                { "date": "2024-11-01", "value": 12 }
+              ],
+              "trend": "improving"
+            }
+          ]
+        },
+        "reporting": {
+          "scheduledReports": [
+            {
+              "reportId": "report-executive-weekly",
+              "name": "Weekly Executive Security Summary",
+              "type": "executive_summary",
+              "schedule": {
+                "frequency": "weekly",
+                "dayOfWeek": 1,
+                "time": "09:00"
+              },
+              "recipients": ["ciso@sl18.com", "cto@sl18.com"],
+              "format": "pdf",
+              "enabled": true
+            },
+            {
+              "reportId": "report-compliance-monthly",
+              "name": "Monthly Compliance Report",
+              "type": "compliance_report",
+              "schedule": {
+                "frequency": "monthly",
+                "dayOfMonth": 1,
+                "time": "08:00"
+              },
+              "recipients": ["compliance@sl18.com", "audit@sl18.com"],
+              "format": "pdf",
+              "enabled": true
+            },
+            {
+              "reportId": "report-vulnerability-weekly",
+              "name": "Weekly Vulnerability Report",
+              "type": "vulnerability_report",
+              "schedule": {
+                "frequency": "weekly",
+                "dayOfWeek": 5,
+                "time": "17:00"
+              },
+              "recipients": ["security-team@sl18.com"],
+              "format": "html",
+              "enabled": true
+            }
+          ],
+          "adHocReports": {
+            "enabled": true,
+            "templates": [
+              {
+                "templateId": "tmpl-incident",
+                "name": "Incident Report",
+                "type": "incident_report",
+                "parameters": [
+                  { "name": "incident_id", "type": "string", "required": true },
+                  { "name": "include_timeline", "type": "boolean", "required": false }
+                ]
+              },
+              {
+                "templateId": "tmpl-forensic",
+                "name": "Forensic Analysis Report",
+                "type": "forensic_report",
+                "parameters": [
+                  { "name": "start_date", "type": "date", "required": true },
+                  { "name": "end_date", "type": "date", "required": true },
+                  { "name": "user_id", "type": "string", "required": false }
+                ]
+              }
+            ]
+          }
+        },
+        "alerts": {
+          "enabled": true,
+          "channels": [
+            {
+              "channelId": "channel-slack",
+              "type": "slack",
+              "config": {
+                "webhook_url": "https://hooks.slack.com/services/xxx",
+                "channel": "#security-alerts"
+              },
+              "enabled": true
+            },
+            {
+              "channelId": "channel-pagerduty",
+              "type": "pagerduty",
+              "config": {
+                "service_key": "xxx"
+              },
+              "enabled": true
+            },
+            {
+              "channelId": "channel-email",
+              "type": "email",
+              "config": {
+                "recipients": ["security-team@sl18.com"]
+              },
+              "enabled": true
+            }
+          ],
+          "rules": [
+            {
+              "ruleId": "alert-critical-incident",
+              "name": "Critical Incident Alert",
+              "condition": "incident.severity == 'critical'",
+              "severity": "critical",
+              "channels": ["channel-pagerduty", "channel-slack", "channel-email"],
+              "cooldown": 0,
+              "enabled": true
+            },
+            {
+              "ruleId": "alert-security-score-drop",
+              "name": "Security Score Drop Alert",
+              "condition": "security_score < 80",
+              "severity": "high",
+              "channels": ["channel-slack", "channel-email"],
+              "cooldown": 60,
+              "enabled": true
+            }
+          ]
+        },
+        "integrations": {
+          "siem": {
+            "enabled": true,
+            "provider": "elastic",
+            "syncInterval": 30
+          },
+          "ticketing": {
+            "enabled": true,
+            "provider": "jira",
+            "autoCreate": true,
+            "syncBidirectional": true
+          },
+          "threatIntelligence": {
+            "enabled": true,
+            "feeds": [
+              {
+                "feedId": "feed-ip-rep",
+                "name": "IP Reputation Feed",
+                "provider": "AlienVault",
+                "type": "ip_reputation",
+                "enabled": true
+              },
+              {
+                "feedId": "feed-malware",
+                "name": "Malware Hash Feed",
+                "provider": "VirusTotal",
+                "type": "file_hash",
+                "enabled": true
+              }
+            ]
+          }
+        },
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-11-28T04:00:00Z",
+        "createdBy": "security-admin-001"
+      }
+    ],
+    "invalid": [
+      {
+        "observabilityId": "invalid-obs",
+        "version": "1.0.0",
+        "name": "Invalid Observability",
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "createdBy": "admin"
+      }
+    ]
+  },
+  "calculations": {
+    "threatDetectionRate": {
+      "example": {
+        "totalThreats": 1523,
+        "blockedThreats": 1498,
+        "expectedBlockRate": 98.36
+      }
+    },
+    "falsePositiveRate": {
+      "example": {
+        "totalAlerts": 1570,
+        "falsePositives": 47,
+        "expectedFalsePositiveRate": 2.99
+      }
+    },
+    "meanTimeToDetect": {
+      "example": {
+        "detectionTimes": [2, 3, 1, 5, 2, 3, 2, 4, 3, 2],
+        "expectedMTTD": 2.7
+      }
+    },
+    "securityScore": {
+      "example": {
+        "components": [
+          { "name": "compliance", "score": 98, "weight": 0.3 },
+          { "name": "vulnerability_management", "score": 95, "weight": 0.25 },
+          { "name": "incident_response", "score": 92, "weight": 0.25 },
+          { "name": "access_control", "score": 96, "weight": 0.2 }
+        ],
+        "expectedScore": 95.35
+      }
+    }
+  },
+  "auditLogs": {
+    "securityFramework": [
+      {
+        "logId": "log-secfw-001",
+        "timestamp": "2024-11-28T04:00:00Z",
+        "eventType": "security_framework_created",
+        "category": "security",
+        "actor": {
+          "type": "user",
+          "id": "security-admin-001",
+          "name": "Security Administrator"
+        },
+        "target": {
+          "type": "security_framework",
+          "id": "secfw-sl18-global-v1"
+        },
+        "details": {
+          "description": "Global security framework created"
+        },
+        "result": "success"
+      },
+      {
+        "logId": "log-secfw-002",
+        "timestamp": "2024-11-28T04:01:00Z",
+        "eventType": "encryption_standard_updated",
+        "category": "security",
+        "actor": {
+          "type": "user",
+          "id": "security-admin-001",
+          "name": "Security Administrator"
+        },
+        "target": {
+          "type": "security_framework",
+          "id": "secfw-sl18-global-v1"
+        },
+        "details": {
+          "description": "Encryption standards updated to TLS 1.3"
+        },
+        "result": "success"
+      },
+      {
+        "logId": "log-secfw-003",
+        "timestamp": "2024-11-28T04:02:00Z",
+        "eventType": "zero_trust_enabled",
+        "category": "security",
+        "actor": {
+          "type": "user",
+          "id": "security-admin-001",
+          "name": "Security Administrator"
+        },
+        "target": {
+          "type": "security_framework",
+          "id": "secfw-sl18-global-v1"
+        },
+        "details": {
+          "description": "Zero trust architecture enabled globally"
+        },
+        "result": "success"
+      }
+    ],
+    "threatDetection": [
+      {
+        "logId": "log-threat-001",
+        "timestamp": "2024-11-28T04:05:00Z",
+        "eventType": "threat_detected",
+        "category": "threat_detection",
+        "actor": {
+          "type": "system",
+          "id": "threat-detection-engine"
+        },
+        "target": {
+          "type": "threat",
+          "id": "threat-fraud-001"
+        },
+        "details": {
+          "description": "Fraud attempt detected - velocity anomaly",
+          "metadata": {
+            "category": "fraud",
+            "severity": "critical",
+            "riskScore": 95
+          }
+        },
+        "result": "success"
+      },
+      {
+        "logId": "log-threat-002",
+        "timestamp": "2024-11-28T04:05:01Z",
+        "eventType": "threat_blocked",
+        "category": "threat_detection",
+        "actor": {
+          "type": "system",
+          "id": "threat-response-engine"
+        },
+        "target": {
+          "type": "threat",
+          "id": "threat-fraud-001"
+        },
+        "details": {
+          "description": "Fraud attempt blocked automatically",
+          "metadata": {
+            "action": "block",
+            "responseTime": 1.2
+          }
+        },
+        "result": "success"
+      },
+      {
+        "logId": "log-threat-003",
+        "timestamp": "2024-11-28T04:05:02Z",
+        "eventType": "incident_created",
+        "category": "threat_detection",
+        "actor": {
+          "type": "system",
+          "id": "incident-management"
+        },
+        "target": {
+          "type": "incident",
+          "id": "incident-001"
+        },
+        "details": {
+          "description": "Security incident created from threat detection",
+          "metadata": {
+            "severity": "critical",
+            "threatId": "threat-fraud-001"
+          }
+        },
+        "result": "success"
+      }
+    ],
+    "securityObservability": [
+      {
+        "logId": "log-obs-001",
+        "timestamp": "2024-11-28T04:10:00Z",
+        "eventType": "security_dashboard_viewed",
+        "category": "security_observability",
+        "actor": {
+          "type": "user",
+          "id": "security-analyst-001",
+          "name": "Security Analyst"
+        },
+        "target": {
+          "type": "security_dashboard",
+          "id": "dash-security-overview"
+        },
+        "details": {
+          "description": "Security overview dashboard viewed"
+        },
+        "result": "success"
+      },
+      {
+        "logId": "log-obs-002",
+        "timestamp": "2024-11-28T04:11:00Z",
+        "eventType": "forensic_log_exported",
+        "category": "security_observability",
+        "actor": {
+          "type": "user",
+          "id": "security-admin-001",
+          "name": "Security Administrator"
+        },
+        "target": {
+          "type": "forensic_log",
+          "id": "export-001"
+        },
+        "details": {
+          "description": "Forensic logs exported for incident investigation",
+          "metadata": {
+            "timeRange": "24h",
+            "recordCount": 15000
+          }
+        },
+        "result": "success"
+      }
+    ]
+  }
+}

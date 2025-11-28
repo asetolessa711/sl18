@@ -1,0 +1,845 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SecurityObservability",
+  "description": "Schema for security observability in SL18 - security dashboards, incident tracking, forensic logs, and security metrics",
+  "type": "object",
+  "properties": {
+    "observabilityId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^secobs-[a-z0-9-]+$",
+      "description": "Unique security observability configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable configuration name"
+    },
+    "dashboards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "dashboardId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "security_overview",
+              "threat_landscape",
+              "incident_timeline",
+              "compliance_status",
+              "access_analytics",
+              "vulnerability_tracker",
+              "forensic_analysis",
+              "real_time_threats",
+              "api_security",
+              "partner_security"
+            ]
+          },
+          "refreshInterval": {
+            "type": "integer",
+            "minimum": 5,
+            "description": "Refresh interval in seconds"
+          },
+          "widgets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "widgetId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["metric", "chart", "table", "map", "timeline", "heatmap", "gauge", "alert_list", "log_stream"]
+                },
+                "dataSource": {
+                  "type": "string"
+                },
+                "query": {
+                  "type": "string"
+                },
+                "visualization": {
+                  "type": "object",
+                  "properties": {
+                    "chartType": {
+                      "type": "string",
+                      "enum": ["line", "bar", "pie", "area", "scatter", "histogram", "treemap"]
+                    },
+                    "colors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "thresholds": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "number"
+                          },
+                          "color": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": ["widgetId", "name", "type"],
+              "additionalProperties": false
+            }
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["select", "multi_select", "date_range", "text", "number_range"]
+                },
+                "defaultValue": {}
+              },
+              "required": ["field", "type"],
+              "additionalProperties": false
+            }
+          },
+          "accessRoles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Roles allowed to view this dashboard"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["dashboardId", "name", "type", "widgets", "enabled"],
+        "additionalProperties": false
+      }
+    },
+    "incidentTracking": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "severityLevels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low", "info"]
+              },
+              "responseTimeSla": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "SLA response time in minutes"
+              },
+              "resolutionTimeSla": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "SLA resolution time in minutes"
+              },
+              "notificationChannels": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "escalationPath": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["level", "responseTimeSla", "resolutionTimeSla"],
+            "additionalProperties": false
+          }
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["detected", "triaging", "investigating", "containing", "eradicating", "recovering", "closed", "reopened"]
+          }
+        },
+        "incidentTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "typeId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string",
+                "enum": ["security", "compliance", "availability", "data_breach", "fraud", "unauthorized_access"]
+              },
+              "playbookId": {
+                "type": "string",
+                "description": "Reference to response playbook"
+              }
+            },
+            "required": ["typeId", "name", "category"],
+            "additionalProperties": false
+          }
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fieldId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["text", "textarea", "select", "multi_select", "date", "datetime", "user", "boolean"]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["fieldId", "name", "type"],
+            "additionalProperties": false
+          }
+        },
+        "automation": {
+          "type": "object",
+          "properties": {
+            "autoCreate": {
+              "type": "boolean"
+            },
+            "autoAssign": {
+              "type": "boolean"
+            },
+            "autoEscalate": {
+              "type": "boolean"
+            },
+            "autoClose": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "afterDays": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "forensicLogging": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "immutableLogs": {
+          "type": "boolean",
+          "description": "Whether logs are immutable (tamper-proof)"
+        },
+        "storage": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["s3", "azure_blob", "gcs", "elasticsearch", "splunk", "datadog", "custom"]
+            },
+            "retentionDays": {
+              "type": "integer",
+              "minimum": 30,
+              "maximum": 3650
+            },
+            "encryption": {
+              "type": "boolean"
+            },
+            "compression": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "logTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "typeId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "authentication",
+                  "authorization",
+                  "data_access",
+                  "api_calls",
+                  "configuration_changes",
+                  "security_events",
+                  "network_traffic",
+                  "user_activity",
+                  "admin_actions",
+                  "system_events"
+                ]
+              },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "retention": {
+                "type": "integer",
+                "minimum": 30,
+                "description": "Specific retention for this log type in days"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["typeId", "name", "category", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "correlation": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "correlationFields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Fields used for correlation (e.g., correlationId, sessionId)"
+            },
+            "crossServiceCorrelation": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "chainOfCustody": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "hashAlgorithm": {
+              "type": "string",
+              "enum": ["SHA-256", "SHA-384", "SHA-512"]
+            },
+            "timestamping": {
+              "type": "boolean"
+            },
+            "digitalSignature": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "securityMetrics": {
+      "type": "object",
+      "properties": {
+        "kpis": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kpiId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "formula": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string",
+                "enum": ["count", "percentage", "time_minutes", "time_hours", "time_days", "score", "currency"]
+              },
+              "target": {
+                "type": "number"
+              },
+              "thresholds": {
+                "type": "object",
+                "properties": {
+                  "good": {
+                    "type": "number"
+                  },
+                  "warning": {
+                    "type": "number"
+                  },
+                  "critical": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "trending": {
+                "type": "string",
+                "enum": ["higher_better", "lower_better", "target_range"]
+              }
+            },
+            "required": ["kpiId", "name", "unit"],
+            "additionalProperties": false
+          }
+        },
+        "currentValues": {
+          "type": "object",
+          "properties": {
+            "securityScore": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "mttd": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Mean Time to Detect (minutes)"
+            },
+            "mttr": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Mean Time to Respond (minutes)"
+            },
+            "mttc": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Mean Time to Contain (minutes)"
+            },
+            "incidentsOpen": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "incidentsClosed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "vulnerabilitiesCritical": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "vulnerabilitiesHigh": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "patchCompliance": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "mfaAdoption": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "phishingClickRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "lastUpdated": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "additionalProperties": false
+        },
+        "trends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metricId": {
+                "type": "string"
+              },
+              "period": {
+                "type": "string",
+                "enum": ["daily", "weekly", "monthly", "quarterly"]
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "trend": {
+                "type": "string",
+                "enum": ["improving", "stable", "degrading"]
+              }
+            },
+            "required": ["metricId", "period", "values"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "reporting": {
+      "type": "object",
+      "properties": {
+        "scheduledReports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "reportId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "executive_summary",
+                  "incident_report",
+                  "compliance_report",
+                  "vulnerability_report",
+                  "threat_intelligence",
+                  "access_audit",
+                  "forensic_report"
+                ]
+              },
+              "schedule": {
+                "type": "object",
+                "properties": {
+                  "frequency": {
+                    "type": "string",
+                    "enum": ["daily", "weekly", "monthly", "quarterly", "annually", "on_demand"]
+                  },
+                  "dayOfWeek": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 6
+                  },
+                  "dayOfMonth": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 31
+                  },
+                  "time": {
+                    "type": "string",
+                    "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "recipients": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "format": {
+                "type": "string",
+                "enum": ["pdf", "html", "csv", "json"]
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["reportId", "name", "type", "schedule", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "adHocReports": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "templates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "templateId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "parameters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "required": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["templateId", "name", "type"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "alerts": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "channelId": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["email", "slack", "teams", "pagerduty", "opsgenie", "webhook", "sms", "in_app"]
+              },
+              "config": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["channelId", "type", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "condition": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low", "info"]
+              },
+              "channels": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cooldown": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Cooldown period in minutes"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["ruleId", "name", "condition", "severity", "enabled"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "integrations": {
+      "type": "object",
+      "properties": {
+        "siem": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "provider": {
+              "type": "string",
+              "enum": ["splunk", "elastic", "datadog", "sumo_logic", "azure_sentinel", "qradar", "crowdstrike", "custom"]
+            },
+            "syncInterval": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Sync interval in seconds"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ticketing": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "provider": {
+              "type": "string",
+              "enum": ["jira", "servicenow", "zendesk", "freshdesk", "custom"]
+            },
+            "autoCreate": {
+              "type": "boolean"
+            },
+            "syncBidirectional": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "threatIntelligence": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "feeds": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "feedId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["ip_reputation", "domain_reputation", "file_hash", "vulnerability", "malware"]
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["feedId", "name", "type", "enabled"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "suspended", "maintenance", "deprecated"],
+      "description": "Observability configuration status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "observabilityId",
+    "version",
+    "name",
+    "dashboards",
+    "incidentTracking",
+    "forensicLogging",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}
