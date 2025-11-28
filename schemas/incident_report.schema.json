@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IncidentReport",
+  "description": "Schema for automated incident reports with root cause analysis in SL18",
+  "type": "object",
+  "properties": {
+    "incidentId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique incident identifier"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 200,
+      "description": "Incident title"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "warning", "critical"],
+      "description": "Incident severity level"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["open", "investigating", "identified", "resolved", "closed"],
+      "description": "Current incident status"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["qc_failure", "payment_issue", "publishing_error", "fraud_alert", "system_error", "performance_degradation", "data_inconsistency"],
+      "description": "Incident category"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "franchises": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Affected franchises"
+        },
+        "languages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Affected languages"
+        },
+        "regions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Affected regions"
+        },
+        "episodeCount": {
+          "type": "integer",
+          "description": "Number of affected episodes"
+        }
+      },
+      "additionalProperties": false
+    },
+    "timeline": {
+      "type": "object",
+      "properties": {
+        "detectedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When incident was detected"
+        },
+        "acknowledgedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When incident was acknowledged"
+        },
+        "identifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When root cause was identified"
+        },
+        "resolvedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When incident was resolved"
+        },
+        "closedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When incident was closed"
+        }
+      },
+      "required": ["detectedAt"],
+      "additionalProperties": false
+    },
+    "rootCauseAnalysis": {
+      "type": "object",
+      "properties": {
+        "completed": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether root cause analysis is complete"
+        },
+        "primaryCause": {
+          "type": "string",
+          "description": "Primary root cause"
+        },
+        "contributingFactors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Contributing factors"
+        },
+        "correlatedEvents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "eventId": { "type": "string" },
+              "eventType": { "type": "string" },
+              "timestamp": { "type": "string", "format": "date-time" },
+              "correlationId": { "type": "string" },
+              "description": { "type": "string" }
+            },
+            "required": ["eventId", "eventType", "timestamp"],
+            "additionalProperties": false
+          },
+          "description": "Correlated events from audit logs"
+        },
+        "paymentEvents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "transactionId": { "type": "string" },
+              "eventType": { "type": "string" },
+              "timestamp": { "type": "string", "format": "date-time" },
+              "status": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "description": "Related payment events"
+        },
+        "multilingualEvents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "languageCode": { "type": "string" },
+              "eventType": { "type": "string" },
+              "timestamp": { "type": "string", "format": "date-time" },
+              "qcStatus": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "description": "Related multilingual QC events"
+        }
+      },
+      "additionalProperties": false
+    },
+    "suggestedActions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "actionId": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["immediate", "high", "medium", "low"]
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["remediation", "prevention", "monitoring", "communication"]
+          },
+          "automated": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether action can be automated"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "completed", "skipped"]
+          }
+        },
+        "required": ["actionId", "priority", "description", "category"],
+        "additionalProperties": false
+      },
+      "description": "Suggested remediation actions"
+    },
+    "operatorSummary": {
+      "type": "object",
+      "properties": {
+        "impactDescription": {
+          "type": "string",
+          "description": "Human-readable impact description"
+        },
+        "technicalDetails": {
+          "type": "string",
+          "description": "Technical details for operators"
+        },
+        "remediationSteps": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Step-by-step remediation instructions"
+        },
+        "preventionRecommendations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Recommendations to prevent recurrence"
+        }
+      },
+      "additionalProperties": false
+    },
+    "notifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "notificationId": { "type": "string" },
+          "channel": { "type": "string" },
+          "sentAt": { "type": "string", "format": "date-time" },
+          "recipients": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "status": {
+            "type": "string",
+            "enum": ["sent", "delivered", "failed"]
+          }
+        },
+        "required": ["notificationId", "channel", "sentAt", "status"],
+        "additionalProperties": false
+      },
+      "description": "Notification history"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "triggeredBy": {
+          "type": "string",
+          "description": "What triggered the incident (rule ID, manual, etc.)"
+        },
+        "anomalyRuleId": {
+          "type": "string",
+          "description": "Related anomaly detection rule"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "incidentId",
+    "title",
+    "severity",
+    "status",
+    "category",
+    "timeline"
+  ],
+  "additionalProperties": false
+}

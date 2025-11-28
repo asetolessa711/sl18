@@ -1,0 +1,763 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MediaLocalization",
+  "description": "Schema for media localization in SL18 - subtitles, dubbing, accessibility tracks, and persona alignment for multilingual delivery",
+  "type": "object",
+  "properties": {
+    "localizationId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^loc-[a-z0-9-]+$",
+      "description": "Unique localization configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable localization configuration name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "franchise", "series", "episode", "content"],
+          "description": "Localization configuration scope"
+        },
+        "contentId": {
+          "type": "string",
+          "description": "Content identifier if scoped to specific content"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "description": "Language code (ISO 639-1, optionally with region)"
+          }
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$"
+          },
+          "description": "Target regions"
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "subtitles": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "generation": {
+          "type": "object",
+          "properties": {
+            "autoGeneration": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "engine": {
+                  "type": "string",
+                  "enum": ["whisper", "google_speech", "azure_speech", "aws_transcribe", "deepgram", "custom"]
+                },
+                "sourceLanguages": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "accuracy": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Minimum accuracy threshold"
+                },
+                "speakerDiarization": {
+                  "type": "boolean"
+                },
+                "punctuation": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "translation": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "engine": {
+                  "type": "string",
+                  "enum": ["google_translate", "deepl", "azure_translator", "amazon_translate", "custom"]
+                },
+                "targetLanguages": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "contextAware": {
+                  "type": "boolean",
+                  "description": "Use content context for better translation"
+                },
+                "glossarySupport": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formatId": {
+                "type": "string"
+              },
+              "format": {
+                "type": "string",
+                "enum": ["webvtt", "ttml", "srt", "scc", "dfxp", "stl", "ass"]
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["hls", "dash", "web", "ios", "android", "smart_tv", "broadcast"]
+                }
+              },
+              "embedded": {
+                "type": "boolean",
+                "description": "Embed in video stream"
+              },
+              "sidecar": {
+                "type": "boolean",
+                "description": "Provide as sidecar file"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["formatId", "format", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "styling": {
+          "type": "object",
+          "properties": {
+            "fontFamily": {
+              "type": "string"
+            },
+            "fontSize": {
+              "type": "integer",
+              "minimum": 8,
+              "maximum": 72
+            },
+            "fontColor": {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "backgroundColor": {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "backgroundOpacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "position": {
+              "type": "string",
+              "enum": ["bottom_center", "bottom_left", "bottom_right", "top_center", "top_left", "top_right"]
+            },
+            "edgeStyle": {
+              "type": "string",
+              "enum": ["none", "raised", "depressed", "uniform", "drop_shadow"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "qc": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "checks": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["timing_accuracy", "spelling", "grammar", "reading_speed", "line_length", "sync_check", "encoding", "style_consistency"]
+              }
+            },
+            "maxReadingSpeed": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Maximum characters per second"
+            },
+            "maxLineLength": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Maximum characters per line"
+            },
+            "maxLines": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4
+            },
+            "nativeReviewRequired": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "dubbing": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "workflows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "workflowId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["traditional", "ai_voice", "hybrid", "voice_clone"]
+              },
+              "sourceLanguage": {
+                "type": "string"
+              },
+              "targetLanguages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "lipSync": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "method": {
+                    "type": "string",
+                    "enum": ["manual", "automated", "ai_assisted"]
+                  },
+                  "accuracy": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "additionalProperties": false
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["workflowId", "name", "type", "sourceLanguage", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "voiceSynthesis": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "engine": {
+              "type": "string",
+              "enum": ["eleven_labs", "google_wavenet", "azure_neural", "amazon_polly", "coqui", "custom"]
+            },
+            "voiceCloning": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "consentRequired": {
+                  "type": "boolean"
+                },
+                "minimumSamples": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            "emotionPreservation": {
+              "type": "boolean",
+              "description": "Preserve emotion in synthetic voice"
+            },
+            "prosodyMatching": {
+              "type": "boolean",
+              "description": "Match original speech prosody"
+            }
+          },
+          "additionalProperties": false
+        },
+        "personaAlignment": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "voiceMatching": {
+              "type": "object",
+              "properties": {
+                "gender": {
+                  "type": "boolean"
+                },
+                "age": {
+                  "type": "boolean"
+                },
+                "tone": {
+                  "type": "boolean"
+                },
+                "accent": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "culturalAdaptation": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "nameLocalization": {
+                  "type": "boolean"
+                },
+                "idiomAdaptation": {
+                  "type": "boolean"
+                },
+                "honorifics": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "audioMixing": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "separateMusicEffects": {
+              "type": "boolean",
+              "description": "Keep M&E track separate from dialogue"
+            },
+            "dialogueBalance": {
+              "type": "number",
+              "minimum": -12,
+              "maximum": 12,
+              "description": "Dialogue volume adjustment in dB"
+            },
+            "ambientPreservation": {
+              "type": "boolean"
+            },
+            "loudnessNormalization": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "standard": {
+                  "type": "string",
+                  "enum": ["ebu_r128", "atsc_a85", "arib", "custom"]
+                },
+                "targetLufs": {
+                  "type": "number",
+                  "minimum": -30,
+                  "maximum": 0
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "accessibility": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "closedCaptions": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "soundDescriptions": {
+              "type": "boolean",
+              "description": "Include sound effect descriptions"
+            },
+            "speakerIdentification": {
+              "type": "boolean"
+            },
+            "musicDescriptions": {
+              "type": "boolean"
+            },
+            "formats": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["cea608", "cea708", "webvtt_sdh", "ttml_sdh"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "audioDescription": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["standard", "extended", "audio_intro"]
+            },
+            "generation": {
+              "type": "object",
+              "properties": {
+                "manual": {
+                  "type": "boolean"
+                },
+                "aiAssisted": {
+                  "type": "boolean"
+                },
+                "voiceSynthesis": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "languages": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "mixLevel": {
+              "type": "number",
+              "minimum": -20,
+              "maximum": 6,
+              "description": "AD mix level in dB relative to main audio"
+            }
+          },
+          "additionalProperties": false
+        },
+        "signLanguage": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "languages": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["asl", "bsl", "lsf", "dgs", "auslan", "jsl", "isl"]
+              }
+            },
+            "displayMode": {
+              "type": "string",
+              "enum": ["pip", "side_by_side", "overlay", "separate_track"]
+            },
+            "aiGenerated": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "reducedMotion": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "flashWarnings": {
+              "type": "boolean"
+            },
+            "motionReduction": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "tracks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "trackId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["subtitle", "closed_caption", "audio", "audio_description", "sign_language", "commentary"]
+          },
+          "language": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "default": {
+            "type": "boolean"
+          },
+          "forced": {
+            "type": "boolean",
+            "description": "Force display (e.g., foreign language segments)"
+          },
+          "characteristics": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["public.accessibility.describes-video", "public.accessibility.describes-music-and-sound", "public.accessibility.transcribes-spoken-dialog"]
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "qc_pending", "approved", "published", "rejected"]
+          },
+          "qcScore": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": ["trackId", "type", "language", "status"],
+        "additionalProperties": false
+      }
+    },
+    "glossary": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "terms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "termId": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "translations": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "context": {
+                "type": "string"
+              },
+              "doNotTranslate": {
+                "type": "boolean"
+              }
+            },
+            "required": ["termId", "source"],
+            "additionalProperties": false
+          }
+        },
+        "characterNames": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "character": {
+                "type": "string"
+              },
+              "localizations": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "qc": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "workflow": {
+          "type": "object",
+          "properties": {
+            "stages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "stageId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["automated", "native_review", "cultural_review", "technical_review", "final_approval"]
+                  },
+                  "required": {
+                    "type": "boolean"
+                  },
+                  "order": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "required": ["stageId", "name", "type", "order"],
+                "additionalProperties": false
+              }
+            },
+            "minimumScore": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Minimum QC score to pass"
+            },
+            "autoRejectThreshold": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        },
+        "culturalSensitivity": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "checkCategories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["religious", "political", "gender", "racial", "regional_taboos", "social_norms"]
+              }
+            },
+            "escalationRequired": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "languagesSupported": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tracksGenerated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tracksApproved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "avgQcScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "translationAccuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "culturalIssuesFound": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "processing", "qc_pending", "approved", "error"],
+      "description": "Current localization status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "localizationId",
+    "version",
+    "name",
+    "scope",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

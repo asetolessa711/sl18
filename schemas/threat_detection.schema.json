@@ -1,0 +1,719 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ThreatDetection",
+  "description": "Schema for threat detection engine in SL18 - real-time anomaly detection, threat categories, ML risk scoring, and automated response workflows",
+  "type": "object",
+  "properties": {
+    "detectionId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^threat-[a-z0-9-]+$",
+      "description": "Unique threat detection configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable configuration name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "region", "franchise", "partner", "service"],
+          "description": "Detection scope level"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Services monitored"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Regions monitored"
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "threatCategories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "fraud",
+              "account_takeover",
+              "bot_abuse",
+              "api_misuse",
+              "insider_risk",
+              "data_exfiltration",
+              "credential_stuffing",
+              "brute_force",
+              "injection_attack",
+              "xss_attack",
+              "dos_ddos",
+              "malware",
+              "phishing",
+              "social_engineering",
+              "privilege_escalation",
+              "unauthorized_access",
+              "data_breach",
+              "compliance_violation"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low", "info"]
+          },
+          "indicators": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "indicatorId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["behavioral", "transactional", "network", "identity", "content", "temporal", "geographic"]
+                },
+                "description": {
+                  "type": "string"
+                },
+                "weight": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": ["indicatorId", "name", "type"],
+              "additionalProperties": false
+            }
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["categoryId", "name", "type", "severity", "enabled"],
+        "additionalProperties": false
+      },
+      "description": "Threat categories to monitor"
+    },
+    "detectionRules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ruleId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "description": "Reference to threat category"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["threshold", "anomaly", "pattern", "correlation", "ml_model", "signature", "heuristic"]
+          },
+          "condition": {
+            "type": "object",
+            "properties": {
+              "metric": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string",
+                "enum": ["gt", "gte", "lt", "lte", "eq", "neq", "between", "outside", "contains", "matches"]
+              },
+              "value": {},
+              "timeWindow": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Time window in seconds"
+              },
+              "aggregation": {
+                "type": "string",
+                "enum": ["sum", "avg", "count", "min", "max", "distinct", "rate"]
+              }
+            },
+            "required": ["metric", "operator", "value"],
+            "additionalProperties": false
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low", "info"]
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["alert", "block", "throttle", "quarantine", "escalate", "notify", "log", "capture_evidence", "trigger_mfa", "revoke_session", "disable_account"]
+            }
+          },
+          "cooldownPeriod": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Cooldown period in seconds"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": ["ruleId", "name", "type", "condition", "severity", "actions", "enabled"],
+        "additionalProperties": false
+      }
+    },
+    "anomalyDetection": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "behavioral": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "login_frequency",
+                  "session_duration",
+                  "action_patterns",
+                  "navigation_flow",
+                  "typing_patterns",
+                  "mouse_movements",
+                  "api_usage_patterns",
+                  "data_access_patterns",
+                  "time_of_activity",
+                  "device_fingerprint"
+                ]
+              }
+            },
+            "baselinePeriod": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Baseline period in days"
+            },
+            "sensitivityLevel": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "very_high"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "transactional": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "transaction_velocity",
+                  "transaction_amount",
+                  "transaction_frequency",
+                  "payment_method_changes",
+                  "recipient_patterns",
+                  "geographic_spread",
+                  "time_patterns"
+                ]
+              }
+            },
+            "thresholds": {
+              "type": "object",
+              "properties": {
+                "velocityLimit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Max transactions per hour"
+                },
+                "amountLimit": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Max single transaction amount"
+                },
+                "dailyLimit": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Max daily total amount"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "network": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "request_rate",
+                  "bandwidth_usage",
+                  "connection_patterns",
+                  "protocol_anomalies",
+                  "geographic_anomalies",
+                  "timing_anomalies"
+                ]
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "mlModels": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "modelId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["classification", "anomaly_detection", "clustering", "time_series", "neural_network", "ensemble"]
+              },
+              "purpose": {
+                "type": "string",
+                "enum": ["fraud_detection", "account_takeover", "bot_detection", "risk_scoring", "behavior_analysis", "pattern_recognition"]
+              },
+              "version": {
+                "type": "string"
+              },
+              "accuracy": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "lastTrained": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["modelId", "name", "type", "purpose", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "riskScoring": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "factors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "factorId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "weight": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "thresholds": {
+                    "type": "object",
+                    "properties": {
+                      "low": {
+                        "type": "number"
+                      },
+                      "medium": {
+                        "type": "number"
+                      },
+                      "high": {
+                        "type": "number"
+                      },
+                      "critical": {
+                        "type": "number"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "required": ["factorId", "name", "weight"],
+                "additionalProperties": false
+              }
+            },
+            "overallThresholds": {
+              "type": "object",
+              "properties": {
+                "block": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "mfaRequired": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "alert": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "log": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "responseWorkflows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "workflowId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "triggerCategories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "triggerSeverity": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["critical", "high", "medium", "low", "info"]
+            }
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "stepId": {
+                  "type": "string"
+                },
+                "order": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "block_request",
+                    "throttle_rate",
+                    "require_mfa",
+                    "revoke_session",
+                    "disable_account",
+                    "quarantine_content",
+                    "notify_security",
+                    "notify_user",
+                    "capture_evidence",
+                    "escalate",
+                    "create_incident",
+                    "log_forensic",
+                    "trigger_scan",
+                    "rollback_changes",
+                    "isolate_service"
+                  ]
+                },
+                "parameters": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "delay": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Delay in seconds before executing"
+                },
+                "condition": {
+                  "type": "string",
+                  "description": "Condition expression for execution"
+                }
+              },
+              "required": ["stepId", "order", "action"],
+              "additionalProperties": false
+            }
+          },
+          "escalation": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "timeout": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Escalation timeout in minutes"
+              },
+              "path": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Escalation path (roles/teams)"
+              }
+            },
+            "additionalProperties": false
+          },
+          "sla": {
+            "type": "object",
+            "properties": {
+              "responseTime": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Max response time in minutes"
+              },
+              "resolutionTime": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Max resolution time in minutes"
+              }
+            },
+            "additionalProperties": false
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["workflowId", "name", "triggerCategories", "steps", "enabled"],
+        "additionalProperties": false
+      }
+    },
+    "realTimeMonitoring": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "streamProcessing": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "engine": {
+              "type": "string",
+              "enum": ["kafka_streams", "flink", "spark_streaming", "custom"]
+            },
+            "latencyTarget": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Target latency in milliseconds"
+            }
+          },
+          "additionalProperties": false
+        },
+        "alerting": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "channels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["email", "slack", "pagerduty", "webhook", "sms", "teams", "opsgenie", "in_app"]
+              }
+            },
+            "severityRouting": {
+              "type": "object",
+              "properties": {
+                "critical": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "high": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "medium": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "low": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "quietHours": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "start": {
+                  "type": "string",
+                  "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                },
+                "end": {
+                  "type": "string",
+                  "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                },
+                "criticalBypass": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "threatsDetected": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "threatsBlocked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "falsePositives": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truePositiveRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "avgDetectionTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average detection time in seconds"
+        },
+        "avgResponseTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average response time in seconds"
+        },
+        "activeIncidents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "suspended", "maintenance", "deprecated"],
+      "description": "Detection configuration status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "detectionId",
+    "version",
+    "name",
+    "scope",
+    "threatCategories",
+    "detectionRules",
+    "responseWorkflows",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

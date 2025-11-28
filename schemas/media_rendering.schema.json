@@ -1,0 +1,766 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MediaRendering",
+  "description": "Schema for media rendering pipeline in SL18 - ingest, transcode, packaging, and optimization for Waliin Studio productions",
+  "type": "object",
+  "properties": {
+    "renderingId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^render-[a-z0-9-]+$",
+      "description": "Unique media rendering configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable rendering pipeline name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "franchise", "series", "episode"],
+          "description": "Rendering configuration scope"
+        },
+        "franchiseId": {
+          "type": "string",
+          "description": "Franchise identifier if scoped to franchise"
+        },
+        "seriesId": {
+          "type": "string",
+          "description": "Series identifier if scoped to series"
+        },
+        "contentTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["short_drama", "movie", "series_episode", "trailer", "teaser", "clip", "behind_scenes", "music_video"]
+          },
+          "description": "Content types this pipeline handles"
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "ingestPipeline": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["direct_upload", "s3", "gcs", "azure_blob", "ftp", "capcut_export", "studio_link"]
+              },
+              "location": {
+                "type": "string",
+                "description": "Source location URL or path"
+              },
+              "acceptedFormats": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["mp4", "mov", "avi", "mkv", "webm", "prores", "dnxhd", "raw", "mxf"]
+                }
+              },
+              "maxFileSize": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Maximum file size in MB"
+              },
+              "validation": {
+                "type": "object",
+                "properties": {
+                  "checksum": {
+                    "type": "boolean"
+                  },
+                  "virusScan": {
+                    "type": "boolean"
+                  },
+                  "metadataValidation": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["sourceId", "name", "type", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "preprocessing": {
+          "type": "object",
+          "properties": {
+            "deinterlace": {
+              "type": "boolean"
+            },
+            "denoising": {
+              "type": "boolean"
+            },
+            "colorCorrection": {
+              "type": "boolean"
+            },
+            "audioNormalization": {
+              "type": "boolean"
+            },
+            "frameRateConversion": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "qualityAnalysis": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["vmaf", "psnr", "ssim", "bitrate_consistency", "audio_loudness", "black_frames", "scene_detection"]
+              }
+            },
+            "minimumVmaf": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Minimum VMAF score for quality pass"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "transcoding": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "engine": {
+          "type": "string",
+          "enum": ["ffmpeg", "mediaconvert", "elemental", "bitmovin", "encoding_com", "custom"],
+          "description": "Transcoding engine"
+        },
+        "videoCodecs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "codecId": {
+                "type": "string"
+              },
+              "codec": {
+                "type": "string",
+                "enum": ["h264", "h265_hevc", "vp9", "av1", "prores"],
+                "description": "Video codec"
+              },
+              "profile": {
+                "type": "string",
+                "enum": ["baseline", "main", "high", "high10", "main10", "professional"]
+              },
+              "bitDepth": {
+                "type": "integer",
+                "enum": [8, 10, 12]
+              },
+              "hardwareAcceleration": {
+                "type": "string",
+                "enum": ["none", "nvenc", "qsv", "vaapi", "videotoolbox"]
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["codecId", "codec", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "audioCodecs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "codecId": {
+                "type": "string"
+              },
+              "codec": {
+                "type": "string",
+                "enum": ["aac", "ac3", "eac3", "opus", "mp3", "flac", "pcm"]
+              },
+              "channels": {
+                "type": "string",
+                "enum": ["mono", "stereo", "5.1", "7.1", "atmos"]
+              },
+              "sampleRate": {
+                "type": "integer",
+                "enum": [44100, 48000, 96000]
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["codecId", "codec", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "renditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "renditionId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "resolution": {
+                "type": "object",
+                "properties": {
+                  "width": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "height": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "aspectRatio": {
+                    "type": "string",
+                    "enum": ["16:9", "4:3", "9:16", "1:1", "21:9"]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "videoBitrate": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "description": "Target bitrate in kbps"
+                  },
+                  "max": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "description": "Maximum bitrate in kbps"
+                  },
+                  "min": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "description": "Minimum bitrate in kbps"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": ["cbr", "vbr", "crf", "cq"]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "audioBitrate": {
+                "type": "integer",
+                "minimum": 32,
+                "description": "Audio bitrate in kbps"
+              },
+              "frameRate": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 120,
+                "description": "Frame rate in fps"
+              },
+              "deviceTarget": {
+                "type": "string",
+                "enum": ["mobile_small", "mobile_large", "tablet", "desktop", "desktop_large", "smart_tv", "ott_box"],
+                "description": "Target device profile"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100,
+                "description": "Rendering priority (lower = higher priority)"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["renditionId", "name", "resolution", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "optimizations": {
+          "type": "object",
+          "properties": {
+            "perTitleEncoding": {
+              "type": "boolean",
+              "description": "Per-title encoding optimization"
+            },
+            "contentAdaptive": {
+              "type": "boolean",
+              "description": "Content-adaptive encoding"
+            },
+            "twoPassEncoding": {
+              "type": "boolean"
+            },
+            "sceneDetection": {
+              "type": "boolean"
+            },
+            "hdrToSdr": {
+              "type": "boolean",
+              "description": "HDR to SDR tone mapping"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "packaging": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formatId": {
+                "type": "string"
+              },
+              "format": {
+                "type": "string",
+                "enum": ["hls", "dash", "smooth_streaming", "cmaf", "progressive_mp4"],
+                "description": "Packaging format"
+              },
+              "segmentDuration": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 30,
+                "description": "Segment duration in seconds"
+              },
+              "encryption": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "drm": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["widevine", "fairplay", "playready", "clearkey"]
+                    }
+                  },
+                  "keyRotation": {
+                    "type": "boolean"
+                  },
+                  "keyRotationInterval": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Key rotation interval in seconds"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "manifestConfig": {
+                "type": "object",
+                "properties": {
+                  "includeLoudness": {
+                    "type": "boolean"
+                  },
+                  "includeThumbnails": {
+                    "type": "boolean"
+                  },
+                  "subtitleFormat": {
+                    "type": "string",
+                    "enum": ["webvtt", "ttml", "srt", "scc"]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["formatId", "format", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "lowLatency": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "targetLatency": {
+              "type": "number",
+              "minimum": 0.5,
+              "description": "Target latency in seconds"
+            },
+            "partDuration": {
+              "type": "number",
+              "minimum": 0.1,
+              "description": "Low-latency HLS part duration"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "thumbnails": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "generation": {
+          "type": "object",
+          "properties": {
+            "interval": {
+              "type": "number",
+              "minimum": 0.1,
+              "description": "Thumbnail interval in seconds"
+            },
+            "sizes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "width": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "height": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": ["jpg", "png", "webp", "avif"]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "spriteSheets": {
+              "type": "boolean",
+              "description": "Generate sprite sheets for scrubbing"
+            },
+            "aiSelection": {
+              "type": "boolean",
+              "description": "AI-powered thumbnail selection"
+            }
+          },
+          "additionalProperties": false
+        },
+        "poster": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "aiGenerated": {
+              "type": "boolean"
+            },
+            "sizes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "width": {
+                    "type": "integer"
+                  },
+                  "height": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "trailers": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "autoGeneration": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "algorithm": {
+              "type": "string",
+              "enum": ["highlight_detection", "scene_analysis", "ai_summary", "custom"]
+            },
+            "durations": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 5,
+                "description": "Trailer durations in seconds"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "teasers": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "shortFormPlatforms": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["tiktok", "instagram_reels", "youtube_shorts", "snapchat"]
+              }
+            },
+            "durations": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "storage": {
+      "type": "object",
+      "properties": {
+        "primaryStorage": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "enum": ["s3", "gcs", "azure_blob", "wasabi", "backblaze", "on_premise"]
+            },
+            "bucket": {
+              "type": "string"
+            },
+            "region": {
+              "type": "string"
+            },
+            "storageClass": {
+              "type": "string",
+              "enum": ["standard", "intelligent_tiering", "infrequent_access", "glacier", "archive"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "replication": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "destinations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "region": {
+                    "type": "string"
+                  },
+                  "bucket": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "lifecycle": {
+          "type": "object",
+          "properties": {
+            "hotStorageDays": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Days in hot storage before transition"
+            },
+            "warmStorageDays": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Days in warm storage before archive"
+            },
+            "archiveAfterDays": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "deleteAfterDays": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "scheduling": {
+      "type": "object",
+      "properties": {
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low", "batch"],
+          "description": "Job priority"
+        },
+        "queues": {
+          "type": "object",
+          "properties": {
+            "realtime": {
+              "type": "object",
+              "properties": {
+                "maxConcurrent": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "timeout": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Timeout in minutes"
+                }
+              },
+              "additionalProperties": false
+            },
+            "standard": {
+              "type": "object",
+              "properties": {
+                "maxConcurrent": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "timeout": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            "batch": {
+              "type": "object",
+              "properties": {
+                "maxConcurrent": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "scheduleWindow": {
+                  "type": "string",
+                  "description": "Batch processing window (cron expression)"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "jobsCompleted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "jobsFailed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "avgTranscodeTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average transcode time in minutes"
+        },
+        "avgQualityScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "storageUsed": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Storage used in TB"
+        },
+        "lastJobTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "paused", "processing", "error", "maintenance"],
+      "description": "Current pipeline status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "renderingId",
+    "version",
+    "name",
+    "scope",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

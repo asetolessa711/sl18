@@ -1,0 +1,110 @@
+{
+  "validRegistrations": [
+    {
+      "franchiseId": "core",
+      "creatorId": "central-ops-001",
+      "registrationModel": "revenueShare",
+      "agreementSigned": true,
+      "status": "active",
+      "displayName": "SL18 Core",
+      "country": "Ethiopia",
+      "ownerContact": {
+        "name": "Central Ops",
+        "email": "ops@sl18.africa",
+        "phone": "+251-000-0000"
+      },
+      "registeredAt": "2025-01-01T00:00:00Z",
+      "approvedAt": "2025-01-02T00:00:00Z",
+      "notes": "Initial core franchise for SL18"
+    },
+    {
+      "franchiseId": "kenya-001",
+      "creatorId": "partner-ke-001",
+      "registrationModel": "revenueShare",
+      "agreementSigned": true,
+      "status": "active",
+      "displayName": "SL18 Kenya",
+      "country": "Kenya",
+      "ownerContact": {
+        "name": "Kenya Partner",
+        "email": "partner@sl18.ke"
+      },
+      "registeredAt": "2025-02-01T00:00:00Z",
+      "approvedAt": "2025-02-05T00:00:00Z"
+    },
+    {
+      "franchiseId": "nigeria-001",
+      "creatorId": "partner-ng-001",
+      "registrationModel": "fee",
+      "agreementSigned": false,
+      "status": "pending",
+      "displayName": "SL18 Nigeria",
+      "country": "Nigeria",
+      "ownerContact": {
+        "name": "Nigeria Partner",
+        "email": "partner@sl18.ng"
+      },
+      "registeredAt": "2025-11-20T00:00:00Z",
+      "approvedAt": null
+    }
+  ],
+  "invalidRegistrations": [
+    {
+      "description": "Missing required franchiseId",
+      "data": {
+        "creatorId": "test-001",
+        "registrationModel": "revenueShare",
+        "agreementSigned": false,
+        "status": "pending"
+      },
+      "expectedError": "franchiseId is required"
+    },
+    {
+      "description": "Invalid franchiseId format (uppercase)",
+      "data": {
+        "franchiseId": "CORE",
+        "creatorId": "test-001",
+        "registrationModel": "revenueShare",
+        "agreementSigned": false,
+        "status": "pending"
+      },
+      "expectedError": "franchiseId must match pattern"
+    },
+    {
+      "description": "Invalid status value",
+      "data": {
+        "franchiseId": "test-001",
+        "creatorId": "test-001",
+        "registrationModel": "revenueShare",
+        "agreementSigned": false,
+        "status": "invalid_status"
+      },
+      "expectedError": "status must be one of enum values"
+    },
+    {
+      "description": "Invalid registrationModel",
+      "data": {
+        "franchiseId": "test-001",
+        "creatorId": "test-001",
+        "registrationModel": "hybrid",
+        "agreementSigned": false,
+        "status": "pending"
+      },
+      "expectedError": "registrationModel must be fee or revenueShare"
+    },
+    {
+      "description": "Missing ownerContact email",
+      "data": {
+        "franchiseId": "test-001",
+        "creatorId": "test-001",
+        "registrationModel": "revenueShare",
+        "agreementSigned": false,
+        "status": "pending",
+        "ownerContact": {
+          "name": "Test Partner"
+        }
+      },
+      "expectedError": "ownerContact.email is required"
+    }
+  ]
+}

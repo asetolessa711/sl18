@@ -1,0 +1,518 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sl18.io/schemas/ui_panels.schema.json",
+  "title": "UI Panels Schema",
+  "description": "Schema for all SL18 operator panels including language, series, governance, marketplace, partner, personalization, monetization, and insights panels",
+  "type": "object",
+  "properties": {
+    "panels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/panelConfig"
+      }
+    }
+  },
+  "definitions": {
+    "panelConfig": {
+      "type": "object",
+      "properties": {
+        "panelId": {
+          "type": "string",
+          "description": "Unique panel identifier"
+        },
+        "panelType": {
+          "type": "string",
+          "enum": [
+            "language_selection",
+            "series_workspace",
+            "governance_console",
+            "marketplace_portal",
+            "partner_integration",
+            "personalization_ui",
+            "monetization_controls",
+            "insights_dashboard",
+            "feedback_loop",
+            "qc_dashboard"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "config": {
+          "oneOf": [
+            { "$ref": "#/definitions/languageSelectionPanel" },
+            { "$ref": "#/definitions/seriesWorkspacePanel" },
+            { "$ref": "#/definitions/governanceConsolePanel" },
+            { "$ref": "#/definitions/marketplacePortalPanel" },
+            { "$ref": "#/definitions/partnerIntegrationPanel" },
+            { "$ref": "#/definitions/personalizationUIPanel" },
+            { "$ref": "#/definitions/monetizationControlsPanel" },
+            { "$ref": "#/definitions/insightsDashboardPanel" },
+            { "$ref": "#/definitions/feedbackLoopPanel" },
+            { "$ref": "#/definitions/qcDashboardPanel" }
+          ]
+        },
+        "permissions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Required permissions to access this panel"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": ["panelId", "panelType", "title"]
+    },
+    "languageSelectionPanel": {
+      "type": "object",
+      "description": "Language selection and multilingual controls panel",
+      "properties": {
+        "searchEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable search bar for language lookup"
+        },
+        "searchFields": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["code", "displayName", "nativeName", "region"] },
+          "default": ["code", "displayName", "nativeName"]
+        },
+        "multiSelect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow multiple language selection"
+        },
+        "showPrimarySecondary": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show primary/secondary language toggle"
+        },
+        "showRegistryBrowser": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show language registry browser"
+        },
+        "previewEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable preview-before-publish for subtitles/captions"
+        },
+        "dynamicSwitchingEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow language switching mid-workflow"
+        },
+        "qcIntegration": {
+          "type": "object",
+          "properties": {
+            "showQcStatus": { "type": "boolean", "default": true },
+            "showTranslationAccuracy": { "type": "boolean", "default": true },
+            "showPersonaConsistency": { "type": "boolean", "default": true },
+            "sideBySideComparison": { "type": "boolean", "default": true }
+          }
+        },
+        "supportedLanguages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of supported language codes"
+        }
+      }
+    },
+    "seriesWorkspacePanel": {
+      "type": "object",
+      "description": "Series and episode arc workspace panel",
+      "properties": {
+        "showEpisodeTimeline": {
+          "type": "boolean",
+          "default": true
+        },
+        "showContinuityTracker": {
+          "type": "boolean",
+          "default": true,
+          "description": "Track persona continuity across episodes"
+        },
+        "showPlotThreads": {
+          "type": "boolean",
+          "default": true,
+          "description": "Display plot thread tracker (active/resolved/abandoned)"
+        },
+        "showPersonaProfiles": {
+          "type": "boolean",
+          "default": true
+        },
+        "crossFormatQc": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "personaConsistency": { "type": "boolean", "default": true },
+            "brandConsistency": { "type": "boolean", "default": true },
+            "voiceConsistency": { "type": "boolean", "default": true }
+          }
+        },
+        "hybridPublishing": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showShortFormPanel": { "type": "boolean", "default": true },
+            "showSerializedPanel": { "type": "boolean", "default": true },
+            "crossPromotion": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "governanceConsolePanel": {
+      "type": "object",
+      "description": "Governance and access control console",
+      "properties": {
+        "roleManagement": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showRoleAssignment": { "type": "boolean", "default": true },
+            "showRoleHistory": { "type": "boolean", "default": true }
+          }
+        },
+        "policyManagement": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showPolicyList": { "type": "boolean", "default": true },
+            "showComplianceStatus": { "type": "boolean", "default": true }
+          }
+        },
+        "auditTrailViewer": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "maxEntries": { "type": "integer", "default": 100 },
+            "filters": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["category", "actor", "target", "timestamp", "severity"] }
+            },
+            "exportEnabled": { "type": "boolean", "default": true }
+          }
+        },
+        "mfaSettings": {
+          "type": "object",
+          "properties": {
+            "showMfaStatus": { "type": "boolean", "default": true },
+            "enforcementRules": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "marketplacePortalPanel": {
+      "type": "object",
+      "description": "Contributor marketplace portal",
+      "properties": {
+        "listingsView": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showGrid": { "type": "boolean", "default": true },
+            "showList": { "type": "boolean", "default": true },
+            "filters": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["category", "skill", "language", "rating", "price", "availability"] }
+            },
+            "sorting": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["relevance", "rating", "price", "experience", "recent"] }
+            }
+          }
+        },
+        "onboardingWizard": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "steps": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["profile", "skills", "portfolio", "verification", "agreement", "pricing"]
+            }
+          }
+        },
+        "revenueSplitConfig": {
+          "type": "object",
+          "properties": {
+            "showSplitCalculator": { "type": "boolean", "default": true },
+            "showPayoutHistory": { "type": "boolean", "default": true },
+            "showProjectedEarnings": { "type": "boolean", "default": true }
+          }
+        },
+        "qcBadges": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "badgeTypes": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["verified", "top_rated", "fast_delivery", "multilingual", "qc_certified"] }
+            }
+          }
+        }
+      }
+    },
+    "partnerIntegrationPanel": {
+      "type": "object",
+      "description": "Partner integration console",
+      "properties": {
+        "apiKeyManagement": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showKeyList": { "type": "boolean", "default": true },
+            "showKeyRotation": { "type": "boolean", "default": true },
+            "showUsageMetrics": { "type": "boolean", "default": true }
+          }
+        },
+        "complianceWorkflows": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showCertifications": { "type": "boolean", "default": true },
+            "showSlaStatus": { "type": "boolean", "default": true }
+          }
+        },
+        "syndicationPreviews": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "feedTypes": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["rss", "atom", "json", "mrss", "api"] }
+            }
+          }
+        },
+        "healthMonitoring": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showUptimeStatus": { "type": "boolean", "default": true },
+            "showLatencyMetrics": { "type": "boolean", "default": true },
+            "showErrorRates": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "personalizationUIPanel": {
+      "type": "object",
+      "description": "Personalization and recommendation UI",
+      "properties": {
+        "viewerProfileSimulator": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "editableFields": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["language", "region", "genre", "engagement_history", "preferences"] }
+            }
+          }
+        },
+        "adaptiveRenderingPreview": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showSubtitlePreview": { "type": "boolean", "default": true },
+            "showVoiceSelection": { "type": "boolean", "default": true },
+            "showTeaserGeneration": { "type": "boolean", "default": true }
+          }
+        },
+        "qcEnforcementPanel": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showBrandContinuity": { "type": "boolean", "default": true },
+            "showPersonaContinuity": { "type": "boolean", "default": true },
+            "showCulturalSensitivity": { "type": "boolean", "default": true }
+          }
+        },
+        "recommendationEngine": {
+          "type": "object",
+          "properties": {
+            "showRecommendations": { "type": "boolean", "default": true },
+            "showConfidenceScores": { "type": "boolean", "default": true },
+            "showReasoning": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "monetizationControlsPanel": {
+      "type": "object",
+      "description": "Monetization and pricing controls",
+      "properties": {
+        "tierManagement": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showTierList": { "type": "boolean", "default": true },
+            "showTierComparison": { "type": "boolean", "default": true },
+            "showSubscriberCounts": { "type": "boolean", "default": true }
+          }
+        },
+        "pricingPreviews": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showRegionalPricing": { "type": "boolean", "default": true },
+            "showDynamicAdjustments": { "type": "boolean", "default": true },
+            "showPricingHistory": { "type": "boolean", "default": true }
+          }
+        },
+        "retentionActions": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "actionTypes": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["discount_offer", "tier_upgrade_prompt", "loyalty_reward", "win_back_campaign"] }
+            },
+            "showChurnRisk": { "type": "boolean", "default": true }
+          }
+        },
+        "revenueAnalytics": {
+          "type": "object",
+          "properties": {
+            "showRevenueTrends": { "type": "boolean", "default": true },
+            "showConversionFunnel": { "type": "boolean", "default": true },
+            "showRegionalBreakdown": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "insightsDashboardPanel": {
+      "type": "object",
+      "description": "Audience insights dashboard",
+      "properties": {
+        "engagementCharts": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "metrics": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["watch_time", "likes", "shares", "comments", "saves", "replays"] }
+            },
+            "chartTypes": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["line", "bar", "area", "sparkline"] }
+            }
+          }
+        },
+        "sentimentAnalysis": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showOverallSentiment": { "type": "boolean", "default": true },
+            "showCulturalReactions": { "type": "boolean", "default": true },
+            "showTrendChanges": { "type": "boolean", "default": true }
+          }
+        },
+        "retentionCurves": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showDropOffPoints": { "type": "boolean", "default": true },
+            "showPeakMoments": { "type": "boolean", "default": true },
+            "showBingePatterns": { "type": "boolean", "default": true }
+          }
+        },
+        "demographicBreakdowns": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "dimensions": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["region", "age", "language", "device", "platform"] }
+            }
+          }
+        }
+      }
+    },
+    "feedbackLoopPanel": {
+      "type": "object",
+      "description": "Feedback loop monitoring and controls",
+      "properties": {
+        "notifications": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showRealTime": { "type": "boolean", "default": true },
+            "triggerTypes": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["engagement_threshold", "sentiment_change", "retention_drop", "churn_risk", "cultural_issue"] }
+            }
+          }
+        },
+        "adjustmentLogs": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showPersonalizationAdjustments": { "type": "boolean", "default": true },
+            "showMonetizationAdjustments": { "type": "boolean", "default": true },
+            "showQcAlerts": { "type": "boolean", "default": true }
+          }
+        },
+        "culturalSensitivityAlerts": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showAlertDetails": { "type": "boolean", "default": true },
+            "showResolutionSteps": { "type": "boolean", "default": true }
+          }
+        },
+        "impactMetrics": {
+          "type": "object",
+          "properties": {
+            "showBeforeAfter": { "type": "boolean", "default": true },
+            "showImprovementPercent": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "qcDashboardPanel": {
+      "type": "object",
+      "description": "QC quality control dashboard",
+      "properties": {
+        "overallStatus": {
+          "type": "object",
+          "properties": {
+            "showPassRate": { "type": "boolean", "default": true },
+            "showFailureBreakdown": { "type": "boolean", "default": true },
+            "showTrends": { "type": "boolean", "default": true }
+          }
+        },
+        "perLanguageQc": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "sideBySideView": { "type": "boolean", "default": true },
+            "showTranslationAccuracy": { "type": "boolean", "default": true },
+            "showPersonaConsistency": { "type": "boolean", "default": true }
+          }
+        },
+        "perSeriesQc": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showContinuityChecks": { "type": "boolean", "default": true },
+            "showBrandConsistency": { "type": "boolean", "default": true }
+          }
+        },
+        "actionItems": {
+          "type": "object",
+          "properties": {
+            "showPendingReviews": { "type": "boolean", "default": true },
+            "showFailedItems": { "type": "boolean", "default": true },
+            "showResubmissions": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    }
+  }
+}

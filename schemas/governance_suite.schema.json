@@ -1,0 +1,700 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GovernanceSuite",
+  "description": "Schema for global governance suite in SL18 - unified governance policies, compliance rules, and enforcement workflows",
+  "type": "object",
+  "properties": {
+    "suiteId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^govsuite-[a-z0-9-]+$",
+      "description": "Unique governance suite identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Suite version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable suite name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "region", "franchise", "partner", "contributor"],
+          "description": "Governance scope level"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Regions where governance applies"
+        },
+        "franchiseIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Franchise IDs where governance applies"
+        },
+        "partnerIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Partner IDs where governance applies"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Languages covered by governance"
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "policies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "policyId": {
+            "type": "string",
+            "description": "Unique policy identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Policy name"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "content_standards",
+              "monetization_rules",
+              "contributor_terms",
+              "platform_usage",
+              "data_privacy",
+              "security",
+              "cultural_sensitivity",
+              "qc_requirements",
+              "distribution_rules",
+              "partner_compliance"
+            ],
+            "description": "Type of policy"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low"],
+            "description": "Policy enforcement priority"
+          },
+          "enforcement": {
+            "type": "string",
+            "enum": ["mandatory", "recommended", "optional", "advisory"],
+            "description": "Enforcement level"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ruleId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "condition": {
+                  "type": "string",
+                  "description": "Rule condition expression"
+                },
+                "action": {
+                  "type": "string",
+                  "enum": ["allow", "deny", "warn", "require_approval", "block_content", "pause_distribution", "flag_review", "notify_admin", "auto_remediate"],
+                  "description": "Action when rule triggers"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": ["critical", "high", "medium", "low", "info"],
+                  "description": "Rule severity"
+                },
+                "autoRemediation": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "actions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": ["block", "quarantine", "notify", "escalate", "rollback", "suspend"]
+                      }
+                    },
+                    "delay": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "Delay in seconds before auto-remediation"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": ["ruleId", "name", "action"],
+              "additionalProperties": false
+            },
+            "description": "Policy rules"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "pending_approval", "active", "suspended", "deprecated"],
+            "description": "Policy status"
+          },
+          "effectiveDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expirationDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["policyId", "name", "type", "enforcement", "rules", "status"],
+        "additionalProperties": false
+      },
+      "description": "Governance policies"
+    },
+    "complianceRegistry": {
+      "type": "object",
+      "properties": {
+        "frameworks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "frameworkId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "enum": ["GDPR", "CCPA", "SOC2", "ISO27001", "PCI-DSS", "HIPAA", "COPPA", "LGPD", "PIPEDA", "local_regulations"]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "regions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "requirements": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "requirementId": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "category": {
+                      "type": "string",
+                      "enum": ["data_protection", "consent_management", "access_control", "audit_logging", "encryption", "data_retention", "breach_notification", "cross_border_transfer"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["compliant", "non_compliant", "in_progress", "not_assessed", "exempt"]
+                    },
+                    "lastAssessed": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["requirementId", "name", "category", "status"],
+                  "additionalProperties": false
+                }
+              },
+              "lastAudit": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "nextAudit": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "certificationExpiry": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": ["frameworkId", "name", "required"],
+            "additionalProperties": false
+          },
+          "description": "Compliance frameworks"
+        },
+        "globalRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["cultural_sensitivity", "qc_prerequisite", "data_privacy", "security_standard", "legal_requirement", "content_restriction"]
+              },
+              "scope": {
+                "type": "string",
+                "enum": ["global", "regional", "franchise", "partner"]
+              },
+              "regions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "languages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "enforcement": {
+                "type": "string",
+                "enum": ["automatic", "manual_review", "advisory"]
+              },
+              "violationAction": {
+                "type": "string",
+                "enum": ["block", "flag", "warn", "notify", "escalate"]
+              }
+            },
+            "required": ["ruleId", "name", "type", "enforcement", "violationAction"],
+            "additionalProperties": false
+          },
+          "description": "Global compliance rules"
+        }
+      },
+      "additionalProperties": false
+    },
+    "enforcement": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": ["ecosystem_admin", "compliance_officer", "franchise_operator", "content_reviewer", "security_admin", "audit_manager", "qc_supervisor", "regional_manager"],
+                "description": "Enforcement role"
+              },
+              "permissions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "view_policies",
+                    "create_policies",
+                    "edit_policies",
+                    "delete_policies",
+                    "approve_policies",
+                    "enforce_policies",
+                    "view_compliance",
+                    "manage_compliance",
+                    "view_audit_logs",
+                    "export_audit_logs",
+                    "manage_roles",
+                    "block_content",
+                    "pause_distribution",
+                    "suspend_accounts",
+                    "issue_violations",
+                    "override_blocks",
+                    "manage_appeals"
+                  ]
+                },
+                "description": "Role permissions"
+              },
+              "mfaRequired": {
+                "type": "boolean",
+                "description": "MFA requirement for role"
+              },
+              "approvalRequired": {
+                "type": "boolean",
+                "description": "Whether actions require approval"
+              }
+            },
+            "required": ["role", "permissions"],
+            "additionalProperties": false
+          },
+          "description": "Enforcement roles"
+        },
+        "automatedEnforcement": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "triggers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "triggerId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["policy_violation", "compliance_failure", "qc_failure", "cultural_issue", "fraud_detection", "security_threat", "content_flag"]
+                  },
+                  "threshold": {
+                    "type": "object",
+                    "properties": {
+                      "metric": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string",
+                        "enum": ["gt", "gte", "lt", "lte", "eq", "neq"]
+                      },
+                      "value": {
+                        "type": "number"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "actions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["block", "quarantine", "notify", "escalate", "rollback", "suspend", "flag_review", "pause_payouts"]
+                    }
+                  },
+                  "escalationPath": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Escalation path (roles)"
+                  }
+                },
+                "required": ["triggerId", "name", "type", "actions"],
+                "additionalProperties": false
+              }
+            },
+            "cooldownPeriod": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Cooldown period in seconds between automated actions"
+            }
+          },
+          "additionalProperties": false
+        },
+        "appealProcess": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "appealWindow": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Days allowed for appeal"
+            },
+            "reviewers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Roles that can review appeals"
+            },
+            "escalationEnabled": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "violations": {
+      "type": "object",
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "categoryId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "penalties": {
+                "type": "object",
+                "properties": {
+                  "firstOffense": {
+                    "type": "string",
+                    "enum": ["warning", "content_removal", "temporary_suspension", "payout_hold", "financial_penalty", "permanent_ban"]
+                  },
+                  "secondOffense": {
+                    "type": "string",
+                    "enum": ["warning", "content_removal", "temporary_suspension", "payout_hold", "financial_penalty", "permanent_ban"]
+                  },
+                  "thirdOffense": {
+                    "type": "string",
+                    "enum": ["warning", "content_removal", "temporary_suspension", "payout_hold", "financial_penalty", "permanent_ban"]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "escalationThreshold": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Number of violations before escalation"
+              }
+            },
+            "required": ["categoryId", "name", "severity"],
+            "additionalProperties": false
+          }
+        },
+        "tracking": {
+          "type": "object",
+          "properties": {
+            "retentionDays": {
+              "type": "integer",
+              "minimum": 30,
+              "description": "Days to retain violation history"
+            },
+            "resetPeriod": {
+              "type": "integer",
+              "minimum": 30,
+              "description": "Days after which violation count resets"
+            },
+            "aggregation": {
+              "type": "string",
+              "enum": ["per_franchise", "per_partner", "per_contributor", "global"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "auditConfig": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "retentionDays": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 3650
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "policy_created",
+              "policy_updated",
+              "policy_activated",
+              "policy_suspended",
+              "compliance_check_passed",
+              "compliance_check_failed",
+              "violation_detected",
+              "violation_resolved",
+              "enforcement_action_taken",
+              "appeal_submitted",
+              "appeal_resolved",
+              "role_assigned",
+              "role_revoked",
+              "content_blocked",
+              "content_unblocked",
+              "account_suspended",
+              "account_reinstated"
+            ]
+          }
+        },
+        "alertChannels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["email", "slack", "webhook", "sms", "pagerduty", "in_app"]
+          }
+        },
+        "alertThreshold": {
+          "type": "string",
+          "enum": ["all", "high_severity", "critical_only"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "reporting": {
+      "type": "object",
+      "properties": {
+        "dashboards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dashboardId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["compliance_overview", "violation_trends", "enforcement_metrics", "regional_compliance", "partner_compliance", "qc_performance"]
+              },
+              "refreshInterval": {
+                "type": "integer",
+                "minimum": 60,
+                "description": "Refresh interval in seconds"
+              }
+            },
+            "required": ["dashboardId", "name", "type"],
+            "additionalProperties": false
+          }
+        },
+        "scheduledReports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "reportId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "frequency": {
+                "type": "string",
+                "enum": ["daily", "weekly", "monthly", "quarterly", "annually"]
+              },
+              "recipients": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "format": {
+                "type": "string",
+                "enum": ["pdf", "csv", "json", "html"]
+              }
+            },
+            "required": ["reportId", "name", "frequency"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "complianceScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Overall compliance score"
+        },
+        "violationCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total violation count"
+        },
+        "resolvedViolations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Resolved violations count"
+        },
+        "pendingAppeals": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Pending appeals count"
+        },
+        "enforcementActions": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total enforcement actions taken"
+        },
+        "auditCompletionRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Audit completion percentage"
+        },
+        "avgResolutionTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average violation resolution time in hours"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "suspended", "maintenance", "deprecated"],
+      "description": "Suite status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "suiteId",
+    "version",
+    "name",
+    "scope",
+    "policies",
+    "complianceRegistry",
+    "enforcement",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

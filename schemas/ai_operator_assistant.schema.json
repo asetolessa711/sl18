@@ -1,0 +1,528 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sl18.io/schemas/ai_operator_assistant.schema.json",
+  "title": "AI Operator Assistant Schema",
+  "description": "Schema for the SL18 AI-driven operator assistant with conversational AI, contextual guidance, proactive alerts, and intelligent recommendations",
+  "type": "object",
+  "properties": {
+    "assistantId": {
+      "type": "string",
+      "description": "Unique assistant instance identifier",
+      "pattern": "^assistant-[a-z0-9-]+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Assistant version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "operatorId": {
+      "type": "string",
+      "description": "Associated operator identifier"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "idle", "listening", "processing", "responding", "error"],
+      "description": "Current assistant status"
+    },
+    "context": {
+      "type": "object",
+      "description": "Current operational context for the assistant",
+      "properties": {
+        "franchiseId": {
+          "type": "string",
+          "description": "Current franchise context"
+        },
+        "seriesId": {
+          "type": "string",
+          "description": "Current series context"
+        },
+        "episodeId": {
+          "type": "string",
+          "description": "Current episode context"
+        },
+        "language": {
+          "type": "string",
+          "description": "Current language context"
+        },
+        "region": {
+          "type": "string",
+          "description": "Current region context"
+        },
+        "panel": {
+          "type": "string",
+          "description": "Current panel/module context"
+        },
+        "recentActions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "action": { "type": "string" },
+              "timestamp": { "type": "string", "format": "date-time" },
+              "target": { "type": "string" }
+            }
+          },
+          "maxItems": 10,
+          "description": "Recent operator actions for context"
+        },
+        "activeAlerts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Currently active alerts"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "description": "Assistant capabilities",
+      "properties": {
+        "naturalLanguageQueries": {
+          "type": "boolean",
+          "default": true,
+          "description": "Support for natural language navigation queries"
+        },
+        "contextualGuidance": {
+          "type": "boolean",
+          "default": true,
+          "description": "Provide contextual help and explanations"
+        },
+        "proactiveAlerts": {
+          "type": "boolean",
+          "default": true,
+          "description": "Proactively notify about anomalies and issues"
+        },
+        "inlineHelp": {
+          "type": "boolean",
+          "default": true,
+          "description": "Link to documentation modules"
+        },
+        "voiceInteraction": {
+          "type": "boolean",
+          "default": false,
+          "description": "Voice-based interaction support"
+        },
+        "multilingualSupport": {
+          "type": "boolean",
+          "default": true,
+          "description": "Support queries in multiple languages"
+        },
+        "actionExecution": {
+          "type": "boolean",
+          "default": true,
+          "description": "Execute actions on behalf of operator"
+        }
+      }
+    },
+    "conversationHistory": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/conversationTurn"
+      },
+      "description": "Recent conversation history for context"
+    },
+    "supportedCommands": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/assistantCommand"
+      },
+      "description": "List of supported commands and queries"
+    },
+    "recommendations": {
+      "type": "object",
+      "description": "Recommendation engine configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["navigation", "qc_actions", "monetization", "personalization", "troubleshooting", "optimization"]
+          }
+        },
+        "maxRecommendations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 5
+        },
+        "contextWeight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.7,
+          "description": "Weight given to current context in recommendations"
+        },
+        "historyWeight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.3,
+          "description": "Weight given to operator history in recommendations"
+        }
+      }
+    },
+    "proactiveAlerts": {
+      "type": "object",
+      "description": "Proactive alerting configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "alertTypes": {
+          "type": "object",
+          "properties": {
+            "anomalies": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "threshold": { "type": "string", "enum": ["low", "medium", "high"], "default": "medium" },
+                "autoSuggestRemediation": { "type": "boolean", "default": true }
+              }
+            },
+            "qcIssues": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "threshold": { "type": "string", "enum": ["low", "medium", "high"], "default": "low" },
+                "autoSuggestRemediation": { "type": "boolean", "default": true }
+              }
+            },
+            "culturalSensitivity": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "threshold": { "type": "string", "enum": ["low", "medium", "high"], "default": "low" },
+                "autoSuggestRemediation": { "type": "boolean", "default": true }
+              }
+            },
+            "monetizationOpportunities": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "threshold": { "type": "string", "enum": ["low", "medium", "high"], "default": "medium" },
+                "autoSuggestRemediation": { "type": "boolean", "default": true }
+              }
+            },
+            "retentionRisks": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "threshold": { "type": "string", "enum": ["low", "medium", "high"], "default": "medium" },
+                "autoSuggestRemediation": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        },
+        "notificationMode": {
+          "type": "string",
+          "enum": ["inline", "toast", "modal", "subtle"],
+          "default": "inline"
+        },
+        "groupSimilarAlerts": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "conversationalFlows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/conversationalFlow"
+      },
+      "description": "Predefined conversational workflows"
+    },
+    "helpLinks": {
+      "type": "object",
+      "description": "Documentation links for inline help",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "modules": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "description": "Documentation path"
+          }
+        },
+        "searchEnabled": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "preferences": {
+      "type": "object",
+      "description": "Operator preferences for assistant behavior",
+      "properties": {
+        "responseStyle": {
+          "type": "string",
+          "enum": ["concise", "detailed", "technical"],
+          "default": "concise"
+        },
+        "proactivityLevel": {
+          "type": "string",
+          "enum": ["minimal", "moderate", "high"],
+          "default": "moderate"
+        },
+        "language": {
+          "type": "string",
+          "description": "Preferred response language"
+        },
+        "showSuggestions": {
+          "type": "boolean",
+          "default": true
+        },
+        "autoCompleteEnabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "soundEnabled": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Assistant usage metrics",
+      "properties": {
+        "totalQueries": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "successfulQueries": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "averageResponseTimeMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "mostUsedCommands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "command": { "type": "string" },
+              "count": { "type": "integer" }
+            }
+          }
+        },
+        "recommendationsAccepted": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "recommendationsDismissed": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["assistantId", "version", "operatorId", "status"],
+  "definitions": {
+    "conversationTurn": {
+      "type": "object",
+      "properties": {
+        "turnId": {
+          "type": "string",
+          "description": "Unique turn identifier"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["operator", "assistant"],
+          "description": "Who sent the message"
+        },
+        "content": {
+          "type": "string",
+          "description": "Message content"
+        },
+        "intent": {
+          "type": "string",
+          "enum": ["navigate", "query", "action", "help", "feedback", "confirmation", "clarification"],
+          "description": "Detected intent"
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "value": { "type": "string" },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          },
+          "description": "Extracted entities"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Intent detection confidence"
+        },
+        "action": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string" },
+            "target": { "type": "string" },
+            "executed": { "type": "boolean" },
+            "result": { "type": "string" }
+          },
+          "description": "Action taken based on the turn"
+        },
+        "suggestions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Follow-up suggestions"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "inputMethod": {
+          "type": "string",
+          "enum": ["text", "voice", "suggestion_click"],
+          "default": "text"
+        }
+      },
+      "required": ["turnId", "role", "content", "timestamp"]
+    },
+    "assistantCommand": {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "description": "Unique command identifier"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["navigation", "qc", "alerts", "insights", "marketplace", "personalization", "monetization", "distribution", "help", "settings"],
+          "description": "Command category"
+        },
+        "patterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Natural language patterns that trigger this command"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this command does"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string" },
+              "required": { "type": "boolean" },
+              "examples": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "action": {
+          "type": "object",
+          "properties": {
+            "type": { 
+              "type": "string", 
+              "enum": ["navigate", "api_call", "modal", "notification", "switch_context", "execute_workflow"] 
+            },
+            "target": { "type": "string" },
+            "payload": { "type": "object" }
+          }
+        },
+        "requiresConfirmation": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to confirm before executing"
+        },
+        "offlineSupported": {
+          "type": "boolean",
+          "default": false
+        },
+        "examples": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Example queries"
+        }
+      },
+      "required": ["commandId", "category", "patterns", "action"]
+    },
+    "conversationalFlow": {
+      "type": "object",
+      "properties": {
+        "flowId": {
+          "type": "string",
+          "description": "Unique flow identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Flow name"
+        },
+        "trigger": {
+          "type": "object",
+          "properties": {
+            "type": { 
+              "type": "string", 
+              "enum": ["intent", "context", "event", "scheduled"] 
+            },
+            "value": { "type": "string" }
+          }
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stepId": { "type": "string" },
+              "type": { 
+                "type": "string", 
+                "enum": ["message", "prompt", "action", "condition", "wait"] 
+              },
+              "content": { "type": "string" },
+              "options": { 
+                "type": "array", 
+                "items": { 
+                  "type": "object",
+                  "properties": {
+                    "label": { "type": "string" },
+                    "value": { "type": "string" },
+                    "nextStep": { "type": "string" }
+                  }
+                } 
+              },
+              "nextStep": { "type": "string" }
+            }
+          }
+        },
+        "context": {
+          "type": "object",
+          "description": "Context required for this flow"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": ["flowId", "name", "trigger", "steps"]
+    }
+  }
+}

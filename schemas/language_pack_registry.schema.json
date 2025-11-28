@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LanguagePackRegistry",
+  "description": "Dynamic language pack registry for SL18 - allows on-demand loading and runtime language selection",
+  "type": "object",
+  "properties": {
+    "registryVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
+      "description": "Registry version (semver format)"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the registry was last updated"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "description": "ISO 639-1 language code with optional ISO 3166-1 alpha-2 country code"
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 2,
+            "description": "Human-readable language name in English"
+          },
+          "nativeName": {
+            "type": "string",
+            "minLength": 2,
+            "description": "Language name in native script"
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["ltr", "rtl"],
+            "description": "Text direction: left-to-right or right-to-left"
+          },
+          "region": {
+            "type": "string",
+            "description": "Primary geographic region (e.g., 'Africa', 'Europe', 'Asia')"
+          },
+          "localeVariations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "pattern": "^[a-z]{2}-[A-Z]{2}$",
+                  "description": "Locale-specific code (e.g., 'pt-BR', 'pt-PT')"
+                },
+                "displayName": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": ["code", "displayName"],
+              "additionalProperties": false
+            },
+            "description": "Locale-specific variations of the language"
+          },
+          "scriptSystem": {
+            "type": "string",
+            "enum": ["latin", "arabic", "ethiopic", "chinese", "cyrillic", "devanagari", "other"],
+            "description": "Primary script system used"
+          },
+          "qcThresholds": {
+            "type": "object",
+            "properties": {
+              "translationAccuracy": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Minimum translation accuracy percentage"
+              },
+              "personaConsistency": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Minimum persona consistency score"
+              },
+              "culturalSensitivity": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Minimum cultural sensitivity score"
+              }
+            },
+            "additionalProperties": false
+          },
+          "fontRecommendations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Recommended font families for this language"
+          },
+          "ttsVoices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "voiceId": {
+                  "type": "string"
+                },
+                "provider": {
+                  "type": "string",
+                  "enum": ["elevenlabs", "google", "azure", "amazon"]
+                },
+                "gender": {
+                  "type": "string",
+                  "enum": ["male", "female", "neutral"]
+                },
+                "style": {
+                  "type": "string"
+                }
+              },
+              "required": ["voiceId", "provider"],
+              "additionalProperties": false
+            },
+            "description": "Available TTS voices for this language"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["available", "beta", "coming_soon", "deprecated"],
+            "description": "Availability status in the registry"
+          },
+          "loadOnDemand": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether to load language pack dynamically on selection"
+          },
+          "packPath": {
+            "type": "string",
+            "description": "Path to the full language pack configuration"
+          }
+        },
+        "required": ["code", "displayName", "nativeName", "direction", "status"],
+        "additionalProperties": false
+      },
+      "description": "List of available languages in the registry"
+    },
+    "defaultLanguage": {
+      "type": "string",
+      "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+      "description": "Default language code for new workspaces"
+    },
+    "supportedCategories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Content categories supported (e.g., 'scripts', 'subtitles', 'captions')"
+    }
+  },
+  "required": [
+    "registryVersion",
+    "lastUpdated",
+    "languages",
+    "defaultLanguage"
+  ],
+  "additionalProperties": false
+}

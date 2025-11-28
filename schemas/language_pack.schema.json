@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LanguagePack",
+  "description": "Schema for multilingual language packs in SL18 globalization layer",
+  "type": "object",
+  "properties": {
+    "languageCode": {
+      "type": "string",
+      "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+      "description": "ISO 639-1 language code with optional ISO 3166-1 alpha-2 country code (e.g., 'en', 'fr', 'es-MX', 'zh-CN')"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100,
+      "description": "Human-readable language name (e.g., 'English', 'Français', 'Español')"
+    },
+    "nativeName": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100,
+      "description": "Language name in native script (e.g., 'English', 'Français', '中文')"
+    },
+    "direction": {
+      "type": "string",
+      "enum": ["ltr", "rtl"],
+      "default": "ltr",
+      "description": "Text direction: left-to-right or right-to-left"
+    },
+    "scriptGeneration": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether script generation is enabled for this language"
+        },
+        "promptTemplate": {
+          "type": "string",
+          "description": "Path to language-specific prompt template"
+        },
+        "toneGuidelines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Language-specific tone and cultural guidelines"
+        },
+        "forbiddenPhrases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Phrases that should not be used in this language/culture"
+        }
+      },
+      "additionalProperties": false
+    },
+    "subtitles": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether subtitles are enabled for this language"
+        },
+        "fontFamily": {
+          "type": "string",
+          "description": "Preferred font family for subtitles"
+        },
+        "fontSize": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 72,
+          "description": "Default font size for subtitles"
+        },
+        "maxCharsPerLine": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 100,
+          "description": "Maximum characters per subtitle line"
+        },
+        "maxLinesPerFrame": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4,
+          "default": 2,
+          "description": "Maximum subtitle lines displayed at once"
+        }
+      },
+      "additionalProperties": false
+    },
+    "captions": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether captions are enabled for this language"
+        },
+        "format": {
+          "type": "string",
+          "enum": ["srt", "vtt", "ass"],
+          "default": "srt",
+          "description": "Caption file format"
+        },
+        "includeTimestamps": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to include timing information"
+        }
+      },
+      "additionalProperties": false
+    },
+    "personaStyling": {
+      "type": "object",
+      "properties": {
+        "voiceId": {
+          "type": "string",
+          "description": "ElevenLabs or TTS voice ID for this language"
+        },
+        "speakingRate": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 2.0,
+          "default": 1.0,
+          "description": "Speaking rate multiplier"
+        },
+        "pitch": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 2.0,
+          "default": 1.0,
+          "description": "Pitch adjustment"
+        },
+        "accentPreferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Preferred accent characteristics"
+        }
+      },
+      "additionalProperties": false
+    },
+    "qcRules": {
+      "type": "object",
+      "properties": {
+        "translationAccuracyThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 95,
+          "description": "Minimum translation accuracy percentage"
+        },
+        "personaConsistencyRequired": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether persona consistency check is required"
+        },
+        "culturalReviewRequired": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether cultural sensitivity review is required"
+        },
+        "nativeReviewerRequired": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether review by native speaker is required"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated"],
+      "default": "draft",
+      "description": "Status of the language pack"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the language pack was created"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the language pack was last updated"
+    }
+  },
+  "required": [
+    "languageCode",
+    "displayName",
+    "nativeName",
+    "direction",
+    "status"
+  ],
+  "additionalProperties": false
+}

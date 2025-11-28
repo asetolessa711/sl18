@@ -1,0 +1,619 @@
+{
+  "validPolicies": [
+    {
+      "policyId": "policy-content-global-001",
+      "name": "Global Content Standards",
+      "version": "1.0.0",
+      "type": "content_standards",
+      "scope": {
+        "level": "global"
+      },
+      "rules": [
+        {
+          "ruleId": "qc-threshold",
+          "name": "Minimum QC Score",
+          "description": "All content must achieve minimum QC score of 85",
+          "enforcement": "mandatory",
+          "condition": "qcScore >= 85",
+          "action": "deny",
+          "penalty": {
+            "type": "warning",
+            "severity": "medium",
+            "description": "Content rejected for QC revision"
+          }
+        },
+        {
+          "ruleId": "content-review",
+          "name": "Content Review Required",
+          "enforcement": "mandatory",
+          "action": "require_approval"
+        }
+      ],
+      "accessControl": {
+        "roles": [
+          {
+            "role": "operator",
+            "permissions": ["view_content", "create_content", "edit_content", "publish_content"],
+            "mfaRequired": false
+          },
+          {
+            "role": "admin",
+            "permissions": ["view_content", "create_content", "edit_content", "delete_content", "publish_content", "view_policies", "create_policies"],
+            "mfaRequired": true
+          }
+        ],
+        "sensitiveActions": ["delete_content", "create_policies", "assign_roles"]
+      },
+      "complianceRequirements": {
+        "frameworks": ["GDPR", "local_regulations"],
+        "dataRetention": {
+          "auditLogs": 2555,
+          "userContent": 30,
+          "financialRecords": 2555
+        },
+        "reportingFrequency": "monthly"
+      },
+      "auditRequirements": {
+        "frequency": "continuous",
+        "scope": ["access_logs", "content_changes", "policy_changes"],
+        "automated": true,
+        "alerts": {
+          "enabled": true,
+          "channels": ["email", "slack"],
+          "threshold": "high_severity"
+        }
+      },
+      "effectiveDate": "2025-01-01T00:00:00Z",
+      "status": "active",
+      "approvals": [
+        {
+          "approver": "admin-001",
+          "role": "super_admin",
+          "timestamp": "2024-12-15T10:00:00Z",
+          "status": "approved",
+          "comments": "Approved for global deployment"
+        }
+      ],
+      "createdAt": "2024-12-01T00:00:00Z",
+      "updatedAt": "2024-12-15T10:00:00Z",
+      "createdBy": "ops-admin-001"
+    },
+    {
+      "policyId": "policy-revenue-africa-001",
+      "name": "Africa Region Revenue Sharing",
+      "version": "1.0.0",
+      "type": "revenue_sharing",
+      "scope": {
+        "level": "region",
+        "regions": ["africa-east", "africa-west", "africa-central", "africa-south"]
+      },
+      "rules": [
+        {
+          "ruleId": "min-payout",
+          "name": "Minimum Payout Threshold",
+          "enforcement": "mandatory",
+          "action": "deny",
+          "penalty": {
+            "type": "none",
+            "severity": "low"
+          }
+        }
+      ],
+      "status": "active",
+      "createdAt": "2024-12-01T00:00:00Z",
+      "createdBy": "ops-admin-001"
+    }
+  ],
+  "invalidPolicies": [
+    {
+      "policyId": "bad",
+      "name": "X",
+      "status": "active"
+    },
+    {
+      "policyId": "policy-missing-rules",
+      "name": "Policy Without Rules",
+      "version": "1.0.0",
+      "type": "compliance",
+      "scope": {
+        "level": "global"
+      },
+      "rules": [],
+      "status": "active",
+      "createdAt": "2024-12-01T00:00:00Z",
+      "createdBy": "test"
+    }
+  ],
+  "validContributorAgreements": [
+    {
+      "agreementId": "contrib-agr-creator-001",
+      "contributorId": "contrib-ke-001",
+      "contributorType": "creator",
+      "personalInfo": {
+        "fullName": "Jane Muthoni",
+        "email": "jane@example.com",
+        "country": "Kenya",
+        "identityVerified": true,
+        "verificationMethod": "government_id",
+        "verifiedAt": "2025-01-15T10:00:00Z"
+      },
+      "terms": {
+        "version": "1.0.0",
+        "revenueShare": {
+          "model": "tiered",
+          "percentage": 70,
+          "minimumPayout": 50,
+          "payoutCurrency": "USD",
+          "payoutFrequency": "monthly",
+          "tiers": [
+            { "threshold": 0, "percentage": 50 },
+            { "threshold": 1000, "percentage": 55 },
+            { "threshold": 5000, "percentage": 60 }
+          ]
+        },
+        "exclusivity": {
+          "exclusive": false
+        },
+        "intellectualProperty": {
+          "ownership": "shared",
+          "license": "non_exclusive",
+          "attribution": true,
+          "derivativeWorks": true
+        },
+        "contentStandards": {
+          "qcThreshold": 85,
+          "revisionLimit": 3,
+          "turnaroundTime": 48,
+          "prohibitedContent": ["hate_speech", "violence", "adult_content"]
+        },
+        "confidentiality": {
+          "ndaRequired": true,
+          "ndaVersion": "1.0",
+          "scope": ["content", "financial"],
+          "duration": 24
+        },
+        "termination": {
+          "noticePeriod": 30,
+          "terminationForCause": ["policy_violation", "qc_failure", "fraud"],
+          "postTermination": {
+            "contentHandling": "retain",
+            "revenueHandling": "payout_pending"
+          }
+        }
+      },
+      "paymentInfo": {
+        "method": "bank_transfer",
+        "verified": true,
+        "accountDetails": {
+          "lastFour": "1234",
+          "bankName": "Kenya Commercial Bank",
+          "accountType": "savings"
+        }
+      },
+      "franchiseAssociations": [
+        {
+          "franchiseId": "kenya-001",
+          "role": "creator",
+          "startDate": "2025-01-15T00:00:00Z",
+          "status": "active"
+        }
+      ],
+      "qcHistory": {
+        "totalSubmissions": 25,
+        "approvedSubmissions": 23,
+        "averageScore": 92.5,
+        "lastSubmission": "2025-11-20T14:00:00Z"
+      },
+      "signatures": [
+        {
+          "documentType": "main_agreement",
+          "version": "1.0.0",
+          "signedAt": "2025-01-15T11:00:00Z",
+          "ipAddress": "196.201.xxx.xxx",
+          "signatureHash": "sha256:abc123def456"
+        },
+        {
+          "documentType": "nda",
+          "version": "1.0",
+          "signedAt": "2025-01-15T11:05:00Z",
+          "ipAddress": "196.201.xxx.xxx",
+          "signatureHash": "sha256:xyz789ghi012"
+        }
+      ],
+      "status": "active",
+      "effectiveDate": "2025-01-15T00:00:00Z",
+      "expirationDate": "2026-01-15T00:00:00Z",
+      "createdAt": "2025-01-14T10:00:00Z",
+      "updatedAt": "2025-01-15T11:05:00Z"
+    },
+    {
+      "agreementId": "contrib-agr-translator-001",
+      "contributorId": "contrib-et-001",
+      "contributorType": "translator",
+      "personalInfo": {
+        "fullName": "Abebe Tadesse",
+        "email": "abebe@example.com",
+        "country": "Ethiopia",
+        "identityVerified": true,
+        "verificationMethod": "passport",
+        "verifiedAt": "2025-02-01T09:00:00Z"
+      },
+      "terms": {
+        "version": "1.0.0",
+        "revenueShare": {
+          "model": "flat_fee",
+          "minimumPayout": 25,
+          "payoutCurrency": "USD",
+          "payoutFrequency": "biweekly"
+        },
+        "intellectualProperty": {
+          "ownership": "platform",
+          "license": "perpetual"
+        }
+      },
+      "status": "active",
+      "createdAt": "2025-02-01T08:00:00Z"
+    }
+  ],
+  "invalidContributorAgreements": [
+    {
+      "agreementId": "bad-id",
+      "contributorId": "x",
+      "status": "active"
+    },
+    {
+      "agreementId": "contrib-agr-missing-terms",
+      "contributorId": "contrib-001",
+      "contributorType": "creator",
+      "personalInfo": {
+        "fullName": "Test User",
+        "email": "test@example.com",
+        "country": "USA"
+      },
+      "status": "active",
+      "createdAt": "2025-01-01T00:00:00Z"
+    }
+  ],
+  "validMarketplace": {
+    "marketplaceId": "mkt-africa-001",
+    "name": "Africa Creative Marketplace",
+    "region": "africa",
+    "supportedLanguages": ["en", "fr", "sw", "am", "om"],
+    "categories": [
+      {
+        "categoryId": "cat-content-creation",
+        "name": "Content Creation",
+        "description": "Script writing, video production, content strategy",
+        "contributorTypes": ["creator", "editor"]
+      },
+      {
+        "categoryId": "cat-translation",
+        "name": "Translation & Localization",
+        "description": "Multilingual translation and cultural adaptation",
+        "contributorTypes": ["translator"],
+        "parentCategory": null
+      },
+      {
+        "categoryId": "cat-voice",
+        "name": "Voice & Audio",
+        "description": "Voice-over, TTS, audio production",
+        "contributorTypes": ["voice_artist"]
+      },
+      {
+        "categoryId": "cat-qa",
+        "name": "Quality Assurance",
+        "description": "Content review and QC",
+        "contributorTypes": ["reviewer", "qa_specialist"]
+      }
+    ],
+    "listings": [
+      {
+        "listingId": "listing-creator-ke-001",
+        "contributorId": "contrib-ke-001",
+        "contributorType": "creator",
+        "title": "Professional Content Creator - Kenya & East Africa",
+        "description": "Experienced content creator specializing in Kenyan comedy, drama, and educational content. Fluent in English and Swahili with cultural expertise in East African markets. Over 3 years experience in short-form video production.",
+        "categoryId": "cat-content-creation",
+        "skills": ["scriptwriting", "video_editing", "comedy", "drama", "educational_content", "swahili_content"],
+        "languages": [
+          { "code": "en", "proficiency": "native" },
+          { "code": "sw", "proficiency": "native" }
+        ],
+        "portfolio": {
+          "samples": [
+            {
+              "sampleId": "sample-001",
+              "title": "Comedy Sketch - Nairobi Life",
+              "type": "video",
+              "url": "https://example.com/samples/comedy-001",
+              "description": "Popular comedy sketch with 50K views"
+            }
+          ],
+          "externalLinks": [
+            { "platform": "YouTube", "url": "https://youtube.com/@creator-ke" },
+            { "platform": "TikTok", "url": "https://tiktok.com/@creator-ke" }
+          ]
+        },
+        "pricing": {
+          "model": "hybrid",
+          "hourlyRate": 30.00,
+          "projectMinimum": 100.00,
+          "revenueSharePercentage": 40,
+          "currency": "USD",
+          "negotiable": true
+        },
+        "availability": {
+          "status": "available",
+          "hoursPerWeek": 30,
+          "responseTime": "within_day",
+          "timezone": "Africa/Nairobi"
+        },
+        "ratings": {
+          "average": 4.8,
+          "count": 47,
+          "breakdown": {
+            "quality": 4.9,
+            "communication": 4.7,
+            "timeliness": 4.8,
+            "professionalism": 4.9
+          }
+        },
+        "verifications": {
+          "identity": true,
+          "payment": true,
+          "skills": ["scriptwriting", "video_editing"],
+          "qualifications": [
+            {
+              "name": "SL18 Content Creator Certification",
+              "issuer": "SL18 Platform",
+              "verifiedAt": "2025-01-20T00:00:00Z"
+            }
+          ]
+        },
+        "qcRequirements": {
+          "minimumScore": 92,
+          "passedAssessment": true,
+          "assessmentScore": 94
+        },
+        "status": "featured",
+        "featured": true,
+        "createdAt": "2025-01-15T12:00:00Z",
+        "updatedAt": "2025-11-20T10:00:00Z"
+      },
+      {
+        "listingId": "listing-translator-et-001",
+        "contributorId": "contrib-et-001",
+        "contributorType": "translator",
+        "title": "Amharic & Oromifa Translation Expert",
+        "description": "Native Amharic speaker with fluency in Oromifa and English. Specialized in cultural adaptation for Ethiopian audiences. Experience with subtitles, captions, and script localization.",
+        "categoryId": "cat-translation",
+        "skills": ["translation", "subtitling", "localization", "cultural_adaptation"],
+        "languages": [
+          { "code": "am", "proficiency": "native" },
+          { "code": "om", "proficiency": "fluent" },
+          { "code": "en", "proficiency": "advanced" }
+        ],
+        "pricing": {
+          "model": "per_project",
+          "projectMinimum": 50.00,
+          "currency": "USD",
+          "negotiable": true
+        },
+        "availability": {
+          "status": "available",
+          "hoursPerWeek": 20,
+          "responseTime": "within_hours",
+          "timezone": "Africa/Addis_Ababa"
+        },
+        "ratings": {
+          "average": 4.9,
+          "count": 23
+        },
+        "verifications": {
+          "identity": true,
+          "payment": true
+        },
+        "qcRequirements": {
+          "minimumScore": 90,
+          "passedAssessment": true,
+          "assessmentScore": 96
+        },
+        "status": "active",
+        "featured": false,
+        "createdAt": "2025-02-01T10:00:00Z",
+        "updatedAt": "2025-11-15T08:00:00Z"
+      }
+    ],
+    "revenueModels": [
+      {
+        "modelId": "rev-70-30",
+        "name": "Standard Creator Split",
+        "description": "70% contributor, 30% platform",
+        "splitType": "fixed",
+        "defaultSplit": {
+          "contributorPercentage": 70,
+          "platformPercentage": 20,
+          "franchisePercentage": 10
+        },
+        "minimumPayout": 50,
+        "payoutFrequency": "monthly"
+      },
+      {
+        "modelId": "rev-tiered",
+        "name": "Tiered Revenue Model",
+        "description": "Progressive percentages based on earnings",
+        "splitType": "tiered",
+        "defaultSplit": {
+          "contributorPercentage": 50,
+          "platformPercentage": 30,
+          "franchisePercentage": 20
+        },
+        "tiers": [
+          { "threshold": 0, "contributorPercentage": 50 },
+          { "threshold": 1000, "contributorPercentage": 55 },
+          { "threshold": 5000, "contributorPercentage": 60 },
+          { "threshold": 10000, "contributorPercentage": 65 }
+        ],
+        "minimumPayout": 25,
+        "payoutFrequency": "biweekly"
+      }
+    ],
+    "onboarding": {
+      "steps": [
+        { "stepId": "step-account", "name": "Account Creation", "description": "Create your contributor account", "required": true, "order": 1, "verification": "automatic" },
+        { "stepId": "step-identity", "name": "Identity Verification", "description": "Verify your identity", "required": true, "order": 2, "verification": "manual" },
+        { "stepId": "step-agreement", "name": "Agreement Signing", "description": "Review and sign contributor agreement", "required": true, "order": 3, "verification": "automatic" },
+        { "stepId": "step-payment", "name": "Payment Setup", "description": "Add and verify payment method", "required": true, "order": 4, "verification": "automatic" },
+        { "stepId": "step-assessment", "name": "Skills Assessment", "description": "Complete platform assessment", "required": true, "order": 5, "verification": "automatic" },
+        { "stepId": "step-listing", "name": "Create Listing", "description": "Create your marketplace listing", "required": true, "order": 6, "verification": "manual" }
+      ],
+      "requirements": {
+        "identityVerification": true,
+        "paymentVerification": true,
+        "agreementSigned": true,
+        "qcAssessment": true,
+        "minimumQcScore": 85
+      },
+      "approvalProcess": {
+        "type": "hybrid",
+        "estimatedTime": "24-48 hours",
+        "reviewers": ["marketplace_admin", "qc_specialist"]
+      }
+    },
+    "crossPromotion": {
+      "enabled": true,
+      "formats": [
+        { "formatId": "fmt-clip", "name": "Portfolio Clip", "type": "clip", "maxDuration": 60, "languages": ["en", "sw", "am"] },
+        { "formatId": "fmt-teaser", "name": "Skill Teaser", "type": "teaser", "maxDuration": 30, "languages": ["en"] },
+        { "formatId": "fmt-showcase", "name": "Creator Showcase", "type": "showcase", "maxDuration": 120, "languages": ["en", "sw"] }
+      ],
+      "channels": ["marketplace_homepage", "category_pages", "search_results", "email"],
+      "eligibility": {
+        "minimumRating": 4.0,
+        "minimumCompletedProjects": 5,
+        "verifiedOnly": true
+      }
+    },
+    "metrics": {
+      "totalListings": 156,
+      "activeListings": 142,
+      "totalContributors": 189,
+      "totalTransactions": 1247,
+      "totalRevenue": 87500.00,
+      "averageRating": 4.6
+    },
+    "status": "active",
+    "createdAt": "2025-01-01T00:00:00Z",
+    "updatedAt": "2025-11-27T00:00:00Z"
+  },
+  "governanceAuditEvents": [
+    {
+      "logId": "audit-gov-20251127-001",
+      "timestamp": "2025-11-27T10:00:00Z",
+      "eventType": "policy_created",
+      "category": "governance",
+      "actor": {
+        "type": "user",
+        "id": "admin-001",
+        "name": "Platform Admin"
+      },
+      "target": {
+        "type": "policy",
+        "id": "policy-content-global-001"
+      },
+      "details": {
+        "description": "Created global content standards policy"
+      },
+      "result": "success",
+      "correlationId": "gov-policy-001"
+    },
+    {
+      "logId": "audit-gov-20251127-002",
+      "timestamp": "2025-11-27T11:00:00Z",
+      "eventType": "role_assigned",
+      "category": "access_control",
+      "actor": {
+        "type": "user",
+        "id": "admin-001",
+        "name": "Platform Admin"
+      },
+      "target": {
+        "type": "role",
+        "id": "operator",
+        "franchiseId": "kenya-001"
+      },
+      "details": {
+        "description": "Assigned operator role to user ops-ke-001",
+        "newValue": { "userId": "ops-ke-001", "role": "operator" }
+      },
+      "result": "success"
+    },
+    {
+      "logId": "audit-mkt-20251127-001",
+      "timestamp": "2025-11-27T14:00:00Z",
+      "eventType": "contributor_registered",
+      "category": "contributor",
+      "actor": {
+        "type": "user",
+        "id": "contrib-ke-002"
+      },
+      "target": {
+        "type": "contributor",
+        "id": "contrib-ke-002"
+      },
+      "details": {
+        "description": "New contributor registration submitted",
+        "metadata": { "contributorType": "creator", "country": "Kenya" }
+      },
+      "result": "success"
+    },
+    {
+      "logId": "audit-mkt-20251127-002",
+      "timestamp": "2025-11-27T15:00:00Z",
+      "eventType": "listing_approved",
+      "category": "marketplace",
+      "actor": {
+        "type": "user",
+        "id": "mkt-admin-001",
+        "name": "Marketplace Admin"
+      },
+      "target": {
+        "type": "listing",
+        "id": "listing-creator-ke-001"
+      },
+      "details": {
+        "description": "Marketplace listing approved after QC review",
+        "previousValue": "pending_review",
+        "newValue": "active"
+      },
+      "result": "success"
+    },
+    {
+      "logId": "audit-mkt-20251127-003",
+      "timestamp": "2025-11-27T16:00:00Z",
+      "eventType": "marketplace_transaction_completed",
+      "category": "marketplace",
+      "actor": {
+        "type": "system",
+        "id": "payment-processor"
+      },
+      "target": {
+        "type": "listing",
+        "id": "listing-creator-ke-001",
+        "franchiseId": "kenya-001"
+      },
+      "details": {
+        "description": "Marketplace transaction completed",
+        "metadata": {
+          "transactionId": "txn-mkt-001",
+          "amount": 150.00,
+          "currency": "USD",
+          "contributorShare": 105.00,
+          "platformShare": 45.00
+        }
+      },
+      "result": "success",
+      "correlationId": "txn-mkt-001"
+    }
+  ]
+}

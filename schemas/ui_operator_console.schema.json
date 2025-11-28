@@ -1,0 +1,338 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sl18.io/schemas/ui_operator_console.schema.json",
+  "title": "UI Operator Console Schema",
+  "description": "Schema for the SL18 unified operator console interface configuration",
+  "type": "object",
+  "properties": {
+    "consoleId": {
+      "type": "string",
+      "description": "Unique identifier for the console instance",
+      "pattern": "^console-[a-z0-9-]+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Console version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "operator": {
+      "type": "object",
+      "description": "Current operator context",
+      "properties": {
+        "operatorId": {
+          "type": "string",
+          "description": "Operator identifier"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Operator display name"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["viewer", "operator", "reviewer", "contributor", "auditor", "admin", "super_admin"],
+          "description": "Operator role"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Granted permissions"
+        },
+        "mfaEnabled": {
+          "type": "boolean",
+          "description": "Whether MFA is enabled for this operator"
+        }
+      },
+      "required": ["operatorId", "role"]
+    },
+    "context": {
+      "type": "object",
+      "description": "Current operational context",
+      "properties": {
+        "franchiseId": {
+          "type": "string",
+          "description": "Currently selected franchise"
+        },
+        "seriesId": {
+          "type": "string",
+          "description": "Currently selected series"
+        },
+        "language": {
+          "type": "string",
+          "description": "Primary language code"
+        },
+        "region": {
+          "type": "string",
+          "description": "Current region context"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "Operator timezone"
+        }
+      }
+    },
+    "navigation": {
+      "type": "object",
+      "description": "Navigation configuration",
+      "properties": {
+        "primaryModules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/navigationModule"
+          },
+          "description": "Primary navigation modules"
+        },
+        "quickActions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/quickAction"
+          },
+          "description": "Quick action shortcuts"
+        },
+        "recentItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/recentItem"
+          },
+          "maxItems": 10,
+          "description": "Recently accessed items"
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "description": "Console layout preferences",
+      "properties": {
+        "sidebarCollapsed": {
+          "type": "boolean",
+          "default": false
+        },
+        "theme": {
+          "type": "string",
+          "enum": ["light", "dark", "system"],
+          "default": "system"
+        },
+        "density": {
+          "type": "string",
+          "enum": ["compact", "normal", "comfortable"],
+          "default": "normal"
+        },
+        "defaultView": {
+          "type": "string",
+          "enum": ["dashboard", "franchises", "series", "marketplace", "insights"],
+          "default": "dashboard"
+        }
+      }
+    },
+    "notifications": {
+      "type": "object",
+      "description": "Notification preferences",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["in_app", "email", "sms", "push", "webhook"]
+          }
+        },
+        "alertLevels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["info", "warning", "critical"]
+          },
+          "default": ["warning", "critical"]
+        }
+      }
+    },
+    "dashboardWidgets": {
+      "type": "array",
+      "description": "Dashboard widget configuration",
+      "items": {
+        "$ref": "#/definitions/dashboardWidget"
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["consoleId", "version", "operator"],
+  "definitions": {
+    "navigationModule": {
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "type": "string",
+          "enum": [
+            "dashboard",
+            "franchises",
+            "series",
+            "episodes",
+            "personas",
+            "languages",
+            "distribution",
+            "partners",
+            "marketplace",
+            "governance",
+            "personalization",
+            "monetization",
+            "insights",
+            "alerts",
+            "settings"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "badge": {
+          "type": "object",
+          "properties": {
+            "count": { "type": "integer" },
+            "type": { "type": "string", "enum": ["info", "warning", "critical"] }
+          }
+        },
+        "subModules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/navigationModule"
+          }
+        },
+        "requiredPermissions": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["moduleId", "label", "path"]
+    },
+    "quickAction": {
+      "type": "object",
+      "properties": {
+        "actionId": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "shortcut": {
+          "type": "string",
+          "description": "Keyboard shortcut"
+        },
+        "action": {
+          "type": "string",
+          "enum": ["navigate", "modal", "api_call", "external_link"]
+        },
+        "target": {
+          "type": "string"
+        }
+      },
+      "required": ["actionId", "label", "action"]
+    },
+    "recentItem": {
+      "type": "object",
+      "properties": {
+        "itemType": {
+          "type": "string",
+          "enum": ["franchise", "series", "episode", "contributor", "partner", "report"]
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "accessedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["itemType", "itemId", "label"]
+    },
+    "dashboardWidget": {
+      "type": "object",
+      "properties": {
+        "widgetId": {
+          "type": "string"
+        },
+        "widgetType": {
+          "type": "string",
+          "enum": [
+            "kpi_card",
+            "chart_line",
+            "chart_bar",
+            "chart_pie",
+            "chart_area",
+            "table",
+            "list",
+            "map",
+            "heatmap",
+            "timeline",
+            "alert_summary",
+            "activity_feed"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "dataSource": {
+          "type": "string",
+          "enum": [
+            "revenue",
+            "engagement",
+            "distribution",
+            "qc_status",
+            "alerts",
+            "audience",
+            "personalization",
+            "marketplace"
+          ]
+        },
+        "position": {
+          "type": "object",
+          "properties": {
+            "row": { "type": "integer", "minimum": 0 },
+            "col": { "type": "integer", "minimum": 0 },
+            "width": { "type": "integer", "minimum": 1, "maximum": 12 },
+            "height": { "type": "integer", "minimum": 1, "maximum": 6 }
+          }
+        },
+        "filters": {
+          "type": "object",
+          "properties": {
+            "timeRange": { "type": "string" },
+            "franchise": { "type": "string" },
+            "region": { "type": "string" },
+            "language": { "type": "string" }
+          }
+        },
+        "refreshInterval": {
+          "type": "integer",
+          "description": "Auto-refresh interval in seconds",
+          "minimum": 0
+        }
+      },
+      "required": ["widgetId", "widgetType", "title"]
+    }
+  }
+}

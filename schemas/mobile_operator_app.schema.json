@@ -1,0 +1,408 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sl18.io/schemas/mobile_operator_app.schema.json",
+  "title": "Mobile Operator App Schema",
+  "description": "Schema for the SL18 mobile operator application configuration with offline support, push notifications, and secure authentication",
+  "type": "object",
+  "properties": {
+    "appId": {
+      "type": "string",
+      "description": "Unique mobile app instance identifier",
+      "pattern": "^mobile-[a-z0-9-]+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "App version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["ios", "android", "web_mobile"],
+      "description": "Mobile platform"
+    },
+    "deviceInfo": {
+      "type": "object",
+      "description": "Device information",
+      "properties": {
+        "deviceId": {
+          "type": "string",
+          "description": "Unique device identifier"
+        },
+        "model": {
+          "type": "string",
+          "description": "Device model"
+        },
+        "osVersion": {
+          "type": "string",
+          "description": "Operating system version"
+        },
+        "screenSize": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "integer", "minimum": 0 },
+            "height": { "type": "integer", "minimum": 0 },
+            "density": { "type": "number", "minimum": 1 }
+          }
+        },
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "biometricSupported": { "type": "boolean" },
+            "biometricType": { 
+              "type": "string", 
+              "enum": ["face_id", "touch_id", "fingerprint", "none"] 
+            },
+            "pushNotificationsSupported": { "type": "boolean" },
+            "offlineStorageAvailable": { "type": "boolean" },
+            "maxOfflineStorageMB": { "type": "integer", "minimum": 0 }
+          }
+        }
+      },
+      "required": ["deviceId", "model", "osVersion"]
+    },
+    "operator": {
+      "type": "object",
+      "description": "Current operator session",
+      "properties": {
+        "operatorId": {
+          "type": "string",
+          "description": "Operator identifier"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Operator display name"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["viewer", "operator", "reviewer", "contributor", "auditor", "admin", "super_admin"]
+        },
+        "permissions": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["operatorId", "role"]
+    },
+    "authentication": {
+      "type": "object",
+      "description": "Authentication and security settings",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "description": "Current session identifier"
+        },
+        "authMethod": {
+          "type": "string",
+          "enum": ["password", "sso", "oauth", "biometric"],
+          "description": "Primary authentication method"
+        },
+        "mfaEnabled": {
+          "type": "boolean",
+          "description": "Whether MFA is enabled"
+        },
+        "mfaMethod": {
+          "type": "string",
+          "enum": ["totp", "sms", "email", "push", "biometric"],
+          "description": "MFA verification method"
+        },
+        "biometricEnabled": {
+          "type": "boolean",
+          "description": "Whether biometric unlock is enabled (FaceID/TouchID)"
+        },
+        "biometricType": {
+          "type": "string",
+          "enum": ["face_id", "touch_id", "fingerprint"]
+        },
+        "sessionExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastActivityAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "autoLockMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60,
+          "default": 5,
+          "description": "Auto-lock after inactivity"
+        }
+      },
+      "required": ["sessionId", "authMethod"]
+    },
+    "navigation": {
+      "type": "object",
+      "description": "Mobile navigation configuration",
+      "properties": {
+        "bottomTabs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobileTab"
+          },
+          "maxItems": 5,
+          "description": "Bottom navigation tabs"
+        },
+        "quickActions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/quickAction"
+          },
+          "description": "Quick action shortcuts"
+        },
+        "searchEnabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "voiceSearchEnabled": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "offlineMode": {
+      "type": "object",
+      "description": "Offline mode configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "cacheConfig": {
+          "type": "object",
+          "properties": {
+            "dashboardsCached": { "type": "boolean", "default": true },
+            "recentItemsCached": { "type": "boolean", "default": true },
+            "maxCacheSizeMB": { "type": "integer", "default": 100 },
+            "cacheExpiryHours": { "type": "integer", "default": 24 },
+            "priorityData": {
+              "type": "array",
+              "items": { 
+                "type": "string", 
+                "enum": ["franchises", "series", "episodes", "qc_status", "alerts", "insights"] 
+              }
+            }
+          }
+        },
+        "syncConfig": {
+          "type": "object",
+          "properties": {
+            "autoSync": { "type": "boolean", "default": true },
+            "syncOnWifiOnly": { "type": "boolean", "default": false },
+            "syncIntervalMinutes": { "type": "integer", "default": 15 },
+            "backgroundSyncEnabled": { "type": "boolean", "default": true }
+          }
+        },
+        "queuedActions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/queuedAction"
+          },
+          "description": "Actions queued for sync when online"
+        },
+        "lastSyncAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "syncStatus": {
+          "type": "string",
+          "enum": ["synced", "syncing", "pending", "error", "offline"]
+        }
+      }
+    },
+    "notifications": {
+      "type": "object",
+      "description": "Push notification preferences",
+      "properties": {
+        "pushEnabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "pushToken": {
+          "type": "string",
+          "description": "Device push token (FCM/APNs)"
+        },
+        "channels": {
+          "type": "object",
+          "properties": {
+            "anomalies": { 
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "sound": { "type": "boolean", "default": true },
+                "vibrate": { "type": "boolean", "default": true },
+                "priority": { "type": "string", "enum": ["low", "normal", "high"], "default": "high" }
+              }
+            },
+            "qcAlerts": { 
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "sound": { "type": "boolean", "default": true },
+                "vibrate": { "type": "boolean", "default": true },
+                "priority": { "type": "string", "enum": ["low", "normal", "high"], "default": "high" }
+              }
+            },
+            "feedbackLoops": { 
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "sound": { "type": "boolean", "default": false },
+                "vibrate": { "type": "boolean", "default": true },
+                "priority": { "type": "string", "enum": ["low", "normal", "high"], "default": "normal" }
+              }
+            },
+            "marketplaceUpdates": { 
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "sound": { "type": "boolean", "default": false },
+                "vibrate": { "type": "boolean", "default": false },
+                "priority": { "type": "string", "enum": ["low", "normal", "high"], "default": "low" }
+              }
+            },
+            "paymentAlerts": { 
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "sound": { "type": "boolean", "default": true },
+                "vibrate": { "type": "boolean", "default": true },
+                "priority": { "type": "string", "enum": ["low", "normal", "high"], "default": "high" }
+              }
+            },
+            "culturalSensitivity": { 
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "sound": { "type": "boolean", "default": true },
+                "vibrate": { "type": "boolean", "default": true },
+                "priority": { "type": "string", "enum": ["low", "normal", "high"], "default": "high" }
+              }
+            }
+          }
+        },
+        "quietHours": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "startTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+            "endTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+            "allowCritical": { "type": "boolean", "default": true }
+          }
+        },
+        "badgeCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      }
+    },
+    "preferences": {
+      "type": "object",
+      "description": "User preferences",
+      "properties": {
+        "language": {
+          "type": "string",
+          "description": "App UI language"
+        },
+        "theme": {
+          "type": "string",
+          "enum": ["light", "dark", "system"],
+          "default": "system"
+        },
+        "hapticFeedback": {
+          "type": "boolean",
+          "default": true
+        },
+        "reducedMotion": {
+          "type": "boolean",
+          "default": false
+        },
+        "fontSize": {
+          "type": "string",
+          "enum": ["small", "medium", "large", "extra_large"],
+          "default": "medium"
+        },
+        "highContrast": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "description": "Current operational context",
+      "properties": {
+        "franchiseId": { "type": "string" },
+        "seriesId": { "type": "string" },
+        "language": { "type": "string" },
+        "region": { "type": "string" },
+        "timezone": { "type": "string" }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["appId", "version", "platform", "deviceInfo", "operator", "authentication"],
+  "definitions": {
+    "mobileTab": {
+      "type": "object",
+      "properties": {
+        "tabId": {
+          "type": "string",
+          "enum": ["home", "franchises", "alerts", "insights", "more"]
+        },
+        "label": { "type": "string" },
+        "icon": { "type": "string" },
+        "badge": {
+          "type": "object",
+          "properties": {
+            "count": { "type": "integer", "minimum": 0 },
+            "type": { "type": "string", "enum": ["info", "warning", "critical"] }
+          }
+        },
+        "enabled": { "type": "boolean", "default": true }
+      },
+      "required": ["tabId", "label", "icon"]
+    },
+    "quickAction": {
+      "type": "object",
+      "properties": {
+        "actionId": { "type": "string" },
+        "label": { "type": "string" },
+        "icon": { "type": "string" },
+        "action": {
+          "type": "string",
+          "enum": ["navigate", "modal", "api_call", "share", "switch_language", "acknowledge_alert"]
+        },
+        "target": { "type": "string" },
+        "offlineSupported": { "type": "boolean", "default": false }
+      },
+      "required": ["actionId", "label", "action"]
+    },
+    "queuedAction": {
+      "type": "object",
+      "properties": {
+        "actionId": { "type": "string" },
+        "actionType": {
+          "type": "string",
+          "enum": ["alert_acknowledge", "language_switch", "qc_approval", "feedback_response", "settings_update"]
+        },
+        "payload": { "type": "object" },
+        "queuedAt": { "type": "string", "format": "date-time" },
+        "retryCount": { "type": "integer", "default": 0 },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "syncing", "synced", "failed"]
+        }
+      },
+      "required": ["actionId", "actionType", "payload", "queuedAt"]
+    }
+  }
+}

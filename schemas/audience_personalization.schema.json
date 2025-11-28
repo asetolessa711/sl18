@@ -1,0 +1,463 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AudiencePersonalization",
+  "description": "Schema for audience personalization features in SL18 - personalized recommendations, adaptive hero banners, viewer preferences",
+  "type": "object",
+  "properties": {
+    "personalizationId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique personalization profile identifier"
+    },
+    "customerId": {
+      "type": "string",
+      "description": "Associated customer identifier"
+    },
+    "profileId": {
+      "type": "string",
+      "description": "Specific profile within customer account (for family profiles)"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "genres": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "genre": { "type": "string" },
+              "affinity": { "type": "number", "minimum": 0, "maximum": 1, "description": "Affinity score 0-1" },
+              "explicitPreference": { "type": "boolean", "default": false, "description": "User explicitly set this preference" },
+              "viewCount": { "type": "integer", "minimum": 0 },
+              "avgCompletionRate": { "type": "number", "minimum": 0, "maximum": 100 },
+              "lastWatched": { "type": "string", "format": "date-time" }
+            },
+            "required": ["genre", "affinity"],
+            "additionalProperties": false
+          }
+        },
+        "personas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "personaId": { "type": "string" },
+              "personaName": { "type": "string" },
+              "affinity": { "type": "number", "minimum": 0, "maximum": 1 },
+              "interactionCount": { "type": "integer", "minimum": 0 },
+              "favoriteContent": { "type": "array", "items": { "type": "string" } }
+            },
+            "required": ["personaId", "affinity"],
+            "additionalProperties": false
+          }
+        },
+        "contentFormats": {
+          "type": "object",
+          "properties": {
+            "shortDrama": { "type": "number", "minimum": 0, "maximum": 1 },
+            "movie": { "type": "number", "minimum": 0, "maximum": 1 },
+            "series": { "type": "number", "minimum": 0, "maximum": 1 },
+            "documentary": { "type": "number", "minimum": 0, "maximum": 1 },
+            "miniSeries": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "languages": {
+          "type": "object",
+          "properties": {
+            "preferredAudio": { "type": "array", "items": { "type": "string" } },
+            "preferredSubtitles": { "type": "array", "items": { "type": "string" } },
+            "autoSelectSubtitles": { "type": "boolean", "default": true },
+            "dubbingPreferred": { "type": "boolean", "default": false }
+          },
+          "additionalProperties": false
+        },
+        "contentRatings": {
+          "type": "object",
+          "properties": {
+            "maxRating": { "type": "string", "enum": ["G", "PG", "PG-13", "R", "NC-17", "TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA"] },
+            "excludeViolence": { "type": "boolean", "default": false },
+            "excludeAdultThemes": { "type": "boolean", "default": false }
+          },
+          "additionalProperties": false
+        },
+        "viewingTimes": {
+          "type": "object",
+          "properties": {
+            "preferredDays": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] }
+            },
+            "preferredTimeSlots": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["morning", "afternoon", "evening", "late_night"] }
+            },
+            "avgSessionDuration": { "type": "integer", "minimum": 0, "description": "Average session duration in minutes" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "watchingPatterns": {
+      "type": "object",
+      "properties": {
+        "bingeWatcher": {
+          "type": "boolean",
+          "default": false,
+          "description": "User tends to binge watch"
+        },
+        "avgEpisodesPerSession": {
+          "type": "number",
+          "minimum": 0
+        },
+        "skipIntro": {
+          "type": "boolean",
+          "default": false,
+          "description": "User typically skips intro"
+        },
+        "skipCredits": {
+          "type": "boolean",
+          "default": false,
+          "description": "User typically skips credits"
+        },
+        "watchesTrailers": {
+          "type": "boolean",
+          "default": true
+        },
+        "completionTendency": {
+          "type": "string",
+          "enum": ["high_completer", "moderate_completer", "sampler", "abandoner"],
+          "description": "Tendency to complete content"
+        },
+        "rewatch": {
+          "type": "boolean",
+          "default": false,
+          "description": "User tends to rewatch content"
+        },
+        "devicePreference": {
+          "type": "string",
+          "enum": ["mobile", "tablet", "desktop", "tv", "no_preference"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "recommendations": {
+      "type": "object",
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "enum": ["collaborative_filtering", "content_based", "hybrid", "trending", "editorial"],
+          "description": "Primary recommendation algorithm"
+        },
+        "forYouQueue": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentId": { "type": "string" },
+              "score": { "type": "number", "minimum": 0, "maximum": 1 },
+              "reason": { "type": "string", "enum": ["genre_match", "persona_match", "popular_in_region", "similar_to_watched", "trending", "new_release", "editor_pick", "continue_watching"] },
+              "position": { "type": "integer", "minimum": 1 },
+              "addedAt": { "type": "string", "format": "date-time" },
+              "expiresAt": { "type": "string", "format": "date-time" }
+            },
+            "required": ["contentId", "score", "reason", "position"],
+            "additionalProperties": false
+          },
+          "maxItems": 50
+        },
+        "continueWatching": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentId": { "type": "string" },
+              "episodeId": { "type": "string" },
+              "progress": { "type": "number", "minimum": 0, "maximum": 100 },
+              "lastWatched": { "type": "string", "format": "date-time" },
+              "nextEpisodeId": { "type": "string" }
+            },
+            "required": ["contentId", "progress", "lastWatched"],
+            "additionalProperties": false
+          },
+          "maxItems": 20
+        },
+        "similarToWatched": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "basedOnContentId": { "type": "string" },
+              "recommendations": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "contentId": { "type": "string" },
+                    "similarityScore": { "type": "number", "minimum": 0, "maximum": 1 }
+                  },
+                  "additionalProperties": false
+                },
+                "maxItems": 10
+              }
+            },
+            "required": ["basedOnContentId", "recommendations"],
+            "additionalProperties": false
+          }
+        },
+        "lastRefreshed": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "refreshInterval": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Refresh interval in hours"
+        }
+      },
+      "additionalProperties": false
+    },
+    "adaptiveUI": {
+      "type": "object",
+      "properties": {
+        "heroBanner": {
+          "type": "object",
+          "properties": {
+            "personalizedSelection": {
+              "type": "boolean",
+              "default": true,
+              "description": "Use personalized hero banner selection"
+            },
+            "preferredStyle": {
+              "type": "string",
+              "enum": ["action_focused", "character_focused", "mood_focused", "default"],
+              "default": "default"
+            },
+            "autoplayTrailer": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "categoryOrder": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "categoryId": { "type": "string" },
+              "position": { "type": "integer", "minimum": 1 },
+              "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+            },
+            "required": ["categoryId", "position"],
+            "additionalProperties": false
+          },
+          "description": "Personalized category ordering on home page"
+        },
+        "displayDensity": {
+          "type": "string",
+          "enum": ["compact", "normal", "expanded"],
+          "default": "normal"
+        },
+        "thumbnailStyle": {
+          "type": "string",
+          "enum": ["poster", "landscape", "square", "adaptive"],
+          "default": "adaptive"
+        },
+        "showRatings": {
+          "type": "boolean",
+          "default": true
+        },
+        "showProgress": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "kidsMode": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "ageRange": {
+          "type": "string",
+          "enum": ["0-4", "5-7", "8-12", "13-17"]
+        },
+        "allowedGenres": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "blockedContent": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicitly blocked content IDs"
+        },
+        "pinRequired": {
+          "type": "boolean",
+          "default": true
+        },
+        "watchTimeLimits": {
+          "type": "object",
+          "properties": {
+            "dailyLimit": { "type": "integer", "minimum": 0, "description": "Daily limit in minutes" },
+            "sessionLimit": { "type": "integer", "minimum": 0, "description": "Per session limit in minutes" },
+            "bedtimeHour": { "type": "integer", "minimum": 0, "maximum": 23 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "notificationPreferences": {
+      "type": "object",
+      "properties": {
+        "newReleases": {
+          "type": "boolean",
+          "default": true
+        },
+        "recommendedContent": {
+          "type": "boolean",
+          "default": true
+        },
+        "continueWatchingReminders": {
+          "type": "boolean",
+          "default": false
+        },
+        "pollsAndInteractive": {
+          "type": "boolean",
+          "default": true
+        },
+        "commentReplies": {
+          "type": "boolean",
+          "default": true
+        },
+        "frequency": {
+          "type": "string",
+          "enum": ["realtime", "daily_digest", "weekly_digest", "never"],
+          "default": "daily_digest"
+        }
+      },
+      "additionalProperties": false
+    },
+    "privacySettings": {
+      "type": "object",
+      "properties": {
+        "shareWatchHistory": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow sharing watch history for better recommendations"
+        },
+        "shareWithPartners": {
+          "type": "boolean",
+          "default": false,
+          "description": "Share data with distribution partners"
+        },
+        "personalizedAds": {
+          "type": "boolean",
+          "default": true
+        },
+        "analyticsOptIn": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "engagementHistory": {
+      "type": "object",
+      "properties": {
+        "pollsParticipated": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "commentsPosted": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "reactionsGiven": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "contentRated": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "shareCount": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "engagementScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Overall engagement score"
+        },
+        "engagementTier": {
+          "type": "string",
+          "enum": ["casual", "engaged", "active", "superfan"],
+          "default": "casual"
+        }
+      },
+      "additionalProperties": false
+    },
+    "insightsIntegration": {
+      "type": "object",
+      "properties": {
+        "feedToPersonalizationEngine": {
+          "type": "boolean",
+          "default": true,
+          "description": "Feed to Phase 17 Personalization Engine"
+        },
+        "feedToAudienceInsights": {
+          "type": "boolean",
+          "default": true,
+          "description": "Feed to Phase 20 Audience Insights"
+        },
+        "feedbackLoopEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Phase 20 feedback loop integration"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "suspended", "deleted"],
+      "default": "active"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastActiveAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "personalizationId",
+    "customerId",
+    "franchiseId",
+    "status"
+  ],
+  "additionalProperties": false
+}

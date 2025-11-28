@@ -1,0 +1,660 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DistributionRights",
+  "description": "Schema for distribution rights management in SL18 - licensing, revenue share, geo-restrictions, and ad-insertion for short-form content",
+  "type": "object",
+  "properties": {
+    "rightsId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^rights-[a-z0-9-]+$",
+      "description": "Unique rights management identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "contentScope": {
+      "type": "object",
+      "properties": {
+        "contentIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Specific content IDs this applies to"
+        },
+        "franchiseIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Franchise IDs this applies to"
+        },
+        "contentTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["movie", "series", "episode", "short_drama", "trailer", "teaser", "documentary", "behind_scenes"]
+          }
+        },
+        "scopeType": {
+          "type": "string",
+          "enum": ["global", "regional", "content_specific", "franchise_wide"],
+          "description": "Scope of rights application"
+        }
+      },
+      "required": ["scopeType"],
+      "additionalProperties": false
+    },
+    "licensing": {
+      "type": "object",
+      "properties": {
+        "licenseId": {
+          "type": "string",
+          "description": "License agreement identifier"
+        },
+        "licenseType": {
+          "type": "string",
+          "enum": ["exclusive", "non_exclusive", "co_exclusive", "first_run", "second_run", "library"],
+          "description": "Type of license"
+        },
+        "territory": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["worldwide", "regional", "country_specific"]
+            },
+            "regions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Allowed regions"
+            },
+            "countries": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "ISO 3166-1 alpha-2 country codes"
+            },
+            "excludedCountries": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "required": ["type"],
+          "additionalProperties": false
+        },
+        "term": {
+          "type": "object",
+          "properties": {
+            "startDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "endDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "duration": {
+              "type": "object",
+              "properties": {
+                "value": { "type": "integer" },
+                "unit": {
+                  "type": "string",
+                  "enum": ["days", "months", "years"]
+                }
+              },
+              "additionalProperties": false
+            },
+            "autoRenewal": {
+              "type": "boolean"
+            },
+            "renewalTerms": {
+              "type": "object",
+              "properties": {
+                "noticePeriodDays": { "type": "integer" },
+                "maxRenewals": { "type": "integer" },
+                "renewalDuration": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "perpetual": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "rights": {
+          "type": "object",
+          "properties": {
+            "streaming": {
+              "type": "boolean",
+              "description": "Online streaming rights"
+            },
+            "download": {
+              "type": "boolean",
+              "description": "Download/offline viewing rights"
+            },
+            "broadcast": {
+              "type": "boolean",
+              "description": "Linear broadcast rights"
+            },
+            "theatrical": {
+              "type": "boolean"
+            },
+            "homeVideo": {
+              "type": "boolean"
+            },
+            "mobileOnly": {
+              "type": "boolean"
+            },
+            "shortForm": {
+              "type": "boolean",
+              "description": "Short-form clip distribution rights"
+            },
+            "socialMedia": {
+              "type": "boolean",
+              "description": "Social media platform distribution"
+            },
+            "editRights": {
+              "type": "boolean",
+              "description": "Right to edit/crop content"
+            },
+            "subtitleCreation": {
+              "type": "boolean"
+            },
+            "dubbingRights": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "exclusivity": {
+          "type": "object",
+          "properties": {
+            "isExclusive": {
+              "type": "boolean"
+            },
+            "exclusivityType": {
+              "type": "string",
+              "enum": ["full", "platform", "territory", "window"]
+            },
+            "exclusivityWindow": {
+              "type": "object",
+              "properties": {
+                "startDate": { "type": "string", "format": "date" },
+                "endDate": { "type": "string", "format": "date" },
+                "durationDays": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "competitorBlacklist": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "holdback": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "holdbackPeriodDays": { "type": "integer" },
+            "holdbackPlatforms": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "afterPremiere": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["licenseType", "territory", "term"],
+      "additionalProperties": false
+    },
+    "revenueShare": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": ["percentage", "flat_fee", "tiered", "hybrid", "minimum_guarantee", "cost_plus"],
+          "description": "Revenue share model"
+        },
+        "splits": {
+          "type": "object",
+          "properties": {
+            "contentOwnerPercent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "partnerPercent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "platformPercent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "SL18 platform fee"
+            },
+            "aggregatorPercent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        },
+        "tieredRates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tierName": { "type": "string" },
+              "threshold": {
+                "type": "object",
+                "properties": {
+                  "metric": {
+                    "type": "string",
+                    "enum": ["views", "revenue", "subscribers", "hours_watched"]
+                  },
+                  "minValue": { "type": "number" },
+                  "maxValue": { "type": "number" }
+                },
+                "additionalProperties": false
+              },
+              "contentOwnerPercent": { "type": "number" },
+              "partnerPercent": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "minimumGuarantee": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "amount": { "type": "number" },
+            "currency": { "type": "string" },
+            "period": {
+              "type": "string",
+              "enum": ["monthly", "quarterly", "yearly", "per_title", "total"]
+            },
+            "recoupable": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "flatFee": {
+          "type": "object",
+          "properties": {
+            "amount": { "type": "number" },
+            "currency": { "type": "string" },
+            "paymentSchedule": {
+              "type": "string",
+              "enum": ["upfront", "upon_delivery", "installments", "upon_release"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "bonuses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bonusType": {
+                "type": "string",
+                "enum": ["performance", "milestone", "exclusivity", "early_delivery"]
+              },
+              "condition": { "type": "string" },
+              "amount": { "type": "number" },
+              "currency": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "deductions": {
+          "type": "object",
+          "properties": {
+            "distributionCosts": { "type": "boolean" },
+            "marketingCosts": { "type": "boolean" },
+            "technicalCosts": { "type": "boolean" },
+            "taxWithholding": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "percent": { "type": "number" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "paymentTerms": {
+          "type": "object",
+          "properties": {
+            "frequency": {
+              "type": "string",
+              "enum": ["weekly", "biweekly", "monthly", "quarterly", "yearly"]
+            },
+            "netDays": { "type": "integer" },
+            "minimumPayout": { "type": "number" },
+            "currency": { "type": "string" },
+            "paymentMethod": {
+              "type": "string",
+              "enum": ["wire_transfer", "ach", "paypal", "check", "crypto"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "reporting": {
+          "type": "object",
+          "properties": {
+            "frequency": {
+              "type": "string",
+              "enum": ["daily", "weekly", "monthly", "quarterly"]
+            },
+            "format": {
+              "type": "string",
+              "enum": ["pdf", "csv", "api", "dashboard"]
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["views", "watch_time", "revenue", "subscribers", "engagement", "retention"]
+              }
+            },
+            "auditRights": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["model"],
+      "additionalProperties": false
+    },
+    "geoRestrictions": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "defaultPolicy": {
+          "type": "string",
+          "enum": ["allow_all", "deny_all", "allow_listed", "deny_listed"]
+        },
+        "allowedCountries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "ISO 3166-1 alpha-2 codes"
+        },
+        "blockedCountries": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "regionRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "allowed": { "type": "boolean" },
+              "startDate": { "type": "string", "format": "date" },
+              "endDate": { "type": "string", "format": "date" },
+              "contentRating": { "type": "string" },
+              "restrictions": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "vpnDetection": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "action": {
+              "type": "string",
+              "enum": ["block", "warn", "log", "allow"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "proxyDetection": {
+          "type": "boolean"
+        },
+        "ipWhitelist": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "ipBlacklist": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "adInsertion": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "adModel": {
+          "type": "string",
+          "enum": ["partner_managed", "sl18_managed", "hybrid", "none"],
+          "description": "Who manages ad insertion"
+        },
+        "adTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["pre_roll", "mid_roll", "post_roll", "banner", "overlay", "companion", "rewarded"]
+          }
+        },
+        "adFrequency": {
+          "type": "object",
+          "properties": {
+            "preRoll": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "maxDurationSeconds": { "type": "integer" },
+                "skipAfterSeconds": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "midRoll": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "intervalSeconds": { "type": "integer" },
+                "maxPerContent": { "type": "integer" },
+                "minContentDurationSeconds": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "postRoll": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "maxDurationSeconds": { "type": "integer" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "adTiers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tierName": { "type": "string" },
+              "adLoad": {
+                "type": "number",
+                "description": "Ad load percentage"
+              },
+              "adTypes": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "targetCpm": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "adRevenueShare": {
+          "type": "object",
+          "properties": {
+            "contentOwnerPercent": { "type": "number" },
+            "partnerPercent": { "type": "number" },
+            "platformPercent": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "adRestrictions": {
+          "type": "object",
+          "properties": {
+            "blockedCategories": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "blockedAdvertisers": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "competitorBlock": { "type": "boolean" },
+            "brandSafetyLevel": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "strict"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "vastTagUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "VAST tag for ad serving"
+        },
+        "ssaiEnabled": {
+          "type": "boolean",
+          "description": "Server-side ad insertion enabled"
+        }
+      },
+      "additionalProperties": false
+    },
+    "windowManagement": {
+      "type": "object",
+      "properties": {
+        "windows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "windowId": { "type": "string" },
+              "windowType": {
+                "type": "string",
+                "enum": ["premium_vod", "svod", "avod", "free", "tvod", "theatrical", "broadcast"]
+              },
+              "startDate": { "type": "string", "format": "date" },
+              "endDate": { "type": "string", "format": "date" },
+              "priority": { "type": "integer" },
+              "platforms": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "territories": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "defaultWindow": {
+          "type": "string"
+        },
+        "cascadeRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fromWindow": { "type": "string" },
+              "toWindow": { "type": "string" },
+              "delayDays": { "type": "integer" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "pending", "expired", "suspended", "terminated", "under_review"],
+      "description": "Rights status"
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "dataPrivacy": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["GDPR", "CCPA", "LGPD", "PDPA", "COPPA"]
+          }
+        },
+        "contentRegulations": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "copyrightClearance": {
+          "type": "boolean"
+        },
+        "musicLicensing": {
+          "type": "boolean"
+        },
+        "auditTrail": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "approvedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "approvedBy": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "rightsId",
+    "version",
+    "contentScope",
+    "licensing",
+    "revenueShare",
+    "status"
+  ],
+  "additionalProperties": false
+}

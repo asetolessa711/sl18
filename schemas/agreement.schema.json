@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FranchiseAgreement",
+  "description": "Schema for digital franchise agreement records in SL18 governance layer",
+  "type": "object",
+  "properties": {
+    "agreementId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique agreement identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "Reference to the franchise registration"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
+      "description": "Agreement version (semver format, e.g., 1.0 or 1.0.0)"
+    },
+    "terms": {
+      "type": "object",
+      "properties": {
+        "fees": {
+          "type": "object",
+          "properties": {
+            "registrationFee": {
+              "type": "number",
+              "minimum": 0,
+              "description": "One-time registration fee in USD"
+            },
+            "monthlyFee": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Monthly operational fee in USD"
+            },
+            "currency": {
+              "type": "string",
+              "default": "USD",
+              "description": "Currency for fees"
+            }
+          },
+          "additionalProperties": false
+        },
+        "revenueShare": {
+          "type": "object",
+          "properties": {
+            "partnerPercentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Partner's share of revenue in percentage"
+            },
+            "centralPercentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Central ops share of revenue in percentage"
+            },
+            "payoutThreshold": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Minimum amount before payout is triggered (USD)"
+            },
+            "payoutSchedule": {
+              "type": "string",
+              "enum": ["weekly", "biweekly", "monthly", "quarterly"],
+              "description": "Frequency of revenue payouts"
+            }
+          },
+          "required": ["partnerPercentage", "centralPercentage", "payoutSchedule"],
+          "additionalProperties": false
+        },
+        "qcObligations": {
+          "type": "object",
+          "properties": {
+            "requiredBeforePublish": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether QC approval is required before publishing"
+            },
+            "qcTurnaroundHours": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 168,
+              "description": "Maximum hours for QC review"
+            },
+            "strikeLimit": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Number of QC violations before suspension"
+            },
+            "qcCriteria": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of QC criteria that must be met"
+            }
+          },
+          "required": ["requiredBeforePublish", "strikeLimit"],
+          "additionalProperties": false
+        },
+        "publishingRights": {
+          "type": "object",
+          "properties": {
+            "platforms": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["youtube", "instagram", "facebook", "tiktok"]
+              },
+              "description": "Platforms where content can be published"
+            },
+            "exclusiveTerritory": {
+              "type": ["string", "null"],
+              "description": "Exclusive territory for the franchise"
+            },
+            "contentOwnership": {
+              "type": "string",
+              "enum": ["shared", "franchise", "central"],
+              "description": "Who owns the published content"
+            }
+          },
+          "required": ["platforms", "contentOwnership"],
+          "additionalProperties": false
+        },
+        "overrideRules": {
+          "type": "object",
+          "properties": {
+            "centralCanOverride": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether central ops can override franchise decisions"
+            },
+            "overrideNoticeHours": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Hours of notice required before override"
+            },
+            "overrideReasons": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Valid reasons for override"
+            }
+          },
+          "additionalProperties": false
+        },
+        "rollbackRules": {
+          "type": "object",
+          "properties": {
+            "allowRollback": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether content rollback is allowed"
+            },
+            "rollbackWindowHours": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Hours after publish when rollback is allowed"
+            },
+            "requiresApproval": {
+              "type": "boolean",
+              "description": "Whether rollback requires approval"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["revenueShare", "qcObligations", "publishingRights"],
+      "additionalProperties": false
+    },
+    "effectiveDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the agreement becomes effective"
+    },
+    "expirationDate": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "When the agreement expires (null for indefinite)"
+    },
+    "signedBy": {
+      "type": "object",
+      "properties": {
+        "franchiseRepresentative": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "signedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "signatureHash": {
+              "type": "string",
+              "description": "Hash of the digital signature"
+            }
+          },
+          "required": ["name", "signedAt"],
+          "additionalProperties": false
+        },
+        "centralRepresentative": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "signedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "signatureHash": {
+              "type": "string",
+              "description": "Hash of the digital signature"
+            }
+          },
+          "required": ["name", "signedAt"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["franchiseRepresentative", "centralRepresentative"],
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "pending_signature", "active", "amended", "terminated"],
+      "description": "Current status of the agreement"
+    },
+    "amendments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "amendmentId": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "effectiveDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "approvedBy": {
+            "type": "string"
+          }
+        },
+        "required": ["amendmentId", "description", "effectiveDate"],
+        "additionalProperties": false
+      },
+      "description": "List of amendments to the agreement"
+    }
+  },
+  "required": [
+    "agreementId",
+    "franchiseId",
+    "version",
+    "terms",
+    "effectiveDate",
+    "status"
+  ],
+  "additionalProperties": false
+}

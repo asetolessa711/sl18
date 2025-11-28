@@ -1,0 +1,775 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SocialAnalytics",
+  "description": "Schema for cross-platform social media analytics in SL18 + Waliin Studio - metrics ingestion, dashboards, funnel tracking, and reporting",
+  "type": "object",
+  "properties": {
+    "analyticsId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^analytics-social-[a-z0-9-]+$",
+      "description": "Unique social analytics identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "connectorRef": {
+      "type": "string",
+      "pattern": "^social-[a-z0-9-]+$",
+      "description": "Reference to social connectors configuration"
+    },
+    "metricsCollection": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "syncIntervalMinutes": {
+          "type": "integer",
+          "minimum": 15,
+          "default": 60
+        },
+        "platforms": {
+          "type": "object",
+          "properties": {
+            "youtube": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "metrics": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "views", "watch_time", "subscribers", "subscriber_gained", "subscriber_lost",
+                      "impressions", "ctr", "average_view_duration", "average_percentage_viewed",
+                      "likes", "dislikes", "comments", "shares", "saves",
+                      "estimated_revenue", "rpm", "cpm", "ad_impressions", "monetized_playbacks",
+                      "membership_revenue", "super_chat_revenue", "super_thanks_revenue",
+                      "card_clicks", "end_screen_clicks", "annotations_clicks"
+                    ]
+                  }
+                },
+                "dimensions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["video", "date", "country", "device_type", "traffic_source", "playback_location"]
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "facebook": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "metrics": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "page_fans", "page_fan_adds", "page_fan_removes",
+                      "page_impressions", "page_impressions_unique", "page_reach",
+                      "page_post_engagements", "page_video_views", "page_video_view_time",
+                      "post_impressions", "post_reach", "post_engagements",
+                      "post_reactions", "post_comments", "post_shares",
+                      "ad_break_earnings", "fan_subscription_revenue", "stars_revenue"
+                    ]
+                  }
+                },
+                "dimensions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["post", "date", "country", "city", "age", "gender"]
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "instagram": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "metrics": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "followers_count", "follows_count", "media_count",
+                      "impressions", "reach", "profile_views", "website_clicks",
+                      "email_contacts", "phone_call_clicks", "text_message_clicks",
+                      "engagement", "saved", "video_views", "carousel_album_impressions",
+                      "reel_plays", "reel_comments", "reel_likes", "reel_shares", "reel_saves",
+                      "story_impressions", "story_reach", "story_replies", "story_taps_forward", "story_taps_back", "story_exits"
+                    ]
+                  }
+                },
+                "dimensions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["media", "date", "country", "city", "age", "gender", "media_type"]
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "tiktok": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "metrics": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "followers_count", "following_count", "likes_count", "video_count",
+                      "video_views", "profile_views", "comments", "shares", "favorites",
+                      "average_watch_time", "video_duration", "reach", "full_video_watched",
+                      "creator_fund_earnings", "live_gift_earnings", "tips_earnings"
+                    ]
+                  }
+                },
+                "dimensions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["video", "date", "country", "device", "source"]
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "waliinNative": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "metrics": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "active_users", "new_signups", "subscribers", "trials_started", "trials_converted",
+                      "views", "watch_time", "completion_rate", "downloads",
+                      "subscription_revenue", "tvod_revenue", "avod_revenue", "download_revenue",
+                      "mrr", "arr", "arpu", "ltv", "churn_rate"
+                    ]
+                  }
+                },
+                "dimensions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["content", "date", "country", "subscription_tier", "device_type", "source"]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "crossPlatformKPIs": {
+      "type": "object",
+      "properties": {
+        "reach": {
+          "type": "object",
+          "properties": {
+            "totalReach": { "type": "integer" },
+            "uniqueReach": { "type": "integer" },
+            "reachByPlatform": {
+              "type": "object",
+              "properties": {
+                "youtube": { "type": "integer" },
+                "facebook": { "type": "integer" },
+                "instagram": { "type": "integer" },
+                "tiktok": { "type": "integer" },
+                "waliinNative": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "reachGrowthPercent": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "engagement": {
+          "type": "object",
+          "properties": {
+            "totalEngagements": { "type": "integer" },
+            "engagementRate": { "type": "number" },
+            "engagementByPlatform": {
+              "type": "object",
+              "properties": {
+                "youtube": { "type": "number" },
+                "facebook": { "type": "number" },
+                "instagram": { "type": "number" },
+                "tiktok": { "type": "number" },
+                "waliinNative": { "type": "number" }
+              },
+              "additionalProperties": false
+            },
+            "topEngagingContent": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "contentId": { "type": "string" },
+                  "platform": { "type": "string" },
+                  "engagementRate": { "type": "number" },
+                  "totalEngagements": { "type": "integer" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "audience": {
+          "type": "object",
+          "properties": {
+            "totalFollowers": { "type": "integer" },
+            "followersByPlatform": {
+              "type": "object",
+              "properties": {
+                "youtube": { "type": "integer" },
+                "facebook": { "type": "integer" },
+                "instagram": { "type": "integer" },
+                "tiktok": { "type": "integer" },
+                "waliinCustomers": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "followerGrowthPercent": { "type": "number" },
+            "demographicBreakdown": {
+              "type": "object",
+              "properties": {
+                "ageGroups": {
+                  "type": "object",
+                  "properties": {
+                    "13_17": { "type": "number" },
+                    "18_24": { "type": "number" },
+                    "25_34": { "type": "number" },
+                    "35_44": { "type": "number" },
+                    "45_54": { "type": "number" },
+                    "55_64": { "type": "number" },
+                    "65_plus": { "type": "number" }
+                  },
+                  "additionalProperties": false
+                },
+                "genderSplit": {
+                  "type": "object",
+                  "properties": {
+                    "male": { "type": "number" },
+                    "female": { "type": "number" },
+                    "other": { "type": "number" }
+                  },
+                  "additionalProperties": false
+                },
+                "topCountries": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "country": { "type": "string" },
+                      "percentage": { "type": "number" },
+                      "count": { "type": "integer" }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "conversions": {
+          "type": "object",
+          "properties": {
+            "totalConversions": { "type": "integer" },
+            "conversionRate": { "type": "number" },
+            "conversionsBySource": {
+              "type": "object",
+              "properties": {
+                "youtube": { "type": "integer" },
+                "facebook": { "type": "integer" },
+                "instagram": { "type": "integer" },
+                "tiktok": { "type": "integer" },
+                "organic": { "type": "integer" },
+                "direct": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "conversionsByType": {
+              "type": "object",
+              "properties": {
+                "signups": { "type": "integer" },
+                "trials": { "type": "integer" },
+                "subscriptions": { "type": "integer" },
+                "tvodPurchases": { "type": "integer" },
+                "downloads": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "conversionValue": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "revenue": {
+          "type": "object",
+          "properties": {
+            "totalRevenue": { "type": "number" },
+            "revenueByPlatform": {
+              "type": "object",
+              "properties": {
+                "youtube": { "type": "number" },
+                "facebook": { "type": "number" },
+                "instagram": { "type": "number" },
+                "tiktok": { "type": "number" },
+                "waliinNative": { "type": "number" }
+              },
+              "additionalProperties": false
+            },
+            "revenueByType": {
+              "type": "object",
+              "properties": {
+                "ads": { "type": "number" },
+                "subscriptions": { "type": "number" },
+                "transactions": { "type": "number" },
+                "tips_gifts": { "type": "number" },
+                "brand_deals": { "type": "number" }
+              },
+              "additionalProperties": false
+            },
+            "revenueGrowthPercent": { "type": "number" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "funnelTracking": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "utmTracking": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "utmSource": {
+              "type": "object",
+              "properties": {
+                "youtube": { "type": "string", "default": "youtube" },
+                "facebook": { "type": "string", "default": "facebook" },
+                "instagram": { "type": "string", "default": "instagram" },
+                "tiktok": { "type": "string", "default": "tiktok" }
+              },
+              "additionalProperties": false
+            },
+            "utmMedium": {
+              "type": "object",
+              "properties": {
+                "video": { "type": "string", "default": "video" },
+                "short": { "type": "string", "default": "short" },
+                "story": { "type": "string", "default": "story" },
+                "post": { "type": "string", "default": "post" },
+                "bio": { "type": "string", "default": "bio" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "funnelStages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stageName": {
+                "type": "string",
+                "enum": ["awareness", "interest", "consideration", "intent", "evaluation", "purchase", "retention"]
+              },
+              "platforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["youtube", "facebook", "instagram", "tiktok", "waliin_native"]
+                }
+              },
+              "metrics": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "conversionToNext": { "type": "number" }
+            },
+            "additionalProperties": false
+          },
+          "default": [
+            { "stageName": "awareness", "platforms": ["youtube", "tiktok", "instagram"], "metrics": ["impressions", "reach", "views"] },
+            { "stageName": "interest", "platforms": ["youtube", "facebook", "instagram"], "metrics": ["engagement", "follows", "saves"] },
+            { "stageName": "consideration", "platforms": ["youtube", "waliin_native"], "metrics": ["link_clicks", "site_visits", "video_completions"] },
+            { "stageName": "intent", "platforms": ["waliin_native"], "metrics": ["signups", "trial_starts", "cart_adds"] },
+            { "stageName": "purchase", "platforms": ["waliin_native"], "metrics": ["subscriptions", "transactions", "revenue"] },
+            { "stageName": "retention", "platforms": ["waliin_native"], "metrics": ["retention_rate", "repeat_purchases", "ltv"] }
+          ]
+        },
+        "attributionModel": {
+          "type": "string",
+          "enum": ["last_click", "first_click", "linear", "time_decay", "position_based", "data_driven"],
+          "default": "last_click"
+        },
+        "attributionWindow": {
+          "type": "object",
+          "properties": {
+            "clickWindowDays": { "type": "integer", "default": 30 },
+            "viewWindowDays": { "type": "integer", "default": 7 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "regionalInsights": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "topRegions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "country": { "type": "string" },
+              "reach": { "type": "integer" },
+              "engagement": { "type": "number" },
+              "revenue": { "type": "number" },
+              "conversions": { "type": "integer" },
+              "dominantPlatform": {
+                "type": "string",
+                "enum": ["youtube", "facebook", "instagram", "tiktok", "waliin_native"]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "rpmByRegion": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "youtubeRpm": { "type": "number" },
+              "facebookRpm": { "type": "number" },
+              "waliinArpu": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "pricingAlignment": {
+          "type": "boolean",
+          "default": true,
+          "description": "Align regional social insights with SL18 regional pricing"
+        }
+      },
+      "additionalProperties": false
+    },
+    "contentPerformance": {
+      "type": "object",
+      "properties": {
+        "topPerformingContent": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentId": { "type": "string" },
+              "title": { "type": "string" },
+              "platforms": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "totalViews": { "type": "integer" },
+              "totalEngagements": { "type": "integer" },
+              "engagementRate": { "type": "number" },
+              "revenue": { "type": "number" },
+              "conversions": { "type": "integer" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "contentTypePerformance": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentType": {
+                "type": "string",
+                "enum": ["short", "teaser", "trailer", "highlight", "full_episode", "behind_scenes", "poll", "announcement"]
+              },
+              "averageViews": { "type": "integer" },
+              "averageEngagement": { "type": "number" },
+              "averageConversions": { "type": "number" },
+              "postCount": { "type": "integer" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "viralContent": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentId": { "type": "string" },
+              "platform": { "type": "string" },
+              "viralScore": { "type": "number" },
+              "peakViews": { "type": "integer" },
+              "shareRate": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "dashboards": {
+      "type": "object",
+      "properties": {
+        "overviewDashboard": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "widgets": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "total_reach", "total_engagement", "total_followers", "total_revenue",
+                  "reach_trend", "engagement_trend", "follower_trend", "revenue_trend",
+                  "platform_breakdown", "top_content", "recent_posts", "alerts"
+                ]
+              }
+            },
+            "refreshIntervalMinutes": { "type": "integer", "default": 15 }
+          },
+          "additionalProperties": false
+        },
+        "platformDashboards": {
+          "type": "object",
+          "properties": {
+            "youtube": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "widgets": { "type": "array", "items": { "type": "string" } }
+              },
+              "additionalProperties": false
+            },
+            "facebook": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "widgets": { "type": "array", "items": { "type": "string" } }
+              },
+              "additionalProperties": false
+            },
+            "instagram": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "widgets": { "type": "array", "items": { "type": "string" } }
+              },
+              "additionalProperties": false
+            },
+            "tiktok": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "widgets": { "type": "array", "items": { "type": "string" } }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "funnelDashboard": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "widgets": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["funnel_visualization", "conversion_rates", "attribution", "source_breakdown", "conversion_value"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "campaignDashboard": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "widgets": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["active_campaigns", "campaign_performance", "milestone_tracker", "calendar_view", "budget_tracker"]
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "alerting": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "alertTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "reach_spike", "reach_drop", "engagement_spike", "engagement_drop",
+                  "follower_milestone", "revenue_milestone", "viral_content",
+                  "negative_sentiment", "copyright_claim", "policy_violation",
+                  "conversion_drop", "funnel_bottleneck", "campaign_milestone"
+                ]
+              },
+              "enabled": { "type": "boolean" },
+              "threshold": { "type": "number" },
+              "platforms": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "notificationChannels": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["email", "slack", "push", "sms", "operator_console"]
+                }
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["info", "warning", "critical"]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "platform": { "type": "string" },
+              "metric": { "type": "string" },
+              "value": { "type": "number" },
+              "celebratePost": { "type": "boolean", "default": true }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "reporting": {
+      "type": "object",
+      "properties": {
+        "scheduledReports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "reportId": { "type": "string" },
+              "name": { "type": "string" },
+              "frequency": {
+                "type": "string",
+                "enum": ["daily", "weekly", "monthly", "quarterly"]
+              },
+              "recipients": {
+                "type": "array",
+                "items": { "type": "string", "format": "email" }
+              },
+              "format": {
+                "type": "string",
+                "enum": ["pdf", "xlsx", "csv", "html"]
+              },
+              "sections": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["overview", "platforms", "content", "engagement", "revenue", "conversions", "campaigns", "recommendations"]
+                }
+              },
+              "includePlatforms": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "executiveReport": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "frequency": {
+              "type": "string",
+              "enum": ["weekly", "monthly"],
+              "default": "weekly"
+            },
+            "highlights": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["total_reach", "engagement_rate", "conversions", "revenue", "top_content", "recommendations"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "exportFormats": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["pdf", "xlsx", "csv", "json", "google_sheets"]
+          },
+          "default": ["pdf", "xlsx", "csv"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "setup_pending", "suspended"],
+      "description": "Analytics status"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" },
+        "lastSyncAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "analyticsId",
+    "version",
+    "connectorRef",
+    "metricsCollection",
+    "status"
+  ],
+  "additionalProperties": false
+}

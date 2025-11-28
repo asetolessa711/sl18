@@ -1,0 +1,351 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MultilingualQC",
+  "description": "Schema for multilingual QC validation in SL18 globalization layer",
+  "type": "object",
+  "properties": {
+    "qcId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique QC record identifier"
+    },
+    "episodeId": {
+      "type": "string",
+      "description": "Reference to the episode being reviewed"
+    },
+    "franchiseId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "Reference to the franchise"
+    },
+    "sourceLanguage": {
+      "type": "string",
+      "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+      "description": "Original content language"
+    },
+    "targetLanguage": {
+      "type": "string",
+      "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+      "description": "Translation target language"
+    },
+    "translationAccuracy": {
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Translation accuracy score (0-100)"
+        },
+        "threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 95,
+          "description": "Minimum required accuracy"
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "Whether accuracy threshold was met"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["mistranslation", "omission", "addition", "grammar", "terminology", "context"]
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["minor", "major", "critical"]
+              },
+              "location": {
+                "type": "string",
+                "description": "Where the issue occurs (timestamp or line)"
+              },
+              "original": {
+                "type": "string",
+                "description": "Original text"
+              },
+              "translated": {
+                "type": "string",
+                "description": "Translated text"
+              },
+              "suggestion": {
+                "type": "string",
+                "description": "Suggested correction"
+              }
+            },
+            "required": ["type", "severity"],
+            "additionalProperties": false
+          },
+          "description": "List of translation issues"
+        }
+      },
+      "required": ["score", "threshold", "passed"],
+      "additionalProperties": false
+    },
+    "personaConsistency": {
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Persona consistency score (0-100)"
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "Whether persona consistency check passed"
+        },
+        "personaId": {
+          "type": "string",
+          "description": "Persona being validated"
+        },
+        "checks": {
+          "type": "object",
+          "properties": {
+            "toneMatch": {
+              "type": "boolean",
+              "description": "Whether tone matches persona"
+            },
+            "vocabularyMatch": {
+              "type": "boolean",
+              "description": "Whether vocabulary matches persona"
+            },
+            "signOffPresent": {
+              "type": "boolean",
+              "description": "Whether persona sign-off is present"
+            },
+            "culturalAlignment": {
+              "type": "boolean",
+              "description": "Whether content is culturally aligned"
+            }
+          },
+          "additionalProperties": false
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["tone_mismatch", "vocabulary_deviation", "missing_signoff", "cultural_issue"]
+              },
+              "description": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              }
+            },
+            "required": ["type", "description"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["score", "passed"],
+      "additionalProperties": false
+    },
+    "genreRules": {
+      "type": "object",
+      "properties": {
+        "genre": {
+          "type": "string",
+          "description": "Content genre"
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "Whether genre rules were followed"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "passed": {
+                "type": "boolean"
+              }
+            },
+            "required": ["ruleId", "passed"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "culturalSensitivity": {
+      "type": "object",
+      "properties": {
+        "reviewed": {
+          "type": "boolean",
+          "description": "Whether cultural review was completed"
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "Whether content passed cultural review"
+        },
+        "reviewer": {
+          "type": "string",
+          "description": "Who performed the cultural review"
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["offensive", "insensitive", "inappropriate", "religious", "political", "historical"]
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["warning", "block"]
+              },
+              "description": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "resolution": {
+                "type": "string"
+              }
+            },
+            "required": ["type", "severity", "description"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "subtitleQC": {
+      "type": "object",
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "checks": {
+          "type": "object",
+          "properties": {
+            "timingAccurate": { "type": "boolean" },
+            "lengthCompliant": { "type": "boolean" },
+            "readabilityOk": { "type": "boolean" },
+            "formattingCorrect": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["timing", "length", "readability", "formatting", "synchronization"]
+              },
+              "timestamp": { "type": "string" },
+              "description": { "type": "string" }
+            },
+            "required": ["type", "description"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "overallResult": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "passed", "failed", "conditional"],
+          "description": "Overall QC status"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Composite QC score"
+        },
+        "publishReady": {
+          "type": "boolean",
+          "description": "Whether content is ready to publish"
+        },
+        "requiredActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Actions required before publishing"
+        }
+      },
+      "required": ["status", "publishReady"],
+      "additionalProperties": false
+    },
+    "reviewer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Reviewer identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Reviewer name"
+        },
+        "isNativeSpeaker": {
+          "type": "boolean",
+          "description": "Whether reviewer is native speaker of target language"
+        }
+      },
+      "additionalProperties": false
+    },
+    "timestamps": {
+      "type": "object",
+      "properties": {
+        "submittedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["submittedAt"],
+      "additionalProperties": false
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional QC notes"
+    }
+  },
+  "required": [
+    "qcId",
+    "episodeId",
+    "franchiseId",
+    "sourceLanguage",
+    "targetLanguage",
+    "translationAccuracy",
+    "overallResult",
+    "timestamps"
+  ],
+  "additionalProperties": false
+}

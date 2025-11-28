@@ -1,0 +1,691 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MediaObservability",
+  "description": "Schema for media observability in SL18 - playback metrics, error tracking, region heatmaps, and QoE monitoring",
+  "type": "object",
+  "properties": {
+    "observabilityId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^mobs-[a-z0-9-]+$",
+      "description": "Unique media observability configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable observability configuration name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "franchise", "series", "content", "platform"],
+          "description": "Observability scope"
+        },
+        "franchiseId": {
+          "type": "string"
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["web", "ios", "android", "smart_tv", "ott", "all"]
+          }
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "playbackMetrics": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "collection": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "enum": ["conviva", "mux", "youbora", "bitmovin_analytics", "google_analytics", "custom"]
+            },
+            "samplingRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Percentage of sessions to track"
+            },
+            "beaconInterval": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Heartbeat interval in seconds"
+            }
+          },
+          "additionalProperties": false
+        },
+        "qoe": {
+          "type": "object",
+          "properties": {
+            "startupTime": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Target startup time in seconds"
+                },
+                "warning": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Warning threshold in seconds"
+                },
+                "critical": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Critical threshold in seconds"
+                }
+              },
+              "additionalProperties": false
+            },
+            "rebufferRatio": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Target rebuffer ratio percentage"
+                },
+                "warning": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "critical": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "additionalProperties": false
+            },
+            "playbackFailure": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Target failure rate percentage"
+                },
+                "warning": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "critical": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "additionalProperties": false
+            },
+            "videoPrimaryResolution": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Target percentage of sessions at primary resolution"
+                },
+                "warning": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "eventId": {
+                "type": "string"
+              },
+              "event": {
+                "type": "string",
+                "enum": ["play_request", "play_start", "pause", "resume", "seek", "buffer_start", "buffer_end", "quality_change", "bitrate_change", "error", "ad_request", "ad_start", "ad_complete", "ad_skip", "complete", "exit"]
+              },
+              "track": {
+                "type": "boolean"
+              },
+              "properties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Event properties to capture"
+              }
+            },
+            "required": ["eventId", "event", "track"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "errorTracking": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "categoryId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string",
+                "enum": ["network", "drm", "decoder", "manifest", "cdn", "origin", "client", "unknown"]
+              },
+              "errorCodes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low", "info"]
+              },
+              "alerting": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "threshold": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Error rate threshold to trigger alert"
+                  },
+                  "channels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["slack", "pagerduty", "email", "webhook", "mobile_push"]
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": ["categoryId", "name", "category", "severity"],
+            "additionalProperties": false
+          }
+        },
+        "stackTraceCollection": {
+          "type": "boolean"
+        },
+        "deviceInfo": {
+          "type": "boolean",
+          "description": "Collect device information for debugging"
+        },
+        "networkInfo": {
+          "type": "boolean",
+          "description": "Collect network conditions at error time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "regionHeatmaps": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "granularity": {
+          "type": "string",
+          "enum": ["country", "region", "city", "isp"],
+          "description": "Geographic granularity for heatmaps"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["concurrent_viewers", "play_attempts", "error_rate", "avg_bitrate", "rebuffer_ratio", "startup_time", "engagement"]
+          }
+        },
+        "updateInterval": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Update interval in minutes"
+        },
+        "retention": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Data retention in days"
+        }
+      },
+      "additionalProperties": false
+    },
+    "contentAnalytics": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "perTitle": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["views", "unique_viewers", "avg_watch_time", "completion_rate", "peak_concurrent", "total_watch_hours", "engagement_score"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "engagementTracking": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "seekHeatmap": {
+              "type": "boolean",
+              "description": "Track where users seek within content"
+            },
+            "replayTracking": {
+              "type": "boolean"
+            },
+            "dropOffPoints": {
+              "type": "boolean",
+              "description": "Identify where users exit"
+            }
+          },
+          "additionalProperties": false
+        },
+        "audienceRetention": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "granularity": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Retention curve granularity in seconds"
+            },
+            "segments": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["new_users", "returning_users", "subscribers", "free_tier", "region", "device"]
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "cdnMetrics": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "CDN providers to monitor"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["cache_hit_ratio", "bandwidth", "requests", "latency_p50", "latency_p95", "latency_p99", "error_rate", "throughput"]
+          }
+        },
+        "originMetrics": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "shieldHitRatio": {
+              "type": "boolean"
+            },
+            "originLatency": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "dashboards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "dashboardId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["realtime", "qoe_overview", "content_performance", "error_analysis", "cdn_health", "regional_performance", "engagement"]
+          },
+          "widgets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "widgetId": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["counter", "gauge", "line_chart", "bar_chart", "pie_chart", "heatmap", "table", "map", "timeline"]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "metrics": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "timeRange": {
+                  "type": "string"
+                },
+                "refreshInterval": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": ["widgetId", "type", "title"],
+              "additionalProperties": false
+            }
+          },
+          "refreshInterval": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Dashboard refresh interval in seconds"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": ["public", "team", "private"]
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["dashboardId", "name", "type", "enabled"],
+        "additionalProperties": false
+      }
+    },
+    "alerting": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "metric": {
+                "type": "string"
+              },
+              "condition": {
+                "type": "object",
+                "properties": {
+                  "operator": {
+                    "type": "string",
+                    "enum": ["gt", "lt", "gte", "lte", "eq", "ne"]
+                  },
+                  "threshold": {
+                    "type": "number"
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Duration in seconds"
+                  }
+                },
+                "required": ["operator", "threshold"],
+                "additionalProperties": false
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low", "info"]
+              },
+              "channels": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["slack", "pagerduty", "email", "webhook", "sms", "mobile_push"]
+                }
+              },
+              "runbook": {
+                "type": "string",
+                "format": "uri"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["ruleId", "name", "metric", "condition", "severity", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "suppressionRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": {
+                "type": "string"
+              },
+              "alertRules": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "schedule": {
+                "type": "string",
+                "description": "Cron expression for suppression"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": ["ruleId"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "reporting": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "schedules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "reportId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["daily_summary", "weekly_qoe", "monthly_performance", "content_report", "error_report", "custom"]
+              },
+              "schedule": {
+                "type": "string",
+                "description": "Cron expression"
+              },
+              "recipients": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "format": {
+                "type": "string",
+                "enum": ["pdf", "csv", "excel", "json"]
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["reportId", "name", "type", "schedule", "enabled"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "currentMetrics": {
+      "type": "object",
+      "properties": {
+        "concurrentViewers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "peakConcurrent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalPlays": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "avgStartupTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average startup time in seconds"
+        },
+        "rebufferRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "errorRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "avgBitrate": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average bitrate in kbps"
+        },
+        "cdnHitRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "engagementScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "qoeScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Overall QoE score"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "paused", "error", "maintenance"],
+      "description": "Current observability status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "observabilityId",
+    "version",
+    "name",
+    "scope",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

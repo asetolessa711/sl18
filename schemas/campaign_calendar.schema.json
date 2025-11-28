@@ -1,0 +1,710 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CampaignCalendar",
+  "description": "Schema for global social media campaign calendar in SL18 + Waliin Studio - campaign planning, scheduling, content pipeline, and milestone tracking for CEO launch preparation",
+  "type": "object",
+  "properties": {
+    "calendarId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^calendar-[a-z0-9-]+$",
+      "description": "Unique campaign calendar identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "connectorRef": {
+      "type": "string",
+      "pattern": "^social-[a-z0-9-]+$",
+      "description": "Reference to social connectors configuration"
+    },
+    "calendarSettings": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "Waliin Studio Global Campaign Calendar"
+        },
+        "timezone": {
+          "type": "string",
+          "default": "Africa/Addis_Ababa",
+          "description": "Primary timezone for calendar"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Calendar start date"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Calendar end date (optional)"
+        },
+        "fiscalYearStart": {
+          "type": "string",
+          "pattern": "^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",
+          "default": "01-01",
+          "description": "Fiscal year start (MM-DD)"
+        },
+        "viewModes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["day", "week", "month", "quarter", "year", "timeline"]
+          },
+          "default": ["week", "month", "quarter"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "launchPhases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phaseId": { "type": "string" },
+          "phaseName": {
+            "type": "string",
+            "enum": ["pre_launch", "soft_launch", "launch", "growth", "scaling", "mature"]
+          },
+          "startDate": { "type": "string", "format": "date" },
+          "endDate": { "type": "string", "format": "date" },
+          "objectives": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "keyMilestones": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "milestone": { "type": "string" },
+                "targetDate": { "type": "string", "format": "date" },
+                "status": {
+                  "type": "string",
+                  "enum": ["not_started", "in_progress", "completed", "delayed", "at_risk"]
+                },
+                "owner": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "targetKPIs": {
+            "type": "object",
+            "properties": {
+              "followers": { "type": "integer" },
+              "reach": { "type": "integer" },
+              "engagement": { "type": "number" },
+              "subscribers": { "type": "integer" },
+              "revenue": { "type": "number" }
+            },
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "string",
+            "enum": ["planning", "active", "completed"],
+            "default": "planning"
+          }
+        },
+        "required": ["phaseId", "phaseName", "startDate"],
+        "additionalProperties": false
+      },
+      "description": "Launch phases for CEO preparation"
+    },
+    "campaigns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "campaignId": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": [
+              "launch", "premiere", "awareness", "engagement", "conversion",
+              "seasonal", "promotional", "partnership", "community", "milestone"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "scheduled", "active", "paused", "completed", "cancelled"],
+            "default": "draft"
+          },
+          "startDate": { "type": "string", "format": "date-time" },
+          "endDate": { "type": "string", "format": "date-time" },
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["youtube", "facebook", "instagram", "tiktok", "waliin_native", "twitter", "all"]
+            }
+          },
+          "objectives": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "metric": {
+                  "type": "string",
+                  "enum": ["reach", "engagement", "followers", "views", "conversions", "revenue", "subscribers"]
+                },
+                "target": { "type": "number" },
+                "current": { "type": "number" },
+                "progress": { "type": "number" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "budget": {
+            "type": "object",
+            "properties": {
+              "total": { "type": "number" },
+              "currency": { "type": "string", "default": "USD" },
+              "allocated": {
+                "type": "object",
+                "properties": {
+                  "content_production": { "type": "number" },
+                  "paid_promotion": { "type": "number" },
+                  "influencer": { "type": "number" },
+                  "tools": { "type": "number" }
+                },
+                "additionalProperties": false
+              },
+              "spent": { "type": "number" }
+            },
+            "additionalProperties": false
+          },
+          "contentPlan": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "contentId": { "type": "string" },
+                "title": { "type": "string" },
+                "contentType": {
+                  "type": "string",
+                  "enum": ["short", "teaser", "trailer", "highlight", "behind_scenes", "poll", "announcement", "live", "story", "carousel"]
+                },
+                "platforms": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "scheduledDate": { "type": "string", "format": "date-time" },
+                "status": {
+                  "type": "string",
+                  "enum": ["idea", "in_production", "ready", "scheduled", "published", "cancelled"]
+                },
+                "assignee": { "type": "string" },
+                "assets": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "assetType": { "type": "string" },
+                      "url": { "type": "string", "format": "uri" },
+                      "status": { "type": "string" }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "copy": {
+                  "type": "object",
+                  "properties": {
+                    "caption": { "type": "string" },
+                    "hashtags": { "type": "array", "items": { "type": "string" } },
+                    "callToAction": { "type": "string" },
+                    "links": { "type": "array", "items": { "type": "string", "format": "uri" } }
+                  },
+                  "additionalProperties": false
+                },
+                "approvalStatus": {
+                  "type": "string",
+                  "enum": ["pending", "approved", "revision_requested", "rejected"],
+                  "default": "pending"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "team": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "enum": ["campaign_lead", "content_creator", "social_manager", "designer", "video_editor", "copywriter", "analyst"]
+                },
+                "userId": { "type": "string" },
+                "name": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["campaignId", "name", "type", "startDate", "platforms"],
+        "additionalProperties": false
+      }
+    },
+    "contentCadence": {
+      "type": "object",
+      "properties": {
+        "weeklyTargets": {
+          "type": "object",
+          "properties": {
+            "youtube": {
+              "type": "object",
+              "properties": {
+                "shorts": { "type": "integer", "default": 5 },
+                "longForm": { "type": "integer", "default": 2 },
+                "live": { "type": "integer", "default": 0 },
+                "communityPosts": { "type": "integer", "default": 3 }
+              },
+              "additionalProperties": false
+            },
+            "facebook": {
+              "type": "object",
+              "properties": {
+                "reels": { "type": "integer", "default": 3 },
+                "posts": { "type": "integer", "default": 5 },
+                "stories": { "type": "integer", "default": 7 },
+                "live": { "type": "integer", "default": 1 }
+              },
+              "additionalProperties": false
+            },
+            "instagram": {
+              "type": "object",
+              "properties": {
+                "reels": { "type": "integer", "default": 5 },
+                "posts": { "type": "integer", "default": 3 },
+                "stories": { "type": "integer", "default": 14 },
+                "carousels": { "type": "integer", "default": 2 }
+              },
+              "additionalProperties": false
+            },
+            "tiktok": {
+              "type": "object",
+              "properties": {
+                "videos": { "type": "integer", "default": 7 },
+                "live": { "type": "integer", "default": 1 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "optimalPostingTimes": {
+          "type": "object",
+          "properties": {
+            "youtube": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": { "type": "string" },
+                  "times": { "type": "array", "items": { "type": "string" } }
+                },
+                "additionalProperties": false
+              }
+            },
+            "facebook": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": { "type": "string" },
+                  "times": { "type": "array", "items": { "type": "string" } }
+                },
+                "additionalProperties": false
+              }
+            },
+            "instagram": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": { "type": "string" },
+                  "times": { "type": "array", "items": { "type": "string" } }
+                },
+                "additionalProperties": false
+              }
+            },
+            "tiktok": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": { "type": "string" },
+                  "times": { "type": "array", "items": { "type": "string" } }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "contentMix": {
+          "type": "object",
+          "properties": {
+            "entertainment": { "type": "number", "default": 40 },
+            "educational": { "type": "number", "default": 20 },
+            "promotional": { "type": "number", "default": 20 },
+            "community": { "type": "number", "default": 10 },
+            "behindScenes": { "type": "number", "default": 10 }
+          },
+          "additionalProperties": false,
+          "description": "Percentage breakdown of content types"
+        }
+      },
+      "additionalProperties": false
+    },
+    "milestones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "milestoneId": { "type": "string" },
+          "name": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": [
+              "follower_milestone", "subscriber_milestone", "view_milestone",
+              "revenue_milestone", "content_milestone", "launch_milestone",
+              "partnership_milestone", "award_milestone"
+            ]
+          },
+          "platform": {
+            "type": "string",
+            "enum": ["youtube", "facebook", "instagram", "tiktok", "waliin_native", "all"]
+          },
+          "targetValue": { "type": "number" },
+          "currentValue": { "type": "number" },
+          "targetDate": { "type": "string", "format": "date" },
+          "achievedDate": { "type": "string", "format": "date" },
+          "status": {
+            "type": "string",
+            "enum": ["not_started", "in_progress", "achieved", "missed", "exceeded"],
+            "default": "not_started"
+          },
+          "celebrationPlan": {
+            "type": "object",
+            "properties": {
+              "enabled": { "type": "boolean", "default": true },
+              "celebrationContent": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "platform": { "type": "string" },
+                    "contentType": { "type": "string" },
+                    "message": { "type": "string" }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "communityEngagement": { "type": "boolean", "default": true },
+              "pressRelease": { "type": "boolean", "default": false }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["milestoneId", "name", "type", "targetValue"],
+        "additionalProperties": false
+      }
+    },
+    "premiereCalendar": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "premiereId": { "type": "string" },
+          "contentTitle": { "type": "string" },
+          "contentType": {
+            "type": "string",
+            "enum": ["movie", "series", "episode", "short_drama", "documentary", "special"]
+          },
+          "premiereDate": { "type": "string", "format": "date-time" },
+          "platform": {
+            "type": "string",
+            "enum": ["waliin_native", "youtube", "both"]
+          },
+          "promotionPlan": {
+            "type": "object",
+            "properties": {
+              "teaserReleaseDate": { "type": "string", "format": "date" },
+              "trailerReleaseDate": { "type": "string", "format": "date" },
+              "countdownStart": { "type": "string", "format": "date" },
+              "socialBlitz": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "platform": { "type": "string" },
+                    "contentTypes": { "type": "array", "items": { "type": "string" } },
+                    "frequency": { "type": "string" },
+                    "startDate": { "type": "string", "format": "date" },
+                    "endDate": { "type": "string", "format": "date" }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "influencerCollabs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "influencerId": { "type": "string" },
+                    "platform": { "type": "string" },
+                    "contentType": { "type": "string" },
+                    "deliveryDate": { "type": "string", "format": "date" }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "liveEvents": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "eventType": {
+                      "type": "string",
+                      "enum": ["premiere_watch_party", "qa_session", "behind_scenes_live", "cast_interview"]
+                    },
+                    "platform": { "type": "string" },
+                    "date": { "type": "string", "format": "date-time" }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "string",
+            "enum": ["announced", "teaser_released", "trailer_released", "countdown", "premiered", "post_premiere"],
+            "default": "announced"
+          }
+        },
+        "required": ["premiereId", "contentTitle", "contentType", "premiereDate"],
+        "additionalProperties": false
+      }
+    },
+    "specialEvents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "eventId": { "type": "string" },
+          "name": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": [
+              "holiday", "cultural_event", "industry_event", "company_anniversary",
+              "partnership_launch", "award_show", "community_event", "live_event"
+            ]
+          },
+          "date": { "type": "string", "format": "date" },
+          "endDate": { "type": "string", "format": "date" },
+          "regions": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Applicable regions"
+          },
+          "contentPlan": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "platform": { "type": "string" },
+                "contentType": { "type": "string" },
+                "scheduledDate": { "type": "string", "format": "date-time" },
+                "theme": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "default": "medium"
+          }
+        },
+        "required": ["eventId", "name", "type", "date"],
+        "additionalProperties": false
+      }
+    },
+    "approvalWorkflow": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stageName": {
+                "type": "string",
+                "enum": ["content_review", "copy_review", "legal_review", "cultural_review", "final_approval"]
+              },
+              "required": { "type": "boolean" },
+              "approverRoles": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "slaHours": { "type": "integer" }
+            },
+            "additionalProperties": false
+          },
+          "default": [
+            { "stageName": "content_review", "required": true, "approverRoles": ["content_manager"], "slaHours": 24 },
+            { "stageName": "cultural_review", "required": true, "approverRoles": ["cultural_reviewer"], "slaHours": 24 },
+            { "stageName": "final_approval", "required": true, "approverRoles": ["social_media_manager", "ceo"], "slaHours": 12 }
+          ]
+        },
+        "escalationEnabled": { "type": "boolean", "default": true },
+        "escalationAfterHours": { "type": "integer", "default": 48 }
+      },
+      "additionalProperties": false
+    },
+    "teamAssignments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ceo", "marketing_lead", "social_media_manager", "content_manager",
+              "content_creator", "video_editor", "designer", "copywriter",
+              "community_manager", "analyst", "cultural_reviewer"
+            ]
+          },
+          "platforms": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["view", "create", "edit", "publish", "approve", "delete", "analytics", "admin"]
+            }
+          }
+        },
+        "required": ["userId", "name", "role"],
+        "additionalProperties": false
+      }
+    },
+    "notifications": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["email", "slack", "push", "sms", "operator_console"]
+          },
+          "default": ["email", "slack", "operator_console"]
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "string",
+                "enum": [
+                  "content_scheduled", "content_published", "approval_needed", "approval_complete",
+                  "milestone_approaching", "milestone_achieved", "campaign_starting", "campaign_ending",
+                  "premiere_reminder", "deadline_approaching", "deadline_missed"
+                ]
+              },
+              "enabled": { "type": "boolean" },
+              "recipients": { "type": "array", "items": { "type": "string" } },
+              "advanceNoticeDays": { "type": "integer" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "integrations": {
+      "type": "object",
+      "properties": {
+        "airtable": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "baseId": { "type": "string" },
+            "contentCalendarTable": { "type": "string" },
+            "campaignsTable": { "type": "string" },
+            "milestonesTable": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "googleCalendar": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "calendarId": { "type": "string" },
+            "syncEnabled": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "slack": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "channelId": { "type": "string" },
+            "botToken": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" }
+          },
+          "additionalProperties": false
+        },
+        "notion": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "databaseId": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "setup_pending"],
+      "description": "Calendar status"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "calendarId",
+    "version",
+    "calendarSettings",
+    "status"
+  ],
+  "additionalProperties": false
+}

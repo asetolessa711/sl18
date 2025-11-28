@@ -1,0 +1,499 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WaliinContentDetail",
+  "description": "Schema for Waliin Studio movie/episode detail pages in SL18 - synopsis, cast, engagement metrics, and monetization hooks",
+  "type": "object",
+  "properties": {
+    "contentDetailId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^detail-[a-z0-9-]+$",
+      "description": "Unique content detail configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "contentType": {
+      "type": "string",
+      "enum": ["movie", "series", "episode", "short_drama", "mini_series", "special", "documentary"],
+      "description": "Type of content"
+    },
+    "contentInfo": {
+      "type": "object",
+      "properties": {
+        "contentId": {
+          "type": "string",
+          "description": "Unique content identifier"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "description": "Content title"
+        },
+        "titleLocalized": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Localized titles by language code"
+        },
+        "originalTitle": {
+          "type": "string",
+          "description": "Original language title"
+        },
+        "synopsis": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 5000,
+          "description": "Content synopsis/description"
+        },
+        "synopsisLocalized": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Localized synopsis by language code"
+        },
+        "shortSynopsis": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "Short synopsis for previews"
+        },
+        "tagline": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Marketing tagline"
+        },
+        "genres": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["drama", "comedy", "thriller", "romance", "action", "horror", "documentary", "musical", "family", "sci_fi", "fantasy", "historical", "slice_of_life", "mystery", "crime"]
+          },
+          "description": "Content genres"
+        },
+        "rating": {
+          "type": "object",
+          "properties": {
+            "contentRating": {
+              "type": "string",
+              "enum": ["G", "PG", "PG-13", "R", "NC-17", "TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA"],
+              "description": "Content rating"
+            },
+            "advisories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["violence", "language", "sexual_content", "drug_use", "smoking", "horror_themes", "flashing_lights"]
+              }
+            }
+          }
+        },
+        "releaseInfo": {
+          "type": "object",
+          "properties": {
+            "releaseDate": { "type": "string", "format": "date" },
+            "premiereDate": { "type": "string", "format": "date-time" },
+            "year": { "type": "integer" },
+            "country": { "type": "string" },
+            "region": { "type": "string" },
+            "productionCompany": { "type": "string" },
+            "distributor": { "type": "string" }
+          }
+        },
+        "runtime": {
+          "type": "object",
+          "properties": {
+            "duration": { "type": "integer", "description": "Duration in seconds" },
+            "formatted": { "type": "string", "description": "Formatted duration (e.g., 1h 30m)" }
+          }
+        },
+        "seriesInfo": {
+          "type": "object",
+          "properties": {
+            "seriesId": { "type": "string" },
+            "seriesTitle": { "type": "string" },
+            "seasonNumber": { "type": "integer" },
+            "episodeNumber": { "type": "integer" },
+            "totalSeasons": { "type": "integer" },
+            "totalEpisodes": { "type": "integer" },
+            "episodesInSeason": { "type": "integer" }
+          },
+          "description": "Series information for episodes"
+        }
+      },
+      "required": ["contentId", "title", "synopsis", "genres"]
+    },
+    "castAndCrew": {
+      "type": "object",
+      "properties": {
+        "cast": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "personId": { "type": "string" },
+              "name": { "type": "string" },
+              "role": { "type": "string" },
+              "character": { "type": "string" },
+              "profileImage": { "type": "string", "format": "uri" },
+              "featured": { "type": "boolean" },
+              "sortOrder": { "type": "integer" }
+            },
+            "required": ["personId", "name"]
+          },
+          "description": "Cast members"
+        },
+        "crew": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "personId": { "type": "string" },
+              "name": { "type": "string" },
+              "role": {
+                "type": "string",
+                "enum": ["director", "writer", "producer", "executive_producer", "cinematographer", "editor", "composer", "costume_designer", "production_designer", "sound_designer"]
+              },
+              "department": { "type": "string" },
+              "profileImage": { "type": "string", "format": "uri" }
+            },
+            "required": ["personId", "name", "role"]
+          },
+          "description": "Crew members"
+        },
+        "personas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "personaId": { "type": "string" },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "voiceArtist": { "type": "string" },
+              "profileImage": { "type": "string", "format": "uri" },
+              "characteristics": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "description": "SL18 Personas featured in content"
+        }
+      },
+      "description": "Cast and crew information"
+    },
+    "media": {
+      "type": "object",
+      "properties": {
+        "posterUrl": { "type": "string", "format": "uri" },
+        "posterVerticalUrl": { "type": "string", "format": "uri" },
+        "backdropUrl": { "type": "string", "format": "uri" },
+        "logoUrl": { "type": "string", "format": "uri" },
+        "trailerUrl": { "type": "string", "format": "uri" },
+        "teaserUrl": { "type": "string", "format": "uri" },
+        "thumbnails": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "string", "format": "uri" },
+              "timestamp": { "type": "integer" },
+              "type": { "type": "string", "enum": ["scene", "character", "action", "landscape"] }
+            }
+          }
+        },
+        "gallery": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "string", "format": "uri" },
+              "caption": { "type": "string" },
+              "type": { "type": "string", "enum": ["still", "behind_scenes", "poster", "promotional"] }
+            }
+          }
+        }
+      },
+      "description": "Media assets"
+    },
+    "localization": {
+      "type": "object",
+      "properties": {
+        "originalLanguage": {
+          "type": "string",
+          "description": "Original content language"
+        },
+        "subtitles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "language": { "type": "string" },
+              "languageName": { "type": "string" },
+              "type": { "type": "string", "enum": ["full", "forced", "sdh", "cc"] },
+              "available": { "type": "boolean" }
+            }
+          },
+          "description": "Available subtitle languages"
+        },
+        "dubbedAudio": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "language": { "type": "string" },
+              "languageName": { "type": "string" },
+              "type": { "type": "string", "enum": ["full_dub", "voice_over"] },
+              "available": { "type": "boolean" }
+            }
+          },
+          "description": "Available dubbed audio tracks"
+        },
+        "audioDescriptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "language": { "type": "string" },
+              "available": { "type": "boolean" }
+            }
+          },
+          "description": "Audio description tracks for accessibility"
+        }
+      },
+      "description": "Localization options"
+    },
+    "engagement": {
+      "type": "object",
+      "properties": {
+        "viewCount": { "type": "integer", "minimum": 0 },
+        "uniqueViewers": { "type": "integer", "minimum": 0 },
+        "likes": { "type": "integer", "minimum": 0 },
+        "dislikes": { "type": "integer", "minimum": 0 },
+        "shares": { "type": "integer", "minimum": 0 },
+        "comments": { "type": "integer", "minimum": 0 },
+        "averageRating": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "ratingCount": { "type": "integer", "minimum": 0 },
+        "completionRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of viewers who completed"
+        },
+        "retentionCurve": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": { "type": "integer" },
+              "retention": { "type": "number" }
+            }
+          },
+          "description": "Audience retention curve data points"
+        },
+        "peakMoments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": { "type": "integer" },
+              "type": { "type": "string", "enum": ["rewatch", "share", "screenshot", "pause"] },
+              "count": { "type": "integer" }
+            }
+          },
+          "description": "Peak engagement moments"
+        },
+        "trending": {
+          "type": "object",
+          "properties": {
+            "isTrending": { "type": "boolean" },
+            "rank": { "type": "integer" },
+            "category": { "type": "string" },
+            "region": { "type": "string" }
+          }
+        }
+      },
+      "description": "Engagement metrics"
+    },
+    "monetization": {
+      "type": "object",
+      "properties": {
+        "accessModel": {
+          "type": "string",
+          "enum": ["free", "ad_supported", "subscription", "tvod", "est", "premium", "exclusive"],
+          "description": "Content access model"
+        },
+        "requiredTier": {
+          "type": "string",
+          "enum": ["free", "basic", "standard", "premium", "vip"],
+          "description": "Minimum subscription tier required"
+        },
+        "transactionalPrice": {
+          "type": "object",
+          "properties": {
+            "rentPrice": { "type": "number" },
+            "buyPrice": { "type": "number" },
+            "currency": { "type": "string" },
+            "rentalPeriod": { "type": "integer", "description": "Rental period in hours" }
+          },
+          "description": "Transactional pricing"
+        },
+        "promotions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "promotionId": { "type": "string" },
+              "type": { "type": "string", "enum": ["free_trial", "discount", "bundle", "early_access"] },
+              "discount": { "type": "number" },
+              "validUntil": { "type": "string", "format": "date-time" }
+            }
+          },
+          "description": "Active promotions"
+        },
+        "geoRestrictions": {
+          "type": "object",
+          "properties": {
+            "allowedCountries": { "type": "array", "items": { "type": "string" } },
+            "blockedCountries": { "type": "array", "items": { "type": "string" } },
+            "licensingWindows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "region": { "type": "string" },
+                  "startDate": { "type": "string", "format": "date" },
+                  "endDate": { "type": "string", "format": "date" }
+                }
+              }
+            }
+          },
+          "description": "Geographic restrictions"
+        }
+      },
+      "description": "Monetization configuration"
+    },
+    "recommendations": {
+      "type": "object",
+      "properties": {
+        "similarContent": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Similar content IDs"
+        },
+        "becauseYouWatched": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentId": { "type": "string" },
+              "reason": { "type": "string" }
+            }
+          },
+          "description": "Personalized recommendations"
+        },
+        "fromSameCreator": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Other content from same creator"
+        },
+        "nextInSeries": { "type": "string" },
+        "relatedPersonas": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Related persona content"
+        }
+      },
+      "description": "Content recommendations"
+    },
+    "playerConfig": {
+      "type": "object",
+      "properties": {
+        "autoplay": { "type": "boolean" },
+        "autoplayNext": { "type": "boolean" },
+        "skipIntro": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "startTime": { "type": "integer" },
+            "endTime": { "type": "integer" }
+          }
+        },
+        "skipCredits": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "startTime": { "type": "integer" }
+          }
+        },
+        "defaultSubtitle": { "type": "string" },
+        "defaultAudio": { "type": "string" },
+        "qualityDefault": { "type": "string", "enum": ["auto", "4k", "1080p", "720p", "480p"] },
+        "previewThumbnails": { "type": "boolean" },
+        "chapters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "startTime": { "type": "integer" },
+              "thumbnail": { "type": "string", "format": "uri" }
+            }
+          }
+        }
+      },
+      "description": "Video player configuration"
+    },
+    "socialFeatures": {
+      "type": "object",
+      "properties": {
+        "commentsEnabled": { "type": "boolean" },
+        "ratingsEnabled": { "type": "boolean" },
+        "sharingEnabled": { "type": "boolean" },
+        "watchPartyEnabled": { "type": "boolean" },
+        "socialSharing": {
+          "type": "object",
+          "properties": {
+            "twitter": { "type": "boolean" },
+            "facebook": { "type": "boolean" },
+            "whatsapp": { "type": "boolean" },
+            "telegram": { "type": "boolean" },
+            "copyLink": { "type": "boolean" }
+          }
+        },
+        "reviews": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "requireVerifiedWatch": { "type": "boolean" },
+            "moderationEnabled": { "type": "boolean" }
+          }
+        }
+      },
+      "description": "Social features configuration"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "scheduled", "published", "hidden", "archived"]
+        },
+        "qcStatus": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected", "requires_changes"]
+        }
+      },
+      "description": "Content metadata"
+    }
+  },
+  "required": ["contentDetailId", "version", "contentType", "contentInfo", "media", "monetization"]
+}

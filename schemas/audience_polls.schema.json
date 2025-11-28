@@ -1,0 +1,426 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AudiencePolls",
+  "description": "Schema for interactive audience polls and feedback in SL18 - episode-level polls, sentiment sliders, real-time voting",
+  "type": "object",
+  "properties": {
+    "pollId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique poll identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "contentId": {
+      "type": "string",
+      "description": "Content identifier (episode, movie) the poll is associated with"
+    },
+    "seriesId": {
+      "type": "string",
+      "description": "Series identifier for series-level polls"
+    },
+    "pollType": {
+      "type": "string",
+      "enum": ["story_choice", "character_vote", "sentiment_slider", "prediction", "rating", "feedback", "trivia", "opinion"],
+      "description": "Type of poll"
+    },
+    "pollConfig": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "description": "Poll question text"
+        },
+        "questionLocalized": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Localized versions of the question (language code -> text)"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "optionId": { "type": "string" },
+              "text": { "type": "string" },
+              "textLocalized": {
+                "type": "object",
+                "additionalProperties": { "type": "string" }
+              },
+              "imageUrl": { "type": "string", "format": "uri" },
+              "personaId": { "type": "string", "description": "Associated persona for character votes" },
+              "metadata": { "type": "object", "additionalProperties": true }
+            },
+            "required": ["optionId", "text"],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 10
+        },
+        "sliderConfig": {
+          "type": "object",
+          "properties": {
+            "minValue": { "type": "number", "default": 0 },
+            "maxValue": { "type": "number", "default": 100 },
+            "step": { "type": "number", "default": 1 },
+            "leftLabel": { "type": "string" },
+            "rightLabel": { "type": "string" },
+            "leftLabelLocalized": { "type": "object", "additionalProperties": { "type": "string" } },
+            "rightLabelLocalized": { "type": "object", "additionalProperties": { "type": "string" } }
+          },
+          "additionalProperties": false,
+          "description": "Configuration for sentiment slider polls"
+        },
+        "ratingConfig": {
+          "type": "object",
+          "properties": {
+            "scale": { "type": "integer", "enum": [5, 10], "default": 5 },
+            "allowHalf": { "type": "boolean", "default": false },
+            "ratingLabels": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false,
+          "description": "Configuration for rating polls"
+        },
+        "allowMultipleChoices": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow selecting multiple options"
+        },
+        "maxChoices": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Maximum choices when allowMultipleChoices is true"
+        },
+        "showResultsBeforeVoting": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show current results before user votes"
+        },
+        "showResultsAfterVoting": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show results after user votes"
+        },
+        "anonymousVoting": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether voting is anonymous"
+        }
+      },
+      "required": ["question"],
+      "additionalProperties": false
+    },
+    "displaySettings": {
+      "type": "object",
+      "properties": {
+        "triggerPoint": {
+          "type": "string",
+          "enum": ["episode_start", "in_episode", "episode_end", "detail_page", "on_demand", "scheduled"],
+          "description": "When to display the poll"
+        },
+        "triggerTimestamp": {
+          "type": "number",
+          "minimum": 0,
+          "description": "For in_episode polls, timestamp in seconds"
+        },
+        "displayDuration": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 300,
+          "description": "How long to display the poll in seconds (0 = no timeout)"
+        },
+        "position": {
+          "type": "string",
+          "enum": ["overlay_top", "overlay_bottom", "overlay_center", "sidebar", "inline", "fullscreen"],
+          "description": "Position on screen"
+        },
+        "theme": {
+          "type": "string",
+          "enum": ["dark", "light", "branded", "transparent"],
+          "default": "dark"
+        },
+        "animation": {
+          "type": "string",
+          "enum": ["slide_in", "fade_in", "bounce", "none"],
+          "default": "fade_in"
+        },
+        "pausePlayback": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to pause playback when poll appears"
+        }
+      },
+      "additionalProperties": false
+    },
+    "scheduling": {
+      "type": "object",
+      "properties": {
+        "startDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the poll becomes active"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the poll closes"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "Timezone for scheduling"
+        },
+        "recurrence": {
+          "type": "string",
+          "enum": ["none", "per_episode", "weekly", "custom"],
+          "default": "none"
+        }
+      },
+      "additionalProperties": false
+    },
+    "targeting": {
+      "type": "object",
+      "properties": {
+        "regions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Target regions (empty = all)"
+        },
+        "languages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Target languages (empty = all)"
+        },
+        "subscriptionTiers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Target subscription tiers"
+        },
+        "viewerSegments": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Target viewer segments (e.g., 'new_viewers', 'binge_watchers')"
+        },
+        "minWatchProgress": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Minimum watch progress percentage to show poll"
+        }
+      },
+      "additionalProperties": false
+    },
+    "results": {
+      "type": "object",
+      "properties": {
+        "totalVotes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of votes"
+        },
+        "uniqueVoters": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of unique voters"
+        },
+        "optionResults": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "optionId": { "type": "string" },
+              "voteCount": { "type": "integer", "minimum": 0 },
+              "percentage": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["optionId", "voteCount", "percentage"],
+            "additionalProperties": false
+          }
+        },
+        "sliderResults": {
+          "type": "object",
+          "properties": {
+            "average": { "type": "number" },
+            "median": { "type": "number" },
+            "mode": { "type": "number" },
+            "distribution": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rangeStart": { "type": "number" },
+                  "rangeEnd": { "type": "number" },
+                  "count": { "type": "integer" },
+                  "percentage": { "type": "number" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "ratingResults": {
+          "type": "object",
+          "properties": {
+            "averageRating": { "type": "number" },
+            "ratingDistribution": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rating": { "type": "number" },
+                  "count": { "type": "integer" },
+                  "percentage": { "type": "number" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "demographicBreakdown": {
+          "type": "object",
+          "properties": {
+            "byRegion": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "region": { "type": "string" },
+                  "voteCount": { "type": "integer" },
+                  "topChoice": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            },
+            "byAgeGroup": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ageGroup": { "type": "string" },
+                  "voteCount": { "type": "integer" },
+                  "topChoice": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "insightsIntegration": {
+      "type": "object",
+      "properties": {
+        "feedToAudienceInsights": {
+          "type": "boolean",
+          "default": true,
+          "description": "Feed poll data to Phase 20 Audience Insights"
+        },
+        "sentimentTracking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Track sentiment from poll responses"
+        },
+        "influencePersonalization": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use poll responses to influence personalization"
+        },
+        "personalizationWeight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.2,
+          "description": "Weight of poll data in personalization"
+        }
+      },
+      "additionalProperties": false
+    },
+    "storyInfluence": {
+      "type": "object",
+      "properties": {
+        "influenceEnabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether poll results influence story outcomes"
+        },
+        "outcomeMapping": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "optionId": { "type": "string" },
+              "outcomeId": { "type": "string" },
+              "outcomeDescription": { "type": "string" }
+            },
+            "required": ["optionId", "outcomeId"],
+            "additionalProperties": false
+          }
+        },
+        "thresholdForOutcome": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 50,
+          "description": "Vote percentage threshold to trigger outcome"
+        }
+      },
+      "additionalProperties": false
+    },
+    "moderation": {
+      "type": "object",
+      "properties": {
+        "requireApproval": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require approval before publishing poll"
+        },
+        "approvedBy": { "type": "string" },
+        "approvedAt": { "type": "string", "format": "date-time" },
+        "flaggedForReview": { "type": "boolean", "default": false },
+        "reviewReason": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "scheduled", "active", "paused", "closed", "archived"],
+      "description": "Current poll status"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "User ID who created the poll"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "pollId",
+    "franchiseId",
+    "contentId",
+    "pollType",
+    "pollConfig",
+    "status"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,281 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sl18.io/schemas/ui_dashboard.schema.json",
+  "title": "UI Dashboard Schema",
+  "description": "Schema for the SL18 unified dashboard configuration with multi-franchise views",
+  "type": "object",
+  "properties": {
+    "dashboardId": {
+      "type": "string",
+      "description": "Unique identifier for the dashboard",
+      "pattern": "^dash-[a-z0-9-]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Dashboard display name"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "overview",
+        "observability",
+        "multilingual",
+        "distribution",
+        "marketplace",
+        "personalization",
+        "monetization",
+        "insights",
+        "governance",
+        "custom"
+      ],
+      "description": "Dashboard type/category"
+    },
+    "scope": {
+      "type": "object",
+      "description": "Dashboard scope filters",
+      "properties": {
+        "franchiseIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Franchises included in this dashboard"
+        },
+        "regions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "languages": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "channels": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "dateRange": {
+          "type": "object",
+          "properties": {
+            "preset": {
+              "type": "string",
+              "enum": ["today", "yesterday", "last_7_days", "last_30_days", "this_month", "last_month", "this_quarter", "this_year", "custom"]
+            },
+            "startDate": { "type": "string", "format": "date" },
+            "endDate": { "type": "string", "format": "date" }
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "description": "Dashboard sections",
+      "items": {
+        "$ref": "#/definitions/dashboardSection"
+      }
+    },
+    "kpis": {
+      "type": "array",
+      "description": "Key performance indicators",
+      "items": {
+        "$ref": "#/definitions/kpiCard"
+      }
+    },
+    "charts": {
+      "type": "array",
+      "description": "Chart configurations",
+      "items": {
+        "$ref": "#/definitions/chartConfig"
+      }
+    },
+    "tables": {
+      "type": "array",
+      "description": "Data table configurations",
+      "items": {
+        "$ref": "#/definitions/tableConfig"
+      }
+    },
+    "alerts": {
+      "type": "object",
+      "description": "Alert summary configuration",
+      "properties": {
+        "showSummary": { "type": "boolean", "default": true },
+        "maxItems": { "type": "integer", "default": 5 },
+        "severityFilter": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["info", "warning", "critical"] }
+        },
+        "autoRefresh": { "type": "boolean", "default": true }
+      }
+    },
+    "refreshConfig": {
+      "type": "object",
+      "properties": {
+        "autoRefresh": { "type": "boolean", "default": true },
+        "intervalSeconds": { "type": "integer", "minimum": 10, "default": 60 },
+        "lastRefreshed": { "type": "string", "format": "date-time" }
+      }
+    },
+    "isDefault": {
+      "type": "boolean",
+      "description": "Whether this is the default dashboard"
+    },
+    "isShared": {
+      "type": "boolean",
+      "description": "Whether this dashboard is shared with team"
+    },
+    "createdBy": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["dashboardId", "name", "type"],
+  "definitions": {
+    "dashboardSection": {
+      "type": "object",
+      "properties": {
+        "sectionId": { "type": "string" },
+        "title": { "type": "string" },
+        "collapsed": { "type": "boolean", "default": false },
+        "columns": { "type": "integer", "minimum": 1, "maximum": 4, "default": 2 },
+        "widgets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Widget IDs in this section"
+        }
+      },
+      "required": ["sectionId", "title"]
+    },
+    "kpiCard": {
+      "type": "object",
+      "properties": {
+        "kpiId": { "type": "string" },
+        "title": { "type": "string" },
+        "metric": {
+          "type": "string",
+          "enum": [
+            "total_revenue",
+            "active_franchises",
+            "active_series",
+            "total_episodes",
+            "active_contributors",
+            "active_partners",
+            "distribution_channels",
+            "qc_pass_rate",
+            "engagement_rate",
+            "audience_reach",
+            "conversion_rate",
+            "churn_rate",
+            "avg_watch_time",
+            "sentiment_score",
+            "translation_accuracy",
+            "persona_consistency"
+          ]
+        },
+        "value": {
+          "type": ["number", "string"]
+        },
+        "previousValue": {
+          "type": ["number", "string"]
+        },
+        "changePercent": {
+          "type": "number"
+        },
+        "trend": {
+          "type": "string",
+          "enum": ["up", "down", "stable"]
+        },
+        "format": {
+          "type": "string",
+          "enum": ["number", "currency", "percent", "duration", "count"]
+        },
+        "icon": { "type": "string" },
+        "color": { "type": "string" }
+      },
+      "required": ["kpiId", "title", "metric"]
+    },
+    "chartConfig": {
+      "type": "object",
+      "properties": {
+        "chartId": { "type": "string" },
+        "title": { "type": "string" },
+        "chartType": {
+          "type": "string",
+          "enum": ["line", "bar", "area", "pie", "donut", "heatmap", "scatter", "funnel", "radar"]
+        },
+        "dataSource": { "type": "string" },
+        "dimensions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "measures": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "groupBy": { "type": "string" },
+        "sortBy": { "type": "string" },
+        "sortOrder": { "type": "string", "enum": ["asc", "desc"] },
+        "limit": { "type": "integer" },
+        "colors": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "showLegend": { "type": "boolean", "default": true },
+        "showTooltip": { "type": "boolean", "default": true },
+        "stacked": { "type": "boolean", "default": false }
+      },
+      "required": ["chartId", "title", "chartType"]
+    },
+    "tableConfig": {
+      "type": "object",
+      "properties": {
+        "tableId": { "type": "string" },
+        "title": { "type": "string" },
+        "dataSource": { "type": "string" },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": { "type": "string" },
+              "header": { "type": "string" },
+              "sortable": { "type": "boolean" },
+              "filterable": { "type": "boolean" },
+              "width": { "type": "string" },
+              "format": { "type": "string" }
+            },
+            "required": ["field", "header"]
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "pageSize": { "type": "integer", "default": 10 },
+            "pageSizeOptions": {
+              "type": "array",
+              "items": { "type": "integer" }
+            }
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "actionId": { "type": "string" },
+              "label": { "type": "string" },
+              "icon": { "type": "string" },
+              "type": { "type": "string", "enum": ["view", "edit", "delete", "custom"] }
+            }
+          }
+        }
+      },
+      "required": ["tableId", "title"]
+    }
+  }
+}

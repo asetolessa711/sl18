@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LanguageSelectionPanel",
+  "description": "Schema for language selection panel configuration in SL18 workspace",
+  "type": "object",
+  "properties": {
+    "panelId": {
+      "type": "string",
+      "description": "Unique panel instance identifier"
+    },
+    "workspaceId": {
+      "type": "string",
+      "description": "Associated workspace identifier"
+    },
+    "selectedLanguages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "description": "Language code"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["primary", "secondary"],
+            "description": "Language role in workspace"
+          },
+          "enabledFor": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["scripts", "subtitles", "captions", "metadata"]
+            },
+            "description": "Content types enabled for this language"
+          },
+          "addedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When language was added to selection"
+          },
+          "addedBy": {
+            "type": "string",
+            "description": "User who added the language"
+          }
+        },
+        "required": ["code", "role"],
+        "additionalProperties": false
+      },
+      "description": "Currently selected languages"
+    },
+    "primaryLanguage": {
+      "type": "string",
+      "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+      "description": "Primary language for content creation"
+    },
+    "searchConfig": {
+      "type": "object",
+      "properties": {
+        "enableSearch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether search bar is enabled"
+        },
+        "searchFields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["code", "displayName", "nativeName", "region"]
+          },
+          "default": ["code", "displayName", "nativeName"],
+          "description": "Fields to search in"
+        },
+        "minSearchLength": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 2,
+          "description": "Minimum characters before search triggers"
+        }
+      },
+      "additionalProperties": false
+    },
+    "displayConfig": {
+      "type": "object",
+      "properties": {
+        "showNativeNames": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show language names in native script"
+        },
+        "showDirectionIndicator": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show RTL/LTR indicator"
+        },
+        "showRegion": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show geographic region"
+        },
+        "showStatus": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show availability status (beta, coming_soon)"
+        },
+        "groupByRegion": {
+          "type": "boolean",
+          "default": false,
+          "description": "Group languages by region"
+        },
+        "sortBy": {
+          "type": "string",
+          "enum": ["displayName", "nativeName", "code", "region"],
+          "default": "displayName",
+          "description": "Sort order for language list"
+        }
+      },
+      "additionalProperties": false
+    },
+    "dynamicSwitching": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow mid-workflow language switching"
+        },
+        "allowedOperations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["add_language", "remove_language", "change_primary", "toggle_content_type"]
+          },
+          "description": "Operations allowed during workflow"
+        },
+        "requireConfirmation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Require confirmation before switching"
+        },
+        "preserveProgress": {
+          "type": "boolean",
+          "default": true,
+          "description": "Preserve work in previous language when switching"
+        }
+      },
+      "additionalProperties": false
+    },
+    "qcDashboardIntegration": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Integrate with QC dashboard"
+        },
+        "showPerLanguageStatus": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show pass/fail status per language"
+        },
+        "sideBySideView": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable side-by-side multilingual quality tracking"
+        },
+        "autoNavigateToFailed": {
+          "type": "boolean",
+          "default": false,
+          "description": "Auto-navigate to failed language on QC failure"
+        }
+      },
+      "additionalProperties": false
+    },
+    "maxLanguages": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20,
+      "default": 10,
+      "description": "Maximum number of languages allowed"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When panel config was created"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When panel config was last updated"
+    }
+  },
+  "required": [
+    "panelId",
+    "workspaceId",
+    "selectedLanguages",
+    "primaryLanguage"
+  ],
+  "additionalProperties": false
+}

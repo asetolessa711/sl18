@@ -1,0 +1,795 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InfrastructureResilience",
+  "description": "Schema for infrastructure resilience in SL18 - redundancy, failover, scaling policies, and multi-region deployment",
+  "type": "object",
+  "properties": {
+    "resilienceId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^infra-[a-z0-9-]+$",
+      "description": "Unique infrastructure resilience configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable configuration name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "region", "zone", "cluster", "service"],
+          "description": "Resilience configuration scope"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Services covered by this configuration"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Regions where configuration applies"
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["production", "staging", "development", "testing", "disaster_recovery"]
+          },
+          "description": "Environments covered"
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "multiRegion": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Multi-region deployment enabled"
+        },
+        "topology": {
+          "type": "string",
+          "enum": ["active_active", "active_passive", "active_hot_standby", "multi_master"],
+          "description": "Multi-region topology"
+        },
+        "primaryRegion": {
+          "type": "string",
+          "description": "Primary region identifier"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "regionId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string",
+                "enum": ["aws", "azure", "gcp", "alibaba", "oracle", "on_premise", "hybrid"]
+              },
+              "zones": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "role": {
+                "type": "string",
+                "enum": ["primary", "secondary", "hot_standby", "cold_standby", "disaster_recovery"]
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100,
+                "description": "Failover priority (lower = higher priority)"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["active", "standby", "draining", "offline", "maintenance"]
+              },
+              "capacity": {
+                "type": "object",
+                "properties": {
+                  "maxInstances": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "currentInstances": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "targetUtilization": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "additionalProperties": false
+              },
+              "latency": {
+                "type": "object",
+                "properties": {
+                  "toPrimary": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Latency to primary region in ms"
+                  },
+                  "threshold": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Maximum acceptable latency in ms"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": ["regionId", "name", "provider", "role", "priority", "status"],
+            "additionalProperties": false
+          }
+        },
+        "dataReplication": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["synchronous", "asynchronous", "semi_synchronous", "eventual"],
+              "description": "Data replication mode"
+            },
+            "lagThreshold": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Maximum acceptable replication lag in seconds"
+            },
+            "conflictResolution": {
+              "type": "string",
+              "enum": ["last_write_wins", "first_write_wins", "merge", "manual", "custom"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "dnsRouting": {
+          "type": "object",
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "enum": ["latency_based", "geolocation", "weighted", "failover", "multivalue"]
+            },
+            "healthCheck": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "protocol": {
+                  "type": "string",
+                  "enum": ["http", "https", "tcp"]
+                },
+                "path": {
+                  "type": "string"
+                },
+                "interval": {
+                  "type": "integer",
+                  "minimum": 5
+                },
+                "threshold": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "failover": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["automatic", "manual", "semi_automatic"],
+          "description": "Failover trigger mode"
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "triggerId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "condition": {
+                "type": "string",
+                "enum": ["health_check_failure", "latency_threshold", "error_rate_threshold", "capacity_threshold", "region_outage", "zone_outage", "manual_trigger"]
+              },
+              "threshold": {
+                "type": "number"
+              },
+              "duration": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Duration in seconds before trigger activates"
+              },
+              "consecutiveFailures": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["triggerId", "name", "condition", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "failoverTime": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Target failover time in seconds"
+            },
+            "maximum": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Maximum acceptable failover time in seconds"
+            }
+          },
+          "additionalProperties": false
+        },
+        "failback": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "mode": {
+              "type": "string",
+              "enum": ["automatic", "manual"]
+            },
+            "delay": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Delay before failback in seconds"
+            },
+            "healthCheckDuration": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Duration to verify health before failback"
+            }
+          },
+          "additionalProperties": false
+        },
+        "circuitBreaker": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "errorThreshold": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Error percentage to trip circuit"
+            },
+            "openDuration": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Duration circuit stays open in seconds"
+            },
+            "halfOpenRequests": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Requests allowed in half-open state"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "loadBalancing": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["application", "network", "global", "regional"],
+          "description": "Load balancer type"
+        },
+        "algorithm": {
+          "type": "string",
+          "enum": ["round_robin", "least_connections", "ip_hash", "weighted", "random", "least_response_time"]
+        },
+        "healthCheck": {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "type": "string",
+              "enum": ["http", "https", "tcp", "grpc"]
+            },
+            "path": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "interval": {
+              "type": "integer",
+              "minimum": 5,
+              "description": "Health check interval in seconds"
+            },
+            "timeout": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Health check timeout in seconds"
+            },
+            "healthyThreshold": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "unhealthyThreshold": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "stickySession": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["cookie", "source_ip"]
+            },
+            "duration": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Session duration in seconds"
+            }
+          },
+          "additionalProperties": false
+        },
+        "connectionDraining": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "timeout": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Draining timeout in seconds"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "scaling": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "horizontal": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "minInstances": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "maxInstances": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "targetUtilization": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "scaleUpCooldown": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Cooldown after scale up in seconds"
+            },
+            "scaleDownCooldown": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Cooldown after scale down in seconds"
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": ["cpu", "memory", "requests_per_second", "latency", "queue_depth", "custom"]
+                  },
+                  "targetValue": {
+                    "type": "number"
+                  },
+                  "scaleUpThreshold": {
+                    "type": "number"
+                  },
+                  "scaleDownThreshold": {
+                    "type": "number"
+                  }
+                },
+                "required": ["name", "targetValue"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "vertical": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "minCpu": {
+              "type": "string",
+              "description": "Minimum CPU allocation"
+            },
+            "maxCpu": {
+              "type": "string",
+              "description": "Maximum CPU allocation"
+            },
+            "minMemory": {
+              "type": "string",
+              "description": "Minimum memory allocation"
+            },
+            "maxMemory": {
+              "type": "string",
+              "description": "Maximum memory allocation"
+            },
+            "updateMode": {
+              "type": "string",
+              "enum": ["auto", "recreate", "initial"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "predictive": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "algorithm": {
+              "type": "string",
+              "enum": ["time_series", "ml_forecast", "custom"]
+            },
+            "lookAhead": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Minutes to look ahead for scaling"
+            },
+            "scheduledEvents": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "eventId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "schedule": {
+                    "type": "string",
+                    "description": "Cron expression"
+                  },
+                  "targetInstances": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Duration in minutes"
+                  }
+                },
+                "required": ["eventId", "name", "schedule", "targetInstances"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "burstCapacity": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "maxBurstInstances": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Additional instances for burst traffic"
+            },
+            "burstThreshold": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Utilization threshold to trigger burst"
+            },
+            "burstDuration": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Maximum burst duration in seconds"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "edgeNodes": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "provider": {
+          "type": "string",
+          "enum": ["cloudflare", "fastly", "akamai", "cloudfront", "azure_cdn", "custom"]
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["active", "standby", "draining", "offline"]
+              },
+              "cacheHitRate": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": ["nodeId", "location", "status"],
+            "additionalProperties": false
+          }
+        },
+        "cacheTtl": {
+          "type": "object",
+          "properties": {
+            "static": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "TTL for static content in seconds"
+            },
+            "dynamic": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "TTL for dynamic content in seconds"
+            },
+            "api": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "TTL for API responses in seconds"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "serviceDiscovery": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "provider": {
+          "type": "string",
+          "enum": ["consul", "etcd", "kubernetes", "eureka", "custom"]
+        },
+        "healthCheck": {
+          "type": "object",
+          "properties": {
+            "interval": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "timeout": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "deregisterCriticalAfter": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Seconds before deregistering unhealthy service"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "sla": {
+      "type": "object",
+      "properties": {
+        "targetUptime": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Target uptime percentage"
+        },
+        "maxDowntime": {
+          "type": "object",
+          "properties": {
+            "monthly": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Maximum monthly downtime in minutes"
+            },
+            "yearly": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Maximum yearly downtime in minutes"
+            }
+          },
+          "additionalProperties": false
+        },
+        "latencyTargets": {
+          "type": "object",
+          "properties": {
+            "p50": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "50th percentile latency target in ms"
+            },
+            "p95": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "95th percentile latency target in ms"
+            },
+            "p99": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "99th percentile latency target in ms"
+            }
+          },
+          "additionalProperties": false
+        },
+        "errorBudget": {
+          "type": "object",
+          "properties": {
+            "monthly": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Monthly error budget percentage"
+            },
+            "consumed": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Error budget consumed this month"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "currentUptime": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "activeRegions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalInstances": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "healthyInstances": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failoversThisMonth": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "avgLatency": {
+          "type": "number",
+          "minimum": 0
+        },
+        "lastIncident": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "degraded", "failover_in_progress", "maintenance", "disabled"],
+      "description": "Current resilience status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "resilienceId",
+    "version",
+    "name",
+    "scope",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

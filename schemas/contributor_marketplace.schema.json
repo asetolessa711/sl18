@@ -1,0 +1,646 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ContributorMarketplace",
+  "description": "Schema for contributor marketplace in SL18 - listings, roles, revenue-share terms, and cross-promotion",
+  "type": "object",
+  "properties": {
+    "marketplaceId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^mkt-[a-z0-9-]+$",
+      "description": "Unique marketplace identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Marketplace name"
+    },
+    "region": {
+      "type": "string",
+      "description": "Primary region for marketplace"
+    },
+    "supportedLanguages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "Supported languages"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "description": "Category identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Category name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Category description"
+          },
+          "parentCategory": {
+            "type": "string",
+            "description": "Parent category ID (for subcategories)"
+          },
+          "contributorTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["creator", "reviewer", "translator", "voice_artist", "editor", "qa_specialist"]
+            },
+            "description": "Contributor types in this category"
+          }
+        },
+        "required": ["categoryId", "name"],
+        "additionalProperties": false
+      },
+      "description": "Marketplace categories"
+    },
+    "listings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "listingId": {
+            "type": "string",
+            "pattern": "^listing-[a-z0-9-]+$",
+            "description": "Unique listing identifier"
+          },
+          "contributorId": {
+            "type": "string",
+            "description": "Contributor who created listing"
+          },
+          "contributorType": {
+            "type": "string",
+            "enum": ["creator", "reviewer", "translator", "voice_artist", "editor", "qa_specialist"],
+            "description": "Type of contributor"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 200,
+            "description": "Listing title"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 50,
+            "maxLength": 2000,
+            "description": "Listing description"
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "Listing category"
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "maxItems": 20,
+            "description": "Listed skills"
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "Language code"
+                },
+                "proficiency": {
+                  "type": "string",
+                  "enum": ["native", "fluent", "advanced", "intermediate"],
+                  "description": "Proficiency level"
+                }
+              },
+              "required": ["code", "proficiency"],
+              "additionalProperties": false
+            },
+            "description": "Language proficiencies"
+          },
+          "portfolio": {
+            "type": "object",
+            "properties": {
+              "samples": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "sampleId": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["video", "audio", "text", "image", "link"]
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["sampleId", "type"],
+                  "additionalProperties": false
+                },
+                "description": "Portfolio samples"
+              },
+              "externalLinks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "platform": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "description": "External portfolio links"
+              }
+            },
+            "additionalProperties": false
+          },
+          "pricing": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string",
+                "enum": ["hourly", "per_project", "revenue_share", "hybrid"],
+                "description": "Pricing model"
+              },
+              "hourlyRate": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Hourly rate (if applicable)"
+              },
+              "projectMinimum": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Minimum project fee"
+              },
+              "revenueSharePercentage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Revenue share percentage requested"
+              },
+              "currency": {
+                "type": "string",
+                "description": "Pricing currency"
+              },
+              "negotiable": {
+                "type": "boolean",
+                "description": "Whether pricing is negotiable"
+              }
+            },
+            "required": ["model", "currency"],
+            "additionalProperties": false
+          },
+          "availability": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["available", "busy", "limited", "unavailable"],
+                "description": "Current availability"
+              },
+              "hoursPerWeek": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 168,
+                "description": "Available hours per week"
+              },
+              "responseTime": {
+                "type": "string",
+                "enum": ["within_hours", "within_day", "within_week"],
+                "description": "Typical response time"
+              },
+              "timezone": {
+                "type": "string",
+                "description": "Contributor timezone"
+              }
+            },
+            "required": ["status"],
+            "additionalProperties": false
+          },
+          "ratings": {
+            "type": "object",
+            "properties": {
+              "average": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 5,
+                "description": "Average rating"
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Number of ratings"
+              },
+              "breakdown": {
+                "type": "object",
+                "properties": {
+                  "quality": { "type": "number", "minimum": 0, "maximum": 5 },
+                  "communication": { "type": "number", "minimum": 0, "maximum": 5 },
+                  "timeliness": { "type": "number", "minimum": 0, "maximum": 5 },
+                  "professionalism": { "type": "number", "minimum": 0, "maximum": 5 }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "verifications": {
+            "type": "object",
+            "properties": {
+              "identity": {
+                "type": "boolean",
+                "description": "Identity verified"
+              },
+              "payment": {
+                "type": "boolean",
+                "description": "Payment method verified"
+              },
+              "skills": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Verified skills"
+              },
+              "qualifications": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "issuer": { "type": "string" },
+                    "verifiedAt": { "type": "string", "format": "date-time" }
+                  },
+                  "additionalProperties": false
+                },
+                "description": "Verified qualifications"
+              }
+            },
+            "additionalProperties": false
+          },
+          "qcRequirements": {
+            "type": "object",
+            "properties": {
+              "minimumScore": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Minimum QC score maintained"
+              },
+              "passedAssessment": {
+                "type": "boolean",
+                "description": "Passed platform assessment"
+              },
+              "assessmentScore": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Assessment score"
+              }
+            },
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending_review", "active", "featured", "suspended", "inactive"],
+            "description": "Listing status"
+          },
+          "featured": {
+            "type": "boolean",
+            "description": "Whether listing is featured"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "listingId",
+          "contributorId",
+          "contributorType",
+          "title",
+          "description",
+          "skills",
+          "pricing",
+          "status",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Marketplace listings"
+    },
+    "revenueModels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "modelId": {
+            "type": "string",
+            "description": "Revenue model identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Model name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Model description"
+          },
+          "splitType": {
+            "type": "string",
+            "enum": ["fixed", "tiered", "negotiated", "performance_based"],
+            "description": "Type of revenue split"
+          },
+          "defaultSplit": {
+            "type": "object",
+            "properties": {
+              "contributorPercentage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Default contributor percentage"
+              },
+              "platformPercentage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Default platform percentage"
+              },
+              "franchisePercentage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Default franchise percentage"
+              }
+            },
+            "additionalProperties": false
+          },
+          "tiers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "threshold": {
+                  "type": "number",
+                  "description": "Revenue threshold"
+                },
+                "contributorPercentage": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            "description": "Tiered splits"
+          },
+          "minimumPayout": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Minimum payout amount"
+          },
+          "payoutFrequency": {
+            "type": "string",
+            "enum": ["weekly", "biweekly", "monthly", "quarterly"],
+            "description": "Payout frequency"
+          }
+        },
+        "required": ["modelId", "name", "splitType", "defaultSplit"],
+        "additionalProperties": false
+      },
+      "description": "Available revenue models"
+    },
+    "onboarding": {
+      "type": "object",
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stepId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "order": {
+                "type": "integer"
+              },
+              "verification": {
+                "type": "string",
+                "enum": ["manual", "automatic", "none"]
+              }
+            },
+            "required": ["stepId", "name", "required", "order"],
+            "additionalProperties": false
+          },
+          "description": "Onboarding steps"
+        },
+        "requirements": {
+          "type": "object",
+          "properties": {
+            "identityVerification": {
+              "type": "boolean",
+              "description": "Identity verification required"
+            },
+            "paymentVerification": {
+              "type": "boolean",
+              "description": "Payment verification required"
+            },
+            "agreementSigned": {
+              "type": "boolean",
+              "description": "Agreement signature required"
+            },
+            "qcAssessment": {
+              "type": "boolean",
+              "description": "QC assessment required"
+            },
+            "minimumQcScore": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Minimum QC score for approval"
+            }
+          },
+          "additionalProperties": false
+        },
+        "approvalProcess": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["automatic", "manual", "hybrid"],
+              "description": "Approval process type"
+            },
+            "estimatedTime": {
+              "type": "string",
+              "description": "Estimated approval time"
+            },
+            "reviewers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Reviewer roles"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "crossPromotion": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Cross-promotion enabled"
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formatId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["clip", "teaser", "preview", "showcase"]
+              },
+              "maxDuration": {
+                "type": "integer",
+                "description": "Max duration in seconds"
+              },
+              "languages": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["formatId", "name", "type"],
+            "additionalProperties": false
+          },
+          "description": "Cross-promotion formats"
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["marketplace_homepage", "category_pages", "search_results", "email", "social_media", "partner_sites"]
+          },
+          "description": "Promotion channels"
+        },
+        "eligibility": {
+          "type": "object",
+          "properties": {
+            "minimumRating": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 5
+            },
+            "minimumCompletedProjects": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "verifiedOnly": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "totalListings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "activeListings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalContributors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalTransactions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalRevenue": {
+          "type": "number",
+          "minimum": 0
+        },
+        "averageRating": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "maintenance", "suspended", "beta"],
+      "description": "Marketplace status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "marketplaceId",
+    "name",
+    "categories",
+    "revenueModels",
+    "onboarding",
+    "status",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

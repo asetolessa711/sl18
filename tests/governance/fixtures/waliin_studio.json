@@ -1,0 +1,1206 @@
+{
+  "waliinShowcase": {
+    "showcaseId": "showcase-waliin-global",
+    "version": "1.0.0",
+    "name": "Waliin Studio Global Showcase",
+    "scope": {
+      "level": "global",
+      "regions": ["africa", "asia", "europe", "americas"],
+      "countries": ["ET", "KE", "TZ", "US", "UK", "AE"],
+      "languages": ["en", "am", "sw", "om", "ar", "it", "fr", "es", "zh"]
+    },
+    "heroBanner": {
+      "enabled": true,
+      "rotationMode": "automatic",
+      "autoRotateInterval": 8000,
+      "slots": [
+        {
+          "slotId": "hero-slot-1",
+          "priority": 1,
+          "contentType": "featured_release",
+          "contentId": "content-waliin-drama-001",
+          "displayMode": "trailer_autoplay",
+          "autoplayTrailer": true,
+          "muteAutoplay": true,
+          "callToAction": {
+            "primaryButton": {
+              "text": "Watch Now",
+              "action": "play",
+              "style": "primary"
+            },
+            "secondaryButton": {
+              "text": "More Info",
+              "action": "details",
+              "style": "secondary"
+            }
+          },
+          "enabled": true
+        },
+        {
+          "slotId": "hero-slot-2",
+          "priority": 2,
+          "contentType": "premiere",
+          "contentId": "content-waliin-movie-001",
+          "displayMode": "video_teaser",
+          "autoplayTrailer": true,
+          "muteAutoplay": true,
+          "schedule": {
+            "startDate": "2024-03-01T00:00:00Z",
+            "endDate": "2024-03-31T23:59:59Z",
+            "timezone": "UTC"
+          },
+          "enabled": true
+        },
+        {
+          "slotId": "hero-slot-3",
+          "priority": 3,
+          "contentType": "trending",
+          "contentId": "content-waliin-series-001",
+          "displayMode": "backdrop",
+          "enabled": true
+        }
+      ]
+    },
+    "categoryDisplays": [
+      {
+        "categoryId": "category-trending",
+        "name": "Trending Now",
+        "nameLocalized": {
+          "am": "አሁን ተወዳጅ",
+          "sw": "Inayoongoza Sasa",
+          "om": "Amma Trending"
+        },
+        "categoryType": "trending",
+        "rankingType": "trending_today",
+        "displayLayout": "horizontal_carousel",
+        "itemsPerRow": 6,
+        "maxItems": 20,
+        "cardStyle": "backdrop",
+        "showMetadata": {
+          "rating": true,
+          "year": true,
+          "genre": false,
+          "duration": false,
+          "newBadge": true,
+          "rankNumber": true
+        },
+        "sortOrder": 1,
+        "personalizationEnabled": true,
+        "refreshInterval": 3600,
+        "enabled": true
+      },
+      {
+        "categoryId": "category-top10",
+        "name": "Top 10 This Week",
+        "nameLocalized": {
+          "am": "የዚህ ሳምንት ቶፕ 10",
+          "sw": "Bora 10 Wiki Hii"
+        },
+        "categoryType": "ranking",
+        "rankingType": "top_10",
+        "displayLayout": "horizontal_carousel",
+        "itemsPerRow": 5,
+        "maxItems": 10,
+        "cardStyle": "numbered",
+        "showMetadata": {
+          "rating": true,
+          "rankNumber": true
+        },
+        "sortOrder": 2,
+        "enabled": true
+      },
+      {
+        "categoryId": "category-drama",
+        "name": "Drama",
+        "categoryType": "genre",
+        "genre": "drama",
+        "displayLayout": "horizontal_carousel",
+        "itemsPerRow": 6,
+        "maxItems": 30,
+        "cardStyle": "poster",
+        "showMetadata": {
+          "rating": true,
+          "year": true,
+          "duration": true
+        },
+        "sortOrder": 3,
+        "personalizationEnabled": true,
+        "enabled": true
+      },
+      {
+        "categoryId": "category-continue",
+        "name": "Continue Watching",
+        "nameLocalized": {
+          "am": "መመልከት ቀጥል",
+          "sw": "Endelea Kutazama"
+        },
+        "categoryType": "continue_watching",
+        "displayLayout": "horizontal_carousel",
+        "itemsPerRow": 6,
+        "maxItems": 15,
+        "cardStyle": "wide",
+        "showMetadata": {
+          "duration": true
+        },
+        "sortOrder": 4,
+        "personalizationEnabled": true,
+        "enabled": true
+      },
+      {
+        "categoryId": "category-new",
+        "name": "New Releases",
+        "categoryType": "new_releases",
+        "displayLayout": "horizontal_carousel",
+        "itemsPerRow": 6,
+        "maxItems": 20,
+        "cardStyle": "poster",
+        "showMetadata": {
+          "newBadge": true,
+          "year": true
+        },
+        "sortOrder": 5,
+        "enabled": true
+      },
+      {
+        "categoryId": "category-ethiopia",
+        "name": "Made in Ethiopia",
+        "nameLocalized": {
+          "am": "በኢትዮጵያ የተሰራ"
+        },
+        "categoryType": "country_based",
+        "country": "ET",
+        "displayLayout": "horizontal_carousel",
+        "itemsPerRow": 6,
+        "maxItems": 25,
+        "cardStyle": "poster",
+        "sortOrder": 6,
+        "enabled": true
+      }
+    ],
+    "navigation": {
+      "tabs": [
+        {
+          "tabId": "tab-home",
+          "name": "Home",
+          "nameLocalized": { "am": "መነሻ", "sw": "Nyumbani" },
+          "icon": "home",
+          "route": "/",
+          "tabType": "home",
+          "enabled": true,
+          "sortOrder": 1
+        },
+        {
+          "tabId": "tab-categories",
+          "name": "Categories",
+          "nameLocalized": { "am": "ምድቦች", "sw": "Kategoria" },
+          "icon": "grid",
+          "route": "/categories",
+          "tabType": "categories",
+          "enabled": true,
+          "sortOrder": 2
+        },
+        {
+          "tabId": "tab-popular",
+          "name": "Popular",
+          "nameLocalized": { "am": "ተወዳጅ", "sw": "Maarufu" },
+          "icon": "trending",
+          "route": "/popular",
+          "tabType": "popular",
+          "enabled": true,
+          "sortOrder": 3
+        },
+        {
+          "tabId": "tab-new",
+          "name": "New",
+          "icon": "sparkle",
+          "route": "/new",
+          "tabType": "new_releases",
+          "enabled": true,
+          "sortOrder": 4
+        },
+        {
+          "tabId": "tab-watchlist",
+          "name": "My List",
+          "nameLocalized": { "am": "የኔ ዝርዝር", "sw": "Orodha Yangu" },
+          "icon": "bookmark",
+          "route": "/watchlist",
+          "tabType": "watchlist",
+          "enabled": true,
+          "sortOrder": 5
+        }
+      ],
+      "searchBar": {
+        "enabled": true,
+        "placeholder": "Search movies, series, personas...",
+        "placeholderLocalized": {
+          "am": "ፊልሞች፣ ተከታታይ፣ ገፀ-ባህርያት ፈልግ...",
+          "sw": "Tafuta filamu, mfululizo, persona..."
+        },
+        "autocomplete": true,
+        "voiceSearch": true,
+        "recentSearches": true,
+        "trendingSearches": true,
+        "filters": ["genre", "year", "region", "country", "persona", "language", "rating"]
+      }
+    },
+    "responsiveLayouts": {
+      "mobile": {
+        "breakpoint": 767,
+        "columnsGrid": 2,
+        "carouselItemsVisible": 2,
+        "heroBannerHeight": "280px",
+        "cardSize": "small",
+        "touchGestures": true,
+        "bottomNavigation": true
+      },
+      "tablet": {
+        "breakpoint": 1024,
+        "columnsGrid": 4,
+        "carouselItemsVisible": 4,
+        "heroBannerHeight": "400px",
+        "cardSize": "medium"
+      },
+      "desktop": {
+        "breakpoint": 1920,
+        "columnsGrid": 6,
+        "carouselItemsVisible": 6,
+        "heroBannerHeight": "600px",
+        "cardSize": "large",
+        "sidebarNavigation": true
+      },
+      "largeDesktop": {
+        "breakpoint": 2560,
+        "columnsGrid": 8,
+        "carouselItemsVisible": 8,
+        "heroBannerHeight": "700px",
+        "cardSize": "xlarge"
+      }
+    },
+    "studioPromotion": {
+      "enabled": true,
+      "studioInfo": {
+        "name": "Waliin Studio",
+        "tagline": "Stories That Move the World",
+        "mission": "Bringing authentic African stories to global audiences through innovative storytelling.",
+        "creativeVision": "Blending traditional narratives with modern production to create compelling, culturally-rich content.",
+        "brandPositioning": "Premium African entertainment for global viewers.",
+        "logoUrl": "https://cdn.waliin.studio/assets/logo.png",
+        "bannerUrl": "https://cdn.waliin.studio/assets/studio-banner.jpg"
+      },
+      "upcomingReleases": {
+        "enabled": true,
+        "displayCount": 6,
+        "showCountdown": true,
+        "notificationSignup": true
+      },
+      "behindTheScenes": {
+        "enabled": true,
+        "contentTypes": ["production_diary", "interview", "making_of", "cast_spotlight", "director_notes"],
+        "maxItems": 10
+      },
+      "contributorShowcase": {
+        "enabled": true,
+        "showCreators": true,
+        "showActors": true,
+        "showDirectors": true,
+        "showPartners": true,
+        "maxFeatured": 8
+      }
+    },
+    "seo": {
+      "enabled": true,
+      "title": "Waliin Studio - Premium African Entertainment",
+      "description": "Stream the best African dramas, movies, and series. Authentic stories, world-class production.",
+      "keywords": ["African drama", "Ethiopian movies", "Waliin", "streaming", "short drama", "SL18"],
+      "ogImage": "https://cdn.waliin.studio/assets/og-image.jpg",
+      "structuredData": true,
+      "canonicalUrl": "https://waliin.studio"
+    },
+    "analytics": {
+      "enabled": true,
+      "trackPageViews": true,
+      "trackScrollDepth": true,
+      "trackCarouselInteractions": true,
+      "trackSearchQueries": true,
+      "trackContentClicks": true,
+      "heatmaps": true,
+      "sessionRecording": false
+    },
+    "performance": {
+      "lazyLoadImages": true,
+      "lazyLoadCarousels": true,
+      "prefetchNextPage": true,
+      "imageOptimization": {
+        "webp": true,
+        "avif": true,
+        "responsiveImages": true,
+        "blurPlaceholder": true
+      },
+      "caching": {
+        "categoryTtl": 300,
+        "heroBannerTtl": 600,
+        "searchResultsTtl": 60
+      }
+    },
+    "metadata": {
+      "createdAt": "2024-01-15T10:00:00Z",
+      "createdBy": "operator-admin-001",
+      "updatedAt": "2024-03-01T14:30:00Z",
+      "updatedBy": "operator-content-001",
+      "publishedAt": "2024-01-20T00:00:00Z",
+      "status": "published"
+    }
+  },
+  "waliinContentDetail": {
+    "contentDetailId": "detail-waliin-drama-001",
+    "version": "1.0.0",
+    "contentType": "short_drama",
+    "contentInfo": {
+      "contentId": "content-waliin-drama-001",
+      "title": "The Coffee Merchant",
+      "titleLocalized": {
+        "am": "የቡና ነጋዴ",
+        "sw": "Mfanyabiashara wa Kahawa",
+        "om": "Daldalaa Buna"
+      },
+      "originalTitle": "የቡና ነጋዴ",
+      "synopsis": "A gripping tale of ambition, tradition, and family set against the backdrop of Ethiopia's coffee trade. When young entrepreneur Selam inherits her grandfather's struggling coffee business, she must navigate ruthless competitors, family expectations, and her own dreams of modernizing the trade.",
+      "synopsisLocalized": {
+        "am": "ስለ ምኞት፣ ባህል እና ቤተሰብ የሚያስደስት ታሪክ በኢትዮጵያ የቡና ንግድ ዳራ ላይ። ወጣት ሥራ ፈጣሪ ሰላም የአያቷን ችግር ላለበት የቡና ንግድ ስትወርስ..."
+      },
+      "shortSynopsis": "A young entrepreneur inherits a struggling coffee business and must fight to save it.",
+      "tagline": "Where tradition meets ambition",
+      "genres": ["drama", "romance", "historical"],
+      "rating": {
+        "contentRating": "TV-14",
+        "advisories": ["language"]
+      },
+      "releaseInfo": {
+        "releaseDate": "2024-02-15",
+        "premiereDate": "2024-02-14T20:00:00Z",
+        "year": 2024,
+        "country": "ET",
+        "region": "africa",
+        "productionCompany": "Waliin Studio Productions",
+        "distributor": "SL18 Global"
+      },
+      "runtime": {
+        "duration": 3600,
+        "formatted": "1h 0m"
+      }
+    },
+    "castAndCrew": {
+      "cast": [
+        {
+          "personId": "person-actor-001",
+          "name": "Meron Getnet",
+          "role": "Lead Actor",
+          "character": "Selam",
+          "profileImage": "https://cdn.waliin.studio/cast/meron.jpg",
+          "featured": true,
+          "sortOrder": 1
+        },
+        {
+          "personId": "person-actor-002",
+          "name": "Eskindir Tamiru",
+          "role": "Supporting Actor",
+          "character": "Daniel",
+          "profileImage": "https://cdn.waliin.studio/cast/eskindir.jpg",
+          "featured": true,
+          "sortOrder": 2
+        }
+      ],
+      "crew": [
+        {
+          "personId": "person-director-001",
+          "name": "Haile Gerima",
+          "role": "director",
+          "department": "Direction",
+          "profileImage": "https://cdn.waliin.studio/crew/haile.jpg"
+        },
+        {
+          "personId": "person-writer-001",
+          "name": "Fikadu Tekle",
+          "role": "writer",
+          "department": "Writing",
+          "profileImage": "https://cdn.waliin.studio/crew/fikadu.jpg"
+        }
+      ],
+      "personas": [
+        {
+          "personaId": "persona-narrator-001",
+          "name": "Storyteller Abebe",
+          "description": "Traditional Ethiopian storyteller persona",
+          "voiceArtist": "Dawit Wolde",
+          "profileImage": "https://cdn.waliin.studio/personas/abebe.jpg",
+          "characteristics": ["warm", "wise", "poetic"]
+        }
+      ]
+    },
+    "media": {
+      "posterUrl": "https://cdn.waliin.studio/content/drama-001/poster.jpg",
+      "posterVerticalUrl": "https://cdn.waliin.studio/content/drama-001/poster-vertical.jpg",
+      "backdropUrl": "https://cdn.waliin.studio/content/drama-001/backdrop.jpg",
+      "logoUrl": "https://cdn.waliin.studio/content/drama-001/logo.png",
+      "trailerUrl": "https://cdn.waliin.studio/content/drama-001/trailer.mp4",
+      "teaserUrl": "https://cdn.waliin.studio/content/drama-001/teaser.mp4",
+      "thumbnails": [
+        {
+          "url": "https://cdn.waliin.studio/content/drama-001/thumb-001.jpg",
+          "timestamp": 300,
+          "type": "scene"
+        },
+        {
+          "url": "https://cdn.waliin.studio/content/drama-001/thumb-002.jpg",
+          "timestamp": 900,
+          "type": "character"
+        }
+      ],
+      "gallery": [
+        {
+          "url": "https://cdn.waliin.studio/content/drama-001/gallery-001.jpg",
+          "caption": "Selam at the coffee plantation",
+          "type": "still"
+        },
+        {
+          "url": "https://cdn.waliin.studio/content/drama-001/bts-001.jpg",
+          "caption": "Behind the scenes with director Haile",
+          "type": "behind_scenes"
+        }
+      ]
+    },
+    "localization": {
+      "originalLanguage": "am",
+      "subtitles": [
+        { "language": "en", "languageName": "English", "type": "full", "available": true },
+        { "language": "sw", "languageName": "Kiswahili", "type": "full", "available": true },
+        { "language": "om", "languageName": "Oromifa", "type": "full", "available": true },
+        { "language": "ar", "languageName": "Arabic", "type": "full", "available": true },
+        { "language": "fr", "languageName": "French", "type": "full", "available": true }
+      ],
+      "dubbedAudio": [
+        { "language": "en", "languageName": "English", "type": "full_dub", "available": true },
+        { "language": "sw", "languageName": "Kiswahili", "type": "voice_over", "available": true }
+      ],
+      "audioDescriptions": [
+        { "language": "en", "available": true },
+        { "language": "am", "available": true }
+      ]
+    },
+    "engagement": {
+      "viewCount": 125000,
+      "uniqueViewers": 98000,
+      "likes": 15200,
+      "dislikes": 320,
+      "shares": 8500,
+      "comments": 2300,
+      "averageRating": 8.7,
+      "ratingCount": 12500,
+      "completionRate": 78.5,
+      "retentionCurve": [
+        { "timestamp": 0, "retention": 100 },
+        { "timestamp": 300, "retention": 95 },
+        { "timestamp": 900, "retention": 88 },
+        { "timestamp": 1800, "retention": 82 },
+        { "timestamp": 2700, "retention": 79 },
+        { "timestamp": 3600, "retention": 78.5 }
+      ],
+      "peakMoments": [
+        { "timestamp": 1200, "type": "rewatch", "count": 5400 },
+        { "timestamp": 2400, "type": "share", "count": 3200 }
+      ],
+      "trending": {
+        "isTrending": true,
+        "rank": 3,
+        "category": "drama",
+        "region": "africa"
+      }
+    },
+    "monetization": {
+      "accessModel": "subscription",
+      "requiredTier": "basic",
+      "transactionalPrice": {
+        "rentPrice": 2.99,
+        "buyPrice": 9.99,
+        "currency": "USD",
+        "rentalPeriod": 48
+      },
+      "promotions": [
+        {
+          "promotionId": "promo-launch-001",
+          "type": "free_trial",
+          "discount": 100,
+          "validUntil": "2024-03-31T23:59:59Z"
+        }
+      ],
+      "geoRestrictions": {
+        "allowedCountries": ["ET", "KE", "TZ", "US", "UK", "AE", "DE", "FR"],
+        "blockedCountries": [],
+        "licensingWindows": [
+          {
+            "region": "africa",
+            "startDate": "2024-02-15",
+            "endDate": "2025-02-15"
+          }
+        ]
+      }
+    },
+    "recommendations": {
+      "similarContent": ["content-drama-002", "content-drama-005", "content-movie-003"],
+      "becauseYouWatched": [
+        { "contentId": "content-drama-003", "reason": "Similar themes of family and tradition" }
+      ],
+      "fromSameCreator": ["content-drama-010", "content-movie-008"],
+      "relatedPersonas": ["persona-narrator-002", "persona-guide-001"]
+    },
+    "playerConfig": {
+      "autoplay": false,
+      "autoplayNext": true,
+      "skipIntro": {
+        "enabled": true,
+        "startTime": 0,
+        "endTime": 30
+      },
+      "skipCredits": {
+        "enabled": true,
+        "startTime": 3480
+      },
+      "defaultSubtitle": "en",
+      "defaultAudio": "am",
+      "qualityDefault": "auto",
+      "previewThumbnails": true,
+      "chapters": [
+        { "title": "Introduction", "startTime": 0, "thumbnail": "https://cdn.waliin.studio/content/drama-001/chapter-1.jpg" },
+        { "title": "The Inheritance", "startTime": 600, "thumbnail": "https://cdn.waliin.studio/content/drama-001/chapter-2.jpg" },
+        { "title": "The Competition", "startTime": 1800, "thumbnail": "https://cdn.waliin.studio/content/drama-001/chapter-3.jpg" },
+        { "title": "Resolution", "startTime": 3000, "thumbnail": "https://cdn.waliin.studio/content/drama-001/chapter-4.jpg" }
+      ]
+    },
+    "socialFeatures": {
+      "commentsEnabled": true,
+      "ratingsEnabled": true,
+      "sharingEnabled": true,
+      "watchPartyEnabled": true,
+      "socialSharing": {
+        "twitter": true,
+        "facebook": true,
+        "whatsapp": true,
+        "telegram": true,
+        "copyLink": true
+      },
+      "reviews": {
+        "enabled": true,
+        "requireVerifiedWatch": true,
+        "moderationEnabled": true
+      }
+    },
+    "metadata": {
+      "createdAt": "2024-01-10T08:00:00Z",
+      "updatedAt": "2024-03-01T12:00:00Z",
+      "publishedAt": "2024-02-15T00:00:00Z",
+      "status": "published",
+      "qcStatus": "approved"
+    }
+  },
+  "waliinCustomer": {
+    "customerId": "customer-waliin-001",
+    "version": "1.0.0",
+    "profile": {
+      "displayName": "Abebe K.",
+      "email": "abebe.k@example.com",
+      "phoneNumber": "+251911234567",
+      "avatarUrl": "https://cdn.waliin.studio/avatars/customer-001.jpg",
+      "preferredLanguage": "am",
+      "contentLanguages": ["am", "en", "sw"],
+      "subtitleLanguage": "en",
+      "country": "ET",
+      "region": "africa",
+      "timezone": "Africa/Addis_Ababa",
+      "dateOfBirth": "1990-05-15",
+      "maturityRating": "adult"
+    },
+    "subscription": {
+      "tier": "premium",
+      "status": "active",
+      "startDate": "2024-01-01",
+      "endDate": "2025-01-01",
+      "autoRenew": true,
+      "billingCycle": "yearly",
+      "price": {
+        "amount": 99.99,
+        "currency": "USD"
+      },
+      "paymentMethod": {
+        "type": "credit_card",
+        "lastFour": "4242",
+        "expiryDate": "12/26"
+      },
+      "features": ["ad_free", "hd_streaming", "4k_streaming", "downloads", "simultaneous_streams"],
+      "simultaneousStreams": 4,
+      "downloadLimit": 25
+    },
+    "watchlist": {
+      "items": [
+        {
+          "contentId": "content-movie-002",
+          "contentType": "movie",
+          "title": "Mountains of Gold",
+          "posterUrl": "https://cdn.waliin.studio/content/movie-002/poster.jpg",
+          "addedAt": "2024-02-20T14:30:00Z",
+          "priority": "high",
+          "notifyOnRelease": true
+        },
+        {
+          "contentId": "content-series-003",
+          "contentType": "series",
+          "title": "City Lights",
+          "posterUrl": "https://cdn.waliin.studio/content/series-003/poster.jpg",
+          "addedAt": "2024-02-15T10:00:00Z",
+          "priority": "normal",
+          "notifyOnRelease": false
+        }
+      ],
+      "maxItems": 500
+    },
+    "favorites": {
+      "content": [
+        {
+          "contentId": "content-drama-001",
+          "contentType": "short_drama",
+          "title": "The Coffee Merchant",
+          "addedAt": "2024-02-16T18:00:00Z"
+        }
+      ],
+      "personas": [
+        {
+          "personaId": "persona-narrator-001",
+          "name": "Storyteller Abebe",
+          "addedAt": "2024-02-10T09:00:00Z"
+        }
+      ],
+      "genres": ["drama", "romance", "historical"],
+      "creators": [
+        {
+          "creatorId": "creator-001",
+          "name": "Haile Gerima",
+          "addedAt": "2024-01-20T12:00:00Z"
+        }
+      ]
+    },
+    "watchHistory": {
+      "items": [
+        {
+          "contentId": "content-drama-001",
+          "contentType": "short_drama",
+          "title": "The Coffee Merchant",
+          "watchedAt": "2024-02-28T20:00:00Z",
+          "progress": {
+            "percentage": 100,
+            "position": 3600,
+            "duration": 3600,
+            "completed": true
+          },
+          "device": "smart_tv",
+          "quality": "4k"
+        },
+        {
+          "contentId": "content-series-001",
+          "contentType": "episode",
+          "title": "Echoes of Addis - S1E3",
+          "watchedAt": "2024-02-27T21:30:00Z",
+          "progress": {
+            "percentage": 65,
+            "position": 1560,
+            "duration": 2400,
+            "completed": false
+          },
+          "seriesProgress": {
+            "seriesId": "series-001",
+            "currentSeason": 1,
+            "currentEpisode": 3,
+            "episodesWatched": 3,
+            "totalEpisodes": 12
+          },
+          "device": "mobile",
+          "quality": "hd"
+        }
+      ],
+      "continueWatching": [
+        {
+          "contentId": "content-series-001",
+          "title": "Echoes of Addis",
+          "posterUrl": "https://cdn.waliin.studio/content/series-001/poster.jpg",
+          "progress": 65,
+          "position": 1560,
+          "lastWatchedAt": "2024-02-27T21:30:00Z"
+        }
+      ],
+      "retentionDays": 365
+    },
+    "downloads": {
+      "items": [
+        {
+          "contentId": "content-drama-001",
+          "title": "The Coffee Merchant",
+          "downloadedAt": "2024-02-20T08:00:00Z",
+          "expiresAt": "2024-03-20T08:00:00Z",
+          "quality": "hd",
+          "fileSize": 1500,
+          "device": "mobile",
+          "status": "completed"
+        }
+      ],
+      "usedStorage": 1500,
+      "maxStorage": 10000,
+      "monthlyDownloads": 5
+    },
+    "personalization": {
+      "recommendations": {
+        "enabled": true,
+        "algorithm": "hybrid",
+        "excludeGenres": ["horror"],
+        "excludeRatings": ["NC-17"],
+        "preferNewReleases": true,
+        "preferLocalContent": true
+      },
+      "genreAffinities": [
+        { "genre": "drama", "affinity": 0.95, "watchCount": 25, "completionRate": 88 },
+        { "genre": "romance", "affinity": 0.78, "watchCount": 12, "completionRate": 75 },
+        { "genre": "historical", "affinity": 0.72, "watchCount": 8, "completionRate": 82 }
+      ],
+      "personaAffinities": [
+        { "personaId": "persona-narrator-001", "affinity": 0.92, "interactions": 45 },
+        { "personaId": "persona-guide-001", "affinity": 0.68, "interactions": 18 }
+      ],
+      "watchingPatterns": {
+        "preferredDays": ["friday", "saturday", "sunday"],
+        "preferredHours": [19, 20, 21, 22],
+        "bingeWatcher": true,
+        "averageSessionLength": 90
+      }
+    },
+    "notifications": {
+      "email": {
+        "enabled": true,
+        "newReleases": true,
+        "watchlistReminders": true,
+        "recommendations": true,
+        "accountUpdates": true,
+        "promotions": false
+      },
+      "push": {
+        "enabled": true,
+        "newEpisodes": true,
+        "premieres": true,
+        "continueWatching": true,
+        "socialActivity": false
+      },
+      "sms": {
+        "enabled": false,
+        "accountAlerts": true,
+        "billingReminders": true
+      }
+    },
+    "devices": [
+      {
+        "deviceId": "device-001",
+        "deviceName": "Samsung TV",
+        "deviceType": "smart_tv",
+        "platform": "samsung_tv",
+        "lastActive": "2024-02-28T22:00:00Z",
+        "registered": "2024-01-05T10:00:00Z",
+        "downloadEnabled": false,
+        "currentlyStreaming": false
+      },
+      {
+        "deviceId": "device-002",
+        "deviceName": "iPhone 15",
+        "deviceType": "mobile",
+        "platform": "ios",
+        "lastActive": "2024-02-28T18:30:00Z",
+        "registered": "2024-01-01T12:00:00Z",
+        "downloadEnabled": true,
+        "currentlyStreaming": false
+      }
+    ],
+    "familyProfiles": {
+      "enabled": true,
+      "profiles": [
+        {
+          "profileId": "profile-main",
+          "name": "Abebe",
+          "avatarUrl": "https://cdn.waliin.studio/avatars/profile-main.jpg",
+          "isKids": false,
+          "maturityRating": "adult",
+          "preferredLanguage": "am",
+          "createdAt": "2024-01-01T12:00:00Z"
+        },
+        {
+          "profileId": "profile-kids",
+          "name": "Kidist",
+          "avatarUrl": "https://cdn.waliin.studio/avatars/profile-kids.jpg",
+          "isKids": true,
+          "maturityRating": "kids",
+          "pin": "1234",
+          "preferredLanguage": "am",
+          "createdAt": "2024-01-15T10:00:00Z"
+        }
+      ]
+    },
+    "privacy": {
+      "dataCollection": true,
+      "personalizedAds": false,
+      "watchHistoryShared": false,
+      "socialActivity": true,
+      "analyticsOptIn": true,
+      "gdprConsent": true
+    },
+    "metadata": {
+      "createdAt": "2024-01-01T10:00:00Z",
+      "updatedAt": "2024-02-28T22:00:00Z",
+      "lastLoginAt": "2024-02-28T19:00:00Z",
+      "status": "active",
+      "verificationStatus": "fully_verified",
+      "source": "mobile_app"
+    }
+  },
+  "waliinStudioConsole": {
+    "consoleId": "console-waliin-operator",
+    "version": "1.0.0",
+    "name": "Waliin Studio Operator Console",
+    "operatorContext": {
+      "operatorId": "operator-content-001",
+      "role": "content_manager",
+      "permissions": ["upload_content", "review_qc", "view_analytics", "manage_localization"],
+      "franchiseScope": ["waliin-studio", "waliin-originals"]
+    },
+    "uploadPipeline": {
+      "enabled": true,
+      "uploadMethods": [
+        {
+          "methodId": "method-direct",
+          "type": "direct_upload",
+          "maxFileSize": 50000,
+          "allowedFormats": ["mp4", "mov", "prores", "mxf"],
+          "enabled": true
+        },
+        {
+          "methodId": "method-s3",
+          "type": "s3_import",
+          "maxFileSize": 100000,
+          "allowedFormats": ["mp4", "mov", "prores", "mxf", "dnxhd"],
+          "enabled": true
+        }
+      ],
+      "requiredMetadata": ["title", "synopsis", "genres", "rating", "release_date", "cast", "poster"],
+      "autoProcessing": {
+        "transcoding": true,
+        "thumbnailGeneration": true,
+        "trailerExtraction": false,
+        "subtitleExtraction": true,
+        "qualityAnalysis": true,
+        "contentDetection": true
+      },
+      "contentWizard": {
+        "enabled": true,
+        "steps": [
+          { "stepId": "step-upload", "name": "Upload Video", "type": "file_upload", "required": true, "order": 1 },
+          { "stepId": "step-metadata", "name": "Add Metadata", "type": "metadata_entry", "required": true, "order": 2 },
+          { "stepId": "step-cast", "name": "Cast & Crew", "type": "cast_crew", "required": false, "order": 3 },
+          { "stepId": "step-localization", "name": "Localization", "type": "localization", "required": false, "order": 4 },
+          { "stepId": "step-monetization", "name": "Monetization", "type": "monetization", "required": true, "order": 5 },
+          { "stepId": "step-preview", "name": "Preview", "type": "preview", "required": true, "order": 6 },
+          { "stepId": "step-submit", "name": "Submit for QC", "type": "qc_submission", "required": true, "order": 7 }
+        ],
+        "allowDraft": true,
+        "allowScheduledPublish": true
+      },
+      "validation": {
+        "videoQualityMinimum": "hd",
+        "audioQualityMinimum": "stereo",
+        "aspectRatios": ["16:9", "9:16", "1:1"],
+        "durationMinimum": 60,
+        "durationMaximum": 10800
+      }
+    },
+    "qcWorkflow": {
+      "enabled": true,
+      "stages": [
+        {
+          "stageId": "stage-technical",
+          "name": "Technical QC",
+          "type": "technical_qc",
+          "automated": true,
+          "requiredApprovers": 0,
+          "slaHours": 4,
+          "checklistItems": [
+            { "itemId": "check-video-quality", "label": "Video quality meets standards", "category": "video", "required": true },
+            { "itemId": "check-audio-sync", "label": "Audio synchronized", "category": "audio", "required": true },
+            { "itemId": "check-subtitle-timing", "label": "Subtitles properly timed", "category": "subtitles", "required": true }
+          ],
+          "order": 1,
+          "enabled": true
+        },
+        {
+          "stageId": "stage-content",
+          "name": "Content Review",
+          "type": "content_review",
+          "automated": false,
+          "requiredApprovers": 1,
+          "slaHours": 24,
+          "escalationPath": ["qc-lead-001", "content-director-001"],
+          "checklistItems": [
+            { "itemId": "check-content-appropriate", "label": "Content appropriate for rating", "category": "content", "required": true },
+            { "itemId": "check-metadata-accurate", "label": "Metadata accurate", "category": "metadata", "required": true }
+          ],
+          "order": 2,
+          "enabled": true
+        },
+        {
+          "stageId": "stage-cultural",
+          "name": "Cultural Review",
+          "type": "cultural_review",
+          "automated": false,
+          "requiredApprovers": 1,
+          "slaHours": 48,
+          "checklistItems": [
+            { "itemId": "check-cultural-sensitivity", "label": "Culturally appropriate", "category": "cultural", "required": true },
+            { "itemId": "check-persona-consistency", "label": "Persona consistency maintained", "category": "persona", "required": true }
+          ],
+          "order": 3,
+          "enabled": true
+        },
+        {
+          "stageId": "stage-final",
+          "name": "Final Approval",
+          "type": "final_approval",
+          "automated": false,
+          "requiredApprovers": 1,
+          "slaHours": 12,
+          "order": 4,
+          "enabled": true
+        }
+      ],
+      "automatedChecks": {
+        "videoQuality": true,
+        "audioSync": true,
+        "subtitleSync": true,
+        "contentWarningDetection": true,
+        "duplicationCheck": true,
+        "copyrightScan": true,
+        "personaConsistency": true,
+        "culturalSensitivity": true
+      },
+      "reviewQueue": {
+        "sortBy": "sla_deadline",
+        "filters": ["content_type", "status", "priority", "language"],
+        "batchActions": true,
+        "assignmentMode": "auto_expertise"
+      },
+      "feedbackTemplates": [
+        {
+          "templateId": "template-audio-issue",
+          "name": "Audio Issue",
+          "category": "audio",
+          "message": "Audio quality does not meet standards. Please re-export with higher bitrate.",
+          "severity": "error"
+        },
+        {
+          "templateId": "template-subtitle-sync",
+          "name": "Subtitle Timing",
+          "category": "subtitles",
+          "message": "Subtitles are out of sync. Please adjust timing.",
+          "severity": "warning"
+        }
+      ]
+    },
+    "contentManagement": {
+      "contentLibrary": {
+        "viewModes": ["grid", "list", "table", "kanban"],
+        "defaultView": "grid",
+        "filters": ["status", "content_type", "genre", "rating", "release_date", "qc_status", "region", "language"],
+        "bulkActions": ["publish", "unpublish", "archive", "assign_reviewer", "change_status", "export"]
+      },
+      "scheduling": {
+        "enabled": true,
+        "calendarView": true,
+        "releaseWindows": true,
+        "premiereSupport": true,
+        "episodeScheduling": true,
+        "timezoneAware": true
+      },
+      "versionControl": {
+        "enabled": true,
+        "trackChanges": true,
+        "rollback": true,
+        "compareVersions": true
+      }
+    },
+    "localizationManagement": {
+      "enabled": true,
+      "languages": [
+        { "code": "am", "name": "Amharic", "enabled": true, "primary": true },
+        { "code": "en", "name": "English", "enabled": true, "primary": false },
+        { "code": "sw", "name": "Kiswahili", "enabled": true, "primary": false },
+        { "code": "om", "name": "Oromifa", "enabled": true, "primary": false },
+        { "code": "ar", "name": "Arabic", "enabled": true, "primary": false }
+      ],
+      "subtitleManagement": {
+        "uploadFormats": ["srt", "vtt", "ass", "ttml"],
+        "autoGeneration": true,
+        "aiTranslation": true,
+        "qcRequired": true,
+        "timingSync": true
+      },
+      "dubbingManagement": {
+        "enabled": true,
+        "voiceSynthesis": true,
+        "personaAlignment": true,
+        "emotionPreservation": true,
+        "lipSyncSupport": true
+      },
+      "metadataLocalization": {
+        "titleTranslation": true,
+        "synopsisTranslation": true,
+        "taglineTranslation": true,
+        "keywordsTranslation": true
+      }
+    },
+    "analyticsDashboards": {
+      "enabled": true,
+      "dashboards": [
+        {
+          "dashboardId": "dash-overview",
+          "name": "Content Overview",
+          "type": "overview",
+          "widgets": [
+            { "widgetId": "widget-total-views", "type": "kpi_card", "title": "Total Views", "metric": "views_total", "timeRange": "30d", "refreshInterval": 300 },
+            { "widgetId": "widget-engagement", "type": "line_chart", "title": "Engagement Trend", "metric": "engagement_rate", "timeRange": "30d", "refreshInterval": 600 },
+            { "widgetId": "widget-top-content", "type": "leaderboard", "title": "Top Content", "metric": "views", "timeRange": "7d", "refreshInterval": 300 }
+          ],
+          "refreshInterval": 300,
+          "exportFormats": ["pdf", "csv"],
+          "enabled": true
+        },
+        {
+          "dashboardId": "dash-audience",
+          "name": "Audience Insights",
+          "type": "audience_insights",
+          "widgets": [
+            { "widgetId": "widget-demographics", "type": "pie_chart", "title": "Audience Demographics", "metric": "demographics", "timeRange": "30d", "refreshInterval": 3600 },
+            { "widgetId": "widget-geo", "type": "map", "title": "Geographic Distribution", "metric": "views_by_region", "timeRange": "30d", "refreshInterval": 3600 }
+          ],
+          "enabled": true
+        },
+        {
+          "dashboardId": "dash-revenue",
+          "name": "Revenue Analytics",
+          "type": "revenue",
+          "widgets": [
+            { "widgetId": "widget-revenue", "type": "kpi_card", "title": "Total Revenue", "metric": "revenue_total", "timeRange": "30d", "refreshInterval": 300 },
+            { "widgetId": "widget-revenue-trend", "type": "bar_chart", "title": "Revenue by Content", "metric": "revenue_by_content", "timeRange": "30d", "refreshInterval": 600 }
+          ],
+          "enabled": true
+        }
+      ],
+      "metrics": [
+        { "metricId": "metric-views", "name": "Views", "category": "views", "aggregation": "sum", "unit": "count" },
+        { "metricId": "metric-engagement", "name": "Engagement Rate", "category": "engagement", "aggregation": "average", "unit": "percentage" },
+        { "metricId": "metric-revenue", "name": "Revenue", "category": "revenue", "aggregation": "sum", "unit": "currency" },
+        { "metricId": "metric-completion", "name": "Completion Rate", "category": "retention", "aggregation": "average", "unit": "percentage" }
+      ],
+      "reporting": {
+        "scheduledReports": true,
+        "customReports": true,
+        "emailDelivery": true,
+        "slackIntegration": true
+      }
+    },
+    "monetizationControls": {
+      "enabled": true,
+      "accessModels": ["free", "ad_supported", "subscription", "tvod", "premium"],
+      "pricingManagement": {
+        "setContentPrice": true,
+        "promotions": true,
+        "bundling": true,
+        "regionalPricing": true
+      },
+      "revenueTracking": {
+        "realTimeRevenue": true,
+        "revenueByContent": true,
+        "revenueByRegion": true,
+        "payoutTracking": true
+      },
+      "adManagement": {
+        "enabled": true,
+        "adPlacements": ["pre_roll", "mid_roll"],
+        "adFrequency": true,
+        "adTargeting": true
+      }
+    },
+    "distributionControls": {
+      "enabled": true,
+      "channels": [
+        { "channelId": "channel-waliin", "name": "Waliin Platform", "type": "waliin_platform", "autoPublish": true, "enabled": true },
+        { "channelId": "channel-youtube", "name": "YouTube", "type": "social_media", "autoPublish": false, "enabled": true },
+        { "channelId": "channel-partner", "name": "Partner Platforms", "type": "partner_platform", "autoPublish": false, "enabled": true }
+      ],
+      "geoRestrictions": {
+        "enabled": true,
+        "defaultPolicy": "allow_all",
+        "customRules": true
+      },
+      "releaseWindows": {
+        "enabled": true,
+        "windowTypes": ["premium_vod", "svod", "avod", "free"]
+      }
+    },
+    "notifications": {
+      "channels": ["in_app", "email", "slack"],
+      "events": [
+        { "eventType": "upload_completed", "channels": ["in_app", "email"], "enabled": true },
+        { "eventType": "qc_feedback", "channels": ["in_app", "email"], "enabled": true },
+        { "eventType": "content_published", "channels": ["in_app", "slack"], "enabled": true },
+        { "eventType": "analytics_alert", "channels": ["email"], "enabled": true }
+      ]
+    },
+    "auditTrail": {
+      "enabled": true,
+      "retentionDays": 365,
+      "exportEnabled": true,
+      "searchEnabled": true,
+      "realTimeView": true
+    },
+    "metadata": {
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-03-01T10:00:00Z",
+      "status": "active"
+    }
+  },
+  "auditLog": {
+    "logId": "log-waliin-showcase-001",
+    "timestamp": "2024-03-01T14:30:00Z",
+    "eventType": "showcase_published",
+    "category": "waliin_showcase",
+    "actor": {
+      "type": "user",
+      "id": "operator-content-001",
+      "name": "Content Manager"
+    },
+    "target": {
+      "type": "showcase",
+      "id": "showcase-waliin-global",
+      "franchiseId": "waliin-studio"
+    },
+    "details": {
+      "description": "Waliin Studio Global Showcase published with updated hero banners and category displays",
+      "metadata": {
+        "heroBannersUpdated": 3,
+        "categoriesAdded": 2,
+        "version": "1.0.0"
+      }
+    },
+    "result": "success",
+    "correlationId": "corr-showcase-publish-001"
+  }
+}

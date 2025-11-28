@@ -1,0 +1,476 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SyndicationFeed",
+  "description": "Schema for multi-platform syndication feeds in SL18 - RSS, JSON, API endpoints for content distribution",
+  "type": "object",
+  "properties": {
+    "feedId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^feed-[a-z0-9-]+$",
+      "description": "Unique syndication feed identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Feed name"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["rss", "atom", "json_feed", "mrss", "api", "webhook", "custom"],
+      "description": "Feed type"
+    },
+    "format": {
+      "type": "object",
+      "properties": {
+        "contentType": {
+          "type": "string",
+          "enum": ["application/rss+xml", "application/atom+xml", "application/json", "application/xml"],
+          "description": "Content type"
+        },
+        "version": {
+          "type": "string",
+          "description": "Feed format version"
+        },
+        "encoding": {
+          "type": "string",
+          "default": "UTF-8",
+          "description": "Character encoding"
+        },
+        "namespace": {
+          "type": "string",
+          "description": "XML namespace (for RSS/Atom)"
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "enum": ["media_rss", "itunes", "spotify", "dc", "content", "custom"]
+              },
+              "prefix": {
+                "type": "string"
+              },
+              "namespaceUri": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Feed extensions"
+        }
+      },
+      "required": ["contentType"],
+      "additionalProperties": false
+    },
+    "endpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Feed URL"
+        },
+        "authentication": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["none", "api_key", "bearer_token", "basic_auth", "oauth2"]
+            },
+            "credentialRef": {
+              "type": "string",
+              "description": "Reference to stored credentials"
+            }
+          },
+          "additionalProperties": false
+        },
+        "rateLimit": {
+          "type": "object",
+          "properties": {
+            "requestsPerMinute": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "requestsPerHour": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "requestsPerDay": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "caching": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "ttlSeconds": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "etag": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["url"],
+      "additionalProperties": false
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "itemLimit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Maximum items in feed"
+        },
+        "includeTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["episode", "series", "clip", "teaser", "trailer", "behind_scenes", "announcement"]
+          },
+          "description": "Content types to include"
+        },
+        "excludeTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Content types to exclude"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string",
+                "description": "Field to filter on"
+              },
+              "operator": {
+                "type": "string",
+                "enum": ["equals", "not_equals", "contains", "not_contains", "greater_than", "less_than", "in", "not_in"]
+              },
+              "value": {
+                "description": "Filter value"
+              }
+            },
+            "required": ["field", "operator", "value"],
+            "additionalProperties": false
+          },
+          "description": "Content filters"
+        },
+        "sorting": {
+          "type": "object",
+          "properties": {
+            "field": {
+              "type": "string",
+              "enum": ["publishedAt", "createdAt", "updatedAt", "popularity", "engagement", "custom"]
+            },
+            "order": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Feed title"
+        },
+        "description": {
+          "type": "string",
+          "description": "Feed description"
+        },
+        "language": {
+          "type": "string",
+          "description": "Primary language"
+        },
+        "author": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "url": { "type": "string", "format": "uri" }
+          },
+          "additionalProperties": false
+        },
+        "copyright": {
+          "type": "string"
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "url": { "type": "string", "format": "uri" },
+            "title": { "type": "string" },
+            "width": { "type": "integer" },
+            "height": { "type": "integer" }
+          },
+          "additionalProperties": false
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "explicit": {
+          "type": "boolean",
+          "description": "Contains explicit content"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "localization": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether localization is enabled"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "feedUrl": {
+                "type": "string",
+                "format": "uri",
+                "description": "Localized feed URL"
+              },
+              "includeTranslations": {
+                "type": "boolean"
+              }
+            },
+            "required": ["code"],
+            "additionalProperties": false
+          },
+          "description": "Supported languages"
+        },
+        "fallbackLanguage": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "distribution": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Target channel IDs"
+        },
+        "partners": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Syndication partner IDs"
+        },
+        "autoPublish": {
+          "type": "boolean",
+          "description": "Auto-publish new items"
+        },
+        "publishDelay": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Delay before publishing in minutes"
+        },
+        "expirationPolicy": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "daysUntilExpiration": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "action": {
+              "type": "string",
+              "enum": ["remove", "archive", "mark_expired"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "contentRating": {
+          "type": "string",
+          "enum": ["G", "PG", "PG-13", "R", "NC-17", "TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA", "unrated"],
+          "description": "Content rating"
+        },
+        "geoRestrictions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["allow", "block"]
+              },
+              "regions": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["type", "regions"],
+            "additionalProperties": false
+          },
+          "description": "Geographic restrictions"
+        },
+        "licensingTerms": {
+          "type": "object",
+          "properties": {
+            "licenseType": {
+              "type": "string",
+              "enum": ["exclusive", "non_exclusive", "limited", "perpetual", "time_limited"]
+            },
+            "startDate": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "endDate": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "territories": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "copyrightNotice": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "webhooks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "webhookId": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["item_added", "item_updated", "item_removed", "feed_updated", "error"]
+            }
+          },
+          "secret": {
+            "type": "string",
+            "description": "Webhook secret reference"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": ["webhookId", "url", "events"],
+        "additionalProperties": false
+      },
+      "description": "Webhook notifications"
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "totalItems": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalSubscribers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "requestsToday": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lastFetched": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "averageResponseTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average response time in ms"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "error", "maintenance", "pending_approval"],
+      "description": "Feed status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "feedId",
+    "name",
+    "type",
+    "format",
+    "endpoint",
+    "status",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

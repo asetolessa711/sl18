@@ -1,0 +1,771 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SocialConnectors",
+  "description": "Schema for interlinked social media connectors in SL18 + Waliin Studio - platform accounts, publishing workflows, cross-linking, and monetization",
+  "type": "object",
+  "properties": {
+    "connectorId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^social-[a-z0-9-]+$",
+      "description": "Unique social connector identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "branding": {
+      "type": "object",
+      "properties": {
+        "studioName": {
+          "type": "string",
+          "default": "Waliin Studio",
+          "description": "Primary brand name"
+        },
+        "tagline": {
+          "type": "string",
+          "default": "Together through stories",
+          "description": "Brand tagline"
+        },
+        "primaryHashtags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["#WaliinTogether", "#WaliinStudio", "#ShortDrama", "#PoweredBySL18"],
+          "description": "Primary hashtags for all platforms"
+        },
+        "secondaryHashtags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["#AfricanDrama", "#EthiopianDrama", "#OromoDrama", "#KenyanDrama"],
+          "description": "Secondary regional hashtags"
+        },
+        "colorPalette": {
+          "type": "object",
+          "properties": {
+            "primary": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+            "secondary": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+            "accent": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+            "text": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+          },
+          "additionalProperties": false
+        },
+        "logoAssets": {
+          "type": "object",
+          "properties": {
+            "squareUrl": { "type": "string", "format": "uri" },
+            "bannerUrl": { "type": "string", "format": "uri" },
+            "watermarkUrl": { "type": "string", "format": "uri" },
+            "iconUrl": { "type": "string", "format": "uri" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "platforms": {
+      "type": "object",
+      "properties": {
+        "youtube": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "channelId": { "type": "string", "pattern": "^UC[a-zA-Z0-9_-]{22}$" },
+            "channelHandle": { "type": "string", "pattern": "^@[a-zA-Z0-9_-]+$" },
+            "channelUrl": { "type": "string", "format": "uri" },
+            "purpose": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["shorts", "trailers", "full_episodes", "behind_scenes", "live_streams", "community"]
+              }
+            },
+            "contentTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["short", "teaser", "trailer", "highlight", "full_episode", "behind_scenes", "live_stream", "community_post"]
+              }
+            },
+            "monetization": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["ads", "super_chat", "super_thanks", "memberships", "shopping", "brand_connect"]
+              }
+            },
+            "credentials": {
+              "type": "object",
+              "properties": {
+                "oauthRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" },
+                "apiKeyRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" }
+              },
+              "additionalProperties": false
+            },
+            "youtubeIntegrationRef": {
+              "type": "string",
+              "pattern": "^youtube-[a-z0-9-]+$",
+              "description": "Reference to YouTube integration schema"
+            }
+          },
+          "additionalProperties": false
+        },
+        "facebook": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "pageId": { "type": "string" },
+            "pageName": { "type": "string" },
+            "pageUrl": { "type": "string", "format": "uri" },
+            "groupId": { "type": "string" },
+            "groupName": { "type": "string" },
+            "groupUrl": { "type": "string", "format": "uri" },
+            "purpose": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["premieres", "polls", "discussions", "reels", "stories", "events", "live"]
+              }
+            },
+            "contentTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["reel", "story", "post_image", "post_video", "poll", "event", "live_stream", "premiere"]
+              }
+            },
+            "monetization": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["ad_breaks", "fan_subscriptions", "branded_content", "stars", "shops"]
+              }
+            },
+            "credentials": {
+              "type": "object",
+              "properties": {
+                "pageAccessTokenRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" },
+                "appIdRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" },
+                "appSecretRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "instagram": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "accountId": { "type": "string" },
+            "accountHandle": { "type": "string", "pattern": "^@[a-zA-Z0-9_.-]+$" },
+            "accountUrl": { "type": "string", "format": "uri" },
+            "purpose": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["reels", "stories", "carousels", "highlights", "behind_scenes", "live"]
+              }
+            },
+            "contentTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["reel", "story", "carousel", "single_image", "single_video", "live", "igtv"]
+              }
+            },
+            "monetization": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["branded_content", "affiliate_links", "shops", "badges", "subscriptions"]
+              }
+            },
+            "credentials": {
+              "type": "object",
+              "properties": {
+                "accessTokenRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" },
+                "businessAccountId": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "tiktok": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "accountId": { "type": "string" },
+            "accountHandle": { "type": "string", "pattern": "^@[a-zA-Z0-9_.-]+$" },
+            "accountUrl": { "type": "string", "format": "uri" },
+            "purpose": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["trend_challenges", "highlights", "duets", "stitches", "live", "series"]
+              }
+            },
+            "contentTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["video", "duet", "stitch", "live", "photo_carousel", "series"]
+              }
+            },
+            "monetization": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["creator_fund", "brand_partnerships", "live_gifts", "tips", "series_subscriptions", "shop"]
+              }
+            },
+            "credentials": {
+              "type": "object",
+              "properties": {
+                "accessTokenRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" },
+                "openIdRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "waliinNative": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "baseUrl": { "type": "string", "format": "uri" },
+            "premiumUrl": { "type": "string", "format": "uri" },
+            "purpose": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["showcase", "streaming", "polls", "subscriptions", "downloads", "community"]
+              }
+            },
+            "contentTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["full_episode", "series", "movie", "short_drama", "exclusive", "premiere"]
+              }
+            },
+            "monetization": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["subscriptions", "tvod", "avod", "pvod", "est", "downloads"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "twitter": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "accountHandle": { "type": "string", "pattern": "^@[a-zA-Z0-9_]+$" },
+            "accountUrl": { "type": "string", "format": "uri" },
+            "purpose": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["announcements", "engagement", "support", "news", "threads"]
+              }
+            },
+            "contentTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["tweet", "thread", "poll", "space", "video", "image"]
+              }
+            },
+            "credentials": {
+              "type": "object",
+              "properties": {
+                "apiKeyRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" },
+                "apiSecretRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" },
+                "bearerTokenRef": { "type": "string", "pattern": "^vault://[a-zA-Z0-9/_-]+$" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "interlinking": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "strategy": {
+          "type": "object",
+          "properties": {
+            "bioLinks": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "linktreeEnabled": { "type": "boolean", "default": true },
+                "linktreeUrl": { "type": "string", "format": "uri" },
+                "primaryDestination": {
+                  "type": "string",
+                  "enum": ["waliin_native", "youtube", "linktree"],
+                  "default": "waliin_native"
+                }
+              },
+              "additionalProperties": false
+            },
+            "crossPlatformLinks": {
+              "type": "object",
+              "properties": {
+                "youtubeToWaliin": { "type": "boolean", "default": true },
+                "facebookToWaliin": { "type": "boolean", "default": true },
+                "instagramToWaliin": { "type": "boolean", "default": true },
+                "tiktokToWaliin": { "type": "boolean", "default": true },
+                "waliinToYoutube": { "type": "boolean", "default": true },
+                "waliinToSocial": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            },
+            "endScreens": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "primaryCta": {
+                  "type": "string",
+                  "enum": ["subscribe_waliin", "subscribe_youtube", "watch_more", "follow_social"],
+                  "default": "subscribe_waliin"
+                },
+                "secondaryCta": {
+                  "type": "string",
+                  "enum": ["subscribe_waliin", "subscribe_youtube", "watch_more", "follow_social"],
+                  "default": "watch_more"
+                }
+              },
+              "additionalProperties": false
+            },
+            "pinnedComments": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "template": {
+                  "type": "string",
+                  "description": "Comment template with {waliin_url}, {premium_url} placeholders"
+                },
+                "platforms": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["youtube", "facebook", "instagram", "tiktok"]
+                  },
+                  "default": ["youtube", "facebook"]
+                }
+              },
+              "additionalProperties": false
+            },
+            "communitySync": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "syncPolls": { "type": "boolean", "default": true },
+                "syncAnnouncements": { "type": "boolean", "default": true },
+                "syncTeasers": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "hashtagStrategy": {
+          "type": "object",
+          "properties": {
+            "usePrimary": { "type": "boolean", "default": true },
+            "useSecondary": { "type": "boolean", "default": true },
+            "platformSpecific": {
+              "type": "object",
+              "properties": {
+                "youtube": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "instagram": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "tiktok": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "facebook": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxHashtags": {
+              "type": "object",
+              "properties": {
+                "youtube": { "type": "integer", "default": 15 },
+                "instagram": { "type": "integer", "default": 30 },
+                "tiktok": { "type": "integer", "default": 5 },
+                "facebook": { "type": "integer", "default": 10 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "publishingWorkflows": {
+      "type": "object",
+      "properties": {
+        "autoPublish": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically publish without manual review"
+        },
+        "approvalRequired": {
+          "type": "boolean",
+          "default": true,
+          "description": "Require manual approval before publishing"
+        },
+        "approvalRoles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["content_manager", "social_media_manager", "marketing_lead", "ceo"]
+          },
+          "default": ["social_media_manager", "content_manager"]
+        },
+        "crossPostEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic cross-posting between platforms"
+        },
+        "crossPostRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceContent": {
+                "type": "string",
+                "enum": ["short", "trailer", "highlight", "behind_scenes", "announcement", "poll"]
+              },
+              "sourcePlatform": {
+                "type": "string",
+                "enum": ["youtube", "facebook", "instagram", "tiktok", "waliin_native", "all"]
+              },
+              "targetPlatforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["youtube", "facebook", "instagram", "tiktok", "waliin_native"]
+                }
+              },
+              "adaptFormat": {
+                "type": "boolean",
+                "default": true,
+                "description": "Adapt content format for each platform"
+              },
+              "delayMinutes": {
+                "type": "integer",
+                "default": 0,
+                "description": "Delay cross-posting by minutes"
+              }
+            },
+            "required": ["sourceContent", "sourcePlatform", "targetPlatforms"],
+            "additionalProperties": false
+          }
+        },
+        "schedulingEnabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "optimalPostingTimes": {
+          "type": "object",
+          "properties": {
+            "youtube": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": { "type": "string", "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] },
+                  "timeUtc": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$" }
+                },
+                "additionalProperties": false
+              }
+            },
+            "facebook": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": { "type": "string", "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] },
+                  "timeUtc": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$" }
+                },
+                "additionalProperties": false
+              }
+            },
+            "instagram": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": { "type": "string", "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] },
+                  "timeUtc": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$" }
+                },
+                "additionalProperties": false
+              }
+            },
+            "tiktok": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": { "type": "string", "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] },
+                  "timeUtc": { "type": "string", "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "monetization": {
+      "type": "object",
+      "properties": {
+        "revenueTracking": {
+          "type": "boolean",
+          "default": true
+        },
+        "platformRevenue": {
+          "type": "object",
+          "properties": {
+            "youtube": {
+              "type": "object",
+              "properties": {
+                "adsEnabled": { "type": "boolean", "default": true },
+                "membershipsEnabled": { "type": "boolean", "default": true },
+                "superChatEnabled": { "type": "boolean", "default": true },
+                "shoppingEnabled": { "type": "boolean", "default": false },
+                "brandConnectEnabled": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            },
+            "facebook": {
+              "type": "object",
+              "properties": {
+                "adBreaksEnabled": { "type": "boolean", "default": true },
+                "fanSubscriptionsEnabled": { "type": "boolean", "default": true },
+                "brandedContentEnabled": { "type": "boolean", "default": true },
+                "starsEnabled": { "type": "boolean", "default": true },
+                "shopsEnabled": { "type": "boolean", "default": false }
+              },
+              "additionalProperties": false
+            },
+            "instagram": {
+              "type": "object",
+              "properties": {
+                "brandedContentEnabled": { "type": "boolean", "default": true },
+                "affiliateLinksEnabled": { "type": "boolean", "default": true },
+                "shopsEnabled": { "type": "boolean", "default": false },
+                "badgesEnabled": { "type": "boolean", "default": true },
+                "subscriptionsEnabled": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            },
+            "tiktok": {
+              "type": "object",
+              "properties": {
+                "creatorFundEnabled": { "type": "boolean", "default": true },
+                "brandPartnershipsEnabled": { "type": "boolean", "default": true },
+                "liveGiftsEnabled": { "type": "boolean", "default": true },
+                "tipsEnabled": { "type": "boolean", "default": true },
+                "seriesEnabled": { "type": "boolean", "default": true },
+                "shopEnabled": { "type": "boolean", "default": false }
+              },
+              "additionalProperties": false
+            },
+            "waliinNative": {
+              "type": "object",
+              "properties": {
+                "subscriptionsEnabled": { "type": "boolean", "default": true },
+                "tvodEnabled": { "type": "boolean", "default": true },
+                "avodEnabled": { "type": "boolean", "default": true },
+                "downloadSalesEnabled": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "funnelConversions": {
+          "type": "object",
+          "properties": {
+            "trackYoutubeToWaliin": { "type": "boolean", "default": true },
+            "trackFacebookToWaliin": { "type": "boolean", "default": true },
+            "trackInstagramToWaliin": { "type": "boolean", "default": true },
+            "trackTiktokToWaliin": { "type": "boolean", "default": true },
+            "conversionGoals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "type": { "type": "string", "enum": ["subscription", "tvod_purchase", "signup", "trial_start", "download"] },
+                  "targetMonthly": { "type": "integer" },
+                  "value": { "type": "number" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "governance": {
+      "type": "object",
+      "properties": {
+        "culturalSensitivity": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "phase25Integration": { "type": "boolean", "default": true },
+            "reviewRequired": { "type": "boolean", "default": true },
+            "blockedCategories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["religious_sensitivity", "political_sensitivity", "social_norms", "regional_taboos"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "contentGuidelines": {
+          "type": "object",
+          "properties": {
+            "brandVoice": {
+              "type": "string",
+              "enum": ["professional", "friendly", "inspirational", "educational", "entertaining"],
+              "default": "inspirational"
+            },
+            "toneGuidelines": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "prohibitedTopics": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "requiredDisclosures": {
+              "type": "object",
+              "properties": {
+                "sponsoredContent": { "type": "boolean", "default": true },
+                "paidPartnership": { "type": "boolean", "default": true },
+                "affiliateLinks": { "type": "boolean", "default": true },
+                "aiGeneratedContent": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "copyrightCompliance": {
+          "type": "object",
+          "properties": {
+            "contentIdRegistration": { "type": "boolean", "default": true },
+            "musicLicensingRequired": { "type": "boolean", "default": true },
+            "imageLicensingRequired": { "type": "boolean", "default": true },
+            "claimMonitoring": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "accessControl": {
+          "type": "object",
+          "properties": {
+            "publishingRoles": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["social_media_manager", "content_manager", "marketing_lead", "ceo", "franchise_operator"]
+              }
+            },
+            "approvalRoles": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["social_media_manager", "content_manager", "marketing_lead", "ceo"]
+              }
+            },
+            "analyticsRoles": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["social_media_manager", "content_manager", "marketing_lead", "ceo", "analyst"]
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "setup_pending", "suspended", "deprecated"],
+      "description": "Connector status"
+    },
+    "statistics": {
+      "type": "object",
+      "properties": {
+        "totalPosts": { "type": "integer" },
+        "totalReach": { "type": "integer" },
+        "totalEngagements": { "type": "integer" },
+        "totalFollowers": {
+          "type": "object",
+          "properties": {
+            "youtube": { "type": "integer" },
+            "facebook": { "type": "integer" },
+            "instagram": { "type": "integer" },
+            "tiktok": { "type": "integer" },
+            "waliinCustomers": { "type": "integer" }
+          },
+          "additionalProperties": false
+        },
+        "totalRevenue": { "type": "number" },
+        "lastPostAt": { "type": "string", "format": "date-time" },
+        "lastSyncAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "connectorId",
+    "version",
+    "platforms",
+    "status"
+  ],
+  "additionalProperties": false
+}

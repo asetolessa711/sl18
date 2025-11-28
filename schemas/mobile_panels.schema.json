@@ -1,0 +1,458 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sl18.io/schemas/mobile_panels.schema.json",
+  "title": "Mobile Panels Schema",
+  "description": "Schema for mobile-optimized versions of SL18 operator panels with touch-friendly layouts and responsive components",
+  "type": "object",
+  "properties": {
+    "panels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/mobilePanelConfig"
+      }
+    }
+  },
+  "definitions": {
+    "mobilePanelConfig": {
+      "type": "object",
+      "properties": {
+        "panelId": {
+          "type": "string",
+          "description": "Unique mobile panel identifier",
+          "pattern": "^mobile-panel-[a-z0-9-]+$"
+        },
+        "panelType": {
+          "type": "string",
+          "enum": [
+            "mobile_language",
+            "mobile_observability",
+            "mobile_marketplace",
+            "mobile_insights",
+            "mobile_qc",
+            "mobile_alerts",
+            "mobile_franchise",
+            "mobile_settings"
+          ]
+        },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "layout": {
+          "$ref": "#/definitions/mobileLayout"
+        },
+        "config": {
+          "oneOf": [
+            { "$ref": "#/definitions/mobileLanguagePanel" },
+            { "$ref": "#/definitions/mobileObservabilityPanel" },
+            { "$ref": "#/definitions/mobileMarketplacePanel" },
+            { "$ref": "#/definitions/mobileInsightsPanel" },
+            { "$ref": "#/definitions/mobileQcPanel" },
+            { "$ref": "#/definitions/mobileAlertsPanel" },
+            { "$ref": "#/definitions/mobileFranchisePanel" },
+            { "$ref": "#/definitions/mobileSettingsPanel" }
+          ]
+        },
+        "permissions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "offlineSupported": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this panel works offline"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": ["panelId", "panelType", "title"]
+    },
+    "mobileLayout": {
+      "type": "object",
+      "description": "Mobile-specific layout configuration",
+      "properties": {
+        "orientation": {
+          "type": "string",
+          "enum": ["portrait", "landscape", "both"],
+          "default": "both"
+        },
+        "scrollDirection": {
+          "type": "string",
+          "enum": ["vertical", "horizontal", "none"],
+          "default": "vertical"
+        },
+        "pullToRefresh": {
+          "type": "boolean",
+          "default": true
+        },
+        "swipeActions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "direction": { "type": "string", "enum": ["left", "right"] },
+              "action": { "type": "string" },
+              "icon": { "type": "string" },
+              "color": { "type": "string" }
+            }
+          }
+        },
+        "floatingActionButton": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "icon": { "type": "string" },
+            "action": { "type": "string" },
+            "position": { "type": "string", "enum": ["bottom_right", "bottom_center", "bottom_left"] }
+          }
+        },
+        "stickyHeader": {
+          "type": "boolean",
+          "default": true
+        },
+        "compactMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use compact layout for smaller screens"
+        }
+      }
+    },
+    "mobileLanguagePanel": {
+      "type": "object",
+      "description": "Mobile language selection and switching panel",
+      "properties": {
+        "quickSwitch": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "recentLanguages": { "type": "integer", "default": 3 },
+            "showFlags": { "type": "boolean", "default": true }
+          }
+        },
+        "searchBar": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "voiceSearch": { "type": "boolean", "default": false },
+            "searchFields": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["code", "displayName", "nativeName"] }
+            }
+          }
+        },
+        "languageList": {
+          "type": "object",
+          "properties": {
+            "showNativeName": { "type": "boolean", "default": true },
+            "showDirection": { "type": "boolean", "default": true },
+            "showQcStatus": { "type": "boolean", "default": true },
+            "groupByRegion": { "type": "boolean", "default": false }
+          }
+        },
+        "previewMode": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showSubtitlePreview": { "type": "boolean", "default": true },
+            "showCaptionPreview": { "type": "boolean", "default": true }
+          }
+        },
+        "offlineLanguages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Languages available offline"
+        }
+      }
+    },
+    "mobileObservabilityPanel": {
+      "type": "object",
+      "description": "Mobile observability and monitoring panel",
+      "properties": {
+        "dashboardCards": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "maxCards": { "type": "integer", "default": 6 },
+            "cardTypes": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["kpi", "chart_mini", "status", "trend"] }
+            }
+          }
+        },
+        "alertSummary": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showCriticalOnly": { "type": "boolean", "default": false },
+            "maxAlerts": { "type": "integer", "default": 5 },
+            "swipeToAcknowledge": { "type": "boolean", "default": true }
+          }
+        },
+        "anomalyFeed": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showTimeline": { "type": "boolean", "default": true },
+            "pullToRefresh": { "type": "boolean", "default": true }
+          }
+        },
+        "incidentViewer": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showRootCause": { "type": "boolean", "default": true },
+            "showSuggestedActions": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "mobileMarketplacePanel": {
+      "type": "object",
+      "description": "Mobile contributor marketplace panel",
+      "properties": {
+        "browseMode": {
+          "type": "object",
+          "properties": {
+            "defaultView": { "type": "string", "enum": ["grid", "list"], "default": "grid" },
+            "cardSize": { "type": "string", "enum": ["small", "medium", "large"], "default": "medium" },
+            "showRatings": { "type": "boolean", "default": true },
+            "showBadges": { "type": "boolean", "default": true }
+          }
+        },
+        "filters": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "quickFilters": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["category", "language", "rating", "availability"] }
+            },
+            "advancedFilters": { "type": "boolean", "default": false }
+          }
+        },
+        "contributorProfile": {
+          "type": "object",
+          "properties": {
+            "showPortfolio": { "type": "boolean", "default": true },
+            "showReviews": { "type": "boolean", "default": true },
+            "directMessage": { "type": "boolean", "default": false }
+          }
+        },
+        "onboardingWizard": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "stepIndicator": { "type": "boolean", "default": true },
+            "saveProgress": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "mobileInsightsPanel": {
+      "type": "object",
+      "description": "Mobile audience insights panel",
+      "properties": {
+        "engagementOverview": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showSparklines": { "type": "boolean", "default": true },
+            "metrics": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["watch_time", "engagement_rate", "sentiment", "retention"] }
+            }
+          }
+        },
+        "sentimentCard": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showEmoji": { "type": "boolean", "default": true },
+            "showTrend": { "type": "boolean", "default": true },
+            "showRegionalBreakdown": { "type": "boolean", "default": false }
+          }
+        },
+        "retentionChart": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "chartType": { "type": "string", "enum": ["line", "area"], "default": "area" },
+            "showDropOffMarkers": { "type": "boolean", "default": true }
+          }
+        },
+        "demographicSummary": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showPieChart": { "type": "boolean", "default": true },
+            "dimensions": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["region", "age", "device"] }
+            }
+          }
+        }
+      }
+    },
+    "mobileQcPanel": {
+      "type": "object",
+      "description": "Mobile QC status and actions panel",
+      "properties": {
+        "statusOverview": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showPassRate": { "type": "boolean", "default": true },
+            "showPendingCount": { "type": "boolean", "default": true },
+            "colorCoding": { "type": "boolean", "default": true }
+          }
+        },
+        "pendingReviews": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "swipeToApprove": { "type": "boolean", "default": true },
+            "showPreview": { "type": "boolean", "default": true },
+            "batchActions": { "type": "boolean", "default": false }
+          }
+        },
+        "languageQc": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showAccuracyScore": { "type": "boolean", "default": true },
+            "showPersonaConsistency": { "type": "boolean", "default": true }
+          }
+        },
+        "issuesList": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "sortBy": { "type": "string", "enum": ["severity", "date", "type"], "default": "severity" },
+            "tapToExpand": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "mobileAlertsPanel": {
+      "type": "object",
+      "description": "Mobile alerts and notifications panel",
+      "properties": {
+        "alertFeed": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "groupByType": { "type": "boolean", "default": false },
+            "showTimestamp": { "type": "boolean", "default": true },
+            "swipeActions": { "type": "boolean", "default": true }
+          }
+        },
+        "filterBar": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "severityFilter": { "type": "boolean", "default": true },
+            "typeFilter": { "type": "boolean", "default": true },
+            "dateFilter": { "type": "boolean", "default": false }
+          }
+        },
+        "quickAcknowledge": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "bulkAcknowledge": { "type": "boolean", "default": false },
+            "requireComment": { "type": "boolean", "default": false }
+          }
+        },
+        "alertDetails": {
+          "type": "object",
+          "properties": {
+            "showContext": { "type": "boolean", "default": true },
+            "showRelatedItems": { "type": "boolean", "default": true },
+            "showSuggestedActions": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "mobileFranchisePanel": {
+      "type": "object",
+      "description": "Mobile franchise overview panel",
+      "properties": {
+        "franchiseList": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "cardLayout": { "type": "boolean", "default": true },
+            "showStatus": { "type": "boolean", "default": true },
+            "showRevenue": { "type": "boolean", "default": true }
+          }
+        },
+        "franchiseDetails": {
+          "type": "object",
+          "properties": {
+            "showSeriesList": { "type": "boolean", "default": true },
+            "showMetrics": { "type": "boolean", "default": true },
+            "showTeam": { "type": "boolean", "default": false }
+          }
+        },
+        "quickStats": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "metrics": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["episodes", "revenue", "engagement", "qc_pass_rate"] }
+            }
+          }
+        }
+      }
+    },
+    "mobileSettingsPanel": {
+      "type": "object",
+      "description": "Mobile app settings panel",
+      "properties": {
+        "accountSection": {
+          "type": "object",
+          "properties": {
+            "showProfile": { "type": "boolean", "default": true },
+            "showSecurity": { "type": "boolean", "default": true },
+            "showMfa": { "type": "boolean", "default": true }
+          }
+        },
+        "notificationSettings": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "perChannelToggle": { "type": "boolean", "default": true },
+            "quietHours": { "type": "boolean", "default": true }
+          }
+        },
+        "offlineSettings": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "showStorageUsage": { "type": "boolean", "default": true },
+            "clearCacheButton": { "type": "boolean", "default": true }
+          }
+        },
+        "accessibilitySettings": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "fontSize": { "type": "boolean", "default": true },
+            "highContrast": { "type": "boolean", "default": true },
+            "reducedMotion": { "type": "boolean", "default": true }
+          }
+        },
+        "aboutSection": {
+          "type": "object",
+          "properties": {
+            "showVersion": { "type": "boolean", "default": true },
+            "showLegal": { "type": "boolean", "default": true },
+            "showSupport": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    }
+  }
+}

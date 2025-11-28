@@ -1,0 +1,720 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SecurityFramework",
+  "description": "Schema for advanced security framework in SL18 - security policies, encryption standards, access controls, and zero-trust architecture",
+  "type": "object",
+  "properties": {
+    "frameworkId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^secfw-[a-z0-9-]+$",
+      "description": "Unique security framework identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Framework version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable framework name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "region", "franchise", "partner", "service"],
+          "description": "Security framework scope level"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Services covered by this framework"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Regions where framework applies"
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["production", "staging", "development", "testing", "disaster_recovery"]
+          },
+          "description": "Environments covered"
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "encryptionStandards": {
+      "type": "object",
+      "properties": {
+        "dataAtRest": {
+          "type": "object",
+          "properties": {
+            "algorithm": {
+              "type": "string",
+              "enum": ["AES-256-GCM", "AES-256-CBC", "ChaCha20-Poly1305", "RSA-OAEP"],
+              "description": "Encryption algorithm for data at rest"
+            },
+            "keyLength": {
+              "type": "integer",
+              "enum": [128, 192, 256, 2048, 4096],
+              "description": "Key length in bits"
+            },
+            "keyRotationDays": {
+              "type": "integer",
+              "minimum": 30,
+              "maximum": 365,
+              "description": "Key rotation period in days"
+            },
+            "keyManagement": {
+              "type": "string",
+              "enum": ["aws_kms", "azure_keyvault", "gcp_kms", "hashicorp_vault", "hardware_hsm", "custom"],
+              "description": "Key management system"
+            }
+          },
+          "required": ["algorithm", "keyLength", "keyManagement"],
+          "additionalProperties": false
+        },
+        "dataInTransit": {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "type": "string",
+              "enum": ["TLS_1_3", "TLS_1_2", "mTLS"],
+              "description": "Transport encryption protocol"
+            },
+            "minimumTlsVersion": {
+              "type": "string",
+              "enum": ["1.2", "1.3"],
+              "description": "Minimum TLS version"
+            },
+            "cipherSuites": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Allowed cipher suites"
+            },
+            "certificateType": {
+              "type": "string",
+              "enum": ["ev_ssl", "ov_ssl", "dv_ssl", "wildcard", "self_signed"],
+              "description": "Certificate type"
+            },
+            "certificateProvider": {
+              "type": "string",
+              "description": "Certificate authority"
+            },
+            "hsts": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "maxAge": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "includeSubdomains": {
+                  "type": "boolean"
+                },
+                "preload": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["protocol", "minimumTlsVersion"],
+          "additionalProperties": false
+        },
+        "fieldLevelEncryption": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "sensitiveFields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Fields requiring encryption"
+            },
+            "tokenization": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "format": {
+                  "type": "string",
+                  "enum": ["uuid", "random", "format_preserving"]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "accessControl": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": ["rbac", "abac", "pbac", "hybrid"],
+          "description": "Access control model"
+        },
+        "authentication": {
+          "type": "object",
+          "properties": {
+            "methods": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["password", "mfa_totp", "mfa_sms", "mfa_email", "mfa_push", "biometric", "hardware_key", "sso_saml", "sso_oidc", "api_key", "jwt", "certificate"]
+              },
+              "description": "Supported authentication methods"
+            },
+            "mfaRequired": {
+              "type": "boolean",
+              "description": "MFA requirement"
+            },
+            "mfaContextual": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "triggers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["new_device", "new_location", "high_risk_action", "unusual_time", "concurrent_session", "failed_attempts"]
+                  }
+                },
+                "riskThreshold": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "additionalProperties": false
+            },
+            "passwordPolicy": {
+              "type": "object",
+              "properties": {
+                "minLength": {
+                  "type": "integer",
+                  "minimum": 8
+                },
+                "requireUppercase": {
+                  "type": "boolean"
+                },
+                "requireLowercase": {
+                  "type": "boolean"
+                },
+                "requireNumbers": {
+                  "type": "boolean"
+                },
+                "requireSymbols": {
+                  "type": "boolean"
+                },
+                "expirationDays": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "historyCount": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Number of previous passwords to check"
+                },
+                "lockoutThreshold": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "lockoutDuration": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Lockout duration in minutes"
+                }
+              },
+              "additionalProperties": false
+            },
+            "sessionPolicy": {
+              "type": "object",
+              "properties": {
+                "maxDuration": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Maximum session duration in minutes"
+                },
+                "idleTimeout": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Idle timeout in minutes"
+                },
+                "concurrentSessions": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "deviceBinding": {
+                  "type": "boolean"
+                },
+                "geoBinding": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "authorization": {
+          "type": "object",
+          "properties": {
+            "roles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roleId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "permissions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "constraints": {
+                    "type": "object",
+                    "properties": {
+                      "ipWhitelist": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "timeWindows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "dayOfWeek": {
+                              "type": "array",
+                              "items": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 6
+                              }
+                            },
+                            "startHour": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 23
+                            },
+                            "endHour": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 23
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "geoRestrictions": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Allowed country codes"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "mfaRequired": {
+                    "type": "boolean"
+                  },
+                  "approvalRequired": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["roleId", "name", "permissions"],
+                "additionalProperties": false
+              }
+            },
+            "policies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "policyId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "resource": {
+                    "type": "string"
+                  },
+                  "actions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["read", "write", "create", "delete", "execute", "admin"]
+                    }
+                  },
+                  "effect": {
+                    "type": "string",
+                    "enum": ["allow", "deny"]
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "attribute": {
+                          "type": "string"
+                        },
+                        "operator": {
+                          "type": "string",
+                          "enum": ["eq", "neq", "gt", "gte", "lt", "lte", "in", "not_in", "contains"]
+                        },
+                        "value": {}
+                      },
+                      "required": ["attribute", "operator", "value"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["policyId", "name", "resource", "actions", "effect"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "zeroTrust": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "principles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "never_trust_always_verify",
+              "least_privilege",
+              "assume_breach",
+              "verify_explicitly",
+              "continuous_validation",
+              "micro_segmentation"
+            ]
+          }
+        },
+        "networkSegmentation": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "segments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "segmentId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "services": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "allowedConnections": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["segmentId", "name"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "deviceTrust": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "complianceChecks": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["os_version", "security_patches", "antivirus", "disk_encryption", "screen_lock", "jailbreak_detection", "app_integrity"]
+              }
+            },
+            "minimumTrustScore": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        },
+        "identityVerification": {
+          "type": "object",
+          "properties": {
+            "continuousAuth": {
+              "type": "boolean"
+            },
+            "behavioralAnalysis": {
+              "type": "boolean"
+            },
+            "riskScoring": {
+              "type": "boolean"
+            },
+            "stepUpAuth": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "triggers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["sensitive_data", "financial_action", "admin_action", "high_risk_score", "anomaly_detected"]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "credentialManagement": {
+      "type": "object",
+      "properties": {
+        "vault": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "enum": ["hashicorp_vault", "aws_secrets_manager", "azure_keyvault", "gcp_secret_manager", "cyberark", "custom"]
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "autoRotation": {
+              "type": "boolean"
+            },
+            "rotationInterval": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Rotation interval in days"
+            }
+          },
+          "additionalProperties": false
+        },
+        "apiKeys": {
+          "type": "object",
+          "properties": {
+            "format": {
+              "type": "string",
+              "enum": ["uuid", "random", "prefixed"]
+            },
+            "expirationDays": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "rateLimiting": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "requestsPerMinute": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "requestsPerHour": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "serviceAccounts": {
+          "type": "object",
+          "properties": {
+            "minimumPrivilege": {
+              "type": "boolean"
+            },
+            "rotationRequired": {
+              "type": "boolean"
+            },
+            "auditRequired": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "frameworks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["SOC2", "ISO27001", "NIST_CSF", "CIS", "PCI_DSS", "HIPAA", "GDPR", "CCPA", "FedRAMP"]
+          }
+        },
+        "lastAudit": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextAudit": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "certifications": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "issueDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "expirationDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["active", "expired", "pending_renewal"]
+              }
+            },
+            "required": ["name", "status"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "securityScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "vulnerabilitiesOpen": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "vulnerabilitiesClosed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "incidentsThisMonth": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "meanTimeToDetect": {
+          "type": "number",
+          "minimum": 0,
+          "description": "MTTD in minutes"
+        },
+        "meanTimeToRespond": {
+          "type": "number",
+          "minimum": 0,
+          "description": "MTTR in minutes"
+        },
+        "complianceScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "suspended", "maintenance", "deprecated"],
+      "description": "Framework status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "frameworkId",
+    "version",
+    "name",
+    "scope",
+    "encryptionStandards",
+    "accessControl",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

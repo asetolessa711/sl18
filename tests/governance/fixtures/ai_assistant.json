@@ -1,0 +1,546 @@
+{
+  "aiAssistants": {
+    "validAssistant": {
+      "assistantId": "assistant-ops-001",
+      "version": "1.0.0",
+      "operatorId": "operator-001",
+      "status": "active",
+      "context": {
+        "franchiseId": "kenya-001",
+        "seriesId": "series-drama-001",
+        "episodeId": "episode-001",
+        "language": "en",
+        "region": "africa-east",
+        "panel": "qc_dashboard",
+        "recentActions": [
+          { "action": "view_alerts", "timestamp": "2025-01-15T10:00:00Z", "target": "alerts_panel" },
+          { "action": "switch_language", "timestamp": "2025-01-15T09:55:00Z", "target": "sw" }
+        ],
+        "activeAlerts": ["alert-qc-001", "alert-anomaly-002"]
+      },
+      "capabilities": {
+        "naturalLanguageQueries": true,
+        "contextualGuidance": true,
+        "proactiveAlerts": true,
+        "inlineHelp": true,
+        "voiceInteraction": true,
+        "multilingualSupport": true,
+        "actionExecution": true
+      },
+      "conversationHistory": [
+        {
+          "turnId": "turn-001",
+          "role": "operator",
+          "content": "Show me QC alerts",
+          "intent": "navigate",
+          "entities": [{ "type": "panel", "value": "qc_alerts", "confidence": 0.95 }],
+          "confidence": 0.92,
+          "timestamp": "2025-01-15T10:00:00Z",
+          "inputMethod": "text"
+        },
+        {
+          "turnId": "turn-002",
+          "role": "assistant",
+          "content": "Here are your QC alerts. You have 3 pending alerts requiring attention.",
+          "timestamp": "2025-01-15T10:00:01Z",
+          "suggestions": ["Show critical alerts only", "Acknowledge all", "Filter by language"]
+        }
+      ],
+      "supportedCommands": [
+        {
+          "commandId": "cmd-navigate-qc",
+          "category": "navigation",
+          "patterns": ["show me QC alerts", "go to QC", "open QC dashboard"],
+          "description": "Navigate to QC dashboard",
+          "action": { "type": "navigate", "target": "/qc-dashboard" },
+          "examples": ["Show me QC alerts", "Take me to QC"]
+        },
+        {
+          "commandId": "cmd-switch-language",
+          "category": "navigation",
+          "patterns": ["switch to {language}", "change language to {language}"],
+          "description": "Switch workspace language",
+          "parameters": [
+            { "name": "language", "type": "string", "required": true, "examples": ["Amharic", "Kiswahili", "Italian"] }
+          ],
+          "action": { "type": "switch_context", "target": "language" },
+          "examples": ["Switch to Amharic", "Change language to Kiswahili"]
+        },
+        {
+          "commandId": "cmd-acknowledge-alert",
+          "category": "alerts",
+          "patterns": ["acknowledge alert {alertId}", "dismiss alert {alertId}"],
+          "description": "Acknowledge an alert",
+          "parameters": [
+            { "name": "alertId", "type": "string", "required": true }
+          ],
+          "action": { "type": "api_call", "target": "/alerts/acknowledge" },
+          "requiresConfirmation": true
+        }
+      ],
+      "recommendations": {
+        "enabled": true,
+        "categories": ["navigation", "qc_actions", "monetization", "personalization", "troubleshooting"],
+        "maxRecommendations": 5,
+        "contextWeight": 0.7,
+        "historyWeight": 0.3
+      },
+      "proactiveAlerts": {
+        "enabled": true,
+        "alertTypes": {
+          "anomalies": { "enabled": true, "threshold": "medium", "autoSuggestRemediation": true },
+          "qcIssues": { "enabled": true, "threshold": "low", "autoSuggestRemediation": true },
+          "culturalSensitivity": { "enabled": true, "threshold": "low", "autoSuggestRemediation": true },
+          "monetizationOpportunities": { "enabled": true, "threshold": "medium", "autoSuggestRemediation": true },
+          "retentionRisks": { "enabled": true, "threshold": "medium", "autoSuggestRemediation": true }
+        },
+        "notificationMode": "inline",
+        "groupSimilarAlerts": true
+      },
+      "conversationalFlows": [
+        {
+          "flowId": "flow-onboarding",
+          "name": "New Operator Onboarding",
+          "trigger": { "type": "event", "value": "first_login" },
+          "steps": [
+            { "stepId": "step-1", "type": "message", "content": "Welcome to SL18! I'm your AI assistant. Let me show you around.", "nextStep": "step-2" },
+            { "stepId": "step-2", "type": "prompt", "content": "What would you like to explore first?", "options": [
+              { "label": "QC Dashboard", "value": "qc", "nextStep": "step-qc" },
+              { "label": "Marketplace", "value": "marketplace", "nextStep": "step-marketplace" },
+              { "label": "Skip tour", "value": "skip", "nextStep": null }
+            ]}
+          ],
+          "enabled": true
+        }
+      ],
+      "helpLinks": {
+        "enabled": true,
+        "modules": {
+          "qc": "Docs/governance.md#qc-enforcement",
+          "marketplace": "Docs/contributor_marketplace.md",
+          "distribution": "Docs/distribution.md",
+          "personalization": "Docs/personalization.md"
+        },
+        "searchEnabled": true
+      },
+      "preferences": {
+        "responseStyle": "concise",
+        "proactivityLevel": "moderate",
+        "language": "en",
+        "showSuggestions": true,
+        "autoCompleteEnabled": true,
+        "soundEnabled": false
+      },
+      "metrics": {
+        "totalQueries": 150,
+        "successfulQueries": 142,
+        "averageResponseTimeMs": 245,
+        "mostUsedCommands": [
+          { "command": "show_alerts", "count": 45 },
+          { "command": "navigate_qc", "count": 38 },
+          { "command": "switch_language", "count": 25 }
+        ],
+        "recommendationsAccepted": 28,
+        "recommendationsDismissed": 12
+      },
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": "2025-01-15T10:00:00Z"
+    },
+    "invalidAssistant": {
+      "assistantId": "invalid-id",
+      "version": "invalid",
+      "status": "unknown"
+    },
+    "minimalAssistant": {
+      "assistantId": "assistant-minimal-001",
+      "version": "1.0.0",
+      "operatorId": "operator-002",
+      "status": "idle"
+    }
+  },
+  "voiceControls": {
+    "validVoiceControl": {
+      "voiceControlId": "voice-001",
+      "version": "1.0.0",
+      "operatorId": "operator-001",
+      "enabled": true,
+      "status": "listening",
+      "wakeWord": {
+        "enabled": true,
+        "phrase": "Hey SL18",
+        "alternatives": ["SL eighteen", "Hey assistant"],
+        "sensitivity": 0.5,
+        "confirmationSound": true,
+        "visualIndicator": true
+      },
+      "recognition": {
+        "engine": "google",
+        "primaryLanguage": "en",
+        "supportedLanguages": ["en", "fr", "es", "ar", "zh", "it", "am", "sw", "om"],
+        "autoDetectLanguage": true,
+        "continuousListening": false,
+        "interimResults": true,
+        "maxSilenceMs": 2000,
+        "maxRecordingMs": 15000,
+        "confidenceThreshold": 0.7,
+        "noiseReduction": true,
+        "echoCancellation": true
+      },
+      "synthesis": {
+        "enabled": true,
+        "engine": "google",
+        "voice": { "id": "en-US-Neural2-D", "name": "Neural Voice", "language": "en", "gender": "neutral" },
+        "rate": 1,
+        "pitch": 1,
+        "volume": 1,
+        "readAlerts": false,
+        "confirmActions": true
+      },
+      "commands": [
+        {
+          "commandId": "voice-nav-qc",
+          "category": "navigation",
+          "phrases": ["show QC alerts", "open QC dashboard", "go to quality control"],
+          "description": "Navigate to QC dashboard",
+          "action": { "type": "navigate", "target": "/qc-dashboard" },
+          "confirmationRequired": false,
+          "successResponse": "Opening QC dashboard",
+          "offlineSupported": false,
+          "enabled": true,
+          "multilingualPhrases": {
+            "sw": ["onyesha makosa ya QC", "fungua dashibodi ya QC"],
+            "am": ["የጥራት ማሳወቂያዎችን አሳይ", "የጥራት ዳሽቦርድ ክፈት"]
+          }
+        },
+        {
+          "commandId": "voice-switch-lang",
+          "category": "navigation",
+          "phrases": ["switch to {language}", "change language to {language}"],
+          "description": "Switch workspace language",
+          "parameters": [
+            { "name": "language", "type": "language", "required": true, "examples": ["Amharic", "Kiswahili", "Italian"] }
+          ],
+          "action": { "type": "toggle", "target": "language" },
+          "confirmationRequired": false,
+          "successResponse": "Language switched to {language}",
+          "enabled": true
+        },
+        {
+          "commandId": "voice-acknowledge-alert",
+          "category": "alerts",
+          "phrases": ["acknowledge alert", "dismiss this alert", "mark alert as read"],
+          "description": "Acknowledge current alert",
+          "action": { "type": "acknowledge", "target": "current_alert" },
+          "confirmationRequired": true,
+          "confirmationPhrase": "Are you sure you want to acknowledge this alert?",
+          "successResponse": "Alert acknowledged",
+          "enabled": true
+        },
+        {
+          "commandId": "voice-approve-translation",
+          "category": "qc",
+          "phrases": ["approve translation", "translation looks good", "accept this translation"],
+          "description": "Approve current translation in QC",
+          "action": { "type": "approve", "target": "current_translation" },
+          "confirmationRequired": true,
+          "confirmationPhrase": "Confirm approval of this translation?",
+          "successResponse": "Translation approved",
+          "enabled": true
+        },
+        {
+          "commandId": "voice-reject-persona",
+          "category": "qc",
+          "phrases": ["reject persona", "flag persona inconsistency", "persona needs review"],
+          "description": "Flag persona inconsistency",
+          "action": { "type": "reject", "target": "current_persona_check" },
+          "confirmationRequired": true,
+          "confirmationPhrase": "Confirm flagging this persona inconsistency?",
+          "successResponse": "Persona flagged for review",
+          "enabled": true
+        }
+      ],
+      "commandCategories": {
+        "navigation": { "enabled": true, "confirmationRequired": false },
+        "alerts": { "enabled": true, "confirmationRequired": false },
+        "qcActions": { "enabled": true, "confirmationRequired": true },
+        "distribution": { "enabled": true, "confirmationRequired": true },
+        "settings": { "enabled": true, "confirmationRequired": true },
+        "help": { "enabled": true, "confirmationRequired": false }
+      },
+      "accessibility": {
+        "speechToTextEnabled": true,
+        "voiceNavigationEnabled": true,
+        "screenReaderIntegration": true,
+        "dictationMode": false,
+        "slowSpeechMode": false,
+        "repeatEnabled": true,
+        "spellingMode": true
+      },
+      "deviceIntegration": {
+        "platform": "ios",
+        "microphonePermission": "granted",
+        "backgroundListening": false,
+        "bluetoothMicSupport": true,
+        "siriIntegration": true,
+        "googleAssistantIntegration": false
+      },
+      "multilingualConfig": {
+        "commandLanguages": [
+          {
+            "code": "en",
+            "displayName": "English",
+            "nativeName": "English",
+            "voiceId": "en-US-Neural2-D",
+            "commandMappings": {}
+          },
+          {
+            "code": "sw",
+            "displayName": "Kiswahili",
+            "nativeName": "Kiswahili",
+            "voiceId": "sw-KE-Standard-A",
+            "commandMappings": { "show alerts": "onyesha tahadhari", "approve": "idhinisha" }
+          },
+          {
+            "code": "am",
+            "displayName": "Amharic",
+            "nativeName": "አማርኛ",
+            "voiceId": "am-ET-Standard-A",
+            "commandMappings": { "show alerts": "ማሳወቂያዎችን አሳይ", "approve": "አጽድቅ" }
+          }
+        ],
+        "fallbackLanguage": "en",
+        "mixedLanguageSupport": true,
+        "rtlLanguageSupport": true
+      },
+      "privacy": {
+        "localProcessing": false,
+        "recordingRetention": "none",
+        "transcriptRetention": "session",
+        "anonymizeVoiceData": true,
+        "shareVoiceDataForImprovement": false
+      },
+      "metrics": {
+        "totalVoiceCommands": 85,
+        "successfulCommands": 78,
+        "failedRecognitions": 7,
+        "averageConfidence": 0.89,
+        "mostUsedCommands": [
+          { "command": "show_alerts", "count": 25 },
+          { "command": "switch_language", "count": 18 },
+          { "command": "acknowledge_alert", "count": 15 }
+        ],
+        "languageUsage": { "en": 50, "sw": 20, "am": 15 },
+        "wakeWordActivations": 120,
+        "falseWakeWordActivations": 8
+      },
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": "2025-01-15T10:00:00Z"
+    },
+    "invalidVoiceControl": {
+      "voiceControlId": "invalid-voice",
+      "version": "bad",
+      "status": "unknown"
+    },
+    "disabledVoiceControl": {
+      "voiceControlId": "voice-disabled-001",
+      "version": "1.0.0",
+      "operatorId": "operator-003",
+      "enabled": false,
+      "status": "disabled"
+    }
+  },
+  "conversationTurns": {
+    "navigationQuery": {
+      "turnId": "turn-nav-001",
+      "role": "operator",
+      "content": "Show me QC alerts for the Kenya franchise",
+      "intent": "navigate",
+      "entities": [
+        { "type": "panel", "value": "qc_alerts", "confidence": 0.95 },
+        { "type": "franchise", "value": "kenya-001", "confidence": 0.88 }
+      ],
+      "confidence": 0.91,
+      "timestamp": "2025-01-15T10:00:00Z",
+      "inputMethod": "text"
+    },
+    "actionQuery": {
+      "turnId": "turn-action-001",
+      "role": "operator",
+      "content": "Approve all translations for episode 5",
+      "intent": "action",
+      "entities": [
+        { "type": "action", "value": "approve", "confidence": 0.92 },
+        { "type": "target", "value": "translations", "confidence": 0.88 },
+        { "type": "episode", "value": "5", "confidence": 0.95 }
+      ],
+      "confidence": 0.88,
+      "action": {
+        "type": "batch_approve",
+        "target": "translations",
+        "executed": false,
+        "result": "pending_confirmation"
+      },
+      "timestamp": "2025-01-15T10:05:00Z",
+      "inputMethod": "voice"
+    },
+    "helpQuery": {
+      "turnId": "turn-help-001",
+      "role": "operator",
+      "content": "What does cultural sensitivity mean?",
+      "intent": "help",
+      "entities": [
+        { "type": "topic", "value": "cultural_sensitivity", "confidence": 0.94 }
+      ],
+      "confidence": 0.94,
+      "timestamp": "2025-01-15T10:10:00Z",
+      "inputMethod": "text"
+    },
+    "assistantResponse": {
+      "turnId": "turn-response-001",
+      "role": "assistant",
+      "content": "Cultural sensitivity in SL18 refers to ensuring content respects cultural norms, idioms, and sensitivities of target audiences. The system flags potential issues automatically during QC.",
+      "suggestions": ["Show cultural sensitivity alerts", "View guidelines", "Configure thresholds"],
+      "timestamp": "2025-01-15T10:10:01Z"
+    }
+  },
+  "voiceCommands": {
+    "navigationCommand": {
+      "commandId": "voice-nav-insights",
+      "category": "navigation",
+      "phrases": ["show insights", "open audience insights", "take me to insights dashboard"],
+      "description": "Navigate to audience insights",
+      "action": { "type": "navigate", "target": "/insights" },
+      "confirmationRequired": false,
+      "successResponse": "Opening audience insights dashboard",
+      "offlineSupported": false,
+      "enabled": true
+    },
+    "qcActionCommand": {
+      "commandId": "voice-qc-approve",
+      "category": "qc",
+      "phrases": ["approve this", "looks good", "pass QC"],
+      "description": "Approve current QC item",
+      "action": { "type": "approve", "target": "current_qc_item" },
+      "confirmationRequired": true,
+      "confirmationPhrase": "Confirm QC approval?",
+      "successResponse": "QC item approved",
+      "failureResponse": "Could not approve QC item. Please try again.",
+      "enabled": true
+    },
+    "multilingualCommand": {
+      "commandId": "voice-multilingual-switch",
+      "category": "navigation",
+      "phrases": ["switch to Amharic", "badil ila al-arabia", "cambia a italiano"],
+      "description": "Switch language with multilingual phrases",
+      "parameters": [
+        { "name": "language", "type": "language", "required": true }
+      ],
+      "action": { "type": "toggle", "target": "language" },
+      "enabled": true,
+      "multilingualPhrases": {
+        "ar": ["بدل إلى العربية", "غير اللغة"],
+        "it": ["cambia in italiano", "passa all'italiano"],
+        "am": ["ወደ አማርኛ ቀይር", "ቋንቋ ቀይር"]
+      }
+    }
+  },
+  "recommendations": {
+    "contextualRecommendation": {
+      "type": "qc_action",
+      "title": "Review pending QC items",
+      "description": "You have 5 pending QC items for the Kenya franchise that need attention.",
+      "action": { "type": "navigate", "target": "/qc-dashboard?filter=pending" },
+      "priority": "high",
+      "contextMatch": 0.92
+    },
+    "monetizationRecommendation": {
+      "type": "monetization",
+      "title": "Retention risk detected",
+      "description": "Viewer engagement has dropped 15% in the East Africa region. Consider offering promotional pricing.",
+      "action": { "type": "navigate", "target": "/monetization/retention-actions" },
+      "priority": "medium",
+      "contextMatch": 0.78
+    }
+  },
+  "proactiveAlerts": {
+    "anomalyAlert": {
+      "alertId": "proactive-001",
+      "type": "anomaly",
+      "title": "QC Drop Detected",
+      "description": "QC pass rate has dropped below 85% for Kiswahili translations in the last hour.",
+      "severity": "warning",
+      "suggestedRemediation": "Review recent Kiswahili translations and check translator quality.",
+      "action": { "type": "navigate", "target": "/qc-dashboard?language=sw" },
+      "timestamp": "2025-01-15T10:00:00Z"
+    },
+    "culturalAlert": {
+      "alertId": "proactive-002",
+      "type": "cultural_sensitivity",
+      "title": "Cultural Sensitivity Flag",
+      "description": "Content in episode 7 contains potentially sensitive references for the Amharic audience.",
+      "severity": "critical",
+      "suggestedRemediation": "Review flagged content with a native Amharic reviewer before publishing.",
+      "action": { "type": "navigate", "target": "/qc-dashboard?episode=7&language=am" },
+      "timestamp": "2025-01-15T10:05:00Z"
+    }
+  },
+  "auditEvents": {
+    "assistantQueryEvent": {
+      "eventId": "audit-assistant-001",
+      "eventType": "assistant_query_processed",
+      "category": "ai_assistant",
+      "actor": { "type": "operator", "id": "operator-001" },
+      "target": { "type": "assistant", "id": "assistant-ops-001" },
+      "details": {
+        "query": "Show me QC alerts",
+        "intent": "navigate",
+        "confidence": 0.92,
+        "actionTaken": "navigate_to_qc_dashboard",
+        "responseTimeMs": 245
+      },
+      "timestamp": "2025-01-15T10:00:00Z"
+    },
+    "voiceCommandEvent": {
+      "eventId": "audit-voice-001",
+      "eventType": "voice_command_executed",
+      "category": "voice_control",
+      "actor": { "type": "operator", "id": "operator-001" },
+      "target": { "type": "voice_control", "id": "voice-001" },
+      "details": {
+        "command": "approve translation",
+        "recognizedText": "approve this translation",
+        "confidence": 0.89,
+        "language": "en",
+        "actionTaken": "translation_approved",
+        "confirmationRequired": true,
+        "confirmed": true
+      },
+      "timestamp": "2025-01-15T10:05:00Z"
+    },
+    "wakeWordEvent": {
+      "eventId": "audit-wake-001",
+      "eventType": "wake_word_activated",
+      "category": "voice_control",
+      "actor": { "type": "operator", "id": "operator-001" },
+      "target": { "type": "voice_control", "id": "voice-001" },
+      "details": {
+        "wakeWord": "Hey SL18",
+        "activationTime": "2025-01-15T10:00:00Z",
+        "falsePositive": false
+      },
+      "timestamp": "2025-01-15T10:00:00Z"
+    },
+    "recommendationAcceptedEvent": {
+      "eventId": "audit-rec-001",
+      "eventType": "recommendation_accepted",
+      "category": "ai_assistant",
+      "actor": { "type": "operator", "id": "operator-001" },
+      "target": { "type": "recommendation", "id": "rec-001" },
+      "details": {
+        "recommendationType": "qc_action",
+        "actionTaken": "navigate_to_qc_dashboard"
+      },
+      "timestamp": "2025-01-15T10:02:00Z"
+    }
+  }
+}

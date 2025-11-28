@@ -1,0 +1,758 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DistributionPipeline",
+  "description": "Schema for media distribution pipeline in SL18 - streaming, CDN, DRM, and access control for global delivery",
+  "type": "object",
+  "properties": {
+    "pipelineId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^dist-[a-z0-9-]+$",
+      "description": "Unique distribution pipeline identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable pipeline name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "region", "franchise", "content"],
+          "description": "Distribution scope"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Target distribution regions"
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["web", "ios", "android", "smart_tv", "ott", "chromecast", "airplay"]
+          }
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "streaming": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "protocols": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "protocolId": {
+                "type": "string"
+              },
+              "protocol": {
+                "type": "string",
+                "enum": ["hls", "dash", "smooth", "progressive", "rtmp", "webrtc"],
+                "description": "Streaming protocol"
+              },
+              "versions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Supported protocol versions"
+              },
+              "encryption": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": ["aes_128", "aes_256", "sample_aes", "cbcs", "cenc"]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "lowLatency": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "targetLatency": {
+                    "type": "number",
+                    "minimum": 0.5,
+                    "description": "Target latency in seconds"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["protocolId", "protocol", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "adaptiveBitrate": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "algorithm": {
+              "type": "string",
+              "enum": ["bandwidth_estimation", "buffer_based", "hybrid", "ml_predictive"]
+            },
+            "minBitrate": {
+              "type": "integer",
+              "minimum": 100,
+              "description": "Minimum bitrate in kbps"
+            },
+            "maxBitrate": {
+              "type": "integer",
+              "minimum": 100,
+              "description": "Maximum bitrate in kbps"
+            },
+            "initialBitrate": {
+              "type": "integer",
+              "minimum": 100,
+              "description": "Initial bitrate selection in kbps"
+            }
+          },
+          "additionalProperties": false
+        },
+        "bufferConfig": {
+          "type": "object",
+          "properties": {
+            "minBufferSeconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "maxBufferSeconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "rebufferThreshold": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "cdn": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "providerId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string",
+                "enum": ["cloudflare", "akamai", "fastly", "cloudfront", "azure_cdn", "bunny", "stackpath"]
+              },
+              "weight": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Traffic weight percentage for multi-CDN"
+              },
+              "regions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Regions served by this CDN"
+              },
+              "originShield": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "location": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "caching": {
+                "type": "object",
+                "properties": {
+                  "defaultTtl": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Default TTL in seconds"
+                  },
+                  "manifestTtl": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Manifest TTL in seconds"
+                  },
+                  "segmentTtl": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Segment TTL in seconds"
+                  },
+                  "bypassRules": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["providerId", "name", "provider", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "multiCdn": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "strategy": {
+              "type": "string",
+              "enum": ["weighted", "latency_based", "geo_based", "failover", "cost_optimized"]
+            },
+            "healthCheck": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "interval": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "threshold": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "originConfig": {
+          "type": "object",
+          "properties": {
+            "origins": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "originId": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["s3", "gcs", "azure", "custom_origin"]
+                  },
+                  "endpoint": {
+                    "type": "string"
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "required": ["originId", "type", "endpoint"],
+                "additionalProperties": false
+              }
+            },
+            "failover": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "errorCodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "drm": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "providerId": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string",
+                "enum": ["widevine", "fairplay", "playready", "primetime"]
+              },
+              "licenseServer": {
+                "type": "string",
+                "description": "License server URL"
+              },
+              "securityLevel": {
+                "type": "string",
+                "enum": ["L1", "L2", "L3", "software"],
+                "description": "DRM security level"
+              },
+              "offlineEnabled": {
+                "type": "boolean",
+                "description": "Allow offline playback"
+              },
+              "offlineDuration": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Offline license duration in hours"
+              },
+              "hdcpRequired": {
+                "type": "boolean"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["providerId", "provider", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "keyManagement": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "enum": ["pallycon", "buydrm", "axinom", "irdeto", "custom"]
+            },
+            "keyRotation": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "interval": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Key rotation interval in minutes"
+                }
+              },
+              "additionalProperties": false
+            },
+            "forensicWatermarking": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "provider": {
+                  "type": "string",
+                  "enum": ["nagra", "irdeto", "pallycon", "custom"]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "policyId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "contentTier": {
+                "type": "string",
+                "enum": ["free", "premium", "ultra_premium", "exclusive"]
+              },
+              "rules": {
+                "type": "object",
+                "properties": {
+                  "maxResolution": {
+                    "type": "string",
+                    "enum": ["480p", "720p", "1080p", "4k"]
+                  },
+                  "maxConcurrentStreams": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "allowDownload": {
+                    "type": "boolean"
+                  },
+                  "downloadExpiry": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Download expiry in hours"
+                  },
+                  "screenCapture": {
+                    "type": "boolean"
+                  },
+                  "airplay": {
+                    "type": "boolean"
+                  },
+                  "chromecast": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["policyId", "name", "contentTier", "enabled"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "accessControl": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "tokenAuth": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "algorithm": {
+              "type": "string",
+              "enum": ["hmac_sha256", "rsa_sha256", "jwt", "signed_url"]
+            },
+            "expiry": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Token expiry in seconds"
+            },
+            "ipBinding": {
+              "type": "boolean",
+              "description": "Bind token to client IP"
+            },
+            "userAgentBinding": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "geoRestriction": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "mode": {
+              "type": "string",
+              "enum": ["whitelist", "blacklist"]
+            },
+            "countries": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              },
+              "description": "ISO 3166-1 alpha-2 country codes"
+            },
+            "vpnDetection": {
+              "type": "boolean"
+            },
+            "proxyDetection": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "deviceLimits": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "maxDevices": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "deviceTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["mobile", "tablet", "desktop", "smart_tv", "game_console", "streaming_device"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "rateLimiting": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "requestsPerSecond": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "burstSize": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "offlineDownload": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "profileId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "quality": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "highest"]
+              },
+              "resolution": {
+                "type": "string",
+                "enum": ["480p", "720p", "1080p", "4k"]
+              },
+              "videoBitrate": {
+                "type": "integer",
+                "minimum": 100,
+                "description": "Video bitrate in kbps"
+              },
+              "audioBitrate": {
+                "type": "integer",
+                "minimum": 32,
+                "description": "Audio bitrate in kbps"
+              },
+              "estimatedSizeMB": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Estimated size per minute of content in MB"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["profileId", "name", "quality", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "restrictions": {
+          "type": "object",
+          "properties": {
+            "maxDownloads": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Maximum simultaneous downloads"
+            },
+            "expiryDays": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Download expiry in days"
+            },
+            "requireWifi": {
+              "type": "boolean"
+            },
+            "storageLimit": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Storage limit per user in GB"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "analytics": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "providerId": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string",
+                "enum": ["conviva", "mux", "youbora", "bitmovin_analytics", "custom"]
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["providerId", "provider", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "beacons": {
+          "type": "object",
+          "properties": {
+            "heartbeatInterval": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Heartbeat interval in seconds"
+            },
+            "eventTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["play", "pause", "seek", "buffer", "quality_change", "error", "ad_start", "ad_end", "complete"]
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "totalStreams": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "concurrentPeak": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "avgBitrate": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average bitrate in kbps"
+        },
+        "avgStartupTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average startup time in seconds"
+        },
+        "rebufferRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Rebuffer ratio percentage"
+        },
+        "errorRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "cdnHitRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "CDN cache hit rate"
+        },
+        "bandwidthTB": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total bandwidth delivered in TB"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "paused", "draining", "maintenance", "error"],
+      "description": "Current pipeline status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "pipelineId",
+    "version",
+    "name",
+    "scope",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}

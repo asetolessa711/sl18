@@ -1,0 +1,1453 @@
+{
+  "mediaRendering": {
+    "renderingId": "render-waliin-production",
+    "version": "1.0.0",
+    "name": "Waliin Studio Production Rendering Pipeline",
+    "scope": {
+      "level": "global",
+      "contentTypes": ["short_drama", "movie", "series_episode", "trailer", "teaser"]
+    },
+    "ingestPipeline": {
+      "enabled": true,
+      "sources": [
+        {
+          "sourceId": "source-direct-upload",
+          "name": "Direct Upload",
+          "type": "direct_upload",
+          "location": "https://upload.sl18.io/ingest",
+          "acceptedFormats": ["mp4", "mov", "prores", "mxf"],
+          "maxFileSize": 50000,
+          "validation": {
+            "checksum": true,
+            "virusScan": true,
+            "metadataValidation": true
+          },
+          "enabled": true
+        },
+        {
+          "sourceId": "source-capcut",
+          "name": "CapCut Export",
+          "type": "capcut_export",
+          "location": "s3://sl18-capcut-exports/",
+          "acceptedFormats": ["mp4", "mov"],
+          "maxFileSize": 20000,
+          "validation": {
+            "checksum": true,
+            "virusScan": true,
+            "metadataValidation": true
+          },
+          "enabled": true
+        },
+        {
+          "sourceId": "source-s3-raw",
+          "name": "S3 Raw Assets",
+          "type": "s3",
+          "location": "s3://sl18-raw-assets/",
+          "acceptedFormats": ["prores", "dnxhd", "raw", "mxf"],
+          "maxFileSize": 100000,
+          "validation": {
+            "checksum": true,
+            "virusScan": false,
+            "metadataValidation": true
+          },
+          "enabled": true
+        }
+      ],
+      "preprocessing": {
+        "deinterlace": true,
+        "denoising": false,
+        "colorCorrection": true,
+        "audioNormalization": true,
+        "frameRateConversion": true
+      },
+      "qualityAnalysis": {
+        "enabled": true,
+        "metrics": ["vmaf", "psnr", "ssim", "bitrate_consistency", "audio_loudness", "black_frames", "scene_detection"],
+        "minimumVmaf": 85
+      }
+    },
+    "transcoding": {
+      "enabled": true,
+      "engine": "mediaconvert",
+      "videoCodecs": [
+        {
+          "codecId": "codec-h264",
+          "codec": "h264",
+          "profile": "high",
+          "bitDepth": 8,
+          "hardwareAcceleration": "nvenc",
+          "enabled": true
+        },
+        {
+          "codecId": "codec-h265",
+          "codec": "h265_hevc",
+          "profile": "main10",
+          "bitDepth": 10,
+          "hardwareAcceleration": "nvenc",
+          "enabled": true
+        },
+        {
+          "codecId": "codec-av1",
+          "codec": "av1",
+          "profile": "main",
+          "bitDepth": 10,
+          "hardwareAcceleration": "none",
+          "enabled": true
+        }
+      ],
+      "audioCodecs": [
+        {
+          "codecId": "codec-aac",
+          "codec": "aac",
+          "channels": "stereo",
+          "sampleRate": 48000,
+          "enabled": true
+        },
+        {
+          "codecId": "codec-ac3",
+          "codec": "ac3",
+          "channels": "5.1",
+          "sampleRate": 48000,
+          "enabled": true
+        },
+        {
+          "codecId": "codec-opus",
+          "codec": "opus",
+          "channels": "stereo",
+          "sampleRate": 48000,
+          "enabled": true
+        }
+      ],
+      "renditions": [
+        {
+          "renditionId": "rendition-4k",
+          "name": "4K UHD",
+          "resolution": {
+            "width": 3840,
+            "height": 2160,
+            "aspectRatio": "16:9"
+          },
+          "videoBitrate": {
+            "target": 15000,
+            "max": 20000,
+            "min": 10000,
+            "mode": "vbr"
+          },
+          "audioBitrate": 256,
+          "frameRate": 24,
+          "deviceTarget": "smart_tv",
+          "priority": 1,
+          "enabled": true
+        },
+        {
+          "renditionId": "rendition-1080p",
+          "name": "Full HD",
+          "resolution": {
+            "width": 1920,
+            "height": 1080,
+            "aspectRatio": "16:9"
+          },
+          "videoBitrate": {
+            "target": 6000,
+            "max": 8000,
+            "min": 4000,
+            "mode": "vbr"
+          },
+          "audioBitrate": 192,
+          "frameRate": 24,
+          "deviceTarget": "desktop",
+          "priority": 2,
+          "enabled": true
+        },
+        {
+          "renditionId": "rendition-720p",
+          "name": "HD Ready",
+          "resolution": {
+            "width": 1280,
+            "height": 720,
+            "aspectRatio": "16:9"
+          },
+          "videoBitrate": {
+            "target": 3000,
+            "max": 4000,
+            "min": 2000,
+            "mode": "vbr"
+          },
+          "audioBitrate": 128,
+          "frameRate": 24,
+          "deviceTarget": "tablet",
+          "priority": 3,
+          "enabled": true
+        },
+        {
+          "renditionId": "rendition-480p",
+          "name": "SD",
+          "resolution": {
+            "width": 854,
+            "height": 480,
+            "aspectRatio": "16:9"
+          },
+          "videoBitrate": {
+            "target": 1500,
+            "max": 2000,
+            "min": 1000,
+            "mode": "vbr"
+          },
+          "audioBitrate": 96,
+          "frameRate": 24,
+          "deviceTarget": "mobile_small",
+          "priority": 4,
+          "enabled": true
+        },
+        {
+          "renditionId": "rendition-vertical",
+          "name": "Vertical (9:16)",
+          "resolution": {
+            "width": 1080,
+            "height": 1920,
+            "aspectRatio": "9:16"
+          },
+          "videoBitrate": {
+            "target": 4000,
+            "max": 5000,
+            "min": 2500,
+            "mode": "vbr"
+          },
+          "audioBitrate": 128,
+          "frameRate": 30,
+          "deviceTarget": "mobile_large",
+          "priority": 5,
+          "enabled": true
+        }
+      ],
+      "optimizations": {
+        "perTitleEncoding": true,
+        "contentAdaptive": true,
+        "twoPassEncoding": true,
+        "sceneDetection": true,
+        "hdrToSdr": true
+      }
+    },
+    "packaging": {
+      "enabled": true,
+      "formats": [
+        {
+          "formatId": "format-hls",
+          "format": "hls",
+          "segmentDuration": 6,
+          "encryption": {
+            "enabled": true,
+            "drm": ["fairplay"],
+            "keyRotation": false
+          },
+          "manifestConfig": {
+            "includeLoudness": true,
+            "includeThumbnails": true,
+            "subtitleFormat": "webvtt"
+          },
+          "enabled": true
+        },
+        {
+          "formatId": "format-dash",
+          "format": "dash",
+          "segmentDuration": 6,
+          "encryption": {
+            "enabled": true,
+            "drm": ["widevine", "playready"],
+            "keyRotation": false
+          },
+          "manifestConfig": {
+            "includeLoudness": true,
+            "includeThumbnails": true,
+            "subtitleFormat": "ttml"
+          },
+          "enabled": true
+        },
+        {
+          "formatId": "format-cmaf",
+          "format": "cmaf",
+          "segmentDuration": 6,
+          "encryption": {
+            "enabled": true,
+            "drm": ["widevine", "fairplay", "playready"],
+            "keyRotation": false
+          },
+          "manifestConfig": {
+            "includeLoudness": true,
+            "includeThumbnails": true,
+            "subtitleFormat": "webvtt"
+          },
+          "enabled": true
+        }
+      ],
+      "lowLatency": {
+        "enabled": false,
+        "targetLatency": 3,
+        "partDuration": 0.5
+      }
+    },
+    "thumbnails": {
+      "enabled": true,
+      "generation": {
+        "interval": 10,
+        "sizes": [
+          {"width": 320, "height": 180, "format": "jpg"},
+          {"width": 640, "height": 360, "format": "jpg"},
+          {"width": 1280, "height": 720, "format": "webp"}
+        ],
+        "spriteSheets": true,
+        "aiSelection": true
+      },
+      "poster": {
+        "enabled": true,
+        "aiGenerated": true,
+        "sizes": [
+          {"name": "small", "width": 300, "height": 450},
+          {"name": "medium", "width": 600, "height": 900},
+          {"name": "large", "width": 1200, "height": 1800}
+        ]
+      }
+    },
+    "trailers": {
+      "enabled": true,
+      "autoGeneration": {
+        "enabled": true,
+        "algorithm": "ai_summary",
+        "durations": [15, 30, 60, 120]
+      },
+      "teasers": {
+        "enabled": true,
+        "shortFormPlatforms": ["tiktok", "instagram_reels", "youtube_shorts"],
+        "durations": [15, 30, 60]
+      }
+    },
+    "storage": {
+      "primaryStorage": {
+        "provider": "s3",
+        "bucket": "sl18-media-production",
+        "region": "us-east-1",
+        "storageClass": "standard"
+      },
+      "replication": {
+        "enabled": true,
+        "destinations": [
+          {"region": "eu-west-1", "bucket": "sl18-media-eu"},
+          {"region": "ap-southeast-1", "bucket": "sl18-media-apac"}
+        ]
+      },
+      "lifecycle": {
+        "hotStorageDays": 30,
+        "warmStorageDays": 90,
+        "archiveAfterDays": 365,
+        "deleteAfterDays": 2555
+      }
+    },
+    "scheduling": {
+      "priority": "high",
+      "queues": {
+        "realtime": {
+          "maxConcurrent": 10,
+          "timeout": 60
+        },
+        "standard": {
+          "maxConcurrent": 50,
+          "timeout": 240
+        },
+        "batch": {
+          "maxConcurrent": 100,
+          "scheduleWindow": "0 2 * * *"
+        }
+      }
+    },
+    "metrics": {
+      "jobsCompleted": 15234,
+      "jobsFailed": 12,
+      "avgTranscodeTime": 8.5,
+      "avgQualityScore": 92.3,
+      "storageUsed": 125.7,
+      "lastJobTime": "2024-11-28T05:30:00Z",
+      "lastUpdated": "2024-11-28T06:00:00Z"
+    },
+    "status": "active",
+    "createdAt": "2024-01-15T00:00:00Z",
+    "updatedAt": "2024-11-28T06:00:00Z",
+    "createdBy": "media-team"
+  },
+  "distributionPipeline": {
+    "pipelineId": "dist-waliin-global",
+    "version": "1.0.0",
+    "name": "Waliin Studio Global Distribution",
+    "scope": {
+      "level": "global",
+      "regions": ["us-east-1", "eu-west-1", "ap-southeast-1", "af-south-1", "me-south-1"],
+      "platforms": ["web", "ios", "android", "smart_tv", "ott"]
+    },
+    "streaming": {
+      "enabled": true,
+      "protocols": [
+        {
+          "protocolId": "proto-hls",
+          "protocol": "hls",
+          "versions": ["v7", "v8"],
+          "encryption": {
+            "enabled": true,
+            "mode": "sample_aes"
+          },
+          "lowLatency": {
+            "enabled": false,
+            "targetLatency": 3
+          },
+          "enabled": true
+        },
+        {
+          "protocolId": "proto-dash",
+          "protocol": "dash",
+          "versions": ["4.0"],
+          "encryption": {
+            "enabled": true,
+            "mode": "cenc"
+          },
+          "lowLatency": {
+            "enabled": false,
+            "targetLatency": 3
+          },
+          "enabled": true
+        }
+      ],
+      "adaptiveBitrate": {
+        "enabled": true,
+        "algorithm": "hybrid",
+        "minBitrate": 500,
+        "maxBitrate": 20000,
+        "initialBitrate": 3000
+      },
+      "bufferConfig": {
+        "minBufferSeconds": 15,
+        "maxBufferSeconds": 60,
+        "rebufferThreshold": 5
+      }
+    },
+    "cdn": {
+      "enabled": true,
+      "providers": [
+        {
+          "providerId": "cdn-cloudflare",
+          "name": "Cloudflare",
+          "provider": "cloudflare",
+          "weight": 50,
+          "regions": ["us-east-1", "eu-west-1", "af-south-1"],
+          "originShield": {
+            "enabled": true,
+            "location": "us-east-1"
+          },
+          "caching": {
+            "defaultTtl": 86400,
+            "manifestTtl": 5,
+            "segmentTtl": 3600,
+            "bypassRules": ["/api/*", "/auth/*"]
+          },
+          "enabled": true
+        },
+        {
+          "providerId": "cdn-akamai",
+          "name": "Akamai",
+          "provider": "akamai",
+          "weight": 30,
+          "regions": ["ap-southeast-1", "me-south-1"],
+          "originShield": {
+            "enabled": true,
+            "location": "ap-southeast-1"
+          },
+          "caching": {
+            "defaultTtl": 86400,
+            "manifestTtl": 5,
+            "segmentTtl": 3600,
+            "bypassRules": ["/api/*"]
+          },
+          "enabled": true
+        },
+        {
+          "providerId": "cdn-cloudfront",
+          "name": "CloudFront",
+          "provider": "cloudfront",
+          "weight": 20,
+          "regions": ["us-east-1", "eu-west-1"],
+          "originShield": {
+            "enabled": true,
+            "location": "us-east-1"
+          },
+          "caching": {
+            "defaultTtl": 86400,
+            "manifestTtl": 5,
+            "segmentTtl": 3600,
+            "bypassRules": []
+          },
+          "enabled": true
+        }
+      ],
+      "multiCdn": {
+        "enabled": true,
+        "strategy": "latency_based",
+        "healthCheck": {
+          "enabled": true,
+          "interval": 30,
+          "threshold": 3
+        }
+      },
+      "originConfig": {
+        "origins": [
+          {
+            "originId": "origin-s3-primary",
+            "type": "s3",
+            "endpoint": "s3://sl18-media-production.s3.amazonaws.com",
+            "priority": 1
+          },
+          {
+            "originId": "origin-s3-backup",
+            "type": "s3",
+            "endpoint": "s3://sl18-media-eu.s3.eu-west-1.amazonaws.com",
+            "priority": 2
+          }
+        ],
+        "failover": {
+          "enabled": true,
+          "errorCodes": [500, 502, 503, 504]
+        }
+      }
+    },
+    "drm": {
+      "enabled": true,
+      "providers": [
+        {
+          "providerId": "drm-widevine",
+          "provider": "widevine",
+          "licenseServer": "https://drm.sl18.io/widevine/license",
+          "securityLevel": "L1",
+          "offlineEnabled": true,
+          "offlineDuration": 168,
+          "hdcpRequired": true,
+          "enabled": true
+        },
+        {
+          "providerId": "drm-fairplay",
+          "provider": "fairplay",
+          "licenseServer": "https://drm.sl18.io/fairplay/license",
+          "securityLevel": "software",
+          "offlineEnabled": true,
+          "offlineDuration": 168,
+          "hdcpRequired": false,
+          "enabled": true
+        },
+        {
+          "providerId": "drm-playready",
+          "provider": "playready",
+          "licenseServer": "https://drm.sl18.io/playready/license",
+          "securityLevel": "L1",
+          "offlineEnabled": true,
+          "offlineDuration": 168,
+          "hdcpRequired": true,
+          "enabled": true
+        }
+      ],
+      "keyManagement": {
+        "provider": "pallycon",
+        "keyRotation": {
+          "enabled": false,
+          "interval": 60
+        },
+        "forensicWatermarking": {
+          "enabled": true,
+          "provider": "pallycon"
+        }
+      },
+      "policies": [
+        {
+          "policyId": "policy-free",
+          "name": "Free Tier",
+          "contentTier": "free",
+          "rules": {
+            "maxResolution": "720p",
+            "maxConcurrentStreams": 1,
+            "allowDownload": false,
+            "screenCapture": true,
+            "airplay": false,
+            "chromecast": true
+          },
+          "enabled": true
+        },
+        {
+          "policyId": "policy-premium",
+          "name": "Premium",
+          "contentTier": "premium",
+          "rules": {
+            "maxResolution": "4k",
+            "maxConcurrentStreams": 3,
+            "allowDownload": true,
+            "downloadExpiry": 720,
+            "screenCapture": false,
+            "airplay": true,
+            "chromecast": true
+          },
+          "enabled": true
+        }
+      ]
+    },
+    "accessControl": {
+      "enabled": true,
+      "tokenAuth": {
+        "enabled": true,
+        "algorithm": "jwt",
+        "expiry": 3600,
+        "ipBinding": false,
+        "userAgentBinding": false
+      },
+      "geoRestriction": {
+        "enabled": true,
+        "mode": "blacklist",
+        "countries": ["KP", "IR", "SY"],
+        "vpnDetection": true,
+        "proxyDetection": true
+      },
+      "deviceLimits": {
+        "enabled": true,
+        "maxDevices": 5,
+        "deviceTypes": ["mobile", "tablet", "desktop", "smart_tv", "streaming_device"]
+      },
+      "rateLimiting": {
+        "enabled": true,
+        "requestsPerSecond": 100,
+        "burstSize": 200
+      }
+    },
+    "offlineDownload": {
+      "enabled": true,
+      "profiles": [
+        {
+          "profileId": "download-low",
+          "name": "Low Quality",
+          "quality": "low",
+          "resolution": "480p",
+          "videoBitrate": 1000,
+          "audioBitrate": 64,
+          "estimatedSizeMB": 25,
+          "enabled": true
+        },
+        {
+          "profileId": "download-medium",
+          "name": "Medium Quality",
+          "quality": "medium",
+          "resolution": "720p",
+          "videoBitrate": 2500,
+          "audioBitrate": 128,
+          "estimatedSizeMB": 60,
+          "enabled": true
+        },
+        {
+          "profileId": "download-high",
+          "name": "High Quality",
+          "quality": "high",
+          "resolution": "1080p",
+          "videoBitrate": 5000,
+          "audioBitrate": 192,
+          "estimatedSizeMB": 120,
+          "enabled": true
+        }
+      ],
+      "restrictions": {
+        "maxDownloads": 25,
+        "expiryDays": 30,
+        "requireWifi": true,
+        "storageLimit": 50
+      }
+    },
+    "analytics": {
+      "enabled": true,
+      "providers": [
+        {
+          "providerId": "analytics-mux",
+          "provider": "mux",
+          "enabled": true
+        },
+        {
+          "providerId": "analytics-conviva",
+          "provider": "conviva",
+          "enabled": true
+        }
+      ],
+      "beacons": {
+        "heartbeatInterval": 10,
+        "eventTypes": ["play", "pause", "seek", "buffer", "quality_change", "error", "complete"]
+      }
+    },
+    "metrics": {
+      "totalStreams": 25678234,
+      "concurrentPeak": 45230,
+      "avgBitrate": 4520,
+      "avgStartupTime": 1.8,
+      "rebufferRatio": 0.3,
+      "errorRate": 0.05,
+      "cdnHitRate": 98.5,
+      "bandwidthTB": 1250.5,
+      "lastUpdated": "2024-11-28T06:00:00Z"
+    },
+    "status": "active",
+    "createdAt": "2024-01-15T00:00:00Z",
+    "updatedAt": "2024-11-28T06:00:00Z",
+    "createdBy": "distribution-team"
+  },
+  "mediaLocalization": {
+    "localizationId": "loc-waliin-multilingual",
+    "version": "1.0.0",
+    "name": "Waliin Studio Multilingual Localization",
+    "scope": {
+      "level": "global",
+      "languages": ["en", "sw", "am", "om", "ar", "fr", "es", "zh", "it", "pt"],
+      "regions": ["US", "ET", "KE", "TZ", "EG", "FR", "ES", "CN", "IT", "BR"]
+    },
+    "subtitles": {
+      "enabled": true,
+      "generation": {
+        "autoGeneration": {
+          "enabled": true,
+          "engine": "whisper",
+          "sourceLanguages": ["en", "sw", "am", "om"],
+          "accuracy": 95,
+          "speakerDiarization": true,
+          "punctuation": true
+        },
+        "translation": {
+          "enabled": true,
+          "engine": "deepl",
+          "targetLanguages": ["ar", "fr", "es", "zh", "it", "pt"],
+          "contextAware": true,
+          "glossarySupport": true
+        }
+      },
+      "formats": [
+        {
+          "formatId": "format-webvtt",
+          "format": "webvtt",
+          "platforms": ["hls", "web", "ios", "android"],
+          "embedded": false,
+          "sidecar": true,
+          "enabled": true
+        },
+        {
+          "formatId": "format-ttml",
+          "format": "ttml",
+          "platforms": ["dash", "smart_tv"],
+          "embedded": false,
+          "sidecar": true,
+          "enabled": true
+        },
+        {
+          "formatId": "format-srt",
+          "format": "srt",
+          "platforms": ["web"],
+          "embedded": false,
+          "sidecar": true,
+          "enabled": true
+        }
+      ],
+      "styling": {
+        "fontFamily": "Noto Sans",
+        "fontSize": 24,
+        "fontColor": "#FFFFFF",
+        "backgroundColor": "#000000",
+        "backgroundOpacity": 0.75,
+        "position": "bottom_center",
+        "edgeStyle": "drop_shadow"
+      },
+      "qc": {
+        "enabled": true,
+        "checks": ["timing_accuracy", "spelling", "grammar", "reading_speed", "line_length", "sync_check", "style_consistency"],
+        "maxReadingSpeed": 21,
+        "maxLineLength": 42,
+        "maxLines": 2,
+        "nativeReviewRequired": true
+      }
+    },
+    "dubbing": {
+      "enabled": true,
+      "workflows": [
+        {
+          "workflowId": "dub-ai-voice",
+          "name": "AI Voice Dubbing",
+          "type": "ai_voice",
+          "sourceLanguage": "en",
+          "targetLanguages": ["sw", "am", "ar", "fr", "es", "zh"],
+          "lipSync": {
+            "enabled": true,
+            "method": "ai_assisted",
+            "accuracy": 85
+          },
+          "enabled": true
+        },
+        {
+          "workflowId": "dub-hybrid",
+          "name": "Hybrid Dubbing",
+          "type": "hybrid",
+          "sourceLanguage": "en",
+          "targetLanguages": ["om", "it", "pt"],
+          "lipSync": {
+            "enabled": true,
+            "method": "manual",
+            "accuracy": 95
+          },
+          "enabled": true
+        }
+      ],
+      "voiceSynthesis": {
+        "enabled": true,
+        "engine": "eleven_labs",
+        "voiceCloning": {
+          "enabled": true,
+          "consentRequired": true,
+          "minimumSamples": 30
+        },
+        "emotionPreservation": true,
+        "prosodyMatching": true
+      },
+      "personaAlignment": {
+        "enabled": true,
+        "voiceMatching": {
+          "gender": true,
+          "age": true,
+          "tone": true,
+          "accent": true
+        },
+        "culturalAdaptation": {
+          "enabled": true,
+          "nameLocalization": true,
+          "idiomAdaptation": true,
+          "honorifics": true
+        }
+      },
+      "audioMixing": {
+        "enabled": true,
+        "separateMusicEffects": true,
+        "dialogueBalance": 3,
+        "ambientPreservation": true,
+        "loudnessNormalization": {
+          "enabled": true,
+          "standard": "ebu_r128",
+          "targetLufs": -23
+        }
+      }
+    },
+    "accessibility": {
+      "enabled": true,
+      "closedCaptions": {
+        "enabled": true,
+        "soundDescriptions": true,
+        "speakerIdentification": true,
+        "musicDescriptions": true,
+        "formats": ["cea608", "cea708", "webvtt_sdh"]
+      },
+      "audioDescription": {
+        "enabled": true,
+        "type": "standard",
+        "generation": {
+          "manual": true,
+          "aiAssisted": true,
+          "voiceSynthesis": true
+        },
+        "languages": ["en", "sw", "am", "ar"],
+        "mixLevel": -3
+      },
+      "signLanguage": {
+        "enabled": true,
+        "languages": ["asl", "bsl"],
+        "displayMode": "pip",
+        "aiGenerated": false
+      },
+      "reducedMotion": {
+        "enabled": true,
+        "flashWarnings": true,
+        "motionReduction": true
+      }
+    },
+    "tracks": [
+      {
+        "trackId": "track-sub-en",
+        "type": "subtitle",
+        "language": "en",
+        "label": "English",
+        "default": true,
+        "forced": false,
+        "status": "published",
+        "qcScore": 98
+      },
+      {
+        "trackId": "track-sub-sw",
+        "type": "subtitle",
+        "language": "sw",
+        "label": "Kiswahili",
+        "default": false,
+        "forced": false,
+        "status": "published",
+        "qcScore": 96
+      },
+      {
+        "trackId": "track-sub-am",
+        "type": "subtitle",
+        "language": "am",
+        "label": "አማርኛ",
+        "default": false,
+        "forced": false,
+        "status": "published",
+        "qcScore": 94
+      },
+      {
+        "trackId": "track-cc-en",
+        "type": "closed_caption",
+        "language": "en",
+        "label": "English (CC)",
+        "default": false,
+        "forced": false,
+        "characteristics": ["public.accessibility.describes-music-and-sound", "public.accessibility.transcribes-spoken-dialog"],
+        "status": "published",
+        "qcScore": 97
+      },
+      {
+        "trackId": "track-ad-en",
+        "type": "audio_description",
+        "language": "en",
+        "label": "English (Audio Description)",
+        "default": false,
+        "forced": false,
+        "characteristics": ["public.accessibility.describes-video"],
+        "status": "published",
+        "qcScore": 95
+      },
+      {
+        "trackId": "track-audio-sw",
+        "type": "audio",
+        "language": "sw",
+        "label": "Kiswahili Dub",
+        "default": false,
+        "forced": false,
+        "status": "published",
+        "qcScore": 92
+      }
+    ],
+    "glossary": {
+      "enabled": true,
+      "terms": [
+        {
+          "termId": "term-sl18",
+          "source": "SL18",
+          "translations": {},
+          "context": "Platform name",
+          "doNotTranslate": true
+        },
+        {
+          "termId": "term-waliin",
+          "source": "Waliin Studio",
+          "translations": {},
+          "context": "Studio name",
+          "doNotTranslate": true
+        }
+      ],
+      "characterNames": [
+        {
+          "character": "Amara",
+          "localizations": {
+            "zh": "阿玛拉",
+            "ar": "أمارة"
+          }
+        }
+      ]
+    },
+    "qc": {
+      "enabled": true,
+      "workflow": {
+        "stages": [
+          {
+            "stageId": "stage-auto",
+            "name": "Automated QC",
+            "type": "automated",
+            "required": true,
+            "order": 1
+          },
+          {
+            "stageId": "stage-native",
+            "name": "Native Speaker Review",
+            "type": "native_review",
+            "required": true,
+            "order": 2
+          },
+          {
+            "stageId": "stage-cultural",
+            "name": "Cultural Review",
+            "type": "cultural_review",
+            "required": true,
+            "order": 3
+          },
+          {
+            "stageId": "stage-final",
+            "name": "Final Approval",
+            "type": "final_approval",
+            "required": true,
+            "order": 4
+          }
+        ],
+        "minimumScore": 90,
+        "autoRejectThreshold": 70
+      },
+      "culturalSensitivity": {
+        "enabled": true,
+        "checkCategories": ["religious", "political", "gender", "regional_taboos", "social_norms"],
+        "escalationRequired": true
+      }
+    },
+    "metrics": {
+      "languagesSupported": 10,
+      "tracksGenerated": 456,
+      "tracksApproved": 420,
+      "avgQcScore": 94.5,
+      "translationAccuracy": 96.2,
+      "culturalIssuesFound": 12,
+      "lastUpdated": "2024-11-28T06:00:00Z"
+    },
+    "status": "active",
+    "createdAt": "2024-01-15T00:00:00Z",
+    "updatedAt": "2024-11-28T06:00:00Z",
+    "createdBy": "localization-team"
+  },
+  "mediaObservability": {
+    "observabilityId": "mobs-waliin-production",
+    "version": "1.0.0",
+    "name": "Waliin Studio Media Observability",
+    "scope": {
+      "level": "global",
+      "platforms": ["web", "ios", "android", "smart_tv", "ott"],
+      "regions": ["us-east-1", "eu-west-1", "ap-southeast-1", "af-south-1"]
+    },
+    "playbackMetrics": {
+      "enabled": true,
+      "collection": {
+        "provider": "mux",
+        "samplingRate": 100,
+        "beaconInterval": 10
+      },
+      "qoe": {
+        "startupTime": {
+          "target": 2,
+          "warning": 3,
+          "critical": 5
+        },
+        "rebufferRatio": {
+          "target": 0.5,
+          "warning": 1,
+          "critical": 2
+        },
+        "playbackFailure": {
+          "target": 0.1,
+          "warning": 0.5,
+          "critical": 1
+        },
+        "videoPrimaryResolution": {
+          "target": 90,
+          "warning": 80
+        }
+      },
+      "events": [
+        {
+          "eventId": "event-play-request",
+          "event": "play_request",
+          "track": true,
+          "properties": ["content_id", "user_id", "device_type", "region"]
+        },
+        {
+          "eventId": "event-play-start",
+          "event": "play_start",
+          "track": true,
+          "properties": ["startup_time", "initial_bitrate", "resolution"]
+        },
+        {
+          "eventId": "event-buffer",
+          "event": "buffer_start",
+          "track": true,
+          "properties": ["buffer_time", "current_bitrate", "playhead_position"]
+        },
+        {
+          "eventId": "event-quality",
+          "event": "quality_change",
+          "track": true,
+          "properties": ["from_bitrate", "to_bitrate", "reason"]
+        },
+        {
+          "eventId": "event-error",
+          "event": "error",
+          "track": true,
+          "properties": ["error_code", "error_message", "stack_trace", "device_info"]
+        },
+        {
+          "eventId": "event-complete",
+          "event": "complete",
+          "track": true,
+          "properties": ["watch_time", "completion_percentage"]
+        }
+      ]
+    },
+    "errorTracking": {
+      "enabled": true,
+      "categories": [
+        {
+          "categoryId": "error-network",
+          "name": "Network Errors",
+          "category": "network",
+          "errorCodes": ["NET_001", "NET_002", "NET_003", "TIMEOUT"],
+          "severity": "high",
+          "alerting": {
+            "enabled": true,
+            "threshold": 1,
+            "channels": ["slack", "pagerduty"]
+          }
+        },
+        {
+          "categoryId": "error-drm",
+          "name": "DRM Errors",
+          "category": "drm",
+          "errorCodes": ["DRM_001", "LICENSE_FAIL", "KEY_ROTATION"],
+          "severity": "critical",
+          "alerting": {
+            "enabled": true,
+            "threshold": 0.5,
+            "channels": ["pagerduty", "email"]
+          }
+        },
+        {
+          "categoryId": "error-decoder",
+          "name": "Decoder Errors",
+          "category": "decoder",
+          "errorCodes": ["CODEC_UNSUPPORTED", "DECODE_FAIL"],
+          "severity": "medium",
+          "alerting": {
+            "enabled": true,
+            "threshold": 2,
+            "channels": ["slack"]
+          }
+        },
+        {
+          "categoryId": "error-cdn",
+          "name": "CDN Errors",
+          "category": "cdn",
+          "errorCodes": ["CDN_500", "CDN_502", "CDN_503", "CDN_504"],
+          "severity": "critical",
+          "alerting": {
+            "enabled": true,
+            "threshold": 0.5,
+            "channels": ["pagerduty", "slack"]
+          }
+        }
+      ],
+      "stackTraceCollection": true,
+      "deviceInfo": true,
+      "networkInfo": true
+    },
+    "regionHeatmaps": {
+      "enabled": true,
+      "granularity": "city",
+      "metrics": ["concurrent_viewers", "play_attempts", "error_rate", "avg_bitrate", "rebuffer_ratio", "startup_time"],
+      "updateInterval": 5,
+      "retention": 90
+    },
+    "contentAnalytics": {
+      "enabled": true,
+      "perTitle": {
+        "enabled": true,
+        "metrics": ["views", "unique_viewers", "avg_watch_time", "completion_rate", "peak_concurrent", "total_watch_hours", "engagement_score"]
+      },
+      "engagementTracking": {
+        "enabled": true,
+        "seekHeatmap": true,
+        "replayTracking": true,
+        "dropOffPoints": true
+      },
+      "audienceRetention": {
+        "enabled": true,
+        "granularity": 5,
+        "segments": ["new_users", "returning_users", "subscribers", "free_tier", "region", "device"]
+      }
+    },
+    "cdnMetrics": {
+      "enabled": true,
+      "providers": ["cloudflare", "akamai", "cloudfront"],
+      "metrics": ["cache_hit_ratio", "bandwidth", "requests", "latency_p50", "latency_p95", "latency_p99", "error_rate", "throughput"],
+      "originMetrics": {
+        "enabled": true,
+        "shieldHitRatio": true,
+        "originLatency": true
+      }
+    },
+    "dashboards": [
+      {
+        "dashboardId": "dash-realtime",
+        "name": "Real-time QoE",
+        "type": "realtime",
+        "widgets": [
+          {
+            "widgetId": "widget-concurrent",
+            "type": "counter",
+            "title": "Concurrent Viewers",
+            "metrics": ["concurrent_viewers"],
+            "timeRange": "now",
+            "refreshInterval": 5
+          },
+          {
+            "widgetId": "widget-startup",
+            "type": "gauge",
+            "title": "Avg Startup Time",
+            "metrics": ["avg_startup_time"],
+            "timeRange": "5m",
+            "refreshInterval": 10
+          },
+          {
+            "widgetId": "widget-errors",
+            "type": "line_chart",
+            "title": "Error Rate",
+            "metrics": ["error_rate_1m"],
+            "timeRange": "1h",
+            "refreshInterval": 30
+          },
+          {
+            "widgetId": "widget-bitrate",
+            "type": "bar_chart",
+            "title": "Bitrate Distribution",
+            "metrics": ["bitrate_distribution"],
+            "timeRange": "15m",
+            "refreshInterval": 60
+          }
+        ],
+        "refreshInterval": 10,
+        "visibility": "team",
+        "enabled": true
+      },
+      {
+        "dashboardId": "dash-content",
+        "name": "Content Performance",
+        "type": "content_performance",
+        "widgets": [
+          {
+            "widgetId": "widget-top-content",
+            "type": "table",
+            "title": "Top Performing Content",
+            "metrics": ["views", "watch_time", "completion_rate"],
+            "timeRange": "24h",
+            "refreshInterval": 300
+          },
+          {
+            "widgetId": "widget-retention",
+            "type": "line_chart",
+            "title": "Audience Retention",
+            "metrics": ["retention_curve"],
+            "timeRange": "7d",
+            "refreshInterval": 600
+          }
+        ],
+        "refreshInterval": 300,
+        "visibility": "team",
+        "enabled": true
+      },
+      {
+        "dashboardId": "dash-regional",
+        "name": "Regional Performance",
+        "type": "regional_performance",
+        "widgets": [
+          {
+            "widgetId": "widget-map",
+            "type": "map",
+            "title": "Global Viewer Distribution",
+            "metrics": ["concurrent_viewers"],
+            "timeRange": "now",
+            "refreshInterval": 30
+          },
+          {
+            "widgetId": "widget-region-qoe",
+            "type": "heatmap",
+            "title": "QoE by Region",
+            "metrics": ["qoe_score"],
+            "timeRange": "1h",
+            "refreshInterval": 60
+          }
+        ],
+        "refreshInterval": 60,
+        "visibility": "team",
+        "enabled": true
+      }
+    ],
+    "alerting": {
+      "enabled": true,
+      "rules": [
+        {
+          "ruleId": "alert-high-error",
+          "name": "High Error Rate",
+          "metric": "error_rate",
+          "condition": {
+            "operator": "gt",
+            "threshold": 1,
+            "duration": 300
+          },
+          "severity": "critical",
+          "channels": ["pagerduty", "slack"],
+          "runbook": "https://docs.sl18.io/runbooks/high-error-rate",
+          "enabled": true
+        },
+        {
+          "ruleId": "alert-slow-startup",
+          "name": "Slow Startup Time",
+          "metric": "avg_startup_time",
+          "condition": {
+            "operator": "gt",
+            "threshold": 5,
+            "duration": 180
+          },
+          "severity": "high",
+          "channels": ["slack", "email"],
+          "runbook": "https://docs.sl18.io/runbooks/slow-startup",
+          "enabled": true
+        },
+        {
+          "ruleId": "alert-rebuffer",
+          "name": "High Rebuffer Ratio",
+          "metric": "rebuffer_ratio",
+          "condition": {
+            "operator": "gt",
+            "threshold": 2,
+            "duration": 300
+          },
+          "severity": "high",
+          "channels": ["slack"],
+          "runbook": "https://docs.sl18.io/runbooks/high-rebuffer",
+          "enabled": true
+        },
+        {
+          "ruleId": "alert-cdn-miss",
+          "name": "Low CDN Cache Hit Rate",
+          "metric": "cdn_cache_hit_ratio",
+          "condition": {
+            "operator": "lt",
+            "threshold": 90,
+            "duration": 600
+          },
+          "severity": "medium",
+          "channels": ["slack"],
+          "runbook": "https://docs.sl18.io/runbooks/cdn-cache-miss",
+          "enabled": true
+        }
+      ],
+      "suppressionRules": [
+        {
+          "ruleId": "suppress-maintenance",
+          "alertRules": ["alert-high-error", "alert-slow-startup"],
+          "schedule": "0 2 * * 0",
+          "reason": "Weekly maintenance window"
+        }
+      ]
+    },
+    "reporting": {
+      "enabled": true,
+      "schedules": [
+        {
+          "reportId": "report-daily",
+          "name": "Daily QoE Summary",
+          "type": "daily_summary",
+          "schedule": "0 8 * * *",
+          "recipients": ["media-team@sl18.io", "ops@sl18.io"],
+          "format": "pdf",
+          "enabled": true
+        },
+        {
+          "reportId": "report-weekly",
+          "name": "Weekly Performance Report",
+          "type": "weekly_qoe",
+          "schedule": "0 9 * * 1",
+          "recipients": ["leadership@sl18.io", "media-team@sl18.io"],
+          "format": "pdf",
+          "enabled": true
+        },
+        {
+          "reportId": "report-content",
+          "name": "Content Performance Report",
+          "type": "content_report",
+          "schedule": "0 10 * * 1",
+          "recipients": ["content-team@sl18.io"],
+          "format": "excel",
+          "enabled": true
+        }
+      ]
+    },
+    "currentMetrics": {
+      "concurrentViewers": 12456,
+      "peakConcurrent": 45230,
+      "totalPlays": 89234567,
+      "avgStartupTime": 1.8,
+      "rebufferRatio": 0.3,
+      "errorRate": 0.05,
+      "avgBitrate": 4520,
+      "cdnHitRate": 98.5,
+      "engagementScore": 87.5,
+      "qoeScore": 94.2,
+      "lastUpdated": "2024-11-28T06:00:00Z"
+    },
+    "status": "active",
+    "createdAt": "2024-01-15T00:00:00Z",
+    "updatedAt": "2024-11-28T06:00:00Z",
+    "createdBy": "observability-team"
+  },
+  "auditLogEvents": [
+    "rendering_job_created",
+    "rendering_job_started",
+    "rendering_job_completed",
+    "rendering_job_failed",
+    "transcode_started",
+    "transcode_completed",
+    "transcode_failed",
+    "quality_check_passed",
+    "quality_check_failed",
+    "thumbnail_generated",
+    "trailer_generated",
+    "package_created",
+    "drm_key_generated",
+    "storage_replicated",
+    "distribution_started",
+    "distribution_completed",
+    "cdn_cache_purged",
+    "cdn_failover",
+    "drm_license_issued",
+    "drm_license_denied",
+    "stream_started",
+    "stream_completed",
+    "stream_error",
+    "playback_started",
+    "playback_completed",
+    "playback_error",
+    "offline_download_started",
+    "offline_download_completed",
+    "localization_job_created",
+    "subtitle_generated",
+    "subtitle_translated",
+    "subtitle_qc_passed",
+    "subtitle_qc_failed",
+    "dubbing_started",
+    "dubbing_completed",
+    "voice_synthesis_completed",
+    "audio_description_generated",
+    "track_published",
+    "track_rejected",
+    "cultural_review_passed",
+    "cultural_review_flagged",
+    "observability_alert_triggered",
+    "observability_alert_resolved",
+    "qoe_threshold_breached",
+    "qoe_threshold_recovered",
+    "cdn_performance_degraded",
+    "cdn_performance_recovered",
+    "error_spike_detected",
+    "region_performance_degraded",
+    "report_generated",
+    "dashboard_viewed"
+  ]
+}

@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HybridPublishing",
+  "description": "Schema for hybrid publishing supporting serialized and short-form content in SL18",
+  "type": "object",
+  "properties": {
+    "pipelineId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique pipeline identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "Associated franchise"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 200,
+      "description": "Pipeline display name"
+    },
+    "pipelineType": {
+      "type": "string",
+      "enum": ["short_form_only", "serialized_only", "hybrid"],
+      "description": "Type of publishing pipeline"
+    },
+    "shortFormConfig": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "contentTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["comedy_skit", "music_clip", "news_commentary", "educational", "promotional"]
+          }
+        },
+        "maxDuration": {
+          "type": "integer",
+          "minimum": 15,
+          "maximum": 180,
+          "description": "Maximum duration in seconds"
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["tiktok", "instagram_reels", "youtube_shorts", "twitter", "facebook"]
+          }
+        },
+        "publishingSchedule": {
+          "type": "object",
+          "properties": {
+            "frequency": {
+              "type": "string",
+              "enum": ["daily", "multiple_daily", "weekly", "on_demand"]
+            },
+            "preferredTimes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^\\d{2}:\\d{2}$"
+              }
+            },
+            "timezone": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "serializedConfig": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "seriesIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Associated series workspaces"
+        },
+        "contentTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["drama", "comedy_series", "documentary", "reality", "anthology"]
+          }
+        },
+        "episodeDuration": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "integer", "minimum": 60 },
+            "max": { "type": "integer", "maximum": 3600 }
+          },
+          "additionalProperties": false
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["youtube", "spotify", "apple_podcasts", "custom_platform"]
+          }
+        },
+        "releaseSchedule": {
+          "type": "object",
+          "properties": {
+            "frequency": {
+              "type": "string",
+              "enum": ["weekly", "biweekly", "monthly", "season_drop"]
+            },
+            "releaseDay": {
+              "type": "string",
+              "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+            },
+            "releaseTime": {
+              "type": "string",
+              "pattern": "^\\d{2}:\\d{2}$"
+            },
+            "timezone": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "hybridRules": {
+      "type": "object",
+      "properties": {
+        "crossPromotion": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Promote serialized content in short-form clips"
+            },
+            "clipFromSeries": {
+              "type": "boolean",
+              "default": true,
+              "description": "Generate short clips from series episodes"
+            },
+            "teaserGeneration": {
+              "type": "boolean",
+              "default": true,
+              "description": "Auto-generate teasers for upcoming episodes"
+            }
+          },
+          "additionalProperties": false
+        },
+        "personaSharing": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Share personas between short-form and serialized"
+            },
+            "consistencyEnforced": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enforce persona consistency across formats"
+            }
+          },
+          "additionalProperties": false
+        },
+        "workflowIntegration": {
+          "type": "object",
+          "properties": {
+            "sharedAssetLibrary": {
+              "type": "boolean",
+              "default": true
+            },
+            "unifiedQC": {
+              "type": "boolean",
+              "default": true,
+              "description": "Use unified QC for both formats"
+            },
+            "separatePipelines": {
+              "type": "boolean",
+              "default": false,
+              "description": "Run separate pipelines (for isolation)"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "qcEnforcement": {
+      "type": "object",
+      "properties": {
+        "shortFormQC": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "rules": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "serializedQC": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "personaContinuity": { "type": "boolean", "default": true },
+            "plotContinuity": { "type": "boolean", "default": true },
+            "rules": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "crossFormatQC": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "personaConsistency": { "type": "boolean", "default": true },
+            "brandConsistency": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+      },
+      "description": "Supported languages"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "paused", "archived"],
+      "description": "Pipeline status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "pipelineId",
+    "franchiseId",
+    "name",
+    "pipelineType",
+    "status"
+  ],
+  "additionalProperties": false
+}

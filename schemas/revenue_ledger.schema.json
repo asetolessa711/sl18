@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RevenueLedger",
+  "description": "Schema for centralized revenue ledger in SL18 governance layer",
+  "type": "object",
+  "properties": {
+    "ledgerId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique ledger entry identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50,
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "Reference to the franchise"
+    },
+    "period": {
+      "type": "object",
+      "properties": {
+        "startDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Start date of the period (YYYY-MM-DD)"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date",
+          "description": "End date of the period (YYYY-MM-DD)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["weekly", "biweekly", "monthly", "quarterly", "annual"],
+          "description": "Type of reporting period"
+        }
+      },
+      "required": ["startDate", "endDate", "type"],
+      "additionalProperties": false
+    },
+    "revenueGenerated": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total revenue generated in the period"
+        },
+        "currency": {
+          "type": "string",
+          "default": "USD",
+          "description": "Currency of the revenue"
+        },
+        "breakdown": {
+          "type": "object",
+          "properties": {
+            "youtube": {
+              "type": "number",
+              "minimum": 0
+            },
+            "instagram": {
+              "type": "number",
+              "minimum": 0
+            },
+            "facebook": {
+              "type": "number",
+              "minimum": 0
+            },
+            "tiktok": {
+              "type": "number",
+              "minimum": 0
+            },
+            "other": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["total", "currency"],
+      "additionalProperties": false
+    },
+    "revenueSplit": {
+      "type": "object",
+      "properties": {
+        "partnerShare": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Partner's share amount"
+        },
+        "centralShare": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Central ops share amount"
+        },
+        "partnerPercentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Partner's percentage applied"
+        },
+        "centralPercentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Central ops percentage applied"
+        }
+      },
+      "required": ["partnerShare", "centralShare", "partnerPercentage", "centralPercentage"],
+      "additionalProperties": false
+    },
+    "payoutSchedule": {
+      "type": "object",
+      "properties": {
+        "scheduledDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Scheduled payout date"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "processing", "completed", "failed", "cancelled"],
+          "description": "Payout status"
+        },
+        "actualDate": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "Actual payout date"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "description": "Payment method used"
+        },
+        "transactionId": {
+          "type": ["string", "null"],
+          "description": "Payment transaction reference"
+        }
+      },
+      "required": ["scheduledDate", "status"],
+      "additionalProperties": false
+    },
+    "adjustments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "adjustmentId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["deduction", "bonus", "correction", "refund", "fee"]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "appliedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "appliedBy": {
+            "type": "string"
+          }
+        },
+        "required": ["adjustmentId", "type", "amount", "reason", "appliedAt"],
+        "additionalProperties": false
+      },
+      "description": "Adjustments applied to this ledger entry"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the ledger entry was created"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the ledger entry was last updated"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    }
+  },
+  "required": [
+    "ledgerId",
+    "franchiseId",
+    "period",
+    "revenueGenerated",
+    "revenueSplit",
+    "payoutSchedule",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

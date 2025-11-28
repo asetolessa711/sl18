@@ -1,0 +1,722 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DistributionObservability",
+  "description": "Schema for distribution observability in SL18 - partner metrics, syndication dashboards, error tracking, and compliance monitoring",
+  "type": "object",
+  "properties": {
+    "observabilityId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^dist-obs-[a-z0-9-]+$",
+      "description": "Unique observability configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Observability configuration name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "partner", "connector", "content"],
+          "description": "Scope level"
+        },
+        "partnerIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "connectorIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "franchiseIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["level"],
+      "additionalProperties": false
+    },
+    "partnerMetrics": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "collectionFrequency": {
+          "type": "string",
+          "enum": ["real_time", "hourly", "daily", "weekly"],
+          "description": "How often metrics are collected"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metricId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string",
+                "enum": ["performance", "engagement", "monetization", "quality", "compliance", "health"]
+              },
+              "type": {
+                "type": "string",
+                "enum": ["counter", "gauge", "histogram", "summary"]
+              },
+              "unit": {
+                "type": "string",
+                "enum": ["count", "percentage", "milliseconds", "bytes", "currency", "views", "hours"]
+              },
+              "aggregation": {
+                "type": "string",
+                "enum": ["sum", "average", "min", "max", "p50", "p95", "p99", "count"]
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["metricId", "name", "category", "type"],
+            "additionalProperties": false
+          }
+        },
+        "performanceMetrics": {
+          "type": "object",
+          "properties": {
+            "views": { "type": "boolean" },
+            "uniqueViewers": { "type": "boolean" },
+            "watchTime": { "type": "boolean" },
+            "completionRate": { "type": "boolean" },
+            "avgViewDuration": { "type": "boolean" },
+            "peakConcurrentViewers": { "type": "boolean" },
+            "startupTime": { "type": "boolean" },
+            "rebufferRatio": { "type": "boolean" },
+            "playbackFailures": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "engagementMetrics": {
+          "type": "object",
+          "properties": {
+            "likes": { "type": "boolean" },
+            "shares": { "type": "boolean" },
+            "comments": { "type": "boolean" },
+            "saves": { "type": "boolean" },
+            "followsGained": { "type": "boolean" },
+            "clickThroughRate": { "type": "boolean" },
+            "conversionRate": { "type": "boolean" },
+            "subscriptionConversions": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "monetizationMetrics": {
+          "type": "object",
+          "properties": {
+            "grossRevenue": { "type": "boolean" },
+            "netRevenue": { "type": "boolean" },
+            "revenuePerView": { "type": "boolean" },
+            "revenuePerUser": { "type": "boolean" },
+            "adRevenue": { "type": "boolean" },
+            "subscriptionRevenue": { "type": "boolean" },
+            "transactionalRevenue": { "type": "boolean" },
+            "cpm": { "type": "boolean" },
+            "fillRate": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "qualityMetrics": {
+          "type": "object",
+          "properties": {
+            "avgBitrate": { "type": "boolean" },
+            "bitrateSwitch": { "type": "boolean" },
+            "bufferingEvents": { "type": "boolean" },
+            "errorRate": { "type": "boolean" },
+            "videoStartFailures": { "type": "boolean" },
+            "playbackExitsBefore25": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "retentionDays": {
+          "type": "integer",
+          "description": "How long to retain metrics data"
+        }
+      },
+      "additionalProperties": false
+    },
+    "syndicationDashboards": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "dashboards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dashboardId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["overview", "partner_performance", "content_distribution", "revenue_analytics", "error_tracking", "compliance_status", "real_time"]
+              },
+              "description": {
+                "type": "string"
+              },
+              "widgets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "widgetId": { "type": "string" },
+                    "type": {
+                      "type": "string",
+                      "enum": ["kpi_card", "line_chart", "bar_chart", "pie_chart", "table", "map", "heatmap", "funnel", "leaderboard", "status_grid"]
+                    },
+                    "title": { "type": "string" },
+                    "metric": { "type": "string" },
+                    "dimensions": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "timeRange": { "type": "string" },
+                    "refreshInterval": { "type": "integer" },
+                    "thresholds": {
+                      "type": "object",
+                      "properties": {
+                        "warning": { "type": "number" },
+                        "critical": { "type": "number" }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["widgetId", "type", "title"],
+                  "additionalProperties": false
+                }
+              },
+              "layout": {
+                "type": "object",
+                "properties": {
+                  "columns": { "type": "integer" },
+                  "rows": { "type": "integer" }
+                },
+                "additionalProperties": false
+              },
+              "refreshInterval": {
+                "type": "integer",
+                "description": "Dashboard refresh interval in seconds"
+              },
+              "defaultTimeRange": {
+                "type": "string",
+                "enum": ["1h", "6h", "24h", "7d", "30d", "90d", "custom"]
+              },
+              "exportFormats": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["pdf", "csv", "excel", "png"]
+                }
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["dashboardId", "name", "type"],
+            "additionalProperties": false
+          }
+        },
+        "defaultDashboard": {
+          "type": "string"
+        },
+        "permissions": {
+          "type": "object",
+          "properties": {
+            "viewRoles": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "editRoles": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "adminRoles": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "errorTracking": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "errorCategories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "categoryId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string",
+                "enum": ["api_error", "format_mismatch", "metadata_error", "network_error", "auth_error", "rate_limit", "validation_error", "content_error", "drm_error", "geo_block"]
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low", "info"]
+              },
+              "autoRetry": {
+                "type": "boolean"
+              },
+              "maxRetries": {
+                "type": "integer"
+              },
+              "escalationPath": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["categoryId", "name", "category", "severity"],
+            "additionalProperties": false
+          }
+        },
+        "alertThresholds": {
+          "type": "object",
+          "properties": {
+            "errorRatePercent": {
+              "type": "object",
+              "properties": {
+                "warning": { "type": "number" },
+                "critical": { "type": "number" }
+              },
+              "additionalProperties": false
+            },
+            "errorCountPerHour": {
+              "type": "object",
+              "properties": {
+                "warning": { "type": "integer" },
+                "critical": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "consecutiveFailures": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false
+        },
+        "notifications": {
+          "type": "object",
+          "properties": {
+            "channels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["email", "slack", "pagerduty", "webhook", "sms", "in_app"]
+              }
+            },
+            "escalation": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "level": { "type": "integer" },
+                  "delayMinutes": { "type": "integer" },
+                  "channels": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "recipients": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "digestEnabled": { "type": "boolean" },
+            "digestFrequency": {
+              "type": "string",
+              "enum": ["hourly", "daily", "weekly"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "errorAggregation": {
+          "type": "object",
+          "properties": {
+            "groupBy": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["partner", "connector", "content", "error_type", "region"]
+              }
+            },
+            "timeWindows": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["1h", "6h", "24h", "7d"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "retentionDays": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "alerts": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "alertRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["threshold", "anomaly", "trend", "absence", "composite"]
+              },
+              "metric": {
+                "type": "string"
+              },
+              "condition": {
+                "type": "object",
+                "properties": {
+                  "operator": {
+                    "type": "string",
+                    "enum": ["gt", "gte", "lt", "lte", "eq", "neq", "between", "outside"]
+                  },
+                  "value": { "type": "number" },
+                  "minValue": { "type": "number" },
+                  "maxValue": { "type": "number" },
+                  "duration": { "type": "string" },
+                  "evaluationPeriods": { "type": "integer" }
+                },
+                "additionalProperties": false
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low", "info"]
+              },
+              "channels": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "cooldownMinutes": {
+                "type": "integer"
+              },
+              "autoResolve": {
+                "type": "boolean"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["ruleId", "name", "type", "severity"],
+            "additionalProperties": false
+          }
+        },
+        "partnerHealthAlerts": {
+          "type": "object",
+          "properties": {
+            "apiLatency": {
+              "type": "object",
+              "properties": {
+                "warningMs": { "type": "integer" },
+                "criticalMs": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "availability": {
+              "type": "object",
+              "properties": {
+                "warningPercent": { "type": "number" },
+                "criticalPercent": { "type": "number" }
+              },
+              "additionalProperties": false
+            },
+            "syndicationDelay": {
+              "type": "object",
+              "properties": {
+                "warningMinutes": { "type": "integer" },
+                "criticalMinutes": { "type": "integer" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "revenueAlerts": {
+          "type": "object",
+          "properties": {
+            "dropPercent": {
+              "type": "object",
+              "properties": {
+                "warning": { "type": "number" },
+                "critical": { "type": "number" },
+                "comparisonPeriod": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "anomalyDetection": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "complianceAlerts": {
+          "type": "object",
+          "properties": {
+            "rightsExpiring": {
+              "type": "object",
+              "properties": {
+                "daysBeforeWarning": { "type": "integer" },
+                "daysBeforeCritical": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "geoViolation": { "type": "boolean" },
+            "contentRatingViolation": { "type": "boolean" },
+            "qcFailure": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "reporting": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "scheduledReports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "reportId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["partner_summary", "revenue_breakdown", "performance_digest", "error_summary", "compliance_audit", "content_analytics"]
+              },
+              "frequency": {
+                "type": "string",
+                "enum": ["daily", "weekly", "monthly", "quarterly"]
+              },
+              "recipients": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "format": {
+                "type": "string",
+                "enum": ["pdf", "csv", "excel", "html"]
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["reportId", "name", "type", "frequency"],
+            "additionalProperties": false
+          }
+        },
+        "customReports": {
+          "type": "boolean"
+        },
+        "apiExport": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "auditLogging": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "connector_created",
+              "connector_updated",
+              "connector_activated",
+              "connector_deactivated",
+              "syndication_started",
+              "syndication_completed",
+              "syndication_failed",
+              "syndication_retried",
+              "content_published",
+              "content_updated",
+              "content_removed",
+              "rights_granted",
+              "rights_revoked",
+              "rights_expired",
+              "revenue_recorded",
+              "payout_processed",
+              "error_detected",
+              "alert_triggered",
+              "alert_resolved",
+              "compliance_check_passed",
+              "compliance_violation",
+              "geo_block_triggered"
+            ]
+          }
+        },
+        "retentionDays": {
+          "type": "integer"
+        },
+        "immutable": {
+          "type": "boolean"
+        },
+        "exportEnabled": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "integrations": {
+      "type": "object",
+      "properties": {
+        "datadog": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "apiKeyRef": { "type": "string" },
+            "metrics": { "type": "boolean" },
+            "logs": { "type": "boolean" },
+            "traces": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        },
+        "splunk": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "endpoint": { "type": "string", "format": "uri" },
+            "tokenRef": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "grafana": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "endpoint": { "type": "string", "format": "uri" }
+          },
+          "additionalProperties": false
+        },
+        "slack": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "webhookUrlRef": { "type": "string" },
+            "channels": {
+              "type": "object",
+              "properties": {
+                "alerts": { "type": "string" },
+                "reports": { "type": "string" },
+                "errors": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "pagerduty": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "integrationKeyRef": { "type": "string" },
+            "serviceName": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "maintenance"],
+      "description": "Observability configuration status"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "observabilityId",
+    "version",
+    "name",
+    "scope",
+    "partnerMetrics",
+    "status"
+  ],
+  "additionalProperties": false
+}

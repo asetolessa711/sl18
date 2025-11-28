@@ -1,0 +1,534 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AudienceEngagement",
+  "description": "Schema for audience engagement analytics in SL18 - poll participation, comment activity, reaction counts, engagement heatmaps",
+  "type": "object",
+  "properties": {
+    "engagementId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique engagement analytics identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "contentId": {
+      "type": "string",
+      "description": "Content identifier being tracked"
+    },
+    "contentType": {
+      "type": "string",
+      "enum": ["movie", "episode", "series", "short_drama", "trailer", "behind_the_scenes", "poll"],
+      "description": "Type of content"
+    },
+    "periodStart": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Start of the analytics period"
+    },
+    "periodEnd": {
+      "type": "string",
+      "format": "date-time",
+      "description": "End of the analytics period"
+    },
+    "pollEngagement": {
+      "type": "object",
+      "properties": {
+        "totalPolls": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total polls for this content"
+        },
+        "totalVotes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total votes across all polls"
+        },
+        "uniqueVoters": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Unique voters across all polls"
+        },
+        "participationRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of viewers who participated"
+        },
+        "avgVotesPerPoll": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pollBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pollId": { "type": "string" },
+              "pollType": { "type": "string" },
+              "voteCount": { "type": "integer", "minimum": 0 },
+              "participationRate": { "type": "number", "minimum": 0, "maximum": 100 },
+              "avgTimeToVote": { "type": "number", "description": "Average seconds to vote" },
+              "completionRate": { "type": "number", "minimum": 0, "maximum": 100, "description": "Percentage who completed viewing poll results" }
+            },
+            "required": ["pollId", "voteCount"],
+            "additionalProperties": false
+          }
+        },
+        "topPerformingPolls": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 5
+        },
+        "pollTypePerformance": {
+          "type": "object",
+          "properties": {
+            "story_choice": { "type": "number", "minimum": 0, "maximum": 100 },
+            "character_vote": { "type": "number", "minimum": 0, "maximum": 100 },
+            "sentiment_slider": { "type": "number", "minimum": 0, "maximum": 100 },
+            "prediction": { "type": "number", "minimum": 0, "maximum": 100 },
+            "rating": { "type": "number", "minimum": 0, "maximum": 100 },
+            "feedback": { "type": "number", "minimum": 0, "maximum": 100 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "commentEngagement": {
+      "type": "object",
+      "properties": {
+        "totalComments": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uniqueCommenters": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "avgCommentsPerViewer": {
+          "type": "number",
+          "minimum": 0
+        },
+        "totalReplies": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "avgThreadDepth": {
+          "type": "number",
+          "minimum": 0
+        },
+        "commentRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of viewers who commented"
+        },
+        "topComments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "commentId": { "type": "string" },
+              "reactionCount": { "type": "integer", "minimum": 0 },
+              "replyCount": { "type": "integer", "minimum": 0 },
+              "sentiment": { "type": "string" }
+            },
+            "required": ["commentId", "reactionCount"],
+            "additionalProperties": false
+          },
+          "maxItems": 10
+        },
+        "moderationStats": {
+          "type": "object",
+          "properties": {
+            "totalFlagged": { "type": "integer", "minimum": 0 },
+            "totalRemoved": { "type": "integer", "minimum": 0 },
+            "flagRate": { "type": "number", "minimum": 0, "maximum": 100 },
+            "avgReviewTime": { "type": "number", "description": "Average review time in minutes" }
+          },
+          "additionalProperties": false
+        },
+        "timestampedComments": {
+          "type": "object",
+          "properties": {
+            "count": { "type": "integer", "minimum": 0 },
+            "hotspots": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "timestamp": { "type": "number" },
+                  "commentCount": { "type": "integer" },
+                  "avgSentiment": { "type": "number", "minimum": -1, "maximum": 1 }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "reactionEngagement": {
+      "type": "object",
+      "properties": {
+        "totalReactions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uniqueReactors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reactionRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of viewers who reacted"
+        },
+        "reactionBreakdown": {
+          "type": "object",
+          "properties": {
+            "like": { "type": "integer", "minimum": 0, "default": 0 },
+            "love": { "type": "integer", "minimum": 0, "default": 0 },
+            "wow": { "type": "integer", "minimum": 0, "default": 0 },
+            "sad": { "type": "integer", "minimum": 0, "default": 0 },
+            "angry": { "type": "integer", "minimum": 0, "default": 0 },
+            "laugh": { "type": "integer", "minimum": 0, "default": 0 },
+            "fire": { "type": "integer", "minimum": 0, "default": 0 },
+            "heart_eyes": { "type": "integer", "minimum": 0, "default": 0 }
+          },
+          "additionalProperties": false
+        },
+        "reactionTimeline": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": { "type": "string", "format": "date-time" },
+              "count": { "type": "integer" },
+              "topReaction": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "description": "Reaction counts over time"
+        },
+        "sentimentFromReactions": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1,
+          "description": "Derived sentiment from reaction patterns"
+        }
+      },
+      "additionalProperties": false
+    },
+    "regionalEngagement": {
+      "type": "object",
+      "properties": {
+        "heatmapData": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "country": { "type": "string" },
+              "city": { "type": "string" },
+              "engagementScore": { "type": "number", "minimum": 0, "maximum": 100 },
+              "pollParticipation": { "type": "number", "minimum": 0, "maximum": 100 },
+              "commentRate": { "type": "number", "minimum": 0, "maximum": 100 },
+              "reactionRate": { "type": "number", "minimum": 0, "maximum": 100 },
+              "viewerCount": { "type": "integer", "minimum": 0 },
+              "sentiment": { "type": "number", "minimum": -1, "maximum": 1 }
+            },
+            "required": ["region", "engagementScore"],
+            "additionalProperties": false
+          }
+        },
+        "topRegions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 10
+        },
+        "lowEngagementRegions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "engagementScore": { "type": "number" },
+              "suggestedAction": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "description": "Regions with below-average engagement"
+        },
+        "culturalSensitivityAlerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "alertType": { "type": "string", "enum": ["negative_sentiment_spike", "cultural_backlash", "translation_issue", "persona_mismatch"] },
+              "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+              "description": { "type": "string" },
+              "affectedViewers": { "type": "integer" },
+              "detectedAt": { "type": "string", "format": "date-time" }
+            },
+            "required": ["region", "alertType", "severity"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "overallMetrics": {
+      "type": "object",
+      "properties": {
+        "engagementScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Composite engagement score"
+        },
+        "engagementTier": {
+          "type": "string",
+          "enum": ["viral", "high", "moderate", "low", "minimal"],
+          "description": "Engagement classification"
+        },
+        "activeViewers": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Viewers who engaged (poll/comment/reaction)"
+        },
+        "passiveViewers": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Viewers who watched but didn't engage"
+        },
+        "engagementRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Active vs total viewers percentage"
+        },
+        "viralCoefficient": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Shares per viewer"
+        },
+        "communityHealth": {
+          "type": "string",
+          "enum": ["thriving", "healthy", "stable", "declining", "critical"],
+          "description": "Overall community health assessment"
+        }
+      },
+      "additionalProperties": false
+    },
+    "trendAnalysis": {
+      "type": "object",
+      "properties": {
+        "engagementTrend": {
+          "type": "string",
+          "enum": ["increasing", "stable", "decreasing"],
+          "description": "Overall trend direction"
+        },
+        "trendPercentage": {
+          "type": "number",
+          "description": "Percentage change from previous period"
+        },
+        "weekOverWeek": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "week": { "type": "string" },
+              "engagementScore": { "type": "number" },
+              "pollParticipation": { "type": "number" },
+              "commentRate": { "type": "number" },
+              "reactionRate": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "seasonalPatterns": {
+          "type": "object",
+          "properties": {
+            "peakDays": { "type": "array", "items": { "type": "string" } },
+            "peakHours": { "type": "array", "items": { "type": "integer" } },
+            "lowEngagementPeriods": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "anomalies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": { "type": "string", "format": "date-time" },
+              "metric": { "type": "string" },
+              "expectedValue": { "type": "number" },
+              "actualValue": { "type": "number" },
+              "deviation": { "type": "number" },
+              "possibleCause": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "alerts": {
+      "type": "object",
+      "properties": {
+        "activeAlerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "alertId": { "type": "string" },
+              "alertType": {
+                "type": "string",
+                "enum": ["engagement_spike", "engagement_drop", "moderation_backlog", "sentiment_shift", "cultural_issue", "viral_content", "spam_detected"]
+              },
+              "severity": { "type": "string", "enum": ["info", "warning", "critical"] },
+              "message": { "type": "string" },
+              "triggeredAt": { "type": "string", "format": "date-time" },
+              "acknowledgedAt": { "type": "string", "format": "date-time" },
+              "resolvedAt": { "type": "string", "format": "date-time" }
+            },
+            "required": ["alertId", "alertType", "severity", "message", "triggeredAt"],
+            "additionalProperties": false
+          }
+        },
+        "alertThresholds": {
+          "type": "object",
+          "properties": {
+            "engagementDropThreshold": { "type": "number", "description": "Percentage drop to trigger alert" },
+            "moderationBacklogThreshold": { "type": "integer", "description": "Number of pending items" },
+            "sentimentShiftThreshold": { "type": "number", "description": "Sentiment change to trigger alert" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "operatorDashboard": {
+      "type": "object",
+      "properties": {
+        "widgets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "widgetId": { "type": "string" },
+              "widgetType": {
+                "type": "string",
+                "enum": ["kpi_card", "line_chart", "bar_chart", "pie_chart", "heatmap", "table", "alert_list", "comment_feed"]
+              },
+              "title": { "type": "string" },
+              "metric": { "type": "string" },
+              "position": {
+                "type": "object",
+                "properties": {
+                  "row": { "type": "integer" },
+                  "col": { "type": "integer" },
+                  "width": { "type": "integer" },
+                  "height": { "type": "integer" }
+                },
+                "additionalProperties": false
+              },
+              "refreshInterval": { "type": "integer", "description": "Refresh interval in seconds" }
+            },
+            "required": ["widgetId", "widgetType", "title"],
+            "additionalProperties": false
+          }
+        },
+        "defaultView": {
+          "type": "string",
+          "enum": ["overview", "polls", "comments", "reactions", "regional", "alerts"],
+          "default": "overview"
+        },
+        "exportFormats": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["csv", "pdf", "xlsx", "json"] }
+        }
+      },
+      "additionalProperties": false
+    },
+    "insightsIntegration": {
+      "type": "object",
+      "properties": {
+        "feedToAudienceInsights": {
+          "type": "boolean",
+          "default": true,
+          "description": "Feed to Phase 20 Audience Insights"
+        },
+        "feedToFeedbackLoop": {
+          "type": "boolean",
+          "default": true,
+          "description": "Feed to Phase 20 Feedback Loop"
+        },
+        "triggerPersonalizationUpdate": {
+          "type": "boolean",
+          "default": true,
+          "description": "Trigger Phase 17 personalization updates"
+        },
+        "triggerContentOptimization": {
+          "type": "boolean",
+          "default": false,
+          "description": "Trigger content optimization recommendations"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["collecting", "processing", "ready", "stale", "error"],
+      "description": "Current status of the engagement data"
+    },
+    "dataQuality": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "reliability": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        "sampleSize": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "engagementId",
+    "franchiseId",
+    "contentId",
+    "periodStart",
+    "periodEnd",
+    "status"
+  ],
+  "additionalProperties": false
+}

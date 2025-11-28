@@ -1,0 +1,471 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FeedbackLoop",
+  "description": "Schema for feedback loop engine in SL18 - triggers, personalization adjustments, and monetization signals",
+  "type": "object",
+  "properties": {
+    "loopId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Unique feedback loop identifier"
+    },
+    "franchiseId": {
+      "type": "string",
+      "description": "Associated franchise identifier"
+    },
+    "insightId": {
+      "type": "string",
+      "description": "Source audience insight identifier"
+    },
+    "loopType": {
+      "type": "string",
+      "enum": ["personalization", "monetization", "qc", "content_optimization", "distribution"],
+      "description": "Type of feedback loop"
+    },
+    "triggers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "triggerId": {
+            "type": "string",
+            "description": "Unique trigger identifier"
+          },
+          "triggerType": {
+            "type": "string",
+            "enum": [
+              "engagement_threshold",
+              "sentiment_change",
+              "retention_drop",
+              "churn_risk",
+              "cultural_issue",
+              "regional_performance",
+              "demographic_shift",
+              "binge_pattern",
+              "comparison_benchmark",
+              "time_based"
+            ],
+            "description": "Type of trigger condition"
+          },
+          "condition": {
+            "type": "object",
+            "properties": {
+              "metric": {
+                "type": "string",
+                "description": "Metric being evaluated"
+              },
+              "operator": {
+                "type": "string",
+                "enum": ["gt", "lt", "eq", "gte", "lte", "between", "change_by"]
+              },
+              "threshold": {
+                "type": "number",
+                "description": "Threshold value"
+              },
+              "thresholdHigh": {
+                "type": "number",
+                "description": "Upper threshold for 'between' operator"
+              },
+              "timeWindow": {
+                "type": "string",
+                "description": "Time window for evaluation (e.g., '24h', '7d')"
+              },
+              "minimumSampleSize": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Minimum sample size required to trigger"
+              }
+            },
+            "required": ["metric", "operator", "threshold"],
+            "additionalProperties": false
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "description": "Priority of the trigger"
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "cooldownPeriod": {
+            "type": "string",
+            "description": "Minimum time between trigger activations (e.g., '1h', '24h')"
+          },
+          "lastTriggeredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["triggerId", "triggerType", "condition", "priority"],
+        "additionalProperties": false
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "actionId": {
+            "type": "string",
+            "description": "Unique action identifier"
+          },
+          "actionType": {
+            "type": "string",
+            "enum": [
+              "adjust_personalization",
+              "update_recommendations",
+              "modify_pricing",
+              "trigger_retention",
+              "flag_qc_review",
+              "adjust_distribution",
+              "notify_operator",
+              "generate_report",
+              "pause_content",
+              "modify_content_style"
+            ],
+            "description": "Type of action to take"
+          },
+          "triggeredBy": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of trigger IDs that can activate this action"
+          },
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "targetSystem": {
+                "type": "string",
+                "enum": ["personalization_engine", "adaptive_pricing", "qc_dashboard", "distribution_channel", "notification_service", "content_management"]
+              },
+              "adjustmentType": {
+                "type": "string",
+                "description": "Type of adjustment to make"
+              },
+              "adjustmentValue": {
+                "description": "Value for the adjustment"
+              },
+              "scope": {
+                "type": "string",
+                "enum": ["global", "regional", "demographic", "individual"],
+                "description": "Scope of the adjustment"
+              },
+              "scopeFilter": {
+                "type": "object",
+                "description": "Filter criteria for scoped adjustments",
+                "additionalProperties": true
+              },
+              "notificationChannels": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["email", "slack", "dashboard", "sms", "webhook"]
+                }
+              },
+              "notificationRecipients": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "additionalProperties": true
+          },
+          "requiresApproval": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether manual approval is required before execution"
+          },
+          "approvalRoles": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Roles that can approve this action"
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": ["actionId", "actionType", "triggeredBy", "parameters"],
+        "additionalProperties": false
+      }
+    },
+    "personalizationAdjustments": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": { "type": "string" },
+              "condition": {
+                "type": "object",
+                "properties": {
+                  "signalType": { "type": "string" },
+                  "signalThreshold": { "type": "number" }
+                },
+                "additionalProperties": true
+              },
+              "adjustment": {
+                "type": "object",
+                "properties": {
+                  "targetField": {
+                    "type": "string",
+                    "enum": ["recommendedPersona", "recommendedFormat", "recommendedContentStyle", "adaptiveRendering"]
+                  },
+                  "adjustmentType": {
+                    "type": "string",
+                    "enum": ["boost", "demote", "replace", "add_weight", "remove_weight"]
+                  },
+                  "value": {
+                    "description": "Adjustment value"
+                  }
+                },
+                "required": ["targetField", "adjustmentType"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["ruleId", "condition", "adjustment"],
+            "additionalProperties": false
+          }
+        },
+        "feedbackToEngine": {
+          "type": "object",
+          "properties": {
+            "engineId": { "type": "string" },
+            "updateFrequency": {
+              "type": "string",
+              "enum": ["realtime", "hourly", "daily", "weekly"]
+            },
+            "learningRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "How quickly the engine adapts to new signals"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "monetizationSignals": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "churnRiskActions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "riskLevel": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"]
+              },
+              "action": {
+                "type": "string",
+                "enum": ["discount_offer", "tier_upgrade_prompt", "loyalty_reward", "personal_outreach", "content_recommendation", "feature_unlock"]
+              },
+              "discountPercentage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "validityPeriod": { "type": "string" }
+            },
+            "required": ["riskLevel", "action"],
+            "additionalProperties": false
+          }
+        },
+        "upgradePotentialActions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "potentialLevel": {
+                "type": "string",
+                "enum": ["low", "medium", "high"]
+              },
+              "suggestedTier": { "type": "string" },
+              "incentive": {
+                "type": "string",
+                "enum": ["free_trial", "discount", "feature_preview", "exclusive_content"]
+              }
+            },
+            "required": ["potentialLevel", "suggestedTier"],
+            "additionalProperties": false
+          }
+        },
+        "pricingFeedback": {
+          "type": "object",
+          "properties": {
+            "priceSensitivityScore": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "suggestedPriceAdjustment": {
+              "type": "number",
+              "description": "Percentage adjustment suggested"
+            },
+            "adjustmentReason": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "qcFeedback": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "culturalSensitivityAlerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "alertId": { "type": "string" },
+              "region": { "type": "string" },
+              "issue": { "type": "string" },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"]
+              },
+              "suggestedAction": { "type": "string" },
+              "autoFlagged": { "type": "boolean" }
+            },
+            "required": ["alertId", "region", "issue", "severity"],
+            "additionalProperties": false
+          }
+        },
+        "translationQualityFlags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "flagId": { "type": "string" },
+              "language": { "type": "string" },
+              "qualityScore": { "type": "number", "minimum": 0, "maximum": 100 },
+              "issues": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "suggestedReview": { "type": "boolean" }
+            },
+            "required": ["flagId", "language", "qualityScore"],
+            "additionalProperties": false
+          }
+        },
+        "personaConsistencyFlags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "flagId": { "type": "string" },
+              "personaId": { "type": "string" },
+              "inconsistencyType": {
+                "type": "string",
+                "enum": ["voice_drift", "style_drift", "character_break", "brand_violation"]
+              },
+              "detectedAt": { "type": "string", "format": "date-time" },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["flagId", "personaId", "inconsistencyType"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "executionHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "executionId": { "type": "string" },
+          "triggerId": { "type": "string" },
+          "actionId": { "type": "string" },
+          "executedAt": { "type": "string", "format": "date-time" },
+          "result": {
+            "type": "string",
+            "enum": ["success", "failure", "pending_approval", "skipped", "partial"]
+          },
+          "details": { "type": "string" },
+          "impactMetrics": {
+            "type": "object",
+            "properties": {
+              "affectedViewers": { "type": "integer" },
+              "measurementPeriod": { "type": "string" },
+              "engagementChange": { "type": "number" },
+              "revenueImpact": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["executionId", "triggerId", "actionId", "executedAt", "result"],
+        "additionalProperties": false
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "paused", "disabled", "learning", "error"],
+      "description": "Current status of the feedback loop"
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "evaluationInterval": {
+          "type": "string",
+          "description": "How often to evaluate triggers (e.g., '5m', '1h', '24h')"
+        },
+        "autoExecute": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to auto-execute actions or require approval"
+        },
+        "maxActionsPerHour": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Rate limit for action execution"
+        },
+        "rollbackEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether automatic rollback is enabled on negative impact"
+        },
+        "rollbackThreshold": {
+          "type": "number",
+          "description": "Engagement drop percentage that triggers rollback"
+        }
+      },
+      "additionalProperties": false
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "loopId",
+    "franchiseId",
+    "loopType",
+    "triggers",
+    "actions",
+    "status"
+  ],
+  "additionalProperties": false
+}

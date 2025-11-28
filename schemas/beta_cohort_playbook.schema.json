@@ -1,0 +1,984 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BetaCohortPlaybook",
+  "description": "Schema for Beta Testing Cohort Playbook - guides structured beta rollout with cohort management, feedback loops, and readiness gates for CEO and ops team",
+  "type": "object",
+  "properties": {
+    "playbookId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^beta-cohort-[a-z0-9-]+$",
+      "description": "Unique playbook identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "playbookName": {
+      "type": "string",
+      "description": "Human-readable playbook name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Playbook purpose and scope"
+    },
+    "cohortStructure": {
+      "type": "object",
+      "description": "Beta cohort phases and structure",
+      "properties": {
+        "phases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "phaseId": {
+                "type": "string",
+                "pattern": "^cohort-phase-[a-z0-9-]+$"
+              },
+              "name": {
+                "type": "string",
+                "enum": ["internal_beta", "closed_beta", "open_beta", "production_validation"]
+              },
+              "description": { "type": "string" },
+              "order": { "type": "integer", "minimum": 1 },
+              "audience": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["employees", "core_developers", "trusted_partners", "invite_only", "public_capped", "full_rollout"]
+                  },
+                  "targetSize": { "type": "integer", "minimum": 1 },
+                  "maxSize": { "type": "integer" },
+                  "regionalDiversity": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "targetRegions": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "inviteOnly": { "type": "boolean" },
+                  "requiresNda": { "type": "boolean", "default": false }
+                },
+                "additionalProperties": false
+              },
+              "goals": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "goalId": { "type": "string" },
+                    "description": { "type": "string" },
+                    "priority": {
+                      "type": "string",
+                      "enum": ["critical", "high", "medium", "low"]
+                    },
+                    "metrics": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": { "type": "string" },
+                          "target": { "type": "number" },
+                          "unit": { "type": "string" }
+                        },
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": ["goalId", "description", "priority"],
+                  "additionalProperties": false
+                }
+              },
+              "testFocus": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "critical_flows", "signup", "content_publishing", "monetization",
+                    "governance_filters", "audit_logs", "dashboards", "attribution",
+                    "engagement_features", "polls", "comments", "personalization",
+                    "subscription_tiers", "regional_pricing", "fraud_detection",
+                    "scalability", "cross_platform_funnels", "ads", "memberships",
+                    "fan_funding", "campaign_calendar", "global_traffic"
+                  ]
+                }
+              },
+              "duration": {
+                "type": "object",
+                "properties": {
+                  "minDays": { "type": "integer", "minimum": 1 },
+                  "maxDays": { "type": "integer" },
+                  "extensionAllowed": { "type": "boolean", "default": true }
+                },
+                "additionalProperties": false
+              },
+              "feedbackLoop": {
+                "type": "object",
+                "properties": {
+                  "channels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["daily_syncs", "jira_tickets", "slack_alerts", "structured_surveys", "moderated_forums", "analytics_dashboards", "automated_feedback_forms", "sentiment_analysis", "anomaly_alerts", "continuous_monitoring", "escalation_pipelines", "ceo_dashboard"]
+                    }
+                  },
+                  "frequency": {
+                    "type": "string",
+                    "enum": ["real_time", "hourly", "daily", "weekly"]
+                  },
+                  "escalationPath": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "level": { "type": "integer" },
+                        "role": { "type": "string" },
+                        "slaMinutes": { "type": "integer" }
+                      },
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "entryGates": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "gateId": { "type": "string" },
+                    "name": { "type": "string" },
+                    "requirement": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["not_started", "in_progress", "passed", "failed", "blocked"]
+                    }
+                  },
+                  "required": ["gateId", "name", "requirement"],
+                  "additionalProperties": false
+                }
+              },
+              "exitCriteria": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "criteriaId": { "type": "string" },
+                    "description": { "type": "string" },
+                    "metric": { "type": "string" },
+                    "threshold": { "type": "number" },
+                    "operator": {
+                      "type": "string",
+                      "enum": [">=", "<=", "==", ">", "<"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["not_evaluated", "passed", "failed"]
+                    }
+                  },
+                  "required": ["criteriaId", "description", "metric", "threshold"],
+                  "additionalProperties": false
+                }
+              },
+              "status": {
+                "type": "string",
+                "enum": ["upcoming", "active", "paused", "completed", "skipped"],
+                "default": "upcoming"
+              }
+            },
+            "required": ["phaseId", "name", "order", "audience", "goals"],
+            "additionalProperties": false
+          },
+          "default": [
+            {
+              "phaseId": "cohort-phase-internal",
+              "name": "internal_beta",
+              "description": "Internal testing with employees, core developers, and trusted partners",
+              "order": 1,
+              "audience": {
+                "type": "employees",
+                "targetSize": 50,
+                "maxSize": 100,
+                "regionalDiversity": true,
+                "targetRegions": ["US", "KE", "ET", "NG"],
+                "inviteOnly": true,
+                "requiresNda": true
+              },
+              "goals": [
+                { "goalId": "internal-goal-1", "description": "Validate critical flows (signup, content publishing, monetization)", "priority": "critical" },
+                { "goalId": "internal-goal-2", "description": "Stress-test governance filters and audit logs", "priority": "critical" },
+                { "goalId": "internal-goal-3", "description": "Confirm dashboards and attribution models", "priority": "high" }
+              ],
+              "testFocus": ["critical_flows", "signup", "content_publishing", "monetization", "governance_filters", "audit_logs", "dashboards", "attribution"],
+              "duration": { "minDays": 7, "maxDays": 14, "extensionAllowed": true },
+              "feedbackLoop": {
+                "channels": ["daily_syncs", "jira_tickets", "slack_alerts"],
+                "frequency": "daily",
+                "escalationPath": [
+                  { "level": 1, "role": "qa_lead", "slaMinutes": 60 },
+                  { "level": 2, "role": "engineering_lead", "slaMinutes": 120 },
+                  { "level": 3, "role": "ceo", "slaMinutes": 240 }
+                ]
+              },
+              "entryGates": [
+                { "gateId": "internal-entry-1", "name": "E2E Tests Pass", "requirement": "All Phase 33 E2E tests pass with 100% critical flow success", "status": "not_started" },
+                { "gateId": "internal-entry-2", "name": "Infrastructure Ready", "requirement": "Beta environment deployed and validated", "status": "not_started" }
+              ],
+              "exitCriteria": [
+                { "criteriaId": "internal-exit-1", "description": "Critical bug count", "metric": "critical_bugs", "threshold": 0, "operator": "==", "status": "not_evaluated" },
+                { "criteriaId": "internal-exit-2", "description": "Flow completion rate", "metric": "flow_completion_rate", "threshold": 95, "operator": ">=", "status": "not_evaluated" }
+              ],
+              "status": "upcoming"
+            },
+            {
+              "phaseId": "cohort-phase-closed",
+              "name": "closed_beta",
+              "description": "Invite-only external testers with regional diversity",
+              "order": 2,
+              "audience": {
+                "type": "invite_only",
+                "targetSize": 500,
+                "maxSize": 1000,
+                "regionalDiversity": true,
+                "targetRegions": ["US", "UK", "KE", "ET", "NG", "IN", "BR"],
+                "inviteOnly": true,
+                "requiresNda": false
+              },
+              "goals": [
+                { "goalId": "closed-goal-1", "description": "Test audience engagement features (polls, comments, personalization)", "priority": "critical" },
+                { "goalId": "closed-goal-2", "description": "Validate subscription tiers and regional pricing", "priority": "critical" },
+                { "goalId": "closed-goal-3", "description": "Monitor fraud detection (VPN/proxy, velocity checks)", "priority": "high" }
+              ],
+              "testFocus": ["engagement_features", "polls", "comments", "personalization", "subscription_tiers", "regional_pricing", "fraud_detection"],
+              "duration": { "minDays": 14, "maxDays": 28, "extensionAllowed": true },
+              "feedbackLoop": {
+                "channels": ["structured_surveys", "moderated_forums", "analytics_dashboards"],
+                "frequency": "daily",
+                "escalationPath": [
+                  { "level": 1, "role": "community_manager", "slaMinutes": 120 },
+                  { "level": 2, "role": "product_manager", "slaMinutes": 240 },
+                  { "level": 3, "role": "ceo", "slaMinutes": 480 }
+                ]
+              },
+              "entryGates": [
+                { "gateId": "closed-entry-1", "name": "Internal Beta Complete", "requirement": "Internal beta phase completed with all exit criteria met", "status": "not_started" },
+                { "gateId": "closed-entry-2", "name": "Invite System Ready", "requirement": "Invite code generation and redemption working", "status": "not_started" }
+              ],
+              "exitCriteria": [
+                { "criteriaId": "closed-exit-1", "description": "NPS Score", "metric": "nps_score", "threshold": 40, "operator": ">=", "status": "not_evaluated" },
+                { "criteriaId": "closed-exit-2", "description": "Subscription conversion rate", "metric": "conversion_rate", "threshold": 5, "operator": ">=", "status": "not_evaluated" },
+                { "criteriaId": "closed-exit-3", "description": "Fraud incident rate", "metric": "fraud_rate", "threshold": 0.1, "operator": "<=", "status": "not_evaluated" }
+              ],
+              "status": "upcoming"
+            },
+            {
+              "phaseId": "cohort-phase-open",
+              "name": "open_beta",
+              "description": "Public sign-ups with capped user count",
+              "order": 3,
+              "audience": {
+                "type": "public_capped",
+                "targetSize": 10000,
+                "maxSize": 25000,
+                "regionalDiversity": true,
+                "targetRegions": ["global"],
+                "inviteOnly": false,
+                "requiresNda": false
+              },
+              "goals": [
+                { "goalId": "open-goal-1", "description": "Validate scalability under load", "priority": "critical" },
+                { "goalId": "open-goal-2", "description": "Test cross-platform funnels (YouTube, Facebook, Instagram, TikTok → Waliin Studio)", "priority": "critical" },
+                { "goalId": "open-goal-3", "description": "Confirm monetization flows at scale (ads, memberships, fan funding)", "priority": "critical" }
+              ],
+              "testFocus": ["scalability", "cross_platform_funnels", "monetization", "ads", "memberships", "fan_funding"],
+              "duration": { "minDays": 21, "maxDays": 42, "extensionAllowed": true },
+              "feedbackLoop": {
+                "channels": ["automated_feedback_forms", "sentiment_analysis", "anomaly_alerts"],
+                "frequency": "real_time",
+                "escalationPath": [
+                  { "level": 1, "role": "ops_team", "slaMinutes": 30 },
+                  { "level": 2, "role": "engineering_lead", "slaMinutes": 60 },
+                  { "level": 3, "role": "ceo", "slaMinutes": 120 }
+                ]
+              },
+              "entryGates": [
+                { "gateId": "open-entry-1", "name": "Closed Beta Complete", "requirement": "Closed beta phase completed with all exit criteria met", "status": "not_started" },
+                { "gateId": "open-entry-2", "name": "Infrastructure Scaled", "requirement": "Auto-scaling configured and tested for 10K+ users", "status": "not_started" },
+                { "gateId": "open-entry-3", "name": "Marketing Ready", "requirement": "Landing page and social media announcement prepared", "status": "not_started" }
+              ],
+              "exitCriteria": [
+                { "criteriaId": "open-exit-1", "description": "System uptime", "metric": "uptime", "threshold": 99.9, "operator": ">=", "status": "not_evaluated" },
+                { "criteriaId": "open-exit-2", "description": "P99 latency", "metric": "p99_latency_ms", "threshold": 500, "operator": "<=", "status": "not_evaluated" },
+                { "criteriaId": "open-exit-3", "description": "Monetization revenue target", "metric": "monthly_revenue", "threshold": 1000, "operator": ">=", "status": "not_evaluated" }
+              ],
+              "status": "upcoming"
+            },
+            {
+              "phaseId": "cohort-phase-production",
+              "name": "production_validation",
+              "description": "Full rollout with continuous monitoring",
+              "order": 4,
+              "audience": {
+                "type": "full_rollout",
+                "targetSize": 100000,
+                "regionalDiversity": true,
+                "targetRegions": ["global"],
+                "inviteOnly": false,
+                "requiresNda": false
+              },
+              "goals": [
+                { "goalId": "prod-goal-1", "description": "Confirm readiness gates passed", "priority": "critical" },
+                { "goalId": "prod-goal-2", "description": "Validate global campaign calendar execution", "priority": "critical" },
+                { "goalId": "prod-goal-3", "description": "Ensure governance, monetization, and analytics hold under production traffic", "priority": "critical" }
+              ],
+              "testFocus": ["global_traffic", "campaign_calendar", "monetization", "governance_filters", "attribution"],
+              "duration": { "minDays": 30, "extensionAllowed": false },
+              "feedbackLoop": {
+                "channels": ["continuous_monitoring", "escalation_pipelines", "ceo_dashboard"],
+                "frequency": "real_time",
+                "escalationPath": [
+                  { "level": 1, "role": "ops_team", "slaMinutes": 15 },
+                  { "level": 2, "role": "engineering_lead", "slaMinutes": 30 },
+                  { "level": 3, "role": "ceo", "slaMinutes": 60 }
+                ]
+              },
+              "entryGates": [
+                { "gateId": "prod-entry-1", "name": "Open Beta Complete", "requirement": "Open beta phase completed with all exit criteria met", "status": "not_started" },
+                { "gateId": "prod-entry-2", "name": "CEO Sign-off", "requirement": "CEO has reviewed beta results and approved launch", "status": "not_started" },
+                { "gateId": "prod-entry-3", "name": "Marketing Campaign Live", "requirement": "Global campaign calendar active", "status": "not_started" }
+              ],
+              "exitCriteria": [
+                { "criteriaId": "prod-exit-1", "description": "DAU target", "metric": "daily_active_users", "threshold": 10000, "operator": ">=", "status": "not_evaluated" },
+                { "criteriaId": "prod-exit-2", "description": "Revenue target", "metric": "monthly_revenue", "threshold": 10000, "operator": ">=", "status": "not_evaluated" }
+              ],
+              "status": "upcoming"
+            }
+          ]
+        },
+        "currentPhase": {
+          "type": "string",
+          "enum": ["internal_beta", "closed_beta", "open_beta", "production_validation", "not_started", "completed"],
+          "default": "not_started"
+        }
+      },
+      "additionalProperties": false
+    },
+    "readinessGates": {
+      "type": "object",
+      "description": "Comprehensive readiness gates for beta launch",
+      "properties": {
+        "technical": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string", "default": "Technical Readiness" },
+            "gates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "gateId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "requirement": { "type": "string" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["not_started", "in_progress", "passed", "failed", "blocked"]
+                  },
+                  "owner": { "type": "string" },
+                  "dueDate": { "type": "string", "format": "date" }
+                },
+                "required": ["gateId", "name", "requirement"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "gateId": "tech-1", "name": "E2E Tests Pass", "requirement": "All Phase 33 E2E tests pass (100% critical, 95% overall)", "status": "not_started", "owner": "qa_lead" },
+                { "gateId": "tech-2", "name": "Infrastructure Thresholds", "requirement": "Page load <3s, API <500ms, video start <2s, uptime >99.9%", "status": "not_started", "owner": "engineering_lead" },
+                { "gateId": "tech-3", "name": "Load Test Validated", "requirement": "1000 concurrent users, 30min steady state, no degradation", "status": "not_started", "owner": "sre_lead" },
+                { "gateId": "tech-4", "name": "Chaos Testing Complete", "requirement": "Region failover, CDN failure, database latency scenarios passed", "status": "not_started", "owner": "sre_lead" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "governance": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string", "default": "Governance Readiness" },
+            "gates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "gateId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "requirement": { "type": "string" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["not_started", "in_progress", "passed", "failed", "blocked"]
+                  },
+                  "owner": { "type": "string" },
+                  "dueDate": { "type": "string", "format": "date" }
+                },
+                "required": ["gateId", "name", "requirement"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "gateId": "gov-1", "name": "Moderation Workflows", "requirement": "Auto-moderation, cultural sensitivity filters, escalation tested", "status": "not_started", "owner": "governance_lead" },
+                { "gateId": "gov-2", "name": "Copyright System", "requirement": "Content ID registration and claim workflow operational", "status": "not_started", "owner": "legal_lead" },
+                { "gateId": "gov-3", "name": "Audit Logging", "requirement": "All governance events captured with actor/timestamp", "status": "not_started", "owner": "compliance_lead" },
+                { "gateId": "gov-4", "name": "Disclosure Enforcement", "requirement": "Sponsored, AI-generated, affiliate disclosures enforced", "status": "not_started", "owner": "governance_lead" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "monetization": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string", "default": "Monetization Readiness" },
+            "gates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "gateId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "requirement": { "type": "string" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["not_started", "in_progress", "passed", "failed", "blocked"]
+                  },
+                  "owner": { "type": "string" },
+                  "dueDate": { "type": "string", "format": "date" }
+                },
+                "required": ["gateId", "name", "requirement"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "gateId": "mon-1", "name": "Payment Gateways", "requirement": "Stripe, PayPal, M-Pesa, Flutterwave tested in target regions", "status": "not_started", "owner": "payments_lead" },
+                { "gateId": "mon-2", "name": "Subscription Tiers", "requirement": "All tiers (free to VIP) with correct feature gating", "status": "not_started", "owner": "product_manager" },
+                { "gateId": "mon-3", "name": "Ad Insertion", "requirement": "SSAI pre-roll, mid-roll, rewarded ads functional", "status": "not_started", "owner": "monetization_lead" },
+                { "gateId": "mon-4", "name": "Regional Pricing", "requirement": "PPP-adjusted pricing for KE, ET, NG, IN, BR validated", "status": "not_started", "owner": "finance_lead" },
+                { "gateId": "mon-5", "name": "Fraud Detection", "requirement": "VPN/proxy detection, velocity checks, device fingerprinting active", "status": "not_started", "owner": "security_lead" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "analytics": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string", "default": "Analytics Readiness" },
+            "gates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "gateId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "requirement": { "type": "string" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["not_started", "in_progress", "passed", "failed", "blocked"]
+                  },
+                  "owner": { "type": "string" },
+                  "dueDate": { "type": "string", "format": "date" }
+                },
+                "required": ["gateId", "name", "requirement"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "gateId": "analytics-1", "name": "Funnel Tracking", "requirement": "Awareness→Interest→Consideration→Intent→Purchase→Retention tracked", "status": "not_started", "owner": "analytics_lead" },
+                { "gateId": "analytics-2", "name": "Attribution Models", "requirement": "All 5 models (last_click, first_click, linear, time_decay, data_driven) validated", "status": "not_started", "owner": "analytics_lead" },
+                { "gateId": "analytics-3", "name": "Cross-Platform Dashboards", "requirement": "YouTube, Facebook, Instagram, TikTok, Waliin unified dashboard", "status": "not_started", "owner": "data_lead" },
+                { "gateId": "analytics-4", "name": "Feedback Loop Integration", "requirement": "Phase 17 personalization + Phase 20 insights triggers verified", "status": "not_started", "owner": "product_manager" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "marketing": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string", "default": "Marketing Readiness" },
+            "gates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "gateId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "requirement": { "type": "string" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["not_started", "in_progress", "passed", "failed", "blocked"]
+                  },
+                  "owner": { "type": "string" },
+                  "dueDate": { "type": "string", "format": "date" }
+                },
+                "required": ["gateId", "name", "requirement"],
+                "additionalProperties": false
+              },
+              "default": [
+                { "gateId": "marketing-1", "name": "Social Accounts Setup", "requirement": "YouTube, Facebook, Instagram, TikTok accounts created and branded", "status": "not_started", "owner": "marketing_lead" },
+                { "gateId": "marketing-2", "name": "Campaign Calendar", "requirement": "Phase 34 campaign calendar populated with launch milestones", "status": "not_started", "owner": "marketing_lead" },
+                { "gateId": "marketing-3", "name": "Content Pipeline", "requirement": "30+ pieces of launch content ready (Shorts, Reels, teasers)", "status": "not_started", "owner": "content_lead" },
+                { "gateId": "marketing-4", "name": "Interlinking Configured", "requirement": "Bio links, end screens, cards, pinned comments all set up", "status": "not_started", "owner": "social_media_manager" }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "overallReadiness": {
+          "type": "string",
+          "enum": ["not_ready", "partially_ready", "ready", "ready_with_warnings", "blocked"],
+          "default": "not_ready"
+        }
+      },
+      "additionalProperties": false
+    },
+    "feedbackCollection": {
+      "type": "object",
+      "description": "Feedback collection and analysis configuration",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "channelId": { "type": "string" },
+              "name": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["survey", "forum", "in_app", "support_ticket", "analytics", "social_listening", "interview"]
+              },
+              "cohortPhases": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["internal_beta", "closed_beta", "open_beta", "production_validation"]
+                }
+              },
+              "frequency": {
+                "type": "string",
+                "enum": ["real_time", "daily", "weekly", "phase_end"]
+              },
+              "automated": { "type": "boolean" }
+            },
+            "required": ["channelId", "name", "type", "cohortPhases"],
+            "additionalProperties": false
+          },
+          "default": [
+            { "channelId": "fb-1", "name": "Daily Sync Meetings", "type": "interview", "cohortPhases": ["internal_beta"], "frequency": "daily", "automated": false },
+            { "channelId": "fb-2", "name": "Jira Bug Tickets", "type": "support_ticket", "cohortPhases": ["internal_beta", "closed_beta"], "frequency": "real_time", "automated": true },
+            { "channelId": "fb-3", "name": "Slack Alerts", "type": "analytics", "cohortPhases": ["internal_beta", "closed_beta", "open_beta"], "frequency": "real_time", "automated": true },
+            { "channelId": "fb-4", "name": "Structured Beta Survey", "type": "survey", "cohortPhases": ["closed_beta", "open_beta"], "frequency": "phase_end", "automated": true },
+            { "channelId": "fb-5", "name": "Moderated Beta Forum", "type": "forum", "cohortPhases": ["closed_beta"], "frequency": "real_time", "automated": false },
+            { "channelId": "fb-6", "name": "In-App Feedback Widget", "type": "in_app", "cohortPhases": ["open_beta", "production_validation"], "frequency": "real_time", "automated": true },
+            { "channelId": "fb-7", "name": "Sentiment Analysis", "type": "social_listening", "cohortPhases": ["open_beta", "production_validation"], "frequency": "real_time", "automated": true }
+          ]
+        },
+        "analysisConfig": {
+          "type": "object",
+          "properties": {
+            "sentimentAnalysis": { "type": "boolean", "default": true },
+            "categoryTagging": { "type": "boolean", "default": true },
+            "priorityScoring": { "type": "boolean", "default": true },
+            "trendDetection": { "type": "boolean", "default": true },
+            "anomalyAlerts": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "escalationRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ruleId": { "type": "string" },
+              "trigger": { "type": "string" },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "escalateTo": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "slaMinutes": { "type": "integer" },
+              "notificationChannels": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["slack", "email", "pagerduty", "sms"]
+                }
+              }
+            },
+            "required": ["ruleId", "trigger", "severity", "escalateTo"],
+            "additionalProperties": false
+          },
+          "default": [
+            { "ruleId": "esc-1", "trigger": "Critical bug reported", "severity": "critical", "escalateTo": ["engineering_lead", "ceo"], "slaMinutes": 30, "notificationChannels": ["slack", "pagerduty"] },
+            { "ruleId": "esc-2", "trigger": "Payment flow failure", "severity": "critical", "escalateTo": ["payments_lead", "ceo"], "slaMinutes": 15, "notificationChannels": ["slack", "pagerduty", "sms"] },
+            { "ruleId": "esc-3", "trigger": "NPS drop >10 points", "severity": "high", "escalateTo": ["product_manager", "ceo"], "slaMinutes": 60, "notificationChannels": ["slack", "email"] },
+            { "ruleId": "esc-4", "trigger": "Fraud spike detected", "severity": "critical", "escalateTo": ["security_lead", "ceo"], "slaMinutes": 15, "notificationChannels": ["slack", "pagerduty", "sms"] }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "issueTracking": {
+      "type": "object",
+      "description": "Issue tracking and resolution configuration",
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "critical_bug", "high_bug", "medium_bug", "low_bug",
+              "ux_issue", "performance_issue", "security_issue",
+              "monetization_issue", "governance_issue", "content_issue",
+              "feature_request", "enhancement"
+            ]
+          },
+          "default": ["critical_bug", "high_bug", "medium_bug", "low_bug", "ux_issue", "performance_issue", "security_issue", "monetization_issue", "governance_issue"]
+        },
+        "slaByCategory": {
+          "type": "object",
+          "properties": {
+            "critical_bug": {
+              "type": "object",
+              "properties": {
+                "responseMinutes": { "type": "integer", "default": 15 },
+                "resolutionHours": { "type": "integer", "default": 4 }
+              },
+              "additionalProperties": false
+            },
+            "high_bug": {
+              "type": "object",
+              "properties": {
+                "responseMinutes": { "type": "integer", "default": 60 },
+                "resolutionHours": { "type": "integer", "default": 24 }
+              },
+              "additionalProperties": false
+            },
+            "medium_bug": {
+              "type": "object",
+              "properties": {
+                "responseMinutes": { "type": "integer", "default": 240 },
+                "resolutionHours": { "type": "integer", "default": 72 }
+              },
+              "additionalProperties": false
+            },
+            "security_issue": {
+              "type": "object",
+              "properties": {
+                "responseMinutes": { "type": "integer", "default": 15 },
+                "resolutionHours": { "type": "integer", "default": 2 }
+              },
+              "additionalProperties": false
+            },
+            "monetization_issue": {
+              "type": "object",
+              "properties": {
+                "responseMinutes": { "type": "integer", "default": 30 },
+                "resolutionHours": { "type": "integer", "default": 8 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "triageWorkflow": {
+          "type": "object",
+          "properties": {
+            "autoCategorizationEnabled": { "type": "boolean", "default": true },
+            "dailyTriageMeeting": { "type": "boolean", "default": true },
+            "triageMeetingTime": { "type": "string", "default": "09:00" },
+            "triageOwner": { "type": "string", "default": "qa_lead" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "ceoDashboard": {
+      "type": "object",
+      "description": "CEO-specific dashboard and reporting configuration",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "widgets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "widgetId": { "type": "string" },
+              "name": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["kpi_card", "trend_chart", "funnel", "heatmap", "table", "alert_list", "progress_tracker"]
+              },
+              "dataSource": { "type": "string" },
+              "refreshInterval": {
+                "type": "string",
+                "enum": ["real_time", "5_minutes", "15_minutes", "hourly", "daily"]
+              }
+            },
+            "required": ["widgetId", "name", "type"],
+            "additionalProperties": false
+          },
+          "default": [
+            { "widgetId": "ceo-1", "name": "Beta Phase Progress", "type": "progress_tracker", "dataSource": "cohort_phases", "refreshInterval": "hourly" },
+            { "widgetId": "ceo-2", "name": "Readiness Gates Status", "type": "table", "dataSource": "readiness_gates", "refreshInterval": "hourly" },
+            { "widgetId": "ceo-3", "name": "Active Beta Users", "type": "kpi_card", "dataSource": "user_metrics", "refreshInterval": "real_time" },
+            { "widgetId": "ceo-4", "name": "Conversion Funnel", "type": "funnel", "dataSource": "funnel_analytics", "refreshInterval": "15_minutes" },
+            { "widgetId": "ceo-5", "name": "Revenue Trend", "type": "trend_chart", "dataSource": "monetization_analytics", "refreshInterval": "hourly" },
+            { "widgetId": "ceo-6", "name": "Critical Issues", "type": "alert_list", "dataSource": "issue_tracking", "refreshInterval": "real_time" },
+            { "widgetId": "ceo-7", "name": "NPS Score Trend", "type": "trend_chart", "dataSource": "feedback_analytics", "refreshInterval": "daily" },
+            { "widgetId": "ceo-8", "name": "Regional Engagement Heatmap", "type": "heatmap", "dataSource": "geo_analytics", "refreshInterval": "hourly" }
+          ]
+        },
+        "dailyBriefing": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "deliveryTime": { "type": "string", "default": "07:00" },
+            "deliveryChannels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["email", "slack", "dashboard"]
+              },
+              "default": ["email", "slack"]
+            },
+            "includeMetrics": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["dau", "signups", "conversions", "revenue", "nps", "critical_issues", "gate_progress"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "escalationAlerts": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "alertTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["critical_bug", "payment_failure", "security_incident", "nps_drop", "fraud_spike", "gate_blocked"]
+              },
+              "default": ["critical_bug", "payment_failure", "security_incident", "nps_drop", "fraud_spike", "gate_blocked"]
+            },
+            "channels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["sms", "phone", "slack", "email"]
+              },
+              "default": ["sms", "slack"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "teamAssignments": {
+      "type": "object",
+      "description": "Team roles and responsibilities for beta rollout",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "roleId": { "type": "string" },
+              "title": { "type": "string" },
+              "responsibilities": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "cohortPhases": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["internal_beta", "closed_beta", "open_beta", "production_validation"]
+                }
+              },
+              "escalationLevel": { "type": "integer" }
+            },
+            "required": ["roleId", "title", "responsibilities"],
+            "additionalProperties": false
+          },
+          "default": [
+            {
+              "roleId": "role-ceo",
+              "title": "CEO",
+              "responsibilities": ["Final sign-off on phase progression", "Strategic decisions", "Critical escalation resolution"],
+              "cohortPhases": ["internal_beta", "closed_beta", "open_beta", "production_validation"],
+              "escalationLevel": 3
+            },
+            {
+              "roleId": "role-product",
+              "title": "Product Manager",
+              "responsibilities": ["Feature prioritization", "Roadmap decisions", "User feedback synthesis"],
+              "cohortPhases": ["internal_beta", "closed_beta", "open_beta", "production_validation"],
+              "escalationLevel": 2
+            },
+            {
+              "roleId": "role-qa",
+              "title": "QA Lead",
+              "responsibilities": ["Test execution oversight", "Bug triage", "Quality gates validation"],
+              "cohortPhases": ["internal_beta", "closed_beta", "open_beta"],
+              "escalationLevel": 1
+            },
+            {
+              "roleId": "role-marketing",
+              "title": "Marketing Lead",
+              "responsibilities": ["Campaign calendar execution", "Social media management", "User acquisition"],
+              "cohortPhases": ["closed_beta", "open_beta", "production_validation"],
+              "escalationLevel": 2
+            },
+            {
+              "roleId": "role-ops",
+              "title": "Ops Team Lead",
+              "responsibilities": ["Infrastructure monitoring", "Incident response", "SLA management"],
+              "cohortPhases": ["internal_beta", "closed_beta", "open_beta", "production_validation"],
+              "escalationLevel": 1
+            }
+          ]
+        },
+        "communicationChannels": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "string",
+              "enum": ["slack", "teams", "discord"],
+              "default": "slack"
+            },
+            "escalation": {
+              "type": "string",
+              "enum": ["pagerduty", "opsgenie", "phone"],
+              "default": "pagerduty"
+            },
+            "documentation": {
+              "type": "string",
+              "enum": ["notion", "confluence", "github_wiki"],
+              "default": "notion"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "integrations": {
+      "type": "object",
+      "description": "Tool and system integrations",
+      "properties": {
+        "e2eTesting": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "beta_e2e_testing.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "campaignCalendar": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "campaign_calendar.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "socialAnalytics": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "social_analytics.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "monetizationAnalytics": {
+          "type": "object",
+          "properties": {
+            "schemaRef": { "type": "string", "default": "monetization_analytics.schema.json" },
+            "syncEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "airtable": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "baseId": { "type": "string" },
+            "tables": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["Beta_Cohorts", "Readiness_Gates", "Feedback", "Issues"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "slack": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "channels": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["#beta-ops", "#beta-feedback", "#beta-escalations", "#ceo-briefing"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "jira": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "projectKey": { "type": "string" },
+            "issueTypes": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["Bug", "Task", "Story", "Epic"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "paused", "completed", "archived"],
+      "default": "draft"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" },
+        "launchTargetDate": { "type": "string", "format": "date" },
+        "actualLaunchDate": { "type": "string", "format": "date" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "playbookId",
+    "version",
+    "playbookName",
+    "cohortStructure",
+    "readinessGates",
+    "status"
+  ],
+  "additionalProperties": false
+}
