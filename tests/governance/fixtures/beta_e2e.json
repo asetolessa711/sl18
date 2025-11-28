@@ -1,0 +1,568 @@
+{
+  "validTestSuites": [
+    {
+      "testSuiteId": "beta-e2e-waliin-001",
+      "version": "1.0.0",
+      "testPhase": "closed_beta",
+      "audienceFlows": {
+        "enabled": true,
+        "testScenarios": [
+          {
+            "scenarioId": "audience-signup-to-premium",
+            "name": "Complete Signup to Premium Subscription Journey",
+            "description": "Test full audience journey from signup through premium subscription",
+            "priority": "critical",
+            "steps": [
+              { "stepId": 1, "action": "signup", "expectedResult": "Account created, verification email sent" },
+              { "stepId": 2, "action": "verify_email", "expectedResult": "Email verified, account activated" },
+              { "stepId": 3, "action": "set_preferences", "expectedResult": "Genre and language preferences saved" },
+              { "stepId": 4, "action": "view_personalized_home", "expectedResult": "Personalized content displayed based on preferences" },
+              { "stepId": 5, "action": "play_content", "expectedResult": "Content plays with correct quality for tier" },
+              { "stepId": 6, "action": "vote_poll", "expectedResult": "Vote recorded, results displayed" },
+              { "stepId": 7, "action": "view_subscription_tiers", "expectedResult": "All tiers displayed with features" },
+              { "stepId": 8, "action": "select_tier", "expectedResult": "Premium tier selected" },
+              { "stepId": 9, "action": "enter_payment", "expectedResult": "Payment form validated" },
+              { "stepId": 10, "action": "confirm_subscription", "expectedResult": "Subscription active, features unlocked" }
+            ],
+            "tags": ["critical_path", "monetization"]
+          },
+          {
+            "scenarioId": "audience-social-funnel",
+            "name": "Social Media to Waliin Studio Conversion Funnel",
+            "description": "Test audience journey from social media click to premium conversion",
+            "priority": "critical",
+            "steps": [
+              { "stepId": 1, "action": "social_login", "expectedResult": "UTM parameters captured, account linked" },
+              { "stepId": 2, "action": "browse_home", "expectedResult": "Landing page renders with social context" },
+              { "stepId": 3, "action": "view_content_detail", "expectedResult": "Content detail page loads" },
+              { "stepId": 4, "action": "play_content", "expectedResult": "Content plays (free tier)" },
+              { "stepId": 5, "action": "view_subscription_tiers", "expectedResult": "Upgrade CTA visible" },
+              { "stepId": 6, "action": "confirm_subscription", "expectedResult": "Conversion tracked with attribution" }
+            ],
+            "tags": ["critical_path", "monetization"]
+          }
+        ],
+        "validations": {
+          "uiResponsiveness": {
+            "maxLoadTimeMs": 3000,
+            "maxInteractionDelayMs": 100,
+            "checkAccessibility": true,
+            "wcagLevel": "AA"
+          },
+          "personalizationAccuracy": {
+            "minRelevanceScore": 0.7,
+            "validateRecommendations": true,
+            "validateHeroBanner": true
+          },
+          "subscriptionEnforcement": {
+            "validateTierAccess": true,
+            "validateQualityRestrictions": true,
+            "validateFeatureGating": true
+          },
+          "funnelAttribution": {
+            "validateUtmCapture": true,
+            "validateConversionTracking": true,
+            "validateSocialAnalytics": true
+          }
+        }
+      },
+      "creatorFlows": {
+        "enabled": true,
+        "testScenarios": [
+          {
+            "scenarioId": "creator-upload-to-publish",
+            "name": "Complete Upload to Multi-Platform Publish Journey",
+            "description": "Test full creator journey from upload through cross-platform publishing",
+            "priority": "critical",
+            "steps": [
+              { "stepId": 1, "action": "login_creator", "expectedResult": "Creator authenticated" },
+              { "stepId": 2, "action": "access_studio_console", "expectedResult": "Console loaded with permissions" },
+              { "stepId": 3, "action": "start_upload", "expectedResult": "Upload initiated, progress shown" },
+              { "stepId": 4, "action": "complete_upload", "expectedResult": "Upload complete, transcoding starts" },
+              { "stepId": 5, "action": "set_metadata", "expectedResult": "Metadata saved, localization configured" },
+              { "stepId": 6, "action": "configure_monetization", "expectedResult": "Monetization settings saved" },
+              { "stepId": 7, "action": "set_distribution", "expectedResult": "Distribution channels configured" },
+              { "stepId": 8, "action": "submit_for_qc", "expectedResult": "QC workflow initiated" },
+              { "stepId": 9, "action": "pass_qc", "expectedResult": "Content approved for publishing" },
+              { "stepId": 10, "action": "publish_content", "expectedResult": "Content published to Waliin" },
+              { "stepId": 11, "action": "auto_publish_social", "expectedResult": "Cross-posted to configured platforms" },
+              { "stepId": 12, "action": "view_analytics_dashboard", "expectedResult": "Analytics data appearing" }
+            ],
+            "tags": ["critical_path", "publishing", "cross_platform"]
+          }
+        ],
+        "validations": {
+          "publishingWorkflows": {
+            "validateUploadIntegrity": true,
+            "validateTranscoding": true,
+            "validateFormatConversion": true,
+            "supportedFormats": ["16:9", "9:16", "1:1", "4:5"]
+          },
+          "revenueAttribution": {
+            "validatePlatformReports": true,
+            "validateRevenueMatching": true,
+            "tolerancePercent": 5
+          },
+          "crossPlatformSync": {
+            "validateYouTube": true,
+            "validateFacebook": true,
+            "validateInstagram": true,
+            "validateTikTok": true
+          }
+        }
+      },
+      "monetizationFlows": {
+        "enabled": true,
+        "testScenarios": [
+          {
+            "scenarioId": "monetization-subscription-lifecycle",
+            "name": "Complete Subscription Lifecycle Test",
+            "description": "Test full subscription journey including upgrade, downgrade, and cancellation",
+            "priority": "critical",
+            "steps": [
+              { "stepId": 1, "action": "view_pricing", "expectedResult": "Regional pricing displayed" },
+              { "stepId": 2, "action": "select_subscription", "expectedResult": "Basic tier selected" },
+              { "stepId": 3, "action": "enter_payment_details", "expectedResult": "Payment form validated" },
+              { "stepId": 4, "action": "process_payment", "expectedResult": "Payment successful" },
+              { "stepId": 5, "action": "verify_subscription_active", "expectedResult": "Subscription active, features unlocked" },
+              { "stepId": 6, "action": "upgrade_subscription", "expectedResult": "Upgraded to premium, prorated" },
+              { "stepId": 7, "action": "downgrade_subscription", "expectedResult": "Scheduled downgrade at renewal" },
+              { "stepId": 8, "action": "cancel_subscription", "expectedResult": "Cancelled, access until period end" }
+            ],
+            "paymentGateways": ["stripe", "paypal"],
+            "regions": ["US", "KE", "NG", "ET"],
+            "tags": ["critical_path", "subscription"]
+          },
+          {
+            "scenarioId": "monetization-ad-flow",
+            "name": "Ad Insertion and Revenue Tracking Test",
+            "description": "Test ad insertion during playback and revenue reporting",
+            "priority": "critical",
+            "steps": [
+              { "stepId": 1, "action": "view_ad_supported_content", "expectedResult": "AVOD content accessible" },
+              { "stepId": 2, "action": "verify_ad_insertion", "expectedResult": "Pre-roll ad served via SSAI" },
+              { "stepId": 3, "action": "track_ad_revenue", "expectedResult": "Impression tracked, revenue recorded" },
+              { "stepId": 4, "action": "view_revenue_dashboard", "expectedResult": "Ad revenue visible in dashboard" }
+            ],
+            "tags": ["critical_path", "ad_revenue"]
+          }
+        ],
+        "validations": {
+          "paymentSecurity": {
+            "validatePciCompliance": true,
+            "validateEncryption": true,
+            "validateFraudDetection": true
+          },
+          "revenueDashboards": {
+            "validateRpmByRegion": true,
+            "validateCpmAccuracy": true,
+            "tolerancePercent": 2
+          }
+        }
+      },
+      "governanceFlows": {
+        "enabled": true,
+        "testScenarios": [
+          {
+            "scenarioId": "governance-moderation-flow",
+            "name": "Comment Moderation to Escalation Flow",
+            "description": "Test comment moderation including auto-moderation and cultural sensitivity escalation",
+            "priority": "critical",
+            "steps": [
+              { "stepId": 1, "action": "post_comment", "expectedResult": "Comment submitted for moderation" },
+              { "stepId": 2, "action": "trigger_auto_moderation", "expectedResult": "Auto-moderation filters applied" },
+              { "stepId": 3, "action": "flag_for_review", "expectedResult": "Comment flagged, added to queue" },
+              { "stepId": 4, "action": "escalate_to_cultural_review", "expectedResult": "Escalated per cultural rules" },
+              { "stepId": 5, "action": "cultural_sensitivity_check", "expectedResult": "Cultural review completed" },
+              { "stepId": 6, "action": "view_audit_log", "expectedResult": "All actions logged with actor/timestamp" }
+            ],
+            "governanceSuite": "governance-suite-prod-001",
+            "tags": ["critical_path", "moderation", "compliance"]
+          },
+          {
+            "scenarioId": "governance-copyright-flow",
+            "name": "Copyright Claim to Resolution Flow",
+            "description": "Test copyright claim submission, Content ID check, and resolution",
+            "priority": "critical",
+            "steps": [
+              { "stepId": 1, "action": "submit_copyright_claim", "expectedResult": "Claim submitted" },
+              { "stepId": 2, "action": "verify_content_id", "expectedResult": "Content ID match found" },
+              { "stepId": 3, "action": "dispute_claim", "expectedResult": "Dispute submitted for review" },
+              { "stepId": 4, "action": "resolve_claim", "expectedResult": "Claim resolved, content status updated" },
+              { "stepId": 5, "action": "view_audit_log", "expectedResult": "Copyright events logged" }
+            ],
+            "tags": ["critical_path", "copyright", "compliance"]
+          }
+        ],
+        "validations": {
+          "phase25Integration": {
+            "validateGovernanceSuiteTriggers": true,
+            "validateCulturalSensitivity": true,
+            "validateComplianceFrameworks": true
+          },
+          "auditLogs": {
+            "validateCompleteness": true,
+            "validateTimestamps": true,
+            "validateActorCapture": true,
+            "retentionDays": 365
+          }
+        }
+      },
+      "analyticsFlows": {
+        "enabled": true,
+        "testScenarios": [
+          {
+            "scenarioId": "analytics-funnel-tracking",
+            "name": "Complete Funnel Tracking Test",
+            "description": "Test full funnel tracking from awareness to retention",
+            "priority": "critical",
+            "steps": [
+              { "stepId": 1, "action": "track_funnel_awareness", "expectedResult": "Impression recorded" },
+              { "stepId": 2, "action": "track_funnel_interest", "expectedResult": "Engagement recorded" },
+              { "stepId": 3, "action": "track_funnel_consideration", "expectedResult": "Click-through recorded" },
+              { "stepId": 4, "action": "track_funnel_intent", "expectedResult": "Signup/trial recorded" },
+              { "stepId": 5, "action": "track_funnel_purchase", "expectedResult": "Conversion recorded" },
+              { "stepId": 6, "action": "track_funnel_retention", "expectedResult": "Retention metrics updated" },
+              { "stepId": 7, "action": "view_cross_platform_dashboard", "expectedResult": "Funnel visualized correctly" }
+            ],
+            "attributionModels": ["last_click", "first_click", "linear"],
+            "tags": ["critical_path", "funnel"]
+          },
+          {
+            "scenarioId": "analytics-feedback-loop",
+            "name": "Feedback Loop Trigger and Action Test",
+            "description": "Test Phase 20 feedback loop triggers and automated actions",
+            "priority": "critical",
+            "steps": [
+              { "stepId": 1, "action": "trigger_feedback_loop", "expectedResult": "Loop triggered based on signal" },
+              { "stepId": 2, "action": "verify_personalization_adjustment", "expectedResult": "Recommendations updated" },
+              { "stepId": 3, "action": "verify_monetization_signal", "expectedResult": "Pricing signal captured" },
+              { "stepId": 4, "action": "verify_churn_prediction", "expectedResult": "Churn risk calculated" },
+              { "stepId": 5, "action": "trigger_retention_action", "expectedResult": "Retention offer triggered" }
+            ],
+            "tags": ["critical_path", "feedback_loop"]
+          }
+        ],
+        "validations": {
+          "funnelAccuracy": {
+            "validateStageProgression": true,
+            "validateDropOffCalculation": true,
+            "tolerancePercent": 1
+          },
+          "attributionAccuracy": {
+            "validateModelConsistency": true,
+            "validateCrossDeviceTracking": true
+          },
+          "feedbackLoopIntegration": {
+            "validatePhase17Integration": true,
+            "validatePhase20Integration": true,
+            "validateTriggerExecution": true
+          }
+        }
+      },
+      "infrastructureValidation": {
+        "enabled": true,
+        "performanceThresholds": {
+          "pageLoadTimeMs": 3000,
+          "apiResponseTimeMs": 500,
+          "videoStartTimeMs": 2000,
+          "maxRebufferRatio": 0.005,
+          "uptime": 99.9
+        },
+        "loadTestConfig": {
+          "enabled": true,
+          "concurrentUsers": 1000,
+          "rampUpMinutes": 5,
+          "steadyStateDurationMinutes": 30
+        },
+        "chaosTestConfig": {
+          "enabled": false,
+          "scenarios": ["region_failover", "cdn_failure"]
+        }
+      },
+      "testExecution": {
+        "environment": "beta",
+        "parallelExecution": {
+          "enabled": true,
+          "maxParallelScenarios": 10
+        },
+        "retryPolicy": {
+          "maxRetries": 3,
+          "retryDelaySeconds": 5,
+          "retryOnlyFlaky": true
+        },
+        "dataManagement": {
+          "useTestData": true,
+          "cleanupAfterRun": true,
+          "isolateTestUsers": true,
+          "snapshotEnabled": true
+        },
+        "scheduledRuns": [
+          { "name": "Smoke Tests", "schedule": "hourly", "scenarioTags": ["smoke"], "notifyOnFailure": true },
+          { "name": "Critical Path Tests", "schedule": "daily", "scenarioTags": ["critical_path"], "notifyOnFailure": true },
+          { "name": "Full Regression", "schedule": "weekly", "scenarioTags": ["regression"], "notifyOnFailure": true },
+          { "name": "Deploy Validation", "schedule": "on_deploy", "scenarioTags": ["smoke", "critical_path"], "notifyOnFailure": true }
+        ]
+      },
+      "reporting": {
+        "dashboards": {
+          "enabled": true,
+          "widgets": ["pass_rate", "failure_breakdown", "flaky_tests", "execution_time", "trend_chart", "recent_runs"]
+        },
+        "notifications": {
+          "channels": ["slack", "email"],
+          "onSuccess": false,
+          "onFailure": true,
+          "dailySummary": true
+        },
+        "artifacts": {
+          "screenshots": true,
+          "videos": true,
+          "networkLogs": true,
+          "consoleLogs": true,
+          "retentionDays": 30
+        },
+        "exportFormats": ["html", "json", "junit"]
+      },
+      "betaReadinessGates": {
+        "gates": [
+          {
+            "gateId": "gate-audience-flows",
+            "name": "Audience Flow Validation",
+            "description": "All critical audience journeys must pass",
+            "criteria": { "minPassRate": 100, "maxCriticalFailures": 0, "requiredScenarioTags": ["critical_path"] },
+            "status": "passed"
+          },
+          {
+            "gateId": "gate-monetization",
+            "name": "Monetization Flow Validation",
+            "description": "All payment and subscription flows must pass",
+            "criteria": { "minPassRate": 100, "maxCriticalFailures": 0, "requiredScenarioTags": ["monetization"] },
+            "status": "passed"
+          },
+          {
+            "gateId": "gate-governance",
+            "name": "Governance Compliance Validation",
+            "description": "All governance and compliance flows must pass",
+            "criteria": { "minPassRate": 100, "maxCriticalFailures": 0, "requiredScenarioTags": ["compliance"] },
+            "status": "passed"
+          },
+          {
+            "gateId": "gate-analytics",
+            "name": "Analytics Accuracy Validation",
+            "description": "Funnel tracking and attribution must be accurate",
+            "criteria": { "minPassRate": 95, "maxCriticalFailures": 0, "requiredScenarioTags": ["funnel", "attribution"] },
+            "status": "passed"
+          },
+          {
+            "gateId": "gate-performance",
+            "name": "Performance Threshold Validation",
+            "description": "All performance thresholds must be met",
+            "criteria": { "minPassRate": 99, "maxCriticalFailures": 0, "requiredScenarioTags": ["smoke"] },
+            "status": "passed"
+          }
+        ],
+        "overallReadiness": "ready",
+        "signOffRequired": ["qa_lead", "product_manager"]
+      },
+      "status": "active",
+      "metadata": {
+        "createdAt": "2025-11-28T08:00:00Z",
+        "createdBy": "qa-lead",
+        "updatedAt": "2025-11-28T09:00:00Z",
+        "updatedBy": "qa-lead",
+        "lastRunAt": "2025-11-28T09:30:00Z",
+        "lastRunResult": "passed"
+      }
+    }
+  ],
+  "invalidTestSuites": [
+    {
+      "description": "Missing testSuiteId",
+      "data": {
+        "version": "1.0.0",
+        "testPhase": "closed_beta",
+        "status": "active"
+      }
+    },
+    {
+      "description": "Invalid testSuiteId pattern",
+      "data": {
+        "testSuiteId": "invalid-id",
+        "version": "1.0.0",
+        "testPhase": "closed_beta",
+        "status": "active"
+      }
+    },
+    {
+      "description": "Invalid testPhase",
+      "data": {
+        "testSuiteId": "beta-e2e-test-001",
+        "version": "1.0.0",
+        "testPhase": "alpha",
+        "status": "active"
+      }
+    },
+    {
+      "description": "Invalid status",
+      "data": {
+        "testSuiteId": "beta-e2e-test-001",
+        "version": "1.0.0",
+        "testPhase": "closed_beta",
+        "status": "running"
+      }
+    }
+  ],
+  "audienceFlowScenarios": [
+    {
+      "scenarioId": "audience-signup-to-premium",
+      "name": "Complete Signup to Premium Subscription Journey",
+      "description": "Test full audience journey from signup through premium subscription",
+      "priority": "critical",
+      "steps": [
+        { "stepId": 1, "action": "signup", "expectedResult": "Account created, verification email sent" },
+        { "stepId": 2, "action": "verify_email", "expectedResult": "Email verified, account activated" },
+        { "stepId": 3, "action": "set_preferences", "expectedResult": "Genre and language preferences saved" },
+        { "stepId": 4, "action": "view_personalized_home", "expectedResult": "Personalized content displayed" },
+        { "stepId": 5, "action": "confirm_subscription", "expectedResult": "Subscription active" }
+      ],
+      "tags": ["critical_path", "monetization"]
+    },
+    {
+      "scenarioId": "audience-kids-mode",
+      "name": "Kids Mode and Parental Controls Test",
+      "description": "Test kids mode activation and content filtering",
+      "priority": "high",
+      "steps": [
+        { "stepId": 1, "action": "create_family_profile", "expectedResult": "Family profile created" },
+        { "stepId": 2, "action": "enable_kids_mode", "expectedResult": "Kids mode active, PIN set" },
+        { "stepId": 3, "action": "switch_profile", "expectedResult": "Switched to kids profile" },
+        { "stepId": 4, "action": "browse_home", "expectedResult": "Only age-appropriate content shown" }
+      ],
+      "tags": ["smoke", "accessibility"]
+    }
+  ],
+  "creatorFlowScenarios": [
+    {
+      "scenarioId": "creator-upload-to-publish",
+      "name": "Complete Upload to Multi-Platform Publish Journey",
+      "description": "Test full creator journey from upload through cross-platform publishing",
+      "priority": "critical",
+      "steps": [
+        { "stepId": 1, "action": "login_creator", "expectedResult": "Creator authenticated" },
+        { "stepId": 2, "action": "start_upload", "expectedResult": "Upload initiated" },
+        { "stepId": 3, "action": "complete_upload", "expectedResult": "Upload complete" },
+        { "stepId": 4, "action": "pass_qc", "expectedResult": "Content approved" },
+        { "stepId": 5, "action": "publish_content", "expectedResult": "Content published" },
+        { "stepId": 6, "action": "auto_publish_social", "expectedResult": "Cross-posted to platforms" }
+      ],
+      "tags": ["critical_path", "publishing", "cross_platform"]
+    }
+  ],
+  "monetizationFlowScenarios": [
+    {
+      "scenarioId": "monetization-regional-pricing",
+      "name": "Regional Pricing and Currency Test",
+      "description": "Test pricing display in different regions and currencies",
+      "priority": "high",
+      "steps": [
+        { "stepId": 1, "action": "regional_price_check", "expectedResult": "KES pricing shown for Kenya" },
+        { "stepId": 2, "action": "regional_price_check", "expectedResult": "ETB pricing shown for Ethiopia" },
+        { "stepId": 3, "action": "regional_price_check", "expectedResult": "NGN pricing shown for Nigeria" },
+        { "stepId": 4, "action": "process_payment", "expectedResult": "Payment in local currency" }
+      ],
+      "paymentGateways": ["mpesa", "flutterwave"],
+      "regions": ["KE", "ET", "NG"],
+      "tags": ["smoke", "subscription"]
+    }
+  ],
+  "governanceFlowScenarios": [
+    {
+      "scenarioId": "governance-disclosure-flow",
+      "name": "Disclosure Enforcement Test",
+      "description": "Test sponsored, AI-generated, and affiliate disclosure enforcement",
+      "priority": "high",
+      "steps": [
+        { "stepId": 1, "action": "add_sponsored_disclosure", "expectedResult": "Sponsored tag added" },
+        { "stepId": 2, "action": "verify_disclosure_visible", "expectedResult": "Disclosure visible" },
+        { "stepId": 3, "action": "add_ai_generated_label", "expectedResult": "AI label added" },
+        { "stepId": 4, "action": "verify_ai_label", "expectedResult": "AI label visible" }
+      ],
+      "tags": ["disclosure", "compliance"]
+    }
+  ],
+  "analyticsFlowScenarios": [
+    {
+      "scenarioId": "analytics-attribution-models",
+      "name": "Attribution Model Comparison Test",
+      "description": "Test all attribution models and verify calculations",
+      "priority": "high",
+      "steps": [
+        { "stepId": 1, "action": "verify_attribution_last_click", "expectedResult": "100% credit to last touchpoint" },
+        { "stepId": 2, "action": "verify_attribution_first_click", "expectedResult": "100% credit to first touchpoint" },
+        { "stepId": 3, "action": "verify_attribution_linear", "expectedResult": "Equal credit distribution" },
+        { "stepId": 4, "action": "verify_attribution_time_decay", "expectedResult": "Weighted credit toward conversion" }
+      ],
+      "attributionModels": ["last_click", "first_click", "linear", "time_decay"],
+      "tags": ["attribution"]
+    }
+  ],
+  "betaReadinessGates": [
+    {
+      "gateId": "gate-audience-flows",
+      "name": "Audience Flow Validation",
+      "description": "All critical audience journeys must pass",
+      "criteria": { "minPassRate": 100, "maxCriticalFailures": 0, "requiredScenarioTags": ["critical_path"] },
+      "status": "passed"
+    },
+    {
+      "gateId": "gate-monetization",
+      "name": "Monetization Flow Validation",
+      "description": "All payment and subscription flows must pass",
+      "criteria": { "minPassRate": 100, "maxCriticalFailures": 0, "requiredScenarioTags": ["monetization"] },
+      "status": "in_progress"
+    },
+    {
+      "gateId": "gate-governance",
+      "name": "Governance Compliance Validation",
+      "description": "All governance and compliance flows must pass",
+      "criteria": { "minPassRate": 100, "maxCriticalFailures": 0, "requiredScenarioTags": ["compliance"] },
+      "status": "not_started"
+    }
+  ],
+  "testExecutionResults": [
+    {
+      "runId": "run-001",
+      "testSuiteId": "beta-e2e-waliin-001",
+      "environment": "beta",
+      "startedAt": "2025-11-28T08:00:00Z",
+      "completedAt": "2025-11-28T08:45:00Z",
+      "totalScenarios": 12,
+      "passed": 11,
+      "failed": 1,
+      "skipped": 0,
+      "passRate": 91.67,
+      "failedScenarios": [
+        {
+          "scenarioId": "audience-offline-download",
+          "failedStep": 3,
+          "error": "Download timeout exceeded"
+        }
+      ]
+    }
+  ],
+  "performanceResults": [
+    {
+      "testSuiteId": "beta-e2e-waliin-001",
+      "runId": "run-001",
+      "metrics": {
+        "averagePageLoadTimeMs": 2450,
+        "averageApiResponseTimeMs": 320,
+        "averageVideoStartTimeMs": 1800,
+        "rebufferRatio": 0.003,
+        "uptime": 99.95
+      },
+      "thresholdsPassed": true
+    }
+  ]
+}

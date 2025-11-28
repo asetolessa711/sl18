@@ -1,0 +1,1070 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BetaE2ETesting",
+  "description": "Schema for Beta End-to-End (E2E) Testing in SL18 + Waliin Studio - validates critical user journeys before external cohort rollout",
+  "type": "object",
+  "properties": {
+    "testSuiteId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^beta-e2e-[a-z0-9-]+$",
+      "description": "Unique beta E2E test suite identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "testPhase": {
+      "type": "string",
+      "enum": ["pre_beta", "internal_beta", "closed_beta", "open_beta", "production_validation"],
+      "description": "Current testing phase"
+    },
+    "audienceFlows": {
+      "type": "object",
+      "description": "End-to-end tests for audience/viewer journeys",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "testScenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenarioId": {
+                "type": "string",
+                "pattern": "^audience-[a-z0-9-]+$"
+              },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "priority": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "stepId": { "type": "integer" },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "signup", "login", "social_login", "verify_email", "set_preferences",
+                        "browse_home", "view_personalized_home", "search_content", "browse_category",
+                        "view_content_detail", "play_content", "complete_playback", "partial_playback",
+                        "add_to_watchlist", "remove_from_watchlist", "add_to_favorites", "rate_content",
+                        "vote_poll", "post_comment", "react_to_content", "share_content",
+                        "view_subscription_tiers", "select_tier", "enter_payment", "confirm_subscription",
+                        "upgrade_tier", "downgrade_tier", "cancel_subscription",
+                        "download_for_offline", "play_offline_content", "sync_watch_progress",
+                        "switch_profile", "create_family_profile", "enable_kids_mode",
+                        "update_preferences", "logout"
+                      ]
+                    },
+                    "expectedResult": { "type": "string" },
+                    "validations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["ui_element", "api_response", "database", "analytics_event", "audit_log"]
+                          },
+                          "assertion": { "type": "string" },
+                          "tolerance": { "type": "number" }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "timeoutSeconds": { "type": "integer", "default": 30 }
+                  },
+                  "required": ["stepId", "action", "expectedResult"],
+                  "additionalProperties": false
+                }
+              },
+              "preconditions": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["smoke", "regression", "critical_path", "personalization", "monetization", "engagement", "accessibility"]
+                }
+              }
+            },
+            "required": ["scenarioId", "name", "steps", "priority"],
+            "additionalProperties": false
+          },
+          "default": [
+            {
+              "scenarioId": "audience-signup-to-premium",
+              "name": "Complete Signup to Premium Subscription Journey",
+              "description": "Test full audience journey from signup through premium subscription",
+              "priority": "critical",
+              "steps": [
+                { "stepId": 1, "action": "signup", "expectedResult": "Account created, verification email sent" },
+                { "stepId": 2, "action": "verify_email", "expectedResult": "Email verified, account activated" },
+                { "stepId": 3, "action": "set_preferences", "expectedResult": "Genre and language preferences saved" },
+                { "stepId": 4, "action": "view_personalized_home", "expectedResult": "Personalized content displayed based on preferences" },
+                { "stepId": 5, "action": "play_content", "expectedResult": "Content plays with correct quality for tier" },
+                { "stepId": 6, "action": "vote_poll", "expectedResult": "Vote recorded, results displayed" },
+                { "stepId": 7, "action": "view_subscription_tiers", "expectedResult": "All tiers displayed with features" },
+                { "stepId": 8, "action": "select_tier", "expectedResult": "Premium tier selected" },
+                { "stepId": 9, "action": "enter_payment", "expectedResult": "Payment form validated" },
+                { "stepId": 10, "action": "confirm_subscription", "expectedResult": "Subscription active, features unlocked" }
+              ],
+              "tags": ["critical_path", "monetization"]
+            },
+            {
+              "scenarioId": "audience-social-funnel",
+              "name": "Social Media to Waliin Studio Conversion Funnel",
+              "description": "Test audience journey from social media click to premium conversion",
+              "priority": "critical",
+              "steps": [
+                { "stepId": 1, "action": "social_login", "expectedResult": "UTM parameters captured, account linked" },
+                { "stepId": 2, "action": "browse_home", "expectedResult": "Landing page renders with social context" },
+                { "stepId": 3, "action": "view_content_detail", "expectedResult": "Content detail page loads" },
+                { "stepId": 4, "action": "play_content", "expectedResult": "Content plays (free tier)" },
+                { "stepId": 5, "action": "view_subscription_tiers", "expectedResult": "Upgrade CTA visible" },
+                { "stepId": 6, "action": "confirm_subscription", "expectedResult": "Conversion tracked with attribution" }
+              ],
+              "tags": ["critical_path", "monetization"]
+            }
+          ]
+        },
+        "validations": {
+          "type": "object",
+          "properties": {
+            "uiResponsiveness": {
+              "type": "object",
+              "properties": {
+                "maxLoadTimeMs": { "type": "integer", "default": 3000 },
+                "maxInteractionDelayMs": { "type": "integer", "default": 100 },
+                "checkAccessibility": { "type": "boolean", "default": true },
+                "wcagLevel": { "type": "string", "enum": ["A", "AA", "AAA"], "default": "AA" }
+              },
+              "additionalProperties": false
+            },
+            "personalizationAccuracy": {
+              "type": "object",
+              "properties": {
+                "minRelevanceScore": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.7 },
+                "validateRecommendations": { "type": "boolean", "default": true },
+                "validateHeroBanner": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            },
+            "subscriptionEnforcement": {
+              "type": "object",
+              "properties": {
+                "validateTierAccess": { "type": "boolean", "default": true },
+                "validateQualityRestrictions": { "type": "boolean", "default": true },
+                "validateFeatureGating": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            },
+            "funnelAttribution": {
+              "type": "object",
+              "properties": {
+                "validateUtmCapture": { "type": "boolean", "default": true },
+                "validateConversionTracking": { "type": "boolean", "default": true },
+                "validateSocialAnalytics": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "creatorFlows": {
+      "type": "object",
+      "description": "End-to-end tests for creator/contributor journeys",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "testScenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenarioId": {
+                "type": "string",
+                "pattern": "^creator-[a-z0-9-]+$"
+              },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "priority": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "stepId": { "type": "integer" },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "login_creator", "access_studio_console", "start_upload", "complete_upload",
+                        "set_metadata", "configure_monetization", "set_distribution",
+                        "submit_for_qc", "view_qc_feedback", "address_qc_feedback", "pass_qc",
+                        "schedule_release", "publish_content", "auto_publish_social",
+                        "view_analytics_dashboard", "view_revenue_dashboard", "check_attribution",
+                        "request_payout", "verify_payout",
+                        "create_teaser", "create_short", "cross_post_content",
+                        "respond_to_comment", "pin_comment", "view_engagement_metrics"
+                      ]
+                    },
+                    "expectedResult": { "type": "string" },
+                    "validations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["ui_element", "api_response", "database", "analytics_event", "audit_log", "platform_api"]
+                          },
+                          "assertion": { "type": "string" },
+                          "tolerance": { "type": "number" }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "timeoutSeconds": { "type": "integer", "default": 60 }
+                  },
+                  "required": ["stepId", "action", "expectedResult"],
+                  "additionalProperties": false
+                }
+              },
+              "preconditions": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["smoke", "regression", "critical_path", "publishing", "monetization", "cross_platform"]
+                }
+              }
+            },
+            "required": ["scenarioId", "name", "steps", "priority"],
+            "additionalProperties": false
+          },
+          "default": [
+            {
+              "scenarioId": "creator-upload-to-publish",
+              "name": "Complete Upload to Multi-Platform Publish Journey",
+              "description": "Test full creator journey from upload through cross-platform publishing",
+              "priority": "critical",
+              "steps": [
+                { "stepId": 1, "action": "login_creator", "expectedResult": "Creator authenticated" },
+                { "stepId": 2, "action": "access_studio_console", "expectedResult": "Console loaded with permissions" },
+                { "stepId": 3, "action": "start_upload", "expectedResult": "Upload initiated, progress shown" },
+                { "stepId": 4, "action": "complete_upload", "expectedResult": "Upload complete, transcoding starts" },
+                { "stepId": 5, "action": "set_metadata", "expectedResult": "Metadata saved, localization configured" },
+                { "stepId": 6, "action": "configure_monetization", "expectedResult": "Monetization settings saved" },
+                { "stepId": 7, "action": "set_distribution", "expectedResult": "Distribution channels configured" },
+                { "stepId": 8, "action": "submit_for_qc", "expectedResult": "QC workflow initiated" },
+                { "stepId": 9, "action": "pass_qc", "expectedResult": "Content approved for publishing" },
+                { "stepId": 10, "action": "publish_content", "expectedResult": "Content published to Waliin" },
+                { "stepId": 11, "action": "auto_publish_social", "expectedResult": "Cross-posted to configured platforms" },
+                { "stepId": 12, "action": "view_analytics_dashboard", "expectedResult": "Analytics data appearing" }
+              ],
+              "tags": ["critical_path", "publishing", "cross_platform"]
+            }
+          ]
+        },
+        "validations": {
+          "type": "object",
+          "properties": {
+            "publishingWorkflows": {
+              "type": "object",
+              "properties": {
+                "validateUploadIntegrity": { "type": "boolean", "default": true },
+                "validateTranscoding": { "type": "boolean", "default": true },
+                "validateFormatConversion": { "type": "boolean", "default": true },
+                "supportedFormats": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "default": ["16:9", "9:16", "1:1", "4:5"]
+                }
+              },
+              "additionalProperties": false
+            },
+            "revenueAttribution": {
+              "type": "object",
+              "properties": {
+                "validatePlatformReports": { "type": "boolean", "default": true },
+                "validateRevenueMatching": { "type": "boolean", "default": true },
+                "tolerancePercent": { "type": "number", "default": 5 }
+              },
+              "additionalProperties": false
+            },
+            "crossPlatformSync": {
+              "type": "object",
+              "properties": {
+                "validateYouTube": { "type": "boolean", "default": true },
+                "validateFacebook": { "type": "boolean", "default": true },
+                "validateInstagram": { "type": "boolean", "default": true },
+                "validateTikTok": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "monetizationFlows": {
+      "type": "object",
+      "description": "End-to-end tests for monetization and payment journeys",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "testScenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenarioId": {
+                "type": "string",
+                "pattern": "^monetization-[a-z0-9-]+$"
+              },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "priority": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "stepId": { "type": "integer" },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "view_pricing", "select_subscription", "enter_payment_details",
+                        "process_payment", "verify_subscription_active", "access_premium_content",
+                        "view_ad_supported_content", "verify_ad_insertion", "track_ad_revenue",
+                        "purchase_tvod", "rent_content", "verify_rental_access", "rental_expired",
+                        "send_super_chat", "send_tip", "verify_creator_attribution",
+                        "upgrade_subscription", "downgrade_subscription", "cancel_subscription",
+                        "refund_request", "process_refund", "verify_refund",
+                        "apply_promo_code", "verify_discount", "regional_price_check",
+                        "view_revenue_dashboard", "export_revenue_report", "verify_payout"
+                      ]
+                    },
+                    "expectedResult": { "type": "string" },
+                    "validations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["payment_gateway", "database", "analytics_event", "audit_log", "revenue_dashboard"]
+                          },
+                          "assertion": { "type": "string" }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "timeoutSeconds": { "type": "integer", "default": 60 }
+                  },
+                  "required": ["stepId", "action", "expectedResult"],
+                  "additionalProperties": false
+                }
+              },
+              "paymentGateways": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["stripe", "paypal", "mpesa", "flutterwave", "razorpay", "apple_pay", "google_pay"]
+                }
+              },
+              "regions": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["smoke", "regression", "critical_path", "subscription", "tvod", "ad_revenue", "payout"]
+                }
+              }
+            },
+            "required": ["scenarioId", "name", "steps", "priority"],
+            "additionalProperties": false
+          },
+          "default": [
+            {
+              "scenarioId": "monetization-subscription-lifecycle",
+              "name": "Complete Subscription Lifecycle Test",
+              "description": "Test full subscription journey including upgrade, downgrade, and cancellation",
+              "priority": "critical",
+              "steps": [
+                { "stepId": 1, "action": "view_pricing", "expectedResult": "Regional pricing displayed" },
+                { "stepId": 2, "action": "select_subscription", "expectedResult": "Basic tier selected" },
+                { "stepId": 3, "action": "enter_payment_details", "expectedResult": "Payment form validated" },
+                { "stepId": 4, "action": "process_payment", "expectedResult": "Payment successful" },
+                { "stepId": 5, "action": "verify_subscription_active", "expectedResult": "Subscription active, features unlocked" },
+                { "stepId": 6, "action": "upgrade_subscription", "expectedResult": "Upgraded to premium, prorated" },
+                { "stepId": 7, "action": "downgrade_subscription", "expectedResult": "Scheduled downgrade at renewal" },
+                { "stepId": 8, "action": "cancel_subscription", "expectedResult": "Cancelled, access until period end" }
+              ],
+              "paymentGateways": ["stripe", "paypal"],
+              "regions": ["US", "KE", "NG", "ET"],
+              "tags": ["critical_path", "subscription"]
+            },
+            {
+              "scenarioId": "monetization-ad-flow",
+              "name": "Ad Insertion and Revenue Tracking Test",
+              "description": "Test ad insertion during playback and revenue reporting",
+              "priority": "critical",
+              "steps": [
+                { "stepId": 1, "action": "view_ad_supported_content", "expectedResult": "AVOD content accessible" },
+                { "stepId": 2, "action": "verify_ad_insertion", "expectedResult": "Pre-roll ad served via SSAI" },
+                { "stepId": 3, "action": "track_ad_revenue", "expectedResult": "Impression tracked, revenue recorded" },
+                { "stepId": 4, "action": "view_revenue_dashboard", "expectedResult": "Ad revenue visible in dashboard" }
+              ],
+              "tags": ["critical_path", "ad_revenue"]
+            }
+          ]
+        },
+        "validations": {
+          "type": "object",
+          "properties": {
+            "paymentSecurity": {
+              "type": "object",
+              "properties": {
+                "validatePciCompliance": { "type": "boolean", "default": true },
+                "validateEncryption": { "type": "boolean", "default": true },
+                "validateFraudDetection": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            },
+            "revenueDashboards": {
+              "type": "object",
+              "properties": {
+                "validateRpmByRegion": { "type": "boolean", "default": true },
+                "validateCpmAccuracy": { "type": "boolean", "default": true },
+                "tolerancePercent": { "type": "number", "default": 2 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "governanceFlows": {
+      "type": "object",
+      "description": "End-to-end tests for governance, moderation, and compliance",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "testScenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenarioId": {
+                "type": "string",
+                "pattern": "^governance-[a-z0-9-]+$"
+              },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "priority": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "stepId": { "type": "integer" },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "post_comment", "trigger_auto_moderation", "flag_for_review",
+                        "review_moderation_queue", "approve_content", "reject_content",
+                        "escalate_to_cultural_review", "cultural_sensitivity_check",
+                        "submit_copyright_claim", "verify_content_id", "dispute_claim", "resolve_claim",
+                        "add_sponsored_disclosure", "verify_disclosure_visible",
+                        "add_ai_generated_label", "verify_ai_label",
+                        "add_affiliate_disclosure", "verify_affiliate_label",
+                        "trigger_geo_restriction", "verify_geo_block",
+                        "verify_age_restriction", "check_kids_mode_filter",
+                        "view_audit_log", "export_audit_log", "verify_audit_completeness"
+                      ]
+                    },
+                    "expectedResult": { "type": "string" },
+                    "validations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["moderation_queue", "audit_log", "compliance_report", "database"]
+                          },
+                          "assertion": { "type": "string" }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "timeoutSeconds": { "type": "integer", "default": 30 }
+                  },
+                  "required": ["stepId", "action", "expectedResult"],
+                  "additionalProperties": false
+                }
+              },
+              "governanceSuite": {
+                "type": "string",
+                "description": "Reference to Phase 25 governance suite"
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["smoke", "regression", "critical_path", "moderation", "copyright", "disclosure", "compliance"]
+                }
+              }
+            },
+            "required": ["scenarioId", "name", "steps", "priority"],
+            "additionalProperties": false
+          },
+          "default": [
+            {
+              "scenarioId": "governance-moderation-flow",
+              "name": "Comment Moderation to Escalation Flow",
+              "description": "Test comment moderation including auto-moderation and cultural sensitivity escalation",
+              "priority": "critical",
+              "steps": [
+                { "stepId": 1, "action": "post_comment", "expectedResult": "Comment submitted for moderation" },
+                { "stepId": 2, "action": "trigger_auto_moderation", "expectedResult": "Auto-moderation filters applied" },
+                { "stepId": 3, "action": "flag_for_review", "expectedResult": "Comment flagged, added to queue" },
+                { "stepId": 4, "action": "escalate_to_cultural_review", "expectedResult": "Escalated per cultural rules" },
+                { "stepId": 5, "action": "cultural_sensitivity_check", "expectedResult": "Cultural review completed" },
+                { "stepId": 6, "action": "view_audit_log", "expectedResult": "All actions logged with actor/timestamp" }
+              ],
+              "governanceSuite": "governance-suite-prod-001",
+              "tags": ["critical_path", "moderation", "compliance"]
+            },
+            {
+              "scenarioId": "governance-copyright-flow",
+              "name": "Copyright Claim to Resolution Flow",
+              "description": "Test copyright claim submission, Content ID check, and resolution",
+              "priority": "critical",
+              "steps": [
+                { "stepId": 1, "action": "submit_copyright_claim", "expectedResult": "Claim submitted" },
+                { "stepId": 2, "action": "verify_content_id", "expectedResult": "Content ID match found" },
+                { "stepId": 3, "action": "dispute_claim", "expectedResult": "Dispute submitted for review" },
+                { "stepId": 4, "action": "resolve_claim", "expectedResult": "Claim resolved, content status updated" },
+                { "stepId": 5, "action": "view_audit_log", "expectedResult": "Copyright events logged" }
+              ],
+              "tags": ["critical_path", "copyright", "compliance"]
+            },
+            {
+              "scenarioId": "governance-disclosure-flow",
+              "name": "Disclosure Enforcement Test",
+              "description": "Test sponsored, AI-generated, and affiliate disclosure enforcement",
+              "priority": "high",
+              "steps": [
+                { "stepId": 1, "action": "add_sponsored_disclosure", "expectedResult": "Sponsored tag added" },
+                { "stepId": 2, "action": "verify_disclosure_visible", "expectedResult": "Disclosure visible to viewers" },
+                { "stepId": 3, "action": "add_ai_generated_label", "expectedResult": "AI label added" },
+                { "stepId": 4, "action": "verify_ai_label", "expectedResult": "AI label visible" },
+                { "stepId": 5, "action": "add_affiliate_disclosure", "expectedResult": "Affiliate disclosure added" },
+                { "stepId": 6, "action": "verify_affiliate_label", "expectedResult": "Affiliate label visible" }
+              ],
+              "tags": ["disclosure", "compliance"]
+            }
+          ]
+        },
+        "validations": {
+          "type": "object",
+          "properties": {
+            "phase25Integration": {
+              "type": "object",
+              "properties": {
+                "validateGovernanceSuiteTriggers": { "type": "boolean", "default": true },
+                "validateCulturalSensitivity": { "type": "boolean", "default": true },
+                "validateComplianceFrameworks": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            },
+            "auditLogs": {
+              "type": "object",
+              "properties": {
+                "validateCompleteness": { "type": "boolean", "default": true },
+                "validateTimestamps": { "type": "boolean", "default": true },
+                "validateActorCapture": { "type": "boolean", "default": true },
+                "retentionDays": { "type": "integer", "default": 365 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "analyticsFlows": {
+      "type": "object",
+      "description": "End-to-end tests for analytics, feedback loops, and attribution",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "testScenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenarioId": {
+                "type": "string",
+                "pattern": "^analytics-[a-z0-9-]+$"
+              },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "priority": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "stepId": { "type": "integer" },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "track_funnel_awareness", "track_funnel_interest", "track_funnel_consideration",
+                        "track_funnel_intent", "track_funnel_purchase", "track_funnel_retention",
+                        "verify_attribution_last_click", "verify_attribution_first_click",
+                        "verify_attribution_linear", "verify_attribution_time_decay", "verify_attribution_data_driven",
+                        "trigger_feedback_loop", "verify_personalization_adjustment",
+                        "verify_monetization_signal", "verify_pricing_adjustment",
+                        "verify_churn_prediction", "trigger_retention_action",
+                        "view_cross_platform_dashboard", "verify_platform_aggregation",
+                        "export_analytics_report", "verify_report_accuracy"
+                      ]
+                    },
+                    "expectedResult": { "type": "string" },
+                    "validations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["analytics_event", "database", "dashboard", "feedback_loop"]
+                          },
+                          "assertion": { "type": "string" }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "timeoutSeconds": { "type": "integer", "default": 30 }
+                  },
+                  "required": ["stepId", "action", "expectedResult"],
+                  "additionalProperties": false
+                }
+              },
+              "attributionModels": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["last_click", "first_click", "linear", "time_decay", "data_driven"]
+                }
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["smoke", "regression", "critical_path", "funnel", "attribution", "feedback_loop"]
+                }
+              }
+            },
+            "required": ["scenarioId", "name", "steps", "priority"],
+            "additionalProperties": false
+          },
+          "default": [
+            {
+              "scenarioId": "analytics-funnel-tracking",
+              "name": "Complete Funnel Tracking Test",
+              "description": "Test full funnel tracking from awareness to retention",
+              "priority": "critical",
+              "steps": [
+                { "stepId": 1, "action": "track_funnel_awareness", "expectedResult": "Impression recorded" },
+                { "stepId": 2, "action": "track_funnel_interest", "expectedResult": "Engagement recorded" },
+                { "stepId": 3, "action": "track_funnel_consideration", "expectedResult": "Click-through recorded" },
+                { "stepId": 4, "action": "track_funnel_intent", "expectedResult": "Signup/trial recorded" },
+                { "stepId": 5, "action": "track_funnel_purchase", "expectedResult": "Conversion recorded" },
+                { "stepId": 6, "action": "track_funnel_retention", "expectedResult": "Retention metrics updated" },
+                { "stepId": 7, "action": "view_cross_platform_dashboard", "expectedResult": "Funnel visualized correctly" }
+              ],
+              "attributionModels": ["last_click", "first_click", "linear"],
+              "tags": ["critical_path", "funnel"]
+            },
+            {
+              "scenarioId": "analytics-attribution-models",
+              "name": "Attribution Model Comparison Test",
+              "description": "Test all attribution models and verify calculations",
+              "priority": "high",
+              "steps": [
+                { "stepId": 1, "action": "verify_attribution_last_click", "expectedResult": "100% credit to last touchpoint" },
+                { "stepId": 2, "action": "verify_attribution_first_click", "expectedResult": "100% credit to first touchpoint" },
+                { "stepId": 3, "action": "verify_attribution_linear", "expectedResult": "Equal credit distribution" },
+                { "stepId": 4, "action": "verify_attribution_time_decay", "expectedResult": "Weighted credit toward conversion" },
+                { "stepId": 5, "action": "verify_attribution_data_driven", "expectedResult": "ML-based attribution applied" }
+              ],
+              "attributionModels": ["last_click", "first_click", "linear", "time_decay", "data_driven"],
+              "tags": ["attribution"]
+            },
+            {
+              "scenarioId": "analytics-feedback-loop",
+              "name": "Feedback Loop Trigger and Action Test",
+              "description": "Test Phase 20 feedback loop triggers and automated actions",
+              "priority": "critical",
+              "steps": [
+                { "stepId": 1, "action": "trigger_feedback_loop", "expectedResult": "Loop triggered based on signal" },
+                { "stepId": 2, "action": "verify_personalization_adjustment", "expectedResult": "Recommendations updated" },
+                { "stepId": 3, "action": "verify_monetization_signal", "expectedResult": "Pricing signal captured" },
+                { "stepId": 4, "action": "verify_churn_prediction", "expectedResult": "Churn risk calculated" },
+                { "stepId": 5, "action": "trigger_retention_action", "expectedResult": "Retention offer triggered" }
+              ],
+              "tags": ["critical_path", "feedback_loop"]
+            }
+          ]
+        },
+        "validations": {
+          "type": "object",
+          "properties": {
+            "funnelAccuracy": {
+              "type": "object",
+              "properties": {
+                "validateStageProgression": { "type": "boolean", "default": true },
+                "validateDropOffCalculation": { "type": "boolean", "default": true },
+                "tolerancePercent": { "type": "number", "default": 1 }
+              },
+              "additionalProperties": false
+            },
+            "attributionAccuracy": {
+              "type": "object",
+              "properties": {
+                "validateModelConsistency": { "type": "boolean", "default": true },
+                "validateCrossDeviceTracking": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            },
+            "feedbackLoopIntegration": {
+              "type": "object",
+              "properties": {
+                "validatePhase17Integration": { "type": "boolean", "default": true, "description": "Personalization Engine" },
+                "validatePhase20Integration": { "type": "boolean", "default": true, "description": "Audience Insights" },
+                "validateTriggerExecution": { "type": "boolean", "default": true }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "infrastructureValidation": {
+      "type": "object",
+      "description": "Infrastructure and performance validation during E2E tests",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "performanceThresholds": {
+          "type": "object",
+          "properties": {
+            "pageLoadTimeMs": { "type": "integer", "default": 3000 },
+            "apiResponseTimeMs": { "type": "integer", "default": 500 },
+            "videoStartTimeMs": { "type": "integer", "default": 2000 },
+            "maxRebufferRatio": { "type": "number", "default": 0.005 },
+            "uptime": { "type": "number", "default": 99.9 }
+          },
+          "additionalProperties": false
+        },
+        "loadTestConfig": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "concurrentUsers": { "type": "integer", "default": 1000 },
+            "rampUpMinutes": { "type": "integer", "default": 5 },
+            "steadyStateDurationMinutes": { "type": "integer", "default": 30 }
+          },
+          "additionalProperties": false
+        },
+        "chaosTestConfig": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "scenarios": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["region_failover", "cdn_failure", "database_latency", "payment_gateway_timeout"]
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "testExecution": {
+      "type": "object",
+      "description": "Test execution configuration",
+      "properties": {
+        "environment": {
+          "type": "string",
+          "enum": ["development", "staging", "beta", "production"],
+          "default": "beta"
+        },
+        "parallelExecution": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "maxParallelScenarios": { "type": "integer", "default": 10 }
+          },
+          "additionalProperties": false
+        },
+        "retryPolicy": {
+          "type": "object",
+          "properties": {
+            "maxRetries": { "type": "integer", "default": 3 },
+            "retryDelaySeconds": { "type": "integer", "default": 5 },
+            "retryOnlyFlaky": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "dataManagement": {
+          "type": "object",
+          "properties": {
+            "useTestData": { "type": "boolean", "default": true },
+            "cleanupAfterRun": { "type": "boolean", "default": true },
+            "isolateTestUsers": { "type": "boolean", "default": true },
+            "snapshotEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "scheduledRuns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "schedule": {
+                "type": "string",
+                "enum": ["hourly", "daily", "weekly", "on_deploy", "manual"]
+              },
+              "scenarioTags": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "notifyOnFailure": { "type": "boolean", "default": true }
+            },
+            "additionalProperties": false
+          },
+          "default": [
+            { "name": "Smoke Tests", "schedule": "hourly", "scenarioTags": ["smoke"], "notifyOnFailure": true },
+            { "name": "Critical Path Tests", "schedule": "daily", "scenarioTags": ["critical_path"], "notifyOnFailure": true },
+            { "name": "Full Regression", "schedule": "weekly", "scenarioTags": ["regression"], "notifyOnFailure": true },
+            { "name": "Deploy Validation", "schedule": "on_deploy", "scenarioTags": ["smoke", "critical_path"], "notifyOnFailure": true }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "reporting": {
+      "type": "object",
+      "description": "Test reporting configuration",
+      "properties": {
+        "dashboards": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "widgets": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "pass_rate", "failure_breakdown", "flaky_tests", "execution_time",
+                  "coverage_map", "trend_chart", "flow_coverage", "recent_runs"
+                ]
+              },
+              "default": ["pass_rate", "failure_breakdown", "flaky_tests", "execution_time", "trend_chart", "recent_runs"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "notifications": {
+          "type": "object",
+          "properties": {
+            "channels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["email", "slack", "pagerduty", "operator_console"]
+              },
+              "default": ["slack", "email"]
+            },
+            "onSuccess": { "type": "boolean", "default": false },
+            "onFailure": { "type": "boolean", "default": true },
+            "dailySummary": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "artifacts": {
+          "type": "object",
+          "properties": {
+            "screenshots": { "type": "boolean", "default": true },
+            "videos": { "type": "boolean", "default": true },
+            "networkLogs": { "type": "boolean", "default": true },
+            "consoleLogs": { "type": "boolean", "default": true },
+            "retentionDays": { "type": "integer", "default": 30 }
+          },
+          "additionalProperties": false
+        },
+        "exportFormats": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["html", "json", "junit", "allure", "pdf"]
+          },
+          "default": ["html", "json", "junit"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "betaReadinessGates": {
+      "type": "object",
+      "description": "Gates that must pass before beta cohort rollout",
+      "properties": {
+        "gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "gateId": { "type": "string" },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "criteria": {
+                "type": "object",
+                "properties": {
+                  "minPassRate": { "type": "number", "minimum": 0, "maximum": 100 },
+                  "maxCriticalFailures": { "type": "integer" },
+                  "requiredScenarioTags": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "status": {
+                "type": "string",
+                "enum": ["not_started", "in_progress", "passed", "failed", "blocked"]
+              }
+            },
+            "required": ["gateId", "name", "criteria"],
+            "additionalProperties": false
+          },
+          "default": [
+            {
+              "gateId": "gate-audience-flows",
+              "name": "Audience Flow Validation",
+              "description": "All critical audience journeys must pass",
+              "criteria": { "minPassRate": 100, "maxCriticalFailures": 0, "requiredScenarioTags": ["critical_path"] },
+              "status": "not_started"
+            },
+            {
+              "gateId": "gate-monetization",
+              "name": "Monetization Flow Validation",
+              "description": "All payment and subscription flows must pass",
+              "criteria": { "minPassRate": 100, "maxCriticalFailures": 0, "requiredScenarioTags": ["monetization"] },
+              "status": "not_started"
+            },
+            {
+              "gateId": "gate-governance",
+              "name": "Governance Compliance Validation",
+              "description": "All governance and compliance flows must pass",
+              "criteria": { "minPassRate": 100, "maxCriticalFailures": 0, "requiredScenarioTags": ["compliance"] },
+              "status": "not_started"
+            },
+            {
+              "gateId": "gate-analytics",
+              "name": "Analytics Accuracy Validation",
+              "description": "Funnel tracking and attribution must be accurate",
+              "criteria": { "minPassRate": 95, "maxCriticalFailures": 0, "requiredScenarioTags": ["funnel", "attribution"] },
+              "status": "not_started"
+            },
+            {
+              "gateId": "gate-performance",
+              "name": "Performance Threshold Validation",
+              "description": "All performance thresholds must be met",
+              "criteria": { "minPassRate": 99, "maxCriticalFailures": 0, "requiredScenarioTags": ["smoke"] },
+              "status": "not_started"
+            }
+          ]
+        },
+        "overallReadiness": {
+          "type": "string",
+          "enum": ["not_ready", "partially_ready", "ready", "ready_with_warnings"],
+          "default": "not_ready"
+        },
+        "signOffRequired": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["qa_lead", "product_manager", "engineering_lead", "ceo"]
+          },
+          "default": ["qa_lead", "product_manager"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "paused", "completed", "archived"],
+      "default": "draft"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" },
+        "lastRunAt": { "type": "string", "format": "date-time" },
+        "lastRunResult": {
+          "type": "string",
+          "enum": ["passed", "failed", "partial", "aborted"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "testSuiteId",
+    "version",
+    "testPhase",
+    "status"
+  ],
+  "additionalProperties": false
+}
