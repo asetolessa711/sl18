@@ -1,0 +1,801 @@
+{
+  "mobileOperatorApps": {
+    "valid": [
+      {
+        "appId": "mobile-kenya-001",
+        "version": "2.1.0",
+        "platform": "ios",
+        "deviceInfo": {
+          "deviceId": "device-ios-abc123",
+          "model": "iPhone 15 Pro",
+          "osVersion": "17.2",
+          "screenSize": {
+            "width": 393,
+            "height": 852,
+            "density": 3.0
+          },
+          "capabilities": {
+            "biometricSupported": true,
+            "biometricType": "face_id",
+            "pushNotificationsSupported": true,
+            "offlineStorageAvailable": true,
+            "maxOfflineStorageMB": 500
+          }
+        },
+        "operator": {
+          "operatorId": "op-kenya-001",
+          "displayName": "Kenya Operator",
+          "role": "operator",
+          "permissions": ["view:dashboard", "manage:languages", "manage:distribution"]
+        },
+        "authentication": {
+          "sessionId": "session-xyz789",
+          "authMethod": "sso",
+          "mfaEnabled": true,
+          "mfaMethod": "biometric",
+          "biometricEnabled": true,
+          "biometricType": "face_id",
+          "sessionExpiresAt": "2025-01-15T22:00:00Z",
+          "lastActivityAt": "2025-01-15T10:30:00Z",
+          "autoLockMinutes": 5
+        },
+        "navigation": {
+          "bottomTabs": [
+            { "tabId": "home", "label": "Home", "icon": "🏠", "enabled": true },
+            { "tabId": "franchises", "label": "Franchises", "icon": "📁", "enabled": true },
+            { "tabId": "alerts", "label": "Alerts", "icon": "🔔", "badge": { "count": 3, "type": "critical" }, "enabled": true },
+            { "tabId": "insights", "label": "Insights", "icon": "📊", "enabled": true },
+            { "tabId": "more", "label": "More", "icon": "⋯", "enabled": true }
+          ],
+          "quickActions": [
+            { "actionId": "switch-language", "label": "Switch Language", "icon": "🌐", "action": "switch_language", "target": "language-modal", "offlineSupported": false },
+            { "actionId": "acknowledge-alert", "label": "Acknowledge Alert", "icon": "✓", "action": "acknowledge_alert", "target": "alert-001", "offlineSupported": true }
+          ],
+          "searchEnabled": true,
+          "voiceSearchEnabled": true
+        },
+        "offlineMode": {
+          "enabled": true,
+          "cacheConfig": {
+            "dashboardsCached": true,
+            "recentItemsCached": true,
+            "maxCacheSizeMB": 100,
+            "cacheExpiryHours": 24,
+            "priorityData": ["franchises", "alerts", "qc_status"]
+          },
+          "syncConfig": {
+            "autoSync": true,
+            "syncOnWifiOnly": false,
+            "syncIntervalMinutes": 15,
+            "backgroundSyncEnabled": true
+          },
+          "queuedActions": [
+            {
+              "actionId": "queued-001",
+              "actionType": "alert_acknowledge",
+              "payload": { "alertId": "alert-xyz", "comment": "Acknowledged via mobile" },
+              "queuedAt": "2025-01-15T10:25:00Z",
+              "retryCount": 0,
+              "status": "pending"
+            }
+          ],
+          "lastSyncAt": "2025-01-15T10:00:00Z",
+          "syncStatus": "synced"
+        },
+        "notifications": {
+          "pushEnabled": true,
+          "pushToken": "fcm-token-abc123def456",
+          "channels": {
+            "anomalies": { "enabled": true, "sound": true, "vibrate": true, "priority": "high" },
+            "qcAlerts": { "enabled": true, "sound": true, "vibrate": true, "priority": "high" },
+            "feedbackLoops": { "enabled": true, "sound": false, "vibrate": true, "priority": "normal" },
+            "marketplaceUpdates": { "enabled": true, "sound": false, "vibrate": false, "priority": "low" },
+            "paymentAlerts": { "enabled": true, "sound": true, "vibrate": true, "priority": "high" },
+            "culturalSensitivity": { "enabled": true, "sound": true, "vibrate": true, "priority": "high" }
+          },
+          "quietHours": {
+            "enabled": true,
+            "startTime": "22:00",
+            "endTime": "07:00",
+            "allowCritical": true
+          },
+          "badgeCount": 5
+        },
+        "preferences": {
+          "language": "en",
+          "theme": "system",
+          "hapticFeedback": true,
+          "reducedMotion": false,
+          "fontSize": "medium",
+          "highContrast": false
+        },
+        "context": {
+          "franchiseId": "kenya-001",
+          "seriesId": "series-drama-001",
+          "language": "en",
+          "region": "africa-east",
+          "timezone": "Africa/Nairobi"
+        },
+        "createdAt": "2025-01-01T00:00:00Z",
+        "updatedAt": "2025-01-15T10:30:00Z"
+      },
+      {
+        "appId": "mobile-ethiopia-001",
+        "version": "2.1.0",
+        "platform": "android",
+        "deviceInfo": {
+          "deviceId": "device-android-xyz789",
+          "model": "Samsung Galaxy S24",
+          "osVersion": "14",
+          "screenSize": { "width": 360, "height": 800, "density": 3.0 },
+          "capabilities": {
+            "biometricSupported": true,
+            "biometricType": "fingerprint",
+            "pushNotificationsSupported": true,
+            "offlineStorageAvailable": true,
+            "maxOfflineStorageMB": 256
+          }
+        },
+        "operator": {
+          "operatorId": "op-ethiopia-001",
+          "displayName": "Ethiopia Operator",
+          "role": "reviewer",
+          "permissions": ["view:dashboard", "manage:qc", "view:insights"]
+        },
+        "authentication": {
+          "sessionId": "session-eth456",
+          "authMethod": "password",
+          "mfaEnabled": true,
+          "mfaMethod": "totp",
+          "biometricEnabled": true,
+          "biometricType": "fingerprint",
+          "sessionExpiresAt": "2025-01-15T23:00:00Z",
+          "lastActivityAt": "2025-01-15T11:00:00Z",
+          "autoLockMinutes": 3
+        },
+        "navigation": {
+          "bottomTabs": [
+            { "tabId": "home", "label": "Home", "icon": "🏠", "enabled": true },
+            { "tabId": "alerts", "label": "Alerts", "icon": "🔔", "enabled": true },
+            { "tabId": "insights", "label": "Insights", "icon": "📊", "enabled": true },
+            { "tabId": "more", "label": "More", "icon": "⋯", "enabled": true }
+          ],
+          "quickActions": [],
+          "searchEnabled": true,
+          "voiceSearchEnabled": false
+        },
+        "offlineMode": {
+          "enabled": true,
+          "cacheConfig": {
+            "dashboardsCached": true,
+            "recentItemsCached": true,
+            "maxCacheSizeMB": 50,
+            "cacheExpiryHours": 12,
+            "priorityData": ["alerts", "qc_status"]
+          },
+          "syncConfig": {
+            "autoSync": true,
+            "syncOnWifiOnly": true,
+            "syncIntervalMinutes": 30,
+            "backgroundSyncEnabled": false
+          },
+          "queuedActions": [],
+          "lastSyncAt": "2025-01-15T10:30:00Z",
+          "syncStatus": "synced"
+        },
+        "notifications": {
+          "pushEnabled": true,
+          "pushToken": "fcm-token-eth789",
+          "channels": {
+            "anomalies": { "enabled": true, "sound": true, "vibrate": true, "priority": "high" },
+            "qcAlerts": { "enabled": true, "sound": true, "vibrate": true, "priority": "high" },
+            "feedbackLoops": { "enabled": false, "sound": false, "vibrate": false, "priority": "normal" },
+            "marketplaceUpdates": { "enabled": false, "sound": false, "vibrate": false, "priority": "low" },
+            "paymentAlerts": { "enabled": true, "sound": true, "vibrate": true, "priority": "high" },
+            "culturalSensitivity": { "enabled": true, "sound": true, "vibrate": true, "priority": "high" }
+          },
+          "quietHours": { "enabled": false },
+          "badgeCount": 0
+        },
+        "preferences": {
+          "language": "am",
+          "theme": "dark",
+          "hapticFeedback": true,
+          "reducedMotion": false,
+          "fontSize": "large",
+          "highContrast": false
+        },
+        "context": {
+          "franchiseId": "ethiopia-001",
+          "language": "am",
+          "region": "africa-east",
+          "timezone": "Africa/Addis_Ababa"
+        },
+        "createdAt": "2025-01-05T00:00:00Z",
+        "updatedAt": "2025-01-15T11:00:00Z"
+      }
+    ],
+    "invalid": [
+      {
+        "_description": "Missing required appId",
+        "version": "2.1.0",
+        "platform": "ios",
+        "deviceInfo": { "deviceId": "device-001", "model": "iPhone", "osVersion": "17.0" },
+        "operator": { "operatorId": "op-001", "role": "operator" },
+        "authentication": { "sessionId": "session-001", "authMethod": "password" }
+      },
+      {
+        "_description": "Invalid app ID pattern",
+        "appId": "invalid_app_id",
+        "version": "2.1.0",
+        "platform": "ios",
+        "deviceInfo": { "deviceId": "device-001", "model": "iPhone", "osVersion": "17.0" },
+        "operator": { "operatorId": "op-001", "role": "operator" },
+        "authentication": { "sessionId": "session-001", "authMethod": "password" }
+      },
+      {
+        "_description": "Invalid platform",
+        "appId": "mobile-test-001",
+        "version": "2.1.0",
+        "platform": "windows",
+        "deviceInfo": { "deviceId": "device-001", "model": "Surface", "osVersion": "11" },
+        "operator": { "operatorId": "op-001", "role": "operator" },
+        "authentication": { "sessionId": "session-001", "authMethod": "password" }
+      },
+      {
+        "_description": "Invalid biometric type",
+        "appId": "mobile-test-002",
+        "version": "2.1.0",
+        "platform": "ios",
+        "deviceInfo": { 
+          "deviceId": "device-001", 
+          "model": "iPhone", 
+          "osVersion": "17.0",
+          "capabilities": { "biometricSupported": true, "biometricType": "retina_scan" }
+        },
+        "operator": { "operatorId": "op-001", "role": "operator" },
+        "authentication": { "sessionId": "session-001", "authMethod": "password" }
+      }
+    ]
+  },
+  "mobilePanels": {
+    "mobileLanguage": {
+      "valid": {
+        "panelId": "mobile-panel-lang-001",
+        "panelType": "mobile_language",
+        "title": "Language Selection",
+        "description": "Switch languages on the go",
+        "icon": "🌐",
+        "layout": {
+          "orientation": "portrait",
+          "scrollDirection": "vertical",
+          "pullToRefresh": true,
+          "stickyHeader": true,
+          "compactMode": false
+        },
+        "config": {
+          "quickSwitch": { "enabled": true, "recentLanguages": 3, "showFlags": true },
+          "searchBar": { "enabled": true, "voiceSearch": false, "searchFields": ["code", "displayName", "nativeName"] },
+          "languageList": { "showNativeName": true, "showDirection": true, "showQcStatus": true, "groupByRegion": true },
+          "previewMode": { "enabled": true, "showSubtitlePreview": true, "showCaptionPreview": true },
+          "offlineLanguages": ["en", "sw", "am"]
+        },
+        "permissions": ["manage:languages"],
+        "offlineSupported": true,
+        "enabled": true
+      }
+    },
+    "mobileObservability": {
+      "valid": {
+        "panelId": "mobile-panel-obs-001",
+        "panelType": "mobile_observability",
+        "title": "System Health",
+        "description": "Monitor system health on mobile",
+        "icon": "📊",
+        "layout": {
+          "orientation": "both",
+          "scrollDirection": "vertical",
+          "pullToRefresh": true,
+          "stickyHeader": true
+        },
+        "config": {
+          "dashboardCards": { "enabled": true, "maxCards": 6, "cardTypes": ["kpi", "status", "trend"] },
+          "alertSummary": { "enabled": true, "showCriticalOnly": false, "maxAlerts": 5, "swipeToAcknowledge": true },
+          "anomalyFeed": { "enabled": true, "showTimeline": true, "pullToRefresh": true },
+          "incidentViewer": { "enabled": true, "showRootCause": true, "showSuggestedActions": true }
+        },
+        "permissions": ["view:observability"],
+        "offlineSupported": true,
+        "enabled": true
+      }
+    },
+    "mobileMarketplace": {
+      "valid": {
+        "panelId": "mobile-panel-market-001",
+        "panelType": "mobile_marketplace",
+        "title": "Marketplace",
+        "description": "Browse contributors",
+        "icon": "🛒",
+        "layout": {
+          "orientation": "portrait",
+          "scrollDirection": "vertical",
+          "pullToRefresh": true
+        },
+        "config": {
+          "browseMode": { "defaultView": "grid", "cardSize": "medium", "showRatings": true, "showBadges": true },
+          "filters": { "enabled": true, "quickFilters": ["category", "language", "rating"], "advancedFilters": false },
+          "contributorProfile": { "showPortfolio": true, "showReviews": true, "directMessage": false },
+          "onboardingWizard": { "enabled": true, "stepIndicator": true, "saveProgress": true }
+        },
+        "permissions": ["view:marketplace"],
+        "offlineSupported": false,
+        "enabled": true
+      }
+    },
+    "mobileInsights": {
+      "valid": {
+        "panelId": "mobile-panel-insights-001",
+        "panelType": "mobile_insights",
+        "title": "Audience Insights",
+        "description": "View engagement metrics",
+        "icon": "📈",
+        "layout": {
+          "orientation": "both",
+          "scrollDirection": "vertical",
+          "pullToRefresh": true
+        },
+        "config": {
+          "engagementOverview": { "enabled": true, "showSparklines": true, "metrics": ["watch_time", "engagement_rate", "sentiment"] },
+          "sentimentCard": { "enabled": true, "showEmoji": true, "showTrend": true, "showRegionalBreakdown": false },
+          "retentionChart": { "enabled": true, "chartType": "area", "showDropOffMarkers": true },
+          "demographicSummary": { "enabled": true, "showPieChart": true, "dimensions": ["region", "device"] }
+        },
+        "permissions": ["view:insights"],
+        "offlineSupported": true,
+        "enabled": true
+      }
+    },
+    "mobileQc": {
+      "valid": {
+        "panelId": "mobile-panel-qc-001",
+        "panelType": "mobile_qc",
+        "title": "QC Status",
+        "description": "Quality control on mobile",
+        "icon": "✅",
+        "layout": {
+          "orientation": "portrait",
+          "scrollDirection": "vertical",
+          "pullToRefresh": true,
+          "swipeActions": [
+            { "direction": "right", "action": "approve", "icon": "✓", "color": "#10b981" },
+            { "direction": "left", "action": "reject", "icon": "✗", "color": "#ef4444" }
+          ]
+        },
+        "config": {
+          "statusOverview": { "enabled": true, "showPassRate": true, "showPendingCount": true, "colorCoding": true },
+          "pendingReviews": { "enabled": true, "swipeToApprove": true, "showPreview": true, "batchActions": false },
+          "languageQc": { "enabled": true, "showAccuracyScore": true, "showPersonaConsistency": true },
+          "issuesList": { "enabled": true, "sortBy": "severity", "tapToExpand": true }
+        },
+        "permissions": ["view:qc", "manage:qc"],
+        "offlineSupported": true,
+        "enabled": true
+      }
+    },
+    "mobileAlerts": {
+      "valid": {
+        "panelId": "mobile-panel-alerts-001",
+        "panelType": "mobile_alerts",
+        "title": "Alerts",
+        "description": "View and manage alerts",
+        "icon": "🔔",
+        "layout": {
+          "orientation": "portrait",
+          "scrollDirection": "vertical",
+          "pullToRefresh": true,
+          "swipeActions": [
+            { "direction": "right", "action": "acknowledge", "icon": "✓", "color": "#3b82f6" }
+          ]
+        },
+        "config": {
+          "alertFeed": { "enabled": true, "groupByType": false, "showTimestamp": true, "swipeActions": true },
+          "filterBar": { "enabled": true, "severityFilter": true, "typeFilter": true, "dateFilter": false },
+          "quickAcknowledge": { "enabled": true, "bulkAcknowledge": false, "requireComment": false },
+          "alertDetails": { "showContext": true, "showRelatedItems": true, "showSuggestedActions": true }
+        },
+        "permissions": ["view:alerts", "manage:alerts"],
+        "offlineSupported": true,
+        "enabled": true
+      }
+    },
+    "mobileFranchise": {
+      "valid": {
+        "panelId": "mobile-panel-franchise-001",
+        "panelType": "mobile_franchise",
+        "title": "Franchises",
+        "description": "Manage franchises",
+        "icon": "📁",
+        "layout": {
+          "orientation": "portrait",
+          "scrollDirection": "vertical",
+          "pullToRefresh": true
+        },
+        "config": {
+          "franchiseList": { "enabled": true, "cardLayout": true, "showStatus": true, "showRevenue": true },
+          "franchiseDetails": { "showSeriesList": true, "showMetrics": true, "showTeam": false },
+          "quickStats": { "enabled": true, "metrics": ["episodes", "revenue", "engagement"] }
+        },
+        "permissions": ["view:franchises"],
+        "offlineSupported": true,
+        "enabled": true
+      }
+    },
+    "mobileSettings": {
+      "valid": {
+        "panelId": "mobile-panel-settings-001",
+        "panelType": "mobile_settings",
+        "title": "Settings",
+        "description": "App settings",
+        "icon": "⚙️",
+        "layout": {
+          "orientation": "portrait",
+          "scrollDirection": "vertical",
+          "pullToRefresh": false
+        },
+        "config": {
+          "accountSection": { "showProfile": true, "showSecurity": true, "showMfa": true },
+          "notificationSettings": { "enabled": true, "perChannelToggle": true, "quietHours": true },
+          "offlineSettings": { "enabled": true, "showStorageUsage": true, "clearCacheButton": true },
+          "accessibilitySettings": { "enabled": true, "fontSize": true, "highContrast": true, "reducedMotion": true },
+          "aboutSection": { "showVersion": true, "showLegal": true, "showSupport": true }
+        },
+        "permissions": ["manage:settings"],
+        "offlineSupported": true,
+        "enabled": true
+      }
+    }
+  },
+  "crossPlatformUI": {
+    "valid": [
+      {
+        "configId": "xplatform-main-001",
+        "version": "1.0.0",
+        "deviceProfiles": [
+          {
+            "profileId": "mobile_small",
+            "name": "Small Mobile",
+            "category": "mobile",
+            "minWidth": 320,
+            "maxWidth": 374,
+            "orientation": "portrait",
+            "touchEnabled": true,
+            "pointerType": "touch",
+            "pixelDensity": "xhdpi",
+            "features": { "hover": false, "rightClick": false, "multiTouch": true, "hapticFeedback": true, "keyboardShortcuts": false }
+          },
+          {
+            "profileId": "mobile_large",
+            "name": "Large Mobile",
+            "category": "mobile",
+            "minWidth": 375,
+            "maxWidth": 767,
+            "orientation": "both",
+            "touchEnabled": true,
+            "pointerType": "touch",
+            "pixelDensity": "xxhdpi",
+            "features": { "hover": false, "rightClick": false, "multiTouch": true, "hapticFeedback": true, "keyboardShortcuts": false }
+          },
+          {
+            "profileId": "tablet_portrait",
+            "name": "Tablet Portrait",
+            "category": "tablet",
+            "minWidth": 768,
+            "maxWidth": 1023,
+            "orientation": "portrait",
+            "touchEnabled": true,
+            "pointerType": "both",
+            "pixelDensity": "xhdpi",
+            "features": { "hover": true, "rightClick": false, "multiTouch": true, "hapticFeedback": true, "keyboardShortcuts": true }
+          },
+          {
+            "profileId": "desktop",
+            "name": "Desktop",
+            "category": "desktop",
+            "minWidth": 1024,
+            "maxWidth": 1439,
+            "orientation": "landscape",
+            "touchEnabled": false,
+            "pointerType": "mouse",
+            "pixelDensity": "mdpi",
+            "features": { "hover": true, "rightClick": true, "multiTouch": false, "hapticFeedback": false, "keyboardShortcuts": true }
+          }
+        ],
+        "responsiveBreakpoints": {
+          "mobile": { "maxWidth": 767, "columns": 4, "gutter": 16, "margin": 16 },
+          "tablet": { "minWidth": 768, "maxWidth": 1023, "columns": 8, "gutter": 24, "margin": 24 },
+          "desktop": { "minWidth": 1024, "maxWidth": 1439, "columns": 12, "gutter": 24, "margin": 32 },
+          "largeDesktop": { "minWidth": 1440, "columns": 12, "gutter": 32, "margin": 48 }
+        },
+        "designSystem": {
+          "colors": {
+            "primary": "#2563eb",
+            "secondary": "#7c3aed",
+            "success": "#10b981",
+            "warning": "#f59e0b",
+            "error": "#ef4444",
+            "info": "#3b82f6",
+            "background": { "primary": "#ffffff", "secondary": "#f3f4f6", "tertiary": "#e5e7eb" },
+            "text": { "primary": "#111827", "secondary": "#6b7280", "disabled": "#9ca3af", "inverse": "#ffffff" },
+            "border": { "default": "#d1d5db", "focus": "#2563eb", "error": "#ef4444" }
+          },
+          "typography": {
+            "fontFamily": {
+              "primary": "Inter, system-ui, sans-serif",
+              "secondary": "Georgia, serif",
+              "monospace": "JetBrains Mono, monospace"
+            },
+            "fontSizes": { "xs": 12, "sm": 14, "base": 16, "lg": 18, "xl": 20, "2xl": 24, "3xl": 30, "4xl": 36 },
+            "fontWeights": { "light": 300, "normal": 400, "medium": 500, "semibold": 600, "bold": 700 },
+            "lineHeights": { "tight": 1.25, "normal": 1.5, "relaxed": 1.75 }
+          },
+          "spacing": { "xs": 4, "sm": 8, "md": 16, "lg": 24, "xl": 32, "2xl": 48, "3xl": 64 },
+          "shadows": {
+            "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+            "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+            "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+            "xl": "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
+          },
+          "borders": {
+            "radius": { "none": 0, "sm": 4, "md": 8, "lg": 12, "full": "9999px" },
+            "width": { "thin": 1, "medium": 2, "thick": 4 }
+          },
+          "animations": {
+            "durations": { "fast": 150, "normal": 300, "slow": 500 },
+            "easings": {
+              "easeIn": "cubic-bezier(0.4, 0, 1, 1)",
+              "easeOut": "cubic-bezier(0, 0, 0.2, 1)",
+              "easeInOut": "cubic-bezier(0.4, 0, 0.2, 1)"
+            }
+          }
+        },
+        "adaptiveComponents": [
+          {
+            "componentId": "card",
+            "name": "Adaptive Card",
+            "variants": {
+              "mobile": { "layout": "full-width", "size": "compact", "touchTarget": 48, "spacing": "sm" },
+              "tablet": { "layout": "grid", "size": "medium", "touchTarget": 44, "spacing": "md" },
+              "desktop": { "layout": "grid", "size": "large", "touchTarget": 32, "spacing": "lg" }
+            },
+            "responsiveBehavior": { "collapse": true, "stack": true, "hide": false, "resize": true },
+            "accessibilityFeatures": ["aria_labels", "keyboard_nav", "focus_management"]
+          },
+          {
+            "componentId": "table",
+            "name": "Adaptive Table",
+            "variants": {
+              "mobile": { "layout": "card-list", "size": "compact", "visibility": ["mobile"] },
+              "tablet": { "layout": "scrollable", "size": "medium", "visibility": ["tablet"] },
+              "desktop": { "layout": "full", "size": "normal", "visibility": ["desktop"] }
+            },
+            "responsiveBehavior": { "collapse": true, "stack": false, "hide": false, "resize": true },
+            "accessibilityFeatures": ["aria_labels", "keyboard_nav", "screen_reader"]
+          },
+          {
+            "componentId": "navigation",
+            "name": "Adaptive Navigation",
+            "variants": {
+              "mobile": { "layout": "bottom-tabs", "size": "compact", "touchTarget": 56 },
+              "tablet": { "layout": "side-rail", "size": "medium", "touchTarget": 48 },
+              "desktop": { "layout": "sidebar", "size": "full", "touchTarget": 40 }
+            },
+            "responsiveBehavior": { "collapse": true, "stack": false, "hide": false, "resize": true },
+            "accessibilityFeatures": ["aria_labels", "keyboard_nav", "focus_management", "screen_reader"]
+          }
+        ],
+        "accessibility": {
+          "wcagLevel": "AA",
+          "colorContrast": { "minimumRatio": 4.5, "largeTextRatio": 3.0, "highContrastMode": false },
+          "focusIndicators": { "enabled": true, "style": "ring", "color": "#2563eb", "width": 2 },
+          "keyboardNavigation": { "enabled": true, "skipLinks": true, "tabOrder": "natural" },
+          "screenReader": { "ariaLabels": true, "liveRegions": true, "announcements": true },
+          "reducedMotion": { "respectSystem": true, "disableAnimations": false, "simplifyTransitions": true },
+          "textScaling": { "minScale": 1.0, "maxScale": 2.0, "respectSystem": true }
+        },
+        "localization": {
+          "defaultDirection": "ltr",
+          "rtlLanguages": ["ar", "he", "fa", "ur"],
+          "fontFamilies": {
+            "en": { "primary": "Inter", "secondary": "Georgia", "monospace": "JetBrains Mono" },
+            "ar": { "primary": "Noto Sans Arabic", "secondary": "Amiri", "monospace": "Courier New" },
+            "am": { "primary": "Noto Sans Ethiopic", "secondary": "Noto Serif Ethiopic", "monospace": "Courier New" },
+            "zh-CN": { "primary": "Noto Sans SC", "secondary": "Noto Serif SC", "monospace": "Noto Sans Mono CJK" }
+          },
+          "dateFormats": {
+            "en": "MM/DD/YYYY",
+            "en-GB": "DD/MM/YYYY",
+            "ar": "YYYY/MM/DD",
+            "am": "DD/MM/YYYY"
+          },
+          "numberFormats": {
+            "en": { "decimal": ".", "thousands": ",", "currency": "$" },
+            "ar": { "decimal": "٫", "thousands": "٬", "currency": "ر.س" },
+            "am": { "decimal": ".", "thousands": ",", "currency": "ብር" }
+          }
+        },
+        "notifications": {
+          "channels": ["in_app", "push", "email"],
+          "inAppNotifications": {
+            "position": "top_right",
+            "duration": 5000,
+            "maxVisible": 3,
+            "stackBehavior": "stack"
+          },
+          "pushNotifications": {
+            "platforms": ["ios", "android", "web"],
+            "richNotifications": true,
+            "actionButtons": true
+          }
+        },
+        "auditLogging": {
+          "enabled": true,
+          "events": [
+            "app_launched",
+            "device_registered",
+            "biometric_authenticated",
+            "offline_action_queued",
+            "offline_action_synced",
+            "push_notification_received",
+            "accessibility_feature_enabled",
+            "language_direction_changed",
+            "responsive_layout_changed",
+            "theme_changed"
+          ],
+          "includeDeviceInfo": true,
+          "includeNetworkState": true
+        },
+        "createdAt": "2025-01-01T00:00:00Z",
+        "updatedAt": "2025-01-15T12:00:00Z"
+      }
+    ],
+    "invalid": [
+      {
+        "_description": "Missing required configId",
+        "version": "1.0.0"
+      },
+      {
+        "_description": "Invalid config ID pattern",
+        "configId": "invalid_config_id",
+        "version": "1.0.0"
+      },
+      {
+        "_description": "Invalid device profile category",
+        "configId": "xplatform-test-001",
+        "version": "1.0.0",
+        "deviceProfiles": [
+          { "profileId": "mobile_small", "name": "Small Mobile", "category": "smartwatch" }
+        ]
+      }
+    ]
+  },
+  "auditEvents": {
+    "mobileEvents": [
+      {
+        "eventType": "app_launched",
+        "category": "mobile",
+        "actor": { "type": "operator", "id": "op-kenya-001" },
+        "target": { "type": "mobile_app", "id": "mobile-kenya-001" },
+        "timestamp": "2025-01-15T10:00:00Z",
+        "metadata": {
+          "platform": "ios",
+          "version": "2.1.0",
+          "deviceModel": "iPhone 15 Pro"
+        }
+      },
+      {
+        "eventType": "biometric_authenticated",
+        "category": "mobile",
+        "actor": { "type": "operator", "id": "op-kenya-001" },
+        "target": { "type": "authentication", "id": "session-xyz789" },
+        "timestamp": "2025-01-15T10:00:05Z",
+        "metadata": {
+          "biometricType": "face_id",
+          "success": true
+        }
+      },
+      {
+        "eventType": "offline_action_queued",
+        "category": "mobile",
+        "actor": { "type": "operator", "id": "op-kenya-001" },
+        "target": { "type": "queued_action", "id": "queued-001" },
+        "timestamp": "2025-01-15T10:25:00Z",
+        "metadata": {
+          "actionType": "alert_acknowledge",
+          "networkStatus": "offline"
+        }
+      },
+      {
+        "eventType": "offline_action_synced",
+        "category": "mobile",
+        "actor": { "type": "system", "id": "sync-service" },
+        "target": { "type": "queued_action", "id": "queued-001" },
+        "timestamp": "2025-01-15T10:30:00Z",
+        "metadata": {
+          "actionType": "alert_acknowledge",
+          "syncResult": "success"
+        }
+      },
+      {
+        "eventType": "push_notification_received",
+        "category": "mobile",
+        "actor": { "type": "system", "id": "notification-service" },
+        "target": { "type": "mobile_app", "id": "mobile-kenya-001" },
+        "timestamp": "2025-01-15T10:35:00Z",
+        "metadata": {
+          "notificationType": "qc_alert",
+          "priority": "high",
+          "delivered": true
+        }
+      },
+      {
+        "eventType": "push_notification_tapped",
+        "category": "mobile",
+        "actor": { "type": "operator", "id": "op-kenya-001" },
+        "target": { "type": "notification", "id": "notif-001" },
+        "timestamp": "2025-01-15T10:35:30Z",
+        "metadata": {
+          "notificationType": "qc_alert",
+          "actionTaken": "opened"
+        }
+      },
+      {
+        "eventType": "accessibility_feature_enabled",
+        "category": "cross_platform",
+        "actor": { "type": "operator", "id": "op-ethiopia-001" },
+        "target": { "type": "accessibility", "id": "high_contrast" },
+        "timestamp": "2025-01-15T11:00:00Z",
+        "metadata": {
+          "feature": "high_contrast",
+          "enabled": true,
+          "platform": "android"
+        }
+      },
+      {
+        "eventType": "language_direction_changed",
+        "category": "cross_platform",
+        "actor": { "type": "operator", "id": "op-arabia-001" },
+        "target": { "type": "localization", "id": "direction" },
+        "timestamp": "2025-01-15T11:15:00Z",
+        "metadata": {
+          "previousDirection": "ltr",
+          "newDirection": "rtl",
+          "language": "ar"
+        }
+      },
+      {
+        "eventType": "responsive_layout_changed",
+        "category": "cross_platform",
+        "actor": { "type": "system", "id": "layout-engine" },
+        "target": { "type": "layout", "id": "main-dashboard" },
+        "timestamp": "2025-01-15T11:20:00Z",
+        "metadata": {
+          "previousBreakpoint": "tablet",
+          "newBreakpoint": "mobile",
+          "orientation": "portrait"
+        }
+      },
+      {
+        "eventType": "device_registered",
+        "category": "mobile",
+        "actor": { "type": "operator", "id": "op-kenya-001" },
+        "target": { "type": "device", "id": "device-ios-abc123" },
+        "timestamp": "2025-01-01T00:00:00Z",
+        "metadata": {
+          "platform": "ios",
+          "model": "iPhone 15 Pro",
+          "pushToken": "fcm-token-abc123def456"
+        }
+      }
+    ]
+  }
+}

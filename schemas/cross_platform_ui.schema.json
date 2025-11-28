@@ -1,0 +1,521 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sl18.io/schemas/cross_platform_ui.schema.json",
+  "title": "Cross-Platform UI Schema",
+  "description": "Schema for cross-platform UI configuration including responsive layouts, device profiles, accessibility, and unified design system",
+  "type": "object",
+  "properties": {
+    "configId": {
+      "type": "string",
+      "description": "Unique cross-platform config identifier",
+      "pattern": "^xplatform-[a-z0-9-]+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Config version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "deviceProfiles": {
+      "type": "array",
+      "description": "Supported device profiles",
+      "items": {
+        "$ref": "#/definitions/deviceProfile"
+      }
+    },
+    "responsiveBreakpoints": {
+      "type": "object",
+      "description": "Responsive layout breakpoints",
+      "properties": {
+        "mobile": {
+          "type": "object",
+          "properties": {
+            "maxWidth": { "type": "integer", "default": 767 },
+            "columns": { "type": "integer", "default": 4 },
+            "gutter": { "type": "integer", "default": 16 },
+            "margin": { "type": "integer", "default": 16 }
+          }
+        },
+        "tablet": {
+          "type": "object",
+          "properties": {
+            "minWidth": { "type": "integer", "default": 768 },
+            "maxWidth": { "type": "integer", "default": 1023 },
+            "columns": { "type": "integer", "default": 8 },
+            "gutter": { "type": "integer", "default": 24 },
+            "margin": { "type": "integer", "default": 24 }
+          }
+        },
+        "desktop": {
+          "type": "object",
+          "properties": {
+            "minWidth": { "type": "integer", "default": 1024 },
+            "maxWidth": { "type": "integer", "default": 1439 },
+            "columns": { "type": "integer", "default": 12 },
+            "gutter": { "type": "integer", "default": 24 },
+            "margin": { "type": "integer", "default": 32 }
+          }
+        },
+        "largeDesktop": {
+          "type": "object",
+          "properties": {
+            "minWidth": { "type": "integer", "default": 1440 },
+            "columns": { "type": "integer", "default": 12 },
+            "gutter": { "type": "integer", "default": 32 },
+            "margin": { "type": "integer", "default": 48 }
+          }
+        }
+      }
+    },
+    "designSystem": {
+      "type": "object",
+      "description": "Unified design system tokens",
+      "properties": {
+        "colors": {
+          "$ref": "#/definitions/colorTokens"
+        },
+        "typography": {
+          "$ref": "#/definitions/typographyTokens"
+        },
+        "spacing": {
+          "$ref": "#/definitions/spacingTokens"
+        },
+        "shadows": {
+          "$ref": "#/definitions/shadowTokens"
+        },
+        "borders": {
+          "$ref": "#/definitions/borderTokens"
+        },
+        "animations": {
+          "$ref": "#/definitions/animationTokens"
+        }
+      }
+    },
+    "adaptiveComponents": {
+      "type": "array",
+      "description": "Adaptive UI components",
+      "items": {
+        "$ref": "#/definitions/adaptiveComponent"
+      }
+    },
+    "accessibility": {
+      "type": "object",
+      "description": "Accessibility configuration (WCAG 2.1 AA)",
+      "properties": {
+        "wcagLevel": {
+          "type": "string",
+          "enum": ["A", "AA", "AAA"],
+          "default": "AA"
+        },
+        "colorContrast": {
+          "type": "object",
+          "properties": {
+            "minimumRatio": { "type": "number", "default": 4.5 },
+            "largeTextRatio": { "type": "number", "default": 3.0 },
+            "highContrastMode": { "type": "boolean", "default": false }
+          }
+        },
+        "focusIndicators": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "style": { "type": "string", "enum": ["outline", "ring", "highlight"], "default": "ring" },
+            "color": { "type": "string", "default": "#2563eb" },
+            "width": { "type": "integer", "default": 2 }
+          }
+        },
+        "keyboardNavigation": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "skipLinks": { "type": "boolean", "default": true },
+            "tabOrder": { "type": "string", "enum": ["natural", "explicit"], "default": "natural" }
+          }
+        },
+        "screenReader": {
+          "type": "object",
+          "properties": {
+            "ariaLabels": { "type": "boolean", "default": true },
+            "liveRegions": { "type": "boolean", "default": true },
+            "announcements": { "type": "boolean", "default": true }
+          }
+        },
+        "reducedMotion": {
+          "type": "object",
+          "properties": {
+            "respectSystem": { "type": "boolean", "default": true },
+            "disableAnimations": { "type": "boolean", "default": false },
+            "simplifyTransitions": { "type": "boolean", "default": true }
+          }
+        },
+        "textScaling": {
+          "type": "object",
+          "properties": {
+            "minScale": { "type": "number", "default": 1.0 },
+            "maxScale": { "type": "number", "default": 2.0 },
+            "respectSystem": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "localization": {
+      "type": "object",
+      "description": "Localization and RTL/LTR support",
+      "properties": {
+        "defaultDirection": {
+          "type": "string",
+          "enum": ["ltr", "rtl"],
+          "default": "ltr"
+        },
+        "rtlLanguages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["ar", "he", "fa", "ur"]
+        },
+        "fontFamilies": {
+          "type": "object",
+          "description": "Per-language font families",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "primary": { "type": "string" },
+              "secondary": { "type": "string" },
+              "monospace": { "type": "string" }
+            }
+          }
+        },
+        "dateFormats": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "numberFormats": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "decimal": { "type": "string" },
+              "thousands": { "type": "string" },
+              "currency": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "notifications": {
+      "type": "object",
+      "description": "Cross-platform notification system",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["in_app", "push", "email", "sms", "webhook"]
+          }
+        },
+        "inAppNotifications": {
+          "type": "object",
+          "properties": {
+            "position": { "type": "string", "enum": ["top_right", "top_left", "bottom_right", "bottom_left", "top_center"], "default": "top_right" },
+            "duration": { "type": "integer", "default": 5000 },
+            "maxVisible": { "type": "integer", "default": 3 },
+            "stackBehavior": { "type": "string", "enum": ["stack", "replace", "queue"], "default": "stack" }
+          }
+        },
+        "pushNotifications": {
+          "type": "object",
+          "properties": {
+            "platforms": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["ios", "android", "web"] }
+            },
+            "richNotifications": { "type": "boolean", "default": true },
+            "actionButtons": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "auditLogging": {
+      "type": "object",
+      "description": "Cross-platform audit logging",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "app_launched",
+              "app_backgrounded",
+              "device_registered",
+              "biometric_authenticated",
+              "offline_action_queued",
+              "offline_action_synced",
+              "push_notification_received",
+              "push_notification_tapped",
+              "accessibility_feature_enabled",
+              "language_direction_changed",
+              "responsive_layout_changed",
+              "theme_changed"
+            ]
+          }
+        },
+        "includeDeviceInfo": { "type": "boolean", "default": true },
+        "includeNetworkState": { "type": "boolean", "default": true }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["configId", "version"],
+  "definitions": {
+    "deviceProfile": {
+      "type": "object",
+      "properties": {
+        "profileId": {
+          "type": "string",
+          "enum": ["mobile_small", "mobile_large", "tablet_portrait", "tablet_landscape", "desktop", "desktop_large", "tv"]
+        },
+        "name": { "type": "string" },
+        "category": {
+          "type": "string",
+          "enum": ["mobile", "tablet", "desktop", "tv"]
+        },
+        "minWidth": { "type": "integer" },
+        "maxWidth": { "type": "integer" },
+        "orientation": {
+          "type": "string",
+          "enum": ["portrait", "landscape", "both"]
+        },
+        "touchEnabled": { "type": "boolean" },
+        "pointerType": {
+          "type": "string",
+          "enum": ["touch", "mouse", "both"]
+        },
+        "pixelDensity": {
+          "type": "string",
+          "enum": ["mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"]
+        },
+        "features": {
+          "type": "object",
+          "properties": {
+            "hover": { "type": "boolean" },
+            "rightClick": { "type": "boolean" },
+            "multiTouch": { "type": "boolean" },
+            "hapticFeedback": { "type": "boolean" },
+            "keyboardShortcuts": { "type": "boolean" }
+          }
+        }
+      },
+      "required": ["profileId", "name", "category"]
+    },
+    "colorTokens": {
+      "type": "object",
+      "properties": {
+        "primary": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "secondary": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "success": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "warning": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "error": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "info": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "background": {
+          "type": "object",
+          "properties": {
+            "primary": { "type": "string" },
+            "secondary": { "type": "string" },
+            "tertiary": { "type": "string" }
+          }
+        },
+        "text": {
+          "type": "object",
+          "properties": {
+            "primary": { "type": "string" },
+            "secondary": { "type": "string" },
+            "disabled": { "type": "string" },
+            "inverse": { "type": "string" }
+          }
+        },
+        "border": {
+          "type": "object",
+          "properties": {
+            "default": { "type": "string" },
+            "focus": { "type": "string" },
+            "error": { "type": "string" }
+          }
+        }
+      }
+    },
+    "typographyTokens": {
+      "type": "object",
+      "properties": {
+        "fontFamily": {
+          "type": "object",
+          "properties": {
+            "primary": { "type": "string", "default": "Inter, system-ui, sans-serif" },
+            "secondary": { "type": "string", "default": "Georgia, serif" },
+            "monospace": { "type": "string", "default": "JetBrains Mono, monospace" }
+          }
+        },
+        "fontSizes": {
+          "type": "object",
+          "properties": {
+            "xs": { "type": "integer", "default": 12 },
+            "sm": { "type": "integer", "default": 14 },
+            "base": { "type": "integer", "default": 16 },
+            "lg": { "type": "integer", "default": 18 },
+            "xl": { "type": "integer", "default": 20 },
+            "2xl": { "type": "integer", "default": 24 },
+            "3xl": { "type": "integer", "default": 30 },
+            "4xl": { "type": "integer", "default": 36 }
+          }
+        },
+        "fontWeights": {
+          "type": "object",
+          "properties": {
+            "light": { "type": "integer", "default": 300 },
+            "normal": { "type": "integer", "default": 400 },
+            "medium": { "type": "integer", "default": 500 },
+            "semibold": { "type": "integer", "default": 600 },
+            "bold": { "type": "integer", "default": 700 }
+          }
+        },
+        "lineHeights": {
+          "type": "object",
+          "properties": {
+            "tight": { "type": "number", "default": 1.25 },
+            "normal": { "type": "number", "default": 1.5 },
+            "relaxed": { "type": "number", "default": 1.75 }
+          }
+        }
+      }
+    },
+    "spacingTokens": {
+      "type": "object",
+      "properties": {
+        "xs": { "type": "integer", "default": 4 },
+        "sm": { "type": "integer", "default": 8 },
+        "md": { "type": "integer", "default": 16 },
+        "lg": { "type": "integer", "default": 24 },
+        "xl": { "type": "integer", "default": 32 },
+        "2xl": { "type": "integer", "default": 48 },
+        "3xl": { "type": "integer", "default": 64 }
+      }
+    },
+    "shadowTokens": {
+      "type": "object",
+      "properties": {
+        "sm": { "type": "string", "default": "0 1px 2px 0 rgba(0, 0, 0, 0.05)" },
+        "md": { "type": "string", "default": "0 4px 6px -1px rgba(0, 0, 0, 0.1)" },
+        "lg": { "type": "string", "default": "0 10px 15px -3px rgba(0, 0, 0, 0.1)" },
+        "xl": { "type": "string", "default": "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }
+      }
+    },
+    "borderTokens": {
+      "type": "object",
+      "properties": {
+        "radius": {
+          "type": "object",
+          "properties": {
+            "none": { "type": "integer", "default": 0 },
+            "sm": { "type": "integer", "default": 4 },
+            "md": { "type": "integer", "default": 8 },
+            "lg": { "type": "integer", "default": 12 },
+            "full": { "type": "string", "default": "9999px" }
+          }
+        },
+        "width": {
+          "type": "object",
+          "properties": {
+            "thin": { "type": "integer", "default": 1 },
+            "medium": { "type": "integer", "default": 2 },
+            "thick": { "type": "integer", "default": 4 }
+          }
+        }
+      }
+    },
+    "animationTokens": {
+      "type": "object",
+      "properties": {
+        "durations": {
+          "type": "object",
+          "properties": {
+            "fast": { "type": "integer", "default": 150 },
+            "normal": { "type": "integer", "default": 300 },
+            "slow": { "type": "integer", "default": 500 }
+          }
+        },
+        "easings": {
+          "type": "object",
+          "properties": {
+            "easeIn": { "type": "string", "default": "cubic-bezier(0.4, 0, 1, 1)" },
+            "easeOut": { "type": "string", "default": "cubic-bezier(0, 0, 0.2, 1)" },
+            "easeInOut": { "type": "string", "default": "cubic-bezier(0.4, 0, 0.2, 1)" }
+          }
+        }
+      }
+    },
+    "adaptiveComponent": {
+      "type": "object",
+      "properties": {
+        "componentId": {
+          "type": "string",
+          "enum": [
+            "card",
+            "table",
+            "chart",
+            "form",
+            "modal",
+            "navigation",
+            "list",
+            "grid",
+            "tabs",
+            "accordion",
+            "button",
+            "input",
+            "select",
+            "date_picker",
+            "file_upload"
+          ]
+        },
+        "name": { "type": "string" },
+        "variants": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "layout": { "type": "string" },
+              "size": { "type": "string" },
+              "touchTarget": { "type": "integer" },
+              "spacing": { "type": "string" },
+              "visibility": {
+                "type": "array",
+                "items": { "type": "string", "enum": ["mobile", "tablet", "desktop"] }
+              }
+            }
+          }
+        },
+        "responsiveBehavior": {
+          "type": "object",
+          "properties": {
+            "collapse": { "type": "boolean" },
+            "stack": { "type": "boolean" },
+            "hide": { "type": "boolean" },
+            "resize": { "type": "boolean" }
+          }
+        },
+        "accessibilityFeatures": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["aria_labels", "keyboard_nav", "focus_management", "screen_reader", "high_contrast"]
+          }
+        }
+      },
+      "required": ["componentId", "name"]
+    }
+  }
+}
