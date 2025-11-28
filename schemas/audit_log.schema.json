@@ -254,13 +254,50 @@
         "api_revenue_recorded",
         "api_payout_calculated",
         "partner_flagged",
-        "partner_unflagged"
+        "partner_unflagged",
+        "governance_suite_created",
+        "governance_suite_updated",
+        "governance_suite_activated",
+        "governance_suite_suspended",
+        "enforcement_action_taken",
+        "enforcement_action_appealed",
+        "appeal_submitted",
+        "appeal_resolved",
+        "appeal_escalated",
+        "content_blocked",
+        "content_unblocked",
+        "account_suspended",
+        "account_reinstated",
+        "violation_detected",
+        "violation_resolved",
+        "kyc_verified",
+        "kyc_failed",
+        "kyc_expired",
+        "aml_screening_completed",
+        "aml_flagged",
+        "aml_cleared",
+        "sanctions_hit_detected",
+        "pep_match_detected",
+        "fraud_signal_detected",
+        "fraud_blocked",
+        "tax_compliance_verified",
+        "tax_form_submitted",
+        "payment_compliance_check_passed",
+        "payment_compliance_check_failed",
+        "cultural_qc_check_passed",
+        "cultural_qc_check_failed",
+        "cultural_qc_remediation_started",
+        "cultural_qc_remediation_completed",
+        "translation_qc_passed",
+        "translation_qc_failed",
+        "persona_consistency_passed",
+        "persona_consistency_failed"
       ],
       "description": "Type of governance event"
     },
     "category": {
       "type": "string",
-      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace", "distribution", "syndication", "partner", "audience_insights", "feedback_loop", "ui", "ai_assistant", "voice_control", "partner_ecosystem", "api_marketplace"],
+      "enum": ["registration", "agreement", "revenue", "qc", "publishing", "system", "payment", "globalization", "observability", "series", "hybrid", "personalization", "monetization", "governance", "access_control", "compliance", "contributor", "marketplace", "distribution", "syndication", "partner", "audience_insights", "feedback_loop", "ui", "ai_assistant", "voice_control", "partner_ecosystem", "api_marketplace", "governance_suite", "payment_compliance", "cultural_qc"],
       "description": "Category of the audit event"
     },
     "actor": {
@@ -288,7 +325,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion", "distribution_channel", "syndication_feed", "partner_integration", "audience_insight", "feedback_loop", "engagement_metric", "sentiment_analysis", "retention_curve", "console", "dashboard", "panel", "widget", "assistant", "voice_control", "voice_command", "recommendation", "ecosystem_partner", "api_listing", "api_subscription", "api_key", "api_webhook", "api_quota"],
+          "enum": ["franchise", "agreement", "ledger", "episode", "content", "payment", "workspace", "language_pack", "incident", "series", "pipeline", "alert", "viewer", "subscription", "pricing", "policy", "role", "permission", "contributor", "listing", "marketplace", "promotion", "distribution_channel", "syndication_feed", "partner_integration", "audience_insight", "feedback_loop", "engagement_metric", "sentiment_analysis", "retention_curve", "console", "dashboard", "panel", "widget", "assistant", "voice_control", "voice_command", "recommendation", "ecosystem_partner", "api_listing", "api_subscription", "api_key", "api_webhook", "api_quota", "governance_suite", "payment_compliance", "cultural_qc_check", "kyc_document", "aml_screening", "tax_compliance", "fraud_signal", "cultural_rule", "remediation_workflow", "violation", "appeal"],
           "description": "Type of target entity"
         },
         "id": {

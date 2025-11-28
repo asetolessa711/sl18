@@ -1,0 +1,1050 @@
+{
+  "governanceSuites": {
+    "valid": [
+      {
+        "suiteId": "govsuite-global-2024",
+        "version": "2.0.0",
+        "name": "SL18 Global Governance Suite",
+        "scope": {
+          "level": "global",
+          "regions": ["NA", "EU", "APAC", "LATAM", "MEA"],
+          "languages": ["en", "es", "fr", "ar", "zh", "sw", "am"]
+        },
+        "policies": [
+          {
+            "policyId": "policy-content-standards",
+            "name": "Global Content Standards",
+            "type": "content_standards",
+            "priority": "critical",
+            "enforcement": "mandatory",
+            "rules": [
+              {
+                "ruleId": "rule-no-hate-speech",
+                "name": "No Hate Speech",
+                "description": "Content must not contain hate speech or discrimination",
+                "condition": "content.containsHateSpeech === true",
+                "action": "block_content",
+                "severity": "critical",
+                "autoRemediation": {
+                  "enabled": true,
+                  "actions": ["block", "notify", "escalate"],
+                  "delay": 0
+                }
+              },
+              {
+                "ruleId": "rule-age-appropriate",
+                "name": "Age Appropriate Content",
+                "description": "Content must be age-appropriate for target audience",
+                "condition": "content.ageRating < audience.minimumAge",
+                "action": "flag_review",
+                "severity": "high"
+              },
+              {
+                "ruleId": "rule-cultural-sensitivity",
+                "name": "Cultural Sensitivity Check",
+                "description": "Content must pass cultural sensitivity review",
+                "condition": "qc.culturalSensitivity.passed === false",
+                "action": "require_approval",
+                "severity": "high"
+              }
+            ],
+            "status": "active",
+            "effectiveDate": "2024-01-01T00:00:00Z"
+          },
+          {
+            "policyId": "policy-monetization-rules",
+            "name": "Monetization Compliance",
+            "type": "monetization_rules",
+            "priority": "high",
+            "enforcement": "mandatory",
+            "rules": [
+              {
+                "ruleId": "rule-revenue-split",
+                "name": "Revenue Split Compliance",
+                "description": "Revenue splits must comply with agreement terms",
+                "action": "warn",
+                "severity": "medium"
+              },
+              {
+                "ruleId": "rule-payout-verification",
+                "name": "Payout Verification Required",
+                "description": "Payouts require verified payment details",
+                "condition": "partner.paymentVerified === false",
+                "action": "deny",
+                "severity": "high"
+              }
+            ],
+            "status": "active",
+            "effectiveDate": "2024-01-01T00:00:00Z"
+          }
+        ],
+        "complianceRegistry": {
+          "frameworks": [
+            {
+              "frameworkId": "framework-gdpr",
+              "name": "GDPR",
+              "required": true,
+              "regions": ["EU"],
+              "requirements": [
+                {
+                  "requirementId": "gdpr-consent",
+                  "name": "User Consent Management",
+                  "description": "Obtain and track user consent",
+                  "category": "consent_management",
+                  "status": "compliant",
+                  "lastAssessed": "2024-11-01T00:00:00Z"
+                },
+                {
+                  "requirementId": "gdpr-data-access",
+                  "name": "Data Access Rights",
+                  "description": "Users can access their data",
+                  "category": "data_protection",
+                  "status": "compliant",
+                  "lastAssessed": "2024-11-01T00:00:00Z"
+                },
+                {
+                  "requirementId": "gdpr-breach-notification",
+                  "name": "Breach Notification",
+                  "description": "72-hour breach notification",
+                  "category": "breach_notification",
+                  "status": "compliant",
+                  "lastAssessed": "2024-11-01T00:00:00Z"
+                }
+              ],
+              "lastAudit": "2024-10-01T00:00:00Z",
+              "nextAudit": "2025-04-01T00:00:00Z",
+              "certificationExpiry": "2025-12-31T00:00:00Z"
+            },
+            {
+              "frameworkId": "framework-soc2",
+              "name": "SOC2",
+              "required": true,
+              "regions": ["NA", "EU", "APAC"],
+              "requirements": [
+                {
+                  "requirementId": "soc2-access-control",
+                  "name": "Access Control",
+                  "description": "Role-based access control",
+                  "category": "access_control",
+                  "status": "compliant",
+                  "lastAssessed": "2024-11-01T00:00:00Z"
+                },
+                {
+                  "requirementId": "soc2-audit-logging",
+                  "name": "Audit Logging",
+                  "description": "Comprehensive audit logging",
+                  "category": "audit_logging",
+                  "status": "compliant",
+                  "lastAssessed": "2024-11-01T00:00:00Z"
+                }
+              ],
+              "lastAudit": "2024-09-01T00:00:00Z",
+              "nextAudit": "2025-03-01T00:00:00Z"
+            }
+          ],
+          "globalRules": [
+            {
+              "ruleId": "global-cultural-sensitivity",
+              "name": "Cultural Sensitivity Requirement",
+              "type": "cultural_sensitivity",
+              "scope": "global",
+              "enforcement": "automatic",
+              "violationAction": "flag"
+            },
+            {
+              "ruleId": "global-qc-prerequisite",
+              "name": "QC Prerequisite Check",
+              "type": "qc_prerequisite",
+              "scope": "global",
+              "enforcement": "automatic",
+              "violationAction": "block"
+            },
+            {
+              "ruleId": "regional-mea-content",
+              "name": "MEA Content Restrictions",
+              "type": "content_restriction",
+              "scope": "regional",
+              "regions": ["MEA"],
+              "enforcement": "automatic",
+              "violationAction": "block"
+            }
+          ]
+        },
+        "enforcement": {
+          "roles": [
+            {
+              "role": "ecosystem_admin",
+              "permissions": ["view_policies", "create_policies", "edit_policies", "delete_policies", "approve_policies", "enforce_policies", "view_compliance", "manage_compliance", "view_audit_logs", "export_audit_logs", "manage_roles", "block_content", "suspend_accounts", "override_blocks"],
+              "mfaRequired": true,
+              "approvalRequired": false
+            },
+            {
+              "role": "compliance_officer",
+              "permissions": ["view_policies", "view_compliance", "manage_compliance", "view_audit_logs", "export_audit_logs", "issue_violations", "manage_appeals"],
+              "mfaRequired": true,
+              "approvalRequired": true
+            },
+            {
+              "role": "content_reviewer",
+              "permissions": ["view_policies", "view_compliance", "block_content", "issue_violations"],
+              "mfaRequired": false,
+              "approvalRequired": true
+            }
+          ],
+          "automatedEnforcement": {
+            "enabled": true,
+            "triggers": [
+              {
+                "triggerId": "trigger-hate-speech",
+                "name": "Hate Speech Detection",
+                "type": "policy_violation",
+                "threshold": {
+                  "metric": "hateSpeechScore",
+                  "operator": "gte",
+                  "value": 0.8
+                },
+                "actions": ["block", "notify", "escalate"],
+                "escalationPath": ["content_reviewer", "compliance_officer", "ecosystem_admin"]
+              },
+              {
+                "triggerId": "trigger-fraud",
+                "name": "Fraud Detection",
+                "type": "fraud_detection",
+                "actions": ["block", "notify", "escalate", "pause_payouts"],
+                "escalationPath": ["compliance_officer", "ecosystem_admin"]
+              },
+              {
+                "triggerId": "trigger-qc-failure",
+                "name": "QC Failure",
+                "type": "qc_failure",
+                "threshold": {
+                  "metric": "qcScore",
+                  "operator": "lt",
+                  "value": 70
+                },
+                "actions": ["flag_review", "notify"],
+                "escalationPath": ["content_reviewer"]
+              }
+            ],
+            "cooldownPeriod": 300
+          },
+          "appealProcess": {
+            "enabled": true,
+            "appealWindow": 30,
+            "reviewers": ["compliance_officer", "ecosystem_admin"],
+            "escalationEnabled": true
+          }
+        },
+        "violations": {
+          "categories": [
+            {
+              "categoryId": "cat-hate-speech",
+              "name": "Hate Speech",
+              "severity": "critical",
+              "penalties": {
+                "firstOffense": "content_removal",
+                "secondOffense": "temporary_suspension",
+                "thirdOffense": "permanent_ban"
+              },
+              "escalationThreshold": 2
+            },
+            {
+              "categoryId": "cat-cultural-violation",
+              "name": "Cultural Sensitivity Violation",
+              "severity": "high",
+              "penalties": {
+                "firstOffense": "warning",
+                "secondOffense": "content_removal",
+                "thirdOffense": "temporary_suspension"
+              },
+              "escalationThreshold": 3
+            },
+            {
+              "categoryId": "cat-qc-failure",
+              "name": "QC Standard Failure",
+              "severity": "medium",
+              "penalties": {
+                "firstOffense": "warning",
+                "secondOffense": "warning",
+                "thirdOffense": "payout_hold"
+              },
+              "escalationThreshold": 5
+            }
+          ],
+          "tracking": {
+            "retentionDays": 365,
+            "resetPeriod": 180,
+            "aggregation": "per_franchise"
+          }
+        },
+        "auditConfig": {
+          "enabled": true,
+          "retentionDays": 730,
+          "events": [
+            "policy_created",
+            "policy_updated",
+            "policy_activated",
+            "compliance_check_passed",
+            "compliance_check_failed",
+            "violation_detected",
+            "violation_resolved",
+            "enforcement_action_taken",
+            "appeal_submitted",
+            "appeal_resolved"
+          ],
+          "alertChannels": ["email", "slack", "webhook"],
+          "alertThreshold": "high_severity"
+        },
+        "reporting": {
+          "dashboards": [
+            {
+              "dashboardId": "dash-compliance-overview",
+              "name": "Compliance Overview",
+              "type": "compliance_overview",
+              "refreshInterval": 300
+            },
+            {
+              "dashboardId": "dash-violations",
+              "name": "Violation Trends",
+              "type": "violation_trends",
+              "refreshInterval": 600
+            }
+          ],
+          "scheduledReports": [
+            {
+              "reportId": "report-weekly-compliance",
+              "name": "Weekly Compliance Report",
+              "frequency": "weekly",
+              "recipients": ["compliance@sl18.com", "admin@sl18.com"],
+              "format": "pdf"
+            }
+          ]
+        },
+        "metrics": {
+          "complianceScore": 94.5,
+          "violationCount": 127,
+          "resolvedViolations": 115,
+          "pendingAppeals": 8,
+          "enforcementActions": 89,
+          "auditCompletionRate": 100,
+          "avgResolutionTime": 4.2,
+          "lastUpdated": "2024-11-28T00:00:00Z"
+        },
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-11-28T00:00:00Z",
+        "createdBy": "system"
+      }
+    ],
+    "invalid": [
+      {
+        "suiteId": "invalid-id",
+        "version": "1.0.0",
+        "name": "Invalid Suite"
+      },
+      {
+        "suiteId": "govsuite-missing-required",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "paymentCompliance": {
+    "valid": [
+      {
+        "complianceId": "paycomp-partner-001",
+        "version": "1.0.0",
+        "entityType": "partner",
+        "entityId": "partner-media-global",
+        "kyc": {
+          "status": "verified",
+          "level": "enhanced",
+          "verificationDate": "2024-10-15T00:00:00Z",
+          "expirationDate": "2025-10-15T00:00:00Z",
+          "documents": [
+            {
+              "documentId": "doc-business-license",
+              "type": "business_license",
+              "status": "verified",
+              "verifiedAt": "2024-10-15T00:00:00Z",
+              "expiresAt": "2025-10-15T00:00:00Z",
+              "verifiedBy": "third_party"
+            },
+            {
+              "documentId": "doc-tax-id",
+              "type": "tax_id",
+              "status": "verified",
+              "verifiedAt": "2024-10-15T00:00:00Z",
+              "verifiedBy": "automated"
+            },
+            {
+              "documentId": "doc-beneficial-ownership",
+              "type": "beneficial_ownership",
+              "status": "verified",
+              "verifiedAt": "2024-10-15T00:00:00Z",
+              "verifiedBy": "manual_review"
+            }
+          ],
+          "identityVerification": {
+            "method": "document_scan",
+            "provider": "Jumio",
+            "score": 95,
+            "verified": true
+          },
+          "businessVerification": {
+            "businessType": "corporation",
+            "registrationNumber": "12345678",
+            "registrationCountry": "US",
+            "beneficialOwners": [
+              {
+                "name": "John Smith",
+                "ownershipPercentage": 60,
+                "verified": true
+              },
+              {
+                "name": "Jane Doe",
+                "ownershipPercentage": 40,
+                "verified": true
+              }
+            ],
+            "verified": true
+          }
+        },
+        "aml": {
+          "status": "clear",
+          "riskLevel": "low",
+          "riskScore": 15,
+          "lastScreening": "2024-11-27T00:00:00Z",
+          "nextScreening": "2024-12-27T00:00:00Z",
+          "screeningFrequency": "monthly",
+          "sanctions": {
+            "screened": true,
+            "listsChecked": ["OFAC", "EU", "UN", "UK"],
+            "hits": 0,
+            "resolvedHits": 0
+          },
+          "pep": {
+            "screened": true,
+            "isPep": false,
+            "pepType": "none",
+            "enhancedDueDiligence": false
+          },
+          "adverseMedia": {
+            "screened": true,
+            "hits": 0,
+            "reviewed": true
+          },
+          "transactionMonitoring": {
+            "enabled": true,
+            "thresholds": {
+              "singleTransaction": 50000,
+              "dailyTotal": 100000,
+              "monthlyTotal": 500000
+            },
+            "flaggedTransactions": 0
+          }
+        },
+        "taxCompliance": {
+          "status": "compliant",
+          "taxId": "12-3456789",
+          "taxIdType": "EIN",
+          "taxIdVerified": true,
+          "taxResidency": "US",
+          "taxForms": [
+            {
+              "formId": "form-w9",
+              "formType": "W9",
+              "status": "verified",
+              "submittedAt": "2024-10-01T00:00:00Z"
+            }
+          ],
+          "withholding": {
+            "required": false,
+            "rate": 0,
+            "treatyBenefits": false
+          },
+          "reporting": {
+            "yearEndReporting": true,
+            "reportingThreshold": 600,
+            "lastReportYear": 2023
+          }
+        },
+        "paymentRules": {
+          "allowedMethods": ["bank_transfer", "paypal", "stripe", "wise"],
+          "allowedCurrencies": ["USD", "EUR", "GBP"],
+          "minimumPayout": 100,
+          "maximumPayout": 100000,
+          "payoutSchedule": "monthly",
+          "holdPeriod": 14,
+          "velocityLimits": {
+            "dailyLimit": 100000,
+            "weeklyLimit": 300000,
+            "monthlyLimit": 1000000
+          },
+          "restrictions": []
+        },
+        "fraudDetection": {
+          "enabled": true,
+          "riskScore": 12,
+          "riskLevel": "low",
+          "lastAssessment": "2024-11-27T00:00:00Z",
+          "signals": [],
+          "blockedTransactions": 0,
+          "manualReviewRequired": false
+        },
+        "complianceChecks": [
+          {
+            "checkId": "check-kyc-001",
+            "type": "kyc",
+            "status": "passed",
+            "performedAt": "2024-10-15T00:00:00Z",
+            "performedBy": "third_party",
+            "result": {
+              "passed": true,
+              "score": 95,
+              "details": "All documents verified"
+            },
+            "nextCheckDue": "2025-10-15T00:00:00Z"
+          },
+          {
+            "checkId": "check-aml-001",
+            "type": "aml",
+            "status": "passed",
+            "performedAt": "2024-11-27T00:00:00Z",
+            "performedBy": "automated",
+            "result": {
+              "passed": true,
+              "score": 85,
+              "details": "No sanctions hits, no PEP matches"
+            },
+            "nextCheckDue": "2024-12-27T00:00:00Z"
+          }
+        ],
+        "violations": [],
+        "overallStatus": "compliant",
+        "complianceScore": 98,
+        "lastReviewDate": "2024-11-27T00:00:00Z",
+        "nextReviewDate": "2025-02-27T00:00:00Z",
+        "createdAt": "2024-10-01T00:00:00Z",
+        "updatedAt": "2024-11-27T00:00:00Z"
+      }
+    ],
+    "invalid": [
+      {
+        "complianceId": "invalid-id",
+        "entityType": "partner"
+      }
+    ]
+  },
+  "culturalQC": {
+    "valid": [
+      {
+        "qcId": "culturalqc-mea-ar",
+        "version": "1.0.0",
+        "scope": {
+          "region": "MEA",
+          "language": "ar",
+          "contentType": "all"
+        },
+        "culturalRules": [
+          {
+            "ruleId": "rule-religious-content",
+            "name": "Religious Content Guidelines",
+            "category": "religious_sensitivity",
+            "description": "Content must respect religious sensitivities in the MEA region",
+            "priority": "critical",
+            "enforcement": "mandatory",
+            "keywords": [],
+            "action": "flag_review",
+            "status": "active"
+          },
+          {
+            "ruleId": "rule-political-neutrality",
+            "name": "Political Neutrality",
+            "category": "political_sensitivity",
+            "description": "Content should maintain political neutrality",
+            "priority": "high",
+            "enforcement": "mandatory",
+            "action": "flag_review",
+            "status": "active"
+          },
+          {
+            "ruleId": "rule-social-norms",
+            "name": "Social Norms Compliance",
+            "category": "social_norms",
+            "description": "Content must align with regional social norms",
+            "priority": "high",
+            "enforcement": "mandatory",
+            "action": "warn",
+            "alternativeSuggestions": ["Consider cultural context", "Review with native speaker"],
+            "status": "active"
+          },
+          {
+            "ruleId": "rule-gender-representation",
+            "name": "Gender Representation Guidelines",
+            "category": "gender_representation",
+            "description": "Ensure appropriate gender representation",
+            "priority": "medium",
+            "enforcement": "recommended",
+            "action": "suggest_alternative",
+            "status": "active"
+          }
+        ],
+        "qcDashboard": {
+          "enabled": true,
+          "views": [
+            {
+              "viewId": "view-regional-overview",
+              "name": "Regional Overview",
+              "type": "regional_overview",
+              "filters": {
+                "regions": ["MEA"],
+                "languages": ["ar"]
+              },
+              "refreshInterval": 300
+            },
+            {
+              "viewId": "view-violation-trends",
+              "name": "Violation Trends",
+              "type": "violation_trends",
+              "refreshInterval": 600
+            }
+          ],
+          "metrics": {
+            "totalChecks": 1250,
+            "passRate": 87.5,
+            "failRate": 12.5,
+            "pendingReview": 23,
+            "avgResolutionTime": 3.5,
+            "topViolationCategories": [
+              {
+                "category": "religious_sensitivity",
+                "count": 45,
+                "percentage": 35
+              },
+              {
+                "category": "social_norms",
+                "count": 38,
+                "percentage": 30
+              },
+              {
+                "category": "language_appropriateness",
+                "count": 25,
+                "percentage": 20
+              }
+            ]
+          }
+        },
+        "sensitivityAlerts": {
+          "enabled": true,
+          "alertTypes": [
+            {
+              "alertType": "cultural_violation",
+              "severity": "high",
+              "channels": ["email", "slack", "in_app"],
+              "escalation": {
+                "enabled": true,
+                "afterMinutes": 60,
+                "escalateTo": ["compliance_officer", "regional_manager"]
+              }
+            },
+            {
+              "alertType": "translation_quality",
+              "severity": "medium",
+              "channels": ["email", "in_app"],
+              "escalation": {
+                "enabled": true,
+                "afterMinutes": 120,
+                "escalateTo": ["qc_supervisor"]
+              }
+            },
+            {
+              "alertType": "audience_feedback",
+              "severity": "medium",
+              "channels": ["in_app", "push"],
+              "escalation": {
+                "enabled": false
+              }
+            }
+          ],
+          "quietHours": {
+            "enabled": true,
+            "start": "22:00",
+            "end": "06:00",
+            "bypassForCritical": true
+          }
+        },
+        "feedbackLoopIntegration": {
+          "enabled": true,
+          "triggers": [
+            {
+              "triggerId": "trigger-negative-sentiment",
+              "source": "audience_sentiment",
+              "threshold": -0.5,
+              "action": "flag_qc_review"
+            },
+            {
+              "triggerId": "trigger-engagement-drop",
+              "source": "engagement_drop",
+              "threshold": 30,
+              "action": "notify_operator"
+            },
+            {
+              "triggerId": "trigger-manual-report",
+              "source": "manual_report",
+              "action": "flag_qc_review"
+            }
+          ],
+          "personalizationAdjustments": {
+            "enabled": true,
+            "adjustmentTypes": ["demote_content", "promote_alternatives", "region_specific_override"]
+          }
+        },
+        "translationQC": {
+          "enabled": true,
+          "qualityThresholds": {
+            "accuracy": 95,
+            "fluency": 90,
+            "culturalAdaptation": 85
+          },
+          "checks": [
+            {
+              "checkId": "check-automated",
+              "type": "automated",
+              "required": true,
+              "passingScore": 80
+            },
+            {
+              "checkId": "check-native-speaker",
+              "type": "native_speaker",
+              "required": true,
+              "passingScore": 90
+            },
+            {
+              "checkId": "check-back-translation",
+              "type": "back_translation",
+              "required": false,
+              "passingScore": 85
+            }
+          ],
+          "nativeReviewerRequired": true
+        },
+        "personaConsistency": {
+          "enabled": true,
+          "checks": [
+            {
+              "checkId": "check-voice-tone",
+              "type": "voice_tone",
+              "threshold": 85,
+              "action": "warn"
+            },
+            {
+              "checkId": "check-vocabulary",
+              "type": "vocabulary",
+              "threshold": 90,
+              "action": "flag_review"
+            },
+            {
+              "checkId": "check-cultural-references",
+              "type": "cultural_references",
+              "threshold": 80,
+              "action": "flag_review"
+            }
+          ],
+          "crossEpisodeTracking": true,
+          "crossLanguageTracking": true
+        },
+        "remediation": {
+          "enabled": true,
+          "workflows": [
+            {
+              "workflowId": "workflow-cultural-violation",
+              "name": "Cultural Violation Remediation",
+              "violationType": "cultural_sensitivity",
+              "steps": [
+                {
+                  "stepId": "step-notify",
+                  "action": "notify_creator",
+                  "deadline": 24
+                },
+                {
+                  "stepId": "step-revise",
+                  "action": "request_revision",
+                  "assignee": "creator",
+                  "deadline": 48
+                },
+                {
+                  "stepId": "step-review",
+                  "action": "human_review",
+                  "assignee": "qc_supervisor",
+                  "deadline": 24
+                },
+                {
+                  "stepId": "step-approve",
+                  "action": "approve",
+                  "assignee": "compliance_officer",
+                  "deadline": 12
+                }
+              ],
+              "sla": 108
+            }
+          ],
+          "autoRemediation": {
+            "enabled": true,
+            "allowedActions": ["suggest_alternative", "add_disclaimer", "age_gate"],
+            "requireApproval": true
+          }
+        },
+        "checks": [
+          {
+            "checkId": "check-content-001",
+            "contentId": "content-episode-101",
+            "contentType": "video",
+            "status": "passed",
+            "score": 92,
+            "violations": [],
+            "reviewer": "reviewer-ar-001",
+            "reviewedAt": "2024-11-27T10:00:00Z",
+            "performedAt": "2024-11-27T09:00:00Z"
+          },
+          {
+            "checkId": "check-content-002",
+            "contentId": "content-episode-102",
+            "contentType": "subtitles",
+            "status": "needs_review",
+            "score": 78,
+            "violations": [
+              {
+                "ruleId": "rule-religious-content",
+                "category": "religious_sensitivity",
+                "severity": "medium",
+                "location": "00:05:23",
+                "description": "Reference requires cultural context review",
+                "suggestion": "Consider adding cultural context or alternative phrasing"
+              }
+            ],
+            "performedAt": "2024-11-27T11:00:00Z"
+          }
+        ],
+        "metrics": {
+          "totalChecks": 1250,
+          "passedChecks": 1094,
+          "failedChecks": 156,
+          "pendingReview": 23,
+          "remediatedContent": 133,
+          "avgScore": 87.5,
+          "topViolationTypes": [
+            {
+              "type": "religious_sensitivity",
+              "count": 45
+            },
+            {
+              "type": "social_norms",
+              "count": 38
+            }
+          ],
+          "lastUpdated": "2024-11-28T00:00:00Z"
+        },
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-11-28T00:00:00Z",
+        "createdBy": "system"
+      }
+    ],
+    "invalid": [
+      {
+        "qcId": "invalid-id",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "auditLogs": {
+    "governanceSuite": [
+      {
+        "logId": "log-gov-001",
+        "timestamp": "2024-11-28T10:00:00Z",
+        "eventType": "governance_suite_created",
+        "category": "governance_suite",
+        "actor": {
+          "type": "user",
+          "id": "admin-001",
+          "name": "System Admin"
+        },
+        "target": {
+          "type": "governance_suite",
+          "id": "govsuite-global-2024"
+        },
+        "details": {
+          "description": "Global governance suite created with 2 policies and 3 compliance frameworks"
+        },
+        "result": "success"
+      },
+      {
+        "logId": "log-gov-002",
+        "timestamp": "2024-11-28T10:30:00Z",
+        "eventType": "policy_activated",
+        "category": "governance_suite",
+        "actor": {
+          "type": "user",
+          "id": "compliance-001",
+          "name": "Compliance Officer"
+        },
+        "target": {
+          "type": "policy",
+          "id": "policy-content-standards"
+        },
+        "details": {
+          "description": "Global Content Standards policy activated"
+        },
+        "result": "success"
+      },
+      {
+        "logId": "log-gov-003",
+        "timestamp": "2024-11-28T11:00:00Z",
+        "eventType": "violation_detected",
+        "category": "governance_suite",
+        "actor": {
+          "type": "system",
+          "id": "automated-scanner",
+          "name": "Content Scanner"
+        },
+        "target": {
+          "type": "content",
+          "id": "content-123",
+          "franchiseId": "franchise-abc"
+        },
+        "details": {
+          "description": "Cultural sensitivity violation detected",
+          "metadata": {
+            "ruleId": "rule-cultural-sensitivity",
+            "severity": "high"
+          }
+        },
+        "result": "success"
+      }
+    ],
+    "paymentCompliance": [
+      {
+        "logId": "log-pay-001",
+        "timestamp": "2024-11-28T09:00:00Z",
+        "eventType": "kyc_verified",
+        "category": "payment_compliance",
+        "actor": {
+          "type": "system",
+          "id": "kyc-system",
+          "name": "KYC Verification System"
+        },
+        "target": {
+          "type": "payment_compliance",
+          "id": "paycomp-partner-001"
+        },
+        "details": {
+          "description": "KYC verification completed successfully",
+          "metadata": {
+            "level": "enhanced",
+            "provider": "Jumio"
+          }
+        },
+        "result": "success"
+      },
+      {
+        "logId": "log-pay-002",
+        "timestamp": "2024-11-28T09:30:00Z",
+        "eventType": "aml_screening_completed",
+        "category": "payment_compliance",
+        "actor": {
+          "type": "system",
+          "id": "aml-system",
+          "name": "AML Screening System"
+        },
+        "target": {
+          "type": "payment_compliance",
+          "id": "paycomp-partner-001"
+        },
+        "details": {
+          "description": "AML screening completed - no hits",
+          "metadata": {
+            "riskScore": 15,
+            "riskLevel": "low"
+          }
+        },
+        "result": "success"
+      }
+    ],
+    "culturalQC": [
+      {
+        "logId": "log-cqc-001",
+        "timestamp": "2024-11-28T10:00:00Z",
+        "eventType": "cultural_qc_check_passed",
+        "category": "cultural_qc",
+        "actor": {
+          "type": "system",
+          "id": "qc-system",
+          "name": "Cultural QC System"
+        },
+        "target": {
+          "type": "cultural_qc_check",
+          "id": "check-content-001"
+        },
+        "details": {
+          "description": "Cultural QC check passed with score 92",
+          "metadata": {
+            "score": 92,
+            "region": "MEA",
+            "language": "ar"
+          }
+        },
+        "result": "success"
+      },
+      {
+        "logId": "log-cqc-002",
+        "timestamp": "2024-11-28T11:00:00Z",
+        "eventType": "cultural_sensitivity_alert",
+        "category": "cultural_qc",
+        "actor": {
+          "type": "system",
+          "id": "qc-system",
+          "name": "Cultural QC System"
+        },
+        "target": {
+          "type": "cultural_qc_check",
+          "id": "check-content-002"
+        },
+        "details": {
+          "description": "Cultural sensitivity issue flagged for review",
+          "metadata": {
+            "ruleId": "rule-religious-content",
+            "severity": "medium"
+          }
+        },
+        "result": "success"
+      }
+    ]
+  },
+  "calculations": {
+    "complianceScore": {
+      "example": {
+        "frameworkScores": [
+          { "framework": "GDPR", "score": 95, "weight": 0.3 },
+          { "framework": "SOC2", "score": 92, "weight": 0.3 },
+          { "framework": "PCI-DSS", "score": 98, "weight": 0.2 },
+          { "framework": "ISO27001", "score": 90, "weight": 0.2 }
+        ],
+        "expectedOverallScore": 93.7
+      }
+    },
+    "qcPassRate": {
+      "example": {
+        "totalChecks": 1250,
+        "passedChecks": 1094,
+        "expectedPassRate": 87.52
+      }
+    },
+    "violationResolutionRate": {
+      "example": {
+        "totalViolations": 127,
+        "resolvedViolations": 115,
+        "expectedResolutionRate": 90.55
+      }
+    }
+  }
+}

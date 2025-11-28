@@ -1,0 +1,634 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaymentCompliance",
+  "description": "Schema for payment compliance in SL18 - payment rules, verification, KYC/AML checks, and tax compliance",
+  "type": "object",
+  "properties": {
+    "complianceId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^paycomp-[a-z0-9-]+$",
+      "description": "Unique payment compliance record identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Version (semver format)"
+    },
+    "entityType": {
+      "type": "string",
+      "enum": ["franchise", "partner", "contributor", "creator", "distributor"],
+      "description": "Type of entity this compliance applies to"
+    },
+    "entityId": {
+      "type": "string",
+      "description": "Reference to the entity"
+    },
+    "kyc": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "verified", "failed", "expired", "exempt"],
+          "description": "KYC verification status"
+        },
+        "level": {
+          "type": "string",
+          "enum": ["basic", "standard", "enhanced", "enterprise"],
+          "description": "KYC verification level"
+        },
+        "verificationDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date of last verification"
+        },
+        "expirationDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Verification expiration date"
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "documentId": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["government_id", "passport", "business_license", "tax_id", "bank_statement", "utility_bill", "incorporation_docs", "beneficial_ownership"]
+              },
+              "status": {
+                "type": "string",
+                "enum": ["pending", "verified", "rejected", "expired"]
+              },
+              "verifiedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "verifiedBy": {
+                "type": "string",
+                "enum": ["automated", "manual_review", "third_party"]
+              },
+              "rejectionReason": {
+                "type": "string"
+              }
+            },
+            "required": ["documentId", "type", "status"],
+            "additionalProperties": false
+          },
+          "description": "KYC documents"
+        },
+        "identityVerification": {
+          "type": "object",
+          "properties": {
+            "method": {
+              "type": "string",
+              "enum": ["document_scan", "biometric", "video_call", "third_party_api", "manual"]
+            },
+            "provider": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "verified": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "businessVerification": {
+          "type": "object",
+          "properties": {
+            "businessType": {
+              "type": "string",
+              "enum": ["sole_proprietor", "partnership", "llc", "corporation", "non_profit", "government"]
+            },
+            "registrationNumber": {
+              "type": "string"
+            },
+            "registrationCountry": {
+              "type": "string"
+            },
+            "beneficialOwners": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "ownershipPercentage": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "verified": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "verified": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["status", "level"],
+      "additionalProperties": false
+    },
+    "aml": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["clear", "flagged", "blocked", "under_review", "pending"],
+          "description": "AML check status"
+        },
+        "riskLevel": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "description": "AML risk level"
+        },
+        "riskScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "AML risk score"
+        },
+        "lastScreening": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last AML screening date"
+        },
+        "nextScreening": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Next scheduled screening"
+        },
+        "screeningFrequency": {
+          "type": "string",
+          "enum": ["daily", "weekly", "monthly", "quarterly", "on_transaction"],
+          "description": "Screening frequency"
+        },
+        "sanctions": {
+          "type": "object",
+          "properties": {
+            "screened": {
+              "type": "boolean"
+            },
+            "listsChecked": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["OFAC", "EU", "UN", "UK", "AU", "local"]
+              }
+            },
+            "hits": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "resolvedHits": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "pep": {
+          "type": "object",
+          "properties": {
+            "screened": {
+              "type": "boolean"
+            },
+            "isPep": {
+              "type": "boolean"
+            },
+            "pepType": {
+              "type": "string",
+              "enum": ["current", "former", "family_member", "close_associate", "none"]
+            },
+            "enhancedDueDiligence": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "adverseMedia": {
+          "type": "object",
+          "properties": {
+            "screened": {
+              "type": "boolean"
+            },
+            "hits": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "reviewed": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "transactionMonitoring": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "thresholds": {
+              "type": "object",
+              "properties": {
+                "singleTransaction": {
+                  "type": "number",
+                  "description": "Max single transaction amount"
+                },
+                "dailyTotal": {
+                  "type": "number",
+                  "description": "Max daily total"
+                },
+                "monthlyTotal": {
+                  "type": "number",
+                  "description": "Max monthly total"
+                }
+              },
+              "additionalProperties": false
+            },
+            "flaggedTransactions": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["status", "riskLevel"],
+      "additionalProperties": false
+    },
+    "taxCompliance": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["compliant", "non_compliant", "pending", "exempt"],
+          "description": "Tax compliance status"
+        },
+        "taxId": {
+          "type": "string",
+          "description": "Tax identification number"
+        },
+        "taxIdType": {
+          "type": "string",
+          "enum": ["EIN", "SSN", "VAT", "GST", "TIN", "other"],
+          "description": "Type of tax ID"
+        },
+        "taxIdVerified": {
+          "type": "boolean"
+        },
+        "taxResidency": {
+          "type": "string",
+          "description": "Country of tax residency"
+        },
+        "taxForms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formId": {
+                "type": "string"
+              },
+              "formType": {
+                "type": "string",
+                "enum": ["W9", "W8-BEN", "W8-BEN-E", "1099", "1042-S", "VAT_registration", "local_form"]
+              },
+              "status": {
+                "type": "string",
+                "enum": ["pending", "submitted", "verified", "expired"]
+              },
+              "submittedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": ["formId", "formType", "status"],
+            "additionalProperties": false
+          }
+        },
+        "withholding": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "treatyBenefits": {
+              "type": "boolean"
+            },
+            "treatyCountry": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "reporting": {
+          "type": "object",
+          "properties": {
+            "yearEndReporting": {
+              "type": "boolean"
+            },
+            "reportingThreshold": {
+              "type": "number"
+            },
+            "lastReportYear": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["status"],
+      "additionalProperties": false
+    },
+    "paymentRules": {
+      "type": "object",
+      "properties": {
+        "allowedMethods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["bank_transfer", "paypal", "stripe", "wise", "payoneer", "check", "crypto", "wire"]
+          },
+          "description": "Allowed payment methods"
+        },
+        "allowedCurrencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "description": "Allowed currencies (ISO 4217)"
+        },
+        "minimumPayout": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Minimum payout amount"
+        },
+        "maximumPayout": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum single payout"
+        },
+        "payoutSchedule": {
+          "type": "string",
+          "enum": ["immediate", "daily", "weekly", "bi_weekly", "monthly", "quarterly"],
+          "description": "Payout schedule"
+        },
+        "holdPeriod": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Hold period in days before payout"
+        },
+        "velocityLimits": {
+          "type": "object",
+          "properties": {
+            "dailyLimit": {
+              "type": "number"
+            },
+            "weeklyLimit": {
+              "type": "number"
+            },
+            "monthlyLimit": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "restrictions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["country_block", "currency_block", "method_block", "amount_limit", "kyc_required", "manual_review"]
+              },
+              "reason": {
+                "type": "string"
+              },
+              "active": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "fraudDetection": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "riskScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "riskLevel": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "lastAssessment": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "signals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "signalId": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["velocity_anomaly", "location_mismatch", "device_fingerprint", "behavioral_anomaly", "pattern_match", "third_party_alert"]
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"]
+              },
+              "detectedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "resolved": {
+                "type": "boolean"
+              }
+            },
+            "required": ["signalId", "type", "severity"],
+            "additionalProperties": false
+          }
+        },
+        "blockedTransactions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "manualReviewRequired": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "complianceChecks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "checkId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["kyc", "aml", "sanctions", "pep", "tax", "fraud", "velocity", "threshold"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["passed", "failed", "pending", "review_required", "exempted"]
+          },
+          "performedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "performedBy": {
+            "type": "string",
+            "enum": ["automated", "manual", "third_party"]
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "passed": {
+                "type": "boolean"
+              },
+              "score": {
+                "type": "number"
+              },
+              "details": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "nextCheckDue": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["checkId", "type", "status", "performedAt"],
+        "additionalProperties": false
+      },
+      "description": "Compliance checks performed"
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "violationId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["kyc_failure", "aml_flag", "sanctions_hit", "fraud_detection", "velocity_breach", "threshold_breach", "tax_non_compliance"]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "under_review", "resolved", "escalated", "false_positive"]
+          },
+          "detectedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["none", "warning", "payout_hold", "account_freeze", "account_termination"]
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": ["violationId", "type", "severity", "status", "detectedAt"],
+        "additionalProperties": false
+      },
+      "description": "Payment compliance violations"
+    },
+    "overallStatus": {
+      "type": "string",
+      "enum": ["compliant", "non_compliant", "pending_review", "suspended", "blocked"],
+      "description": "Overall payment compliance status"
+    },
+    "complianceScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Overall compliance score"
+    },
+    "lastReviewDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "nextReviewDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "complianceId",
+    "version",
+    "entityType",
+    "entityId",
+    "kyc",
+    "aml",
+    "overallStatus",
+    "createdAt"
+  ],
+  "additionalProperties": false
+}

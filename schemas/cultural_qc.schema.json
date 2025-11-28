@@ -1,0 +1,707 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CulturalQC",
+  "description": "Schema for cultural sensitivity QC and enforcement in SL18 - cultural rules, QC enforcement, sensitivity alerts",
+  "type": "object",
+  "properties": {
+    "qcId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^culturalqc-[a-z0-9-]+$",
+      "description": "Unique cultural QC record identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Version (semver format)"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "region": {
+          "type": "string",
+          "description": "Region for cultural rules"
+        },
+        "language": {
+          "type": "string",
+          "description": "Language code"
+        },
+        "franchiseId": {
+          "type": "string",
+          "description": "Franchise ID if franchise-scoped"
+        },
+        "contentType": {
+          "type": "string",
+          "enum": ["all", "video", "audio", "text", "subtitles", "captions", "metadata"],
+          "description": "Content type for rules"
+        }
+      },
+      "required": ["region", "language"],
+      "additionalProperties": false
+    },
+    "culturalRules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "Unique rule identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Rule name"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "religious_sensitivity",
+              "political_sensitivity",
+              "social_norms",
+              "historical_context",
+              "regional_taboos",
+              "language_appropriateness",
+              "visual_sensitivity",
+              "audio_sensitivity",
+              "age_appropriateness",
+              "gender_representation",
+              "ethnic_representation",
+              "disability_representation"
+            ],
+            "description": "Rule category"
+          },
+          "description": {
+            "type": "string",
+            "description": "Rule description"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low"],
+            "description": "Rule priority"
+          },
+          "enforcement": {
+            "type": "string",
+            "enum": ["mandatory", "recommended", "advisory"],
+            "description": "Enforcement level"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Keywords to flag"
+          },
+          "patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Regex patterns to match"
+          },
+          "exemptions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "context": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "description": "Rule exemptions"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["block", "flag_review", "warn", "suggest_alternative", "log_only"],
+            "description": "Action when rule triggers"
+          },
+          "alternativeSuggestions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Suggested alternatives"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "suspended", "deprecated"],
+            "description": "Rule status"
+          }
+        },
+        "required": ["ruleId", "name", "category", "priority", "enforcement", "action", "status"],
+        "additionalProperties": false
+      },
+      "description": "Cultural sensitivity rules"
+    },
+    "qcDashboard": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "views": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "viewId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["regional_overview", "language_breakdown", "violation_trends", "pass_fail_rates", "remediation_status", "comparative_analysis"]
+              },
+              "filters": {
+                "type": "object",
+                "properties": {
+                  "regions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "languages": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "dateRange": {
+                    "type": "object",
+                    "properties": {
+                      "start": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "end": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "refreshInterval": {
+                "type": "integer",
+                "minimum": 60,
+                "description": "Refresh interval in seconds"
+              }
+            },
+            "required": ["viewId", "name", "type"],
+            "additionalProperties": false
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "totalChecks": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "passRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "failRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "pendingReview": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "avgResolutionTime": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Average resolution time in hours"
+            },
+            "topViolationCategories": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string"
+                  },
+                  "count": {
+                    "type": "integer"
+                  },
+                  "percentage": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "sensitivityAlerts": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "alertTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "alertType": {
+                "type": "string",
+                "enum": [
+                  "cultural_violation",
+                  "translation_quality",
+                  "persona_inconsistency",
+                  "regional_restriction",
+                  "audience_feedback",
+                  "automated_detection",
+                  "manual_flag"
+                ]
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low", "info"]
+              },
+              "channels": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["email", "slack", "webhook", "sms", "in_app", "push"]
+                }
+              },
+              "escalation": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "afterMinutes": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "escalateTo": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": ["alertType", "severity", "channels"],
+            "additionalProperties": false
+          }
+        },
+        "quietHours": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "start": {
+              "type": "string",
+              "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+            },
+            "end": {
+              "type": "string",
+              "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+            },
+            "bypassForCritical": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "feedbackLoopIntegration": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "triggerId": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string",
+                "enum": ["audience_sentiment", "engagement_drop", "negative_feedback", "automated_scan", "manual_report"]
+              },
+              "threshold": {
+                "type": "number",
+                "description": "Threshold value for trigger"
+              },
+              "action": {
+                "type": "string",
+                "enum": ["flag_qc_review", "block_content", "notify_operator", "adjust_personalization", "pause_distribution"]
+              }
+            },
+            "required": ["triggerId", "source", "action"],
+            "additionalProperties": false
+          }
+        },
+        "personalizationAdjustments": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "adjustmentTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["demote_content", "promote_alternatives", "update_recommendations", "region_specific_override"]
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "translationQC": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "qualityThresholds": {
+          "type": "object",
+          "properties": {
+            "accuracy": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Minimum accuracy percentage"
+            },
+            "fluency": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Minimum fluency score"
+            },
+            "culturalAdaptation": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Minimum cultural adaptation score"
+            }
+          },
+          "additionalProperties": false
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "checkId": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["automated", "human_review", "native_speaker", "back_translation", "machine_comparison"]
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "passingScore": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": ["checkId", "type"],
+            "additionalProperties": false
+          }
+        },
+        "nativeReviewerRequired": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "personaConsistency": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "checkId": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["voice_tone", "vocabulary", "cultural_references", "visual_style", "brand_alignment", "character_consistency"]
+              },
+              "threshold": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "action": {
+                "type": "string",
+                "enum": ["pass", "warn", "flag_review", "block"]
+              }
+            },
+            "required": ["checkId", "type", "action"],
+            "additionalProperties": false
+          }
+        },
+        "crossEpisodeTracking": {
+          "type": "boolean"
+        },
+        "crossLanguageTracking": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "remediation": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "workflows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "workflowId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "violationType": {
+                "type": "string"
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "stepId": {
+                      "type": "string"
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": ["notify_creator", "request_revision", "auto_fix", "human_review", "approve", "reject", "escalate"]
+                    },
+                    "assignee": {
+                      "type": "string"
+                    },
+                    "deadline": {
+                      "type": "integer",
+                      "description": "Hours to complete step"
+                    }
+                  },
+                  "required": ["stepId", "action"],
+                  "additionalProperties": false
+                }
+              },
+              "sla": {
+                "type": "integer",
+                "description": "SLA in hours"
+              }
+            },
+            "required": ["workflowId", "name", "steps"],
+            "additionalProperties": false
+          }
+        },
+        "autoRemediation": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "allowedActions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["suggest_alternative", "blur_content", "mute_audio", "add_disclaimer", "age_gate"]
+              }
+            },
+            "requireApproval": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "checkId": {
+            "type": "string"
+          },
+          "contentId": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "passed", "failed", "needs_review", "remediated"]
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "violations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ruleId": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string"
+                },
+                "location": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "suggestion": {
+                  "type": "string"
+                }
+              },
+              "required": ["ruleId", "category", "severity"],
+              "additionalProperties": false
+            }
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "reviewedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "performedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["checkId", "contentId", "status", "performedAt"],
+        "additionalProperties": false
+      },
+      "description": "QC checks performed"
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "totalChecks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passedChecks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failedChecks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pendingReview": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "remediatedContent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "avgScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "topViolationTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "count": {
+                "type": "integer"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "suspended", "deprecated"],
+      "description": "QC configuration status"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "qcId",
+    "version",
+    "scope",
+    "culturalRules",
+    "status",
+    "createdAt",
+    "createdBy"
+  ],
+  "additionalProperties": false
+}
