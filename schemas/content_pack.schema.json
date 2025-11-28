@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Content Pack Schema",
+  "description": "Schema for demo content packs used in Creator and Customer cohorts",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the content asset"
+    },
+    "title": {
+      "type": "string",
+      "description": "Display title of the content"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["short_drama", "music", "comedy", "demo_clip", "brand_asset"],
+      "description": "Type of content asset"
+    },
+    "duration_seconds": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Length of the content in seconds (required for media types, optional for brand_asset)"
+    },
+    "cohort_access": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["internal", "closed", "open", "creator", "customer"]
+      },
+      "minItems": 1,
+      "description": "Cohorts allowed to access this content (at least one cohort required)"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Metadata tags (e.g., creator_demo, customer_showcase)"
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "download_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Max downloads per token (for demo clips/brand assets)"
+        },
+        "preview_limit_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Max preview duration in seconds (for open cohort content)"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["id", "title", "type", "cohort_access"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": { "enum": ["short_drama", "music", "comedy", "demo_clip"] }
+        }
+      },
+      "then": {
+        "required": ["duration_seconds"]
+      }
+    }
+  ],
+  "additionalProperties": false
+}
