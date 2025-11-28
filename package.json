@@ -10,7 +10,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node tests/governance/governance.test.js && node tests/governance/globalization.test.js && node tests/governance/language_registry.test.js && node tests/governance/observability.test.js && node tests/governance/personalization.test.js && node tests/governance/governance_scaling.test.js && node tests/governance/distribution.test.js && node tests/governance/audience_insights.test.js && node tests/governance/ui_frontend.test.js && node tests/governance/mobile_crossplatform.test.js && node tests/governance/ai_assistant.test.js && node tests/governance/partner_ecosystem.test.js && node tests/governance/governance_suite.test.js && node tests/governance/security.test.js && node tests/governance/infrastructure.test.js && node tests/governance/media.test.js && node tests/governance/waliin_studio.test.js && node tests/governance/short_form_distribution.test.js && node tests/governance/audience_engagement.test.js && node tests/governance/monetization.test.js",
+    "test": "node tests/governance/governance.test.js && node tests/governance/globalization.test.js && node tests/governance/language_registry.test.js && node tests/governance/observability.test.js && node tests/governance/personalization.test.js && node tests/governance/governance_scaling.test.js && node tests/governance/distribution.test.js && node tests/governance/audience_insights.test.js && node tests/governance/ui_frontend.test.js && node tests/governance/mobile_crossplatform.test.js && node tests/governance/ai_assistant.test.js && node tests/governance/partner_ecosystem.test.js && node tests/governance/governance_suite.test.js && node tests/governance/security.test.js && node tests/governance/infrastructure.test.js && node tests/governance/media.test.js && node tests/governance/waliin_studio.test.js && node tests/governance/short_form_distribution.test.js && node tests/governance/audience_engagement.test.js && node tests/governance/monetization.test.js && node tests/governance/youtube_integration.test.js",
     "test:governance": "node tests/governance/governance.test.js",
     "test:globalization": "node tests/governance/globalization.test.js",
     "test:language-registry": "node tests/governance/language_registry.test.js",
@@ -30,7 +30,8 @@
     "test:waliin-studio": "node tests/governance/waliin_studio.test.js",
     "test:short-form-distribution": "node tests/governance/short_form_distribution.test.js",
     "test:audience-engagement": "node tests/governance/audience_engagement.test.js",
-    "test:monetization": "node tests/governance/monetization.test.js"
+    "test:monetization": "node tests/governance/monetization.test.js",
+    "test:youtube-integration": "node tests/governance/youtube_integration.test.js"
   },
   "keywords": [],
   "author": "",

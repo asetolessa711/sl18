@@ -1,0 +1,625 @@
+{
+  "youtubeIntegration": {
+    "sampleIntegration": {
+      "integrationId": "youtube-waliin-studio-main",
+      "version": "1.0.0",
+      "channelConfig": {
+        "channelId": "UCabcdefghijklmnopqrstuv",
+        "channelName": "Waliin Studio",
+        "channelHandle": "@WaliinStudio",
+        "channelType": "main",
+        "credentials": {
+          "oauthRef": "vault://youtube/waliin-studio-oauth",
+          "apiKeyRef": "vault://youtube/waliin-studio-apikey",
+          "scopes": [
+            "youtube.upload",
+            "youtube.readonly",
+            "youtube.force-ssl",
+            "yt-analytics.readonly",
+            "yt-analytics-monetary.readonly"
+          ]
+        },
+        "branding": {
+          "logoUrl": "https://waliin.studio/assets/logo.png",
+          "bannerUrl": "https://waliin.studio/assets/youtube-banner.jpg",
+          "watermarkUrl": "https://waliin.studio/assets/watermark.png",
+          "defaultThumbnailTemplate": "templates/thumbnail_default.psd",
+          "colorPalette": {
+            "primary": "#FF5500",
+            "secondary": "#1A1A1A",
+            "accent": "#00AAFF"
+          }
+        },
+        "defaultSettings": {
+          "defaultCategoryId": "24",
+          "defaultLanguage": "en",
+          "madeForKids": false,
+          "defaultPrivacyStatus": "public",
+          "embeddable": true,
+          "publicStatsViewable": true,
+          "commentsEnabled": true,
+          "commentModeration": "hold_potentially_inappropriate"
+        }
+      },
+      "contentPublishing": {
+        "enabled": true,
+        "autoPublish": false,
+        "contentTypes": [
+          {
+            "type": "short",
+            "enabled": true,
+            "cadence": {
+              "frequency": "weekly",
+              "targetCount": 5,
+              "preferredDays": ["monday", "wednesday", "friday"],
+              "preferredTimeUtc": "18:00"
+            },
+            "formatRequirements": {
+              "aspectRatio": "9:16",
+              "maxDurationSeconds": 60,
+              "minResolution": "1080x1920",
+              "codec": "h264",
+              "container": "mp4"
+            }
+          },
+          {
+            "type": "teaser",
+            "enabled": true,
+            "cadence": {
+              "frequency": "per_release",
+              "preferredDays": ["tuesday", "thursday"],
+              "preferredTimeUtc": "17:00"
+            },
+            "formatRequirements": {
+              "aspectRatio": "16:9",
+              "minDurationSeconds": 30,
+              "maxDurationSeconds": 180,
+              "minResolution": "1920x1080",
+              "codec": "h264",
+              "container": "mp4"
+            }
+          },
+          {
+            "type": "highlight",
+            "enabled": true,
+            "cadence": {
+              "frequency": "weekly",
+              "targetCount": 2
+            },
+            "formatRequirements": {
+              "aspectRatio": "16:9",
+              "minDurationSeconds": 180,
+              "maxDurationSeconds": 600,
+              "codec": "h264"
+            }
+          },
+          {
+            "type": "behind_scenes",
+            "enabled": true,
+            "cadence": {
+              "frequency": "monthly",
+              "targetCount": 2
+            }
+          },
+          {
+            "type": "live_stream",
+            "enabled": true,
+            "cadence": {
+              "frequency": "monthly",
+              "targetCount": 1
+            }
+          }
+        ],
+        "videoSpecs": {
+          "shorts": {
+            "resolution": "1080x1920",
+            "aspectRatio": "9:16",
+            "maxDurationSeconds": 60,
+            "codec": "h264",
+            "fps": 30
+          },
+          "longForm": {
+            "resolution": "1920x1080",
+            "aspectRatio": "16:9",
+            "codec": "h264",
+            "fps": 24,
+            "maxBitrateMbps": 20
+          },
+          "liveStream": {
+            "resolution": "1920x1080",
+            "bitrateMbps": 6,
+            "encoder": "obs"
+          }
+        },
+        "thumbnailRequirements": {
+          "width": 1280,
+          "height": 720,
+          "format": "jpg",
+          "maxSizeBytes": 2097152,
+          "generateAlternatives": true,
+          "alternativeCount": 3
+        },
+        "metadataTemplates": {
+          "titleTemplate": "Waliin Studio – {title} | {format}",
+          "descriptionTemplate": "🎬 {hook}\n\n📺 Watch the full episode on Waliin Studio: {waliinUrl}\n🔔 Subscribe for more: {channelUrl}\n\n---\n\n⭐ PREMIUM ACCESS:\nGet early access, exclusive content, and ad-free viewing!\n👉 {premiumUrl}\n\n---\n\n#WaliinStudio #SL18 {hashtags}",
+          "defaultTags": ["WaliinStudio", "SL18", "AIFilm", "ShortFilm", "Drama"],
+          "genreTags": {
+            "drama": ["Drama", "Series", "Story"],
+            "romance": ["Romance", "LoveStory", "Romantic"],
+            "comedy": ["Comedy", "Funny", "Humor"],
+            "thriller": ["Thriller", "Suspense", "Mystery"]
+          }
+        },
+        "subtitles": {
+          "autoGenerate": true,
+          "languages": ["en", "am", "sw", "ar", "fr", "es"],
+          "format": "srt"
+        }
+      },
+      "crossLinking": {
+        "enabled": true,
+        "waliinStudioLinks": {
+          "baseUrl": "https://waliin.studio",
+          "premiumUrl": "https://waliin.studio/premium",
+          "watchUrl": "https://waliin.studio/watch/{episodeId}"
+        },
+        "endScreens": {
+          "enabled": true,
+          "durationSeconds": 20,
+          "elements": [
+            {
+              "type": "subscribe",
+              "position": "bottom_left",
+              "priority": 1
+            },
+            {
+              "type": "link",
+              "position": "bottom_right",
+              "linkUrl": "https://waliin.studio/premium",
+              "priority": 2
+            },
+            {
+              "type": "video",
+              "position": "top_right",
+              "priority": 3
+            }
+          ]
+        },
+        "cards": {
+          "enabled": true,
+          "maxCardsPerVideo": 3,
+          "defaultCards": [
+            {
+              "type": "link",
+              "timestampPercent": 25,
+              "title": "Watch Full Episode",
+              "linkUrl": "https://waliin.studio",
+              "customMessage": "Catch the full story on Waliin Studio!"
+            },
+            {
+              "type": "link",
+              "timestampPercent": 75,
+              "title": "Get Premium",
+              "linkUrl": "https://waliin.studio/premium",
+              "customMessage": "Unlock exclusive content with Premium!"
+            }
+          ]
+        },
+        "pinnedComments": {
+          "enabled": true,
+          "template": "🎬 Want to see the full story? Watch now on Waliin Studio: {waliinUrl}\n\n⭐ Get Premium for exclusive content and early access: {premiumUrl}",
+          "includeWaliinLink": true,
+          "includePremiumCta": true
+        },
+        "communityTab": {
+          "enabled": true,
+          "postTypes": ["text", "image", "poll", "video_preview"],
+          "pollsEnabled": true,
+          "autoPostOnRelease": true
+        }
+      },
+      "monetization": {
+        "adsEnabled": true,
+        "adSettings": {
+          "preRoll": true,
+          "midRoll": true,
+          "midRollMinDurationMinutes": 8,
+          "postRoll": false,
+          "displayAds": true,
+          "overlayAds": true,
+          "shortsAds": true
+        },
+        "fanFunding": {
+          "superChatEnabled": true,
+          "superStickersEnabled": true,
+          "superThanksEnabled": true
+        },
+        "memberships": {
+          "enabled": true,
+          "tiers": [
+            {
+              "tierId": "tier_supporter",
+              "name": "Supporter",
+              "priceUsd": 2.99,
+              "perks": ["badge", "emoji", "exclusive_posts"]
+            },
+            {
+              "tierId": "tier_fan",
+              "name": "Fan",
+              "priceUsd": 4.99,
+              "perks": ["badge", "emoji", "exclusive_posts", "early_access", "members_only_videos"],
+              "earlyAccessHours": 24
+            },
+            {
+              "tierId": "tier_vip",
+              "name": "VIP",
+              "priceUsd": 9.99,
+              "perks": ["badge", "emoji", "exclusive_posts", "early_access", "members_only_videos", "behind_scenes", "monthly_qa"],
+              "earlyAccessHours": 48
+            },
+            {
+              "tierId": "tier_patron",
+              "name": "Patron",
+              "priceUsd": 24.99,
+              "perks": ["badge", "emoji", "exclusive_posts", "early_access", "members_only_videos", "behind_scenes", "monthly_qa", "credits", "shoutouts", "merch_discount"],
+              "earlyAccessHours": 72
+            }
+          ]
+        },
+        "shopping": {
+          "enabled": false,
+          "storeUrl": "https://shop.waliin.studio",
+          "productTagging": false,
+          "productShelf": false
+        },
+        "brandConnect": {
+          "enabled": true,
+          "sponsorshipTypes": ["integrated", "product_placement"],
+          "disclosureRequired": true
+        }
+      },
+      "analytics": {
+        "enabled": true,
+        "syncEnabled": true,
+        "syncIntervalMinutes": 60,
+        "metrics": {
+          "discovery": ["impressions", "ctr", "views", "unique_viewers", "watch_time", "subscriber_gained", "subscriber_lost"],
+          "engagement": ["average_view_duration", "average_percentage_viewed", "likes", "comments", "shares"],
+          "monetization": ["estimated_revenue", "rpm", "cpm", "ad_impressions", "membership_revenue", "super_chat_revenue"],
+          "funnel": ["card_clicks", "end_screen_clicks", "description_clicks", "waliin_conversions"]
+        },
+        "geographicInsights": {
+          "enabled": true,
+          "topCountries": 25,
+          "rpmByRegion": true
+        },
+        "reporting": {
+          "dailyDashboard": true,
+          "weeklyReport": true,
+          "monthlyReport": true,
+          "alertThresholds": {
+            "viewsDropPercent": 30,
+            "revenueDropPercent": 25,
+            "ctrDropPercent": 20,
+            "copyrightClaims": 1
+          }
+        }
+      },
+      "governance": {
+        "culturalSensitivity": {
+          "enabled": true,
+          "phase25Integration": true,
+          "blockedCategories": ["religious_sensitivity", "political_sensitivity", "regional_taboos"]
+        },
+        "copyright": {
+          "contentIdRegistration": true,
+          "claimMonitoring": true,
+          "autoDisputeFalseClaims": false,
+          "licensedContentCheck": true
+        },
+        "ageRestrictions": {
+          "autoRestrict": true,
+          "ratingMappings": {
+            "G": "none",
+            "PG": "none",
+            "PG-13": "none",
+            "TV-14": "may_restrict",
+            "TV-MA": "age_restricted",
+            "R": "age_restricted",
+            "NC-17": "not_allowed"
+          }
+        },
+        "brandConsistency": {
+          "channelName": "Waliin Studio",
+          "hideSL18Branding": true,
+          "poweredByInAbout": true,
+          "toneGuidelines": ["Professional", "Family-friendly", "Inspirational", "Creative"]
+        },
+        "disclosures": {
+          "sponsoredContent": true,
+          "aiGeneratedContent": true,
+          "affiliateLinks": true
+        }
+      },
+      "airtableIntegration": {
+        "enabled": true,
+        "fieldMappings": {
+          "youtubeEnabled": "youtube_enabled",
+          "youtubeFormat": "youtube_format",
+          "youtubeExportReady": "youtube_export_ready",
+          "youtubeExportPath": "youtube_export_path",
+          "youtubePublishStatus": "youtube_publish_status",
+          "youtubeVideoId": "youtube_video_id",
+          "youtubeVideoUrl": "youtube_video_url",
+          "youtubePublishedAt": "youtube_published_at",
+          "youtubeScheduledFor": "youtube_scheduled_for",
+          "youtubeTitle": "youtube_title",
+          "youtubeDescription": "youtube_description",
+          "youtubeTags": "youtube_tags",
+          "youtubeThumbnailPath": "youtube_thumbnail_path",
+          "youtubeViews": "youtube_views",
+          "youtubeWatchHours": "youtube_watch_hours",
+          "youtubeRevenue": "youtube_revenue",
+          "youtubeNotes": "youtube_notes"
+        },
+        "exportPath": "exports/youtube/{episodeId}/",
+        "exportFiles": [
+          { "filename": "video_youtube.mp4", "type": "video", "required": true },
+          { "filename": "video_youtube_short.mp4", "type": "video_short", "required": false },
+          { "filename": "thumbnail_youtube.jpg", "type": "thumbnail", "required": true },
+          { "filename": "thumbnail_youtube_alt.jpg", "type": "thumbnail_alt", "required": false },
+          { "filename": "caption_youtube.txt", "type": "caption", "required": true },
+          { "filename": "subtitles_en.srt", "type": "subtitles", "required": false },
+          { "filename": "metadata_youtube.json", "type": "metadata", "required": true }
+        ]
+      },
+      "apiConfiguration": {
+        "dataApiVersion": "v3",
+        "analyticsApiVersion": "v2",
+        "quotaLimits": {
+          "dailyQuota": 10000,
+          "videoUploadCost": 1600,
+          "metadataUpdateCost": 50,
+          "thumbnailSetCost": 50
+        },
+        "rateLimits": {
+          "requestsPerMinute": 60,
+          "uploadsPerDay": 6
+        },
+        "webhooks": {
+          "enabled": true,
+          "callbackUrl": "https://api.waliin.studio/webhooks/youtube",
+          "events": ["video_published", "comment_received", "subscriber_milestone", "revenue_threshold", "copyright_claim"]
+        }
+      },
+      "status": "active",
+      "statistics": {
+        "totalVideos": 250,
+        "totalShorts": 180,
+        "totalViews": 5000000,
+        "totalWatchHours": 125000,
+        "totalSubscribers": 75000,
+        "totalRevenue": 15000.00,
+        "lastVideoPublishedAt": "2025-11-27T18:00:00Z",
+        "lastSyncedAt": "2025-11-28T08:00:00Z"
+      },
+      "metadata": {
+        "createdAt": "2025-06-01T10:00:00Z",
+        "createdBy": "admin@waliin.studio",
+        "updatedAt": "2025-11-28T08:00:00Z",
+        "updatedBy": "ops@waliin.studio"
+      }
+    },
+    "franchiseChannelIntegration": {
+      "integrationId": "youtube-waliin-drama-franchise",
+      "version": "1.0.0",
+      "channelConfig": {
+        "channelId": "UCxyzabcdefghijklmnopqrs",
+        "channelName": "Waliin Drama",
+        "channelHandle": "@WaliinDrama",
+        "channelType": "franchise",
+        "credentials": {
+          "oauthRef": "vault://youtube/waliin-drama-oauth"
+        }
+      },
+      "contentPublishing": {
+        "enabled": true,
+        "autoPublish": false,
+        "contentTypes": [
+          {
+            "type": "full_episode",
+            "enabled": true,
+            "cadence": {
+              "frequency": "weekly",
+              "targetCount": 2,
+              "preferredDays": ["saturday", "sunday"]
+            }
+          }
+        ]
+      },
+      "status": "active"
+    }
+  },
+  "videoMetadata": {
+    "sampleVideo": {
+      "episodeId": "ep_2025_11_28_001",
+      "title": "Waliin Studio – Falling Skies | Official Trailer",
+      "description": "🎬 Would you fall for someone who fell from the sky?\n\n📺 Watch the full episode on Waliin Studio: https://waliin.studio/watch/ep_001\n🔔 Subscribe for more: https://youtube.com/@WaliinStudio\n\n---\n\n⭐ PREMIUM ACCESS:\nGet early access, exclusive content, and ad-free viewing!\n👉 https://waliin.studio/premium\n\n---\n\n#WaliinStudio #SL18 #Drama #Romance",
+      "tags": ["WaliinStudio", "SL18", "Drama", "Romance", "ShortFilm", "AIFilm"],
+      "categoryId": "24",
+      "privacyStatus": "public",
+      "madeForKids": false,
+      "scheduledPublishTime": "2025-11-29T18:00:00Z",
+      "thumbnailPath": "thumbnail_youtube.jpg",
+      "subtitles": {
+        "en": "subtitles_en.srt",
+        "am": "subtitles_am.srt",
+        "sw": "subtitles_sw.srt"
+      },
+      "endScreen": {
+        "subscribe": true,
+        "waliin_link": "https://waliin.studio/watch/ep_001"
+      },
+      "cards": [
+        {
+          "timestamp": 30,
+          "type": "link",
+          "url": "https://waliin.studio/premium"
+        },
+        {
+          "timestamp": 90,
+          "type": "link",
+          "url": "https://waliin.studio/watch/ep_001"
+        }
+      ],
+      "createdAt": "2025-11-28T10:00:00Z",
+      "createdBy": "sl18-pipeline"
+    }
+  },
+  "membershipTiers": {
+    "supporter": {
+      "tierId": "tier_supporter",
+      "name": "Supporter",
+      "priceUsd": 2.99,
+      "perks": ["badge", "emoji", "exclusive_posts"]
+    },
+    "fan": {
+      "tierId": "tier_fan",
+      "name": "Fan",
+      "priceUsd": 4.99,
+      "perks": ["badge", "emoji", "exclusive_posts", "early_access", "members_only_videos"],
+      "earlyAccessHours": 24
+    },
+    "vip": {
+      "tierId": "tier_vip",
+      "name": "VIP",
+      "priceUsd": 9.99,
+      "perks": ["badge", "emoji", "exclusive_posts", "early_access", "members_only_videos", "behind_scenes", "monthly_qa"],
+      "earlyAccessHours": 48
+    },
+    "patron": {
+      "tierId": "tier_patron",
+      "name": "Patron",
+      "priceUsd": 24.99,
+      "perks": ["badge", "emoji", "exclusive_posts", "early_access", "members_only_videos", "behind_scenes", "monthly_qa", "credits", "shoutouts", "merch_discount"],
+      "earlyAccessHours": 72
+    }
+  },
+  "analyticsSnapshot": {
+    "daily": {
+      "date": "2025-11-27",
+      "views": 25000,
+      "watchTimeHours": 620,
+      "subscribersGained": 150,
+      "subscribersLost": 12,
+      "estimatedRevenue": 125.50,
+      "impressions": 150000,
+      "ctr": 5.2,
+      "averageViewDuration": 185,
+      "likes": 1200,
+      "comments": 85,
+      "shares": 45
+    },
+    "weekly": {
+      "weekStarting": "2025-11-18",
+      "totalViews": 175000,
+      "totalWatchTimeHours": 4350,
+      "netSubscribers": 950,
+      "totalRevenue": 875.00,
+      "topVideo": {
+        "videoId": "abc123xyz",
+        "title": "Falling Skies - Episode 1",
+        "views": 45000
+      },
+      "topRegions": [
+        { "country": "US", "views": 35000, "rpm": 4.50 },
+        { "country": "ET", "views": 28000, "rpm": 0.85 },
+        { "country": "KE", "views": 22000, "rpm": 1.20 }
+      ]
+    },
+    "funnelMetrics": {
+      "cardClicks": 1250,
+      "endScreenClicks": 890,
+      "descriptionClicks": 520,
+      "waliinConversions": 85,
+      "conversionRate": 1.7
+    }
+  },
+  "contentTypes": [
+    "short",
+    "teaser",
+    "trailer",
+    "highlight",
+    "full_episode",
+    "behind_scenes",
+    "live_stream",
+    "community_post"
+  ],
+  "channelTypes": [
+    "main",
+    "franchise",
+    "persona",
+    "regional",
+    "shorts_only"
+  ],
+  "monetizationModules": [
+    "pre_roll_ads",
+    "mid_roll_ads",
+    "shorts_ads",
+    "super_chat",
+    "super_stickers",
+    "super_thanks",
+    "memberships",
+    "shopping",
+    "brand_connect"
+  ],
+  "auditLogEvents": [
+    "youtube_integration_created",
+    "youtube_integration_updated",
+    "youtube_integration_activated",
+    "youtube_integration_deactivated",
+    "youtube_channel_connected",
+    "youtube_channel_disconnected",
+    "youtube_video_uploaded",
+    "youtube_video_published",
+    "youtube_video_scheduled",
+    "youtube_video_updated",
+    "youtube_video_deleted",
+    "youtube_short_uploaded",
+    "youtube_short_published",
+    "youtube_thumbnail_set",
+    "youtube_end_screen_configured",
+    "youtube_cards_configured",
+    "youtube_comment_pinned",
+    "youtube_community_post_created",
+    "youtube_live_stream_started",
+    "youtube_live_stream_ended",
+    "youtube_analytics_synced",
+    "youtube_revenue_synced",
+    "youtube_membership_tier_created",
+    "youtube_membership_tier_updated",
+    "youtube_membership_conversion",
+    "youtube_super_chat_received",
+    "youtube_super_thanks_received",
+    "youtube_shopping_enabled",
+    "youtube_product_tagged",
+    "youtube_brand_deal_created",
+    "youtube_copyright_claim_received",
+    "youtube_copyright_claim_disputed",
+    "youtube_content_id_registered",
+    "youtube_age_restriction_applied",
+    "youtube_cultural_sensitivity_flagged",
+    "youtube_funnel_click_tracked",
+    "youtube_waliin_conversion_tracked",
+    "youtube_subscriber_milestone",
+    "youtube_views_milestone",
+    "youtube_watch_hours_milestone",
+    "youtube_revenue_milestone",
+    "youtube_quota_warning",
+    "youtube_quota_exceeded",
+    "youtube_api_error",
+    "youtube_webhook_received",
+    "youtube_export_generated",
+    "youtube_export_failed"
+  ]
+}

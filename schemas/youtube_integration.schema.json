@@ -1,0 +1,849 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "YouTubeIntegration",
+  "description": "Schema for YouTube integration in SL18 - content publishing, monetization, cross-linking, engagement analytics, and funnel tracking for Waliin Studio",
+  "type": "object",
+  "properties": {
+    "integrationId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^youtube-[a-z0-9-]+$",
+      "description": "Unique YouTube integration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "channelConfig": {
+      "type": "object",
+      "properties": {
+        "channelId": {
+          "type": "string",
+          "pattern": "^UC[a-zA-Z0-9_-]{22}$",
+          "description": "YouTube channel ID"
+        },
+        "channelName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Channel display name"
+        },
+        "channelHandle": {
+          "type": "string",
+          "pattern": "^@[a-zA-Z0-9_-]+$",
+          "description": "YouTube handle (@username)"
+        },
+        "channelType": {
+          "type": "string",
+          "enum": ["main", "franchise", "persona", "regional", "shorts_only"],
+          "description": "Type of YouTube channel"
+        },
+        "credentials": {
+          "type": "object",
+          "properties": {
+            "oauthRef": {
+              "type": "string",
+              "pattern": "^vault://[a-zA-Z0-9/_-]+$",
+              "description": "Vault reference for OAuth credentials"
+            },
+            "apiKeyRef": {
+              "type": "string",
+              "pattern": "^vault://[a-zA-Z0-9/_-]+$",
+              "description": "Vault reference for API key"
+            },
+            "scopes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "youtube.upload",
+                  "youtube.readonly",
+                  "youtube.force-ssl",
+                  "youtubepartner",
+                  "youtubepartner-channel-audit",
+                  "yt-analytics.readonly",
+                  "yt-analytics-monetary.readonly"
+                ]
+              },
+              "description": "OAuth scopes"
+            }
+          },
+          "required": ["oauthRef"],
+          "additionalProperties": false
+        },
+        "branding": {
+          "type": "object",
+          "properties": {
+            "logoUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "bannerUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "watermarkUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "defaultThumbnailTemplate": {
+              "type": "string"
+            },
+            "colorPalette": {
+              "type": "object",
+              "properties": {
+                "primary": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+                "secondary": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+                "accent": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "defaultSettings": {
+          "type": "object",
+          "properties": {
+            "defaultCategoryId": {
+              "type": "string",
+              "description": "YouTube category ID (e.g., '24' for Entertainment)"
+            },
+            "defaultLanguage": {
+              "type": "string",
+              "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+            },
+            "madeForKids": {
+              "type": "boolean",
+              "default": false
+            },
+            "selfDeclaredMadeForKids": {
+              "type": "boolean"
+            },
+            "defaultPrivacyStatus": {
+              "type": "string",
+              "enum": ["public", "unlisted", "private"],
+              "default": "public"
+            },
+            "embeddable": {
+              "type": "boolean",
+              "default": true
+            },
+            "publicStatsViewable": {
+              "type": "boolean",
+              "default": true
+            },
+            "commentsEnabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "commentModeration": {
+              "type": "string",
+              "enum": ["none", "hold_all", "hold_potentially_inappropriate", "hold_all_for_review"],
+              "default": "hold_potentially_inappropriate"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["channelId", "channelName", "credentials"],
+      "additionalProperties": false
+    },
+    "contentPublishing": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "autoPublish": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically publish without manual review"
+        },
+        "contentTypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["short", "teaser", "trailer", "highlight", "full_episode", "behind_scenes", "live_stream", "community_post"]
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "cadence": {
+                "type": "object",
+                "properties": {
+                  "frequency": {
+                    "type": "string",
+                    "enum": ["daily", "weekly", "monthly", "per_release", "on_demand"]
+                  },
+                  "targetCount": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "preferredDays": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                    }
+                  },
+                  "preferredTimeUtc": {
+                    "type": "string",
+                    "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "formatRequirements": {
+                "type": "object",
+                "properties": {
+                  "aspectRatio": {
+                    "type": "string",
+                    "enum": ["16:9", "9:16", "1:1", "4:3"]
+                  },
+                  "minDurationSeconds": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "maxDurationSeconds": {
+                    "type": "integer"
+                  },
+                  "minResolution": {
+                    "type": "string"
+                  },
+                  "maxResolution": {
+                    "type": "string"
+                  },
+                  "codec": {
+                    "type": "string",
+                    "enum": ["h264", "h265", "vp9", "av1"]
+                  },
+                  "container": {
+                    "type": "string",
+                    "enum": ["mp4", "mov", "webm", "mkv"]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": ["type", "enabled"],
+            "additionalProperties": false
+          }
+        },
+        "videoSpecs": {
+          "type": "object",
+          "properties": {
+            "shorts": {
+              "type": "object",
+              "properties": {
+                "resolution": { "type": "string", "default": "1080x1920" },
+                "aspectRatio": { "type": "string", "default": "9:16" },
+                "maxDurationSeconds": { "type": "integer", "default": 60 },
+                "codec": { "type": "string", "default": "h264" },
+                "fps": { "type": "integer", "default": 30 }
+              },
+              "additionalProperties": false
+            },
+            "longForm": {
+              "type": "object",
+              "properties": {
+                "resolution": { "type": "string", "default": "1920x1080" },
+                "aspectRatio": { "type": "string", "default": "16:9" },
+                "codec": { "type": "string", "default": "h264" },
+                "fps": { "type": "integer", "default": 24 },
+                "maxBitrateMbps": { "type": "integer" }
+              },
+              "additionalProperties": false
+            },
+            "liveStream": {
+              "type": "object",
+              "properties": {
+                "resolution": { "type": "string", "default": "1920x1080" },
+                "bitrateMbps": { "type": "integer", "default": 6 },
+                "encoder": { "type": "string", "enum": ["obs", "streamlabs", "wirecast", "hardware"] }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "thumbnailRequirements": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "integer", "default": 1280 },
+            "height": { "type": "integer", "default": 720 },
+            "format": { "type": "string", "enum": ["jpg", "png", "gif"], "default": "jpg" },
+            "maxSizeBytes": { "type": "integer", "default": 2097152 },
+            "generateAlternatives": { "type": "boolean", "default": true },
+            "alternativeCount": { "type": "integer", "default": 3 }
+          },
+          "additionalProperties": false
+        },
+        "metadataTemplates": {
+          "type": "object",
+          "properties": {
+            "titleTemplate": {
+              "type": "string",
+              "description": "Template for video titles with placeholders"
+            },
+            "descriptionTemplate": {
+              "type": "string",
+              "description": "Template for video descriptions"
+            },
+            "defaultTags": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Default tags for all videos"
+            },
+            "genreTags": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "description": "Genre-specific tags"
+            }
+          },
+          "additionalProperties": false
+        },
+        "subtitles": {
+          "type": "object",
+          "properties": {
+            "autoGenerate": {
+              "type": "boolean",
+              "default": true
+            },
+            "languages": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Languages to generate subtitles for"
+            },
+            "format": {
+              "type": "string",
+              "enum": ["srt", "vtt", "sbv"],
+              "default": "srt"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "crossLinking": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "waliinStudioLinks": {
+          "type": "object",
+          "properties": {
+            "baseUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Waliin Studio base URL"
+            },
+            "premiumUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "Premium subscription URL"
+            },
+            "watchUrl": {
+              "type": "string",
+              "description": "Watch URL template with {episodeId} placeholder"
+            }
+          },
+          "additionalProperties": false
+        },
+        "endScreens": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "durationSeconds": { "type": "integer", "default": 20 },
+            "elements": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["subscribe", "video", "playlist", "channel", "link"]
+                  },
+                  "position": {
+                    "type": "string",
+                    "enum": ["top_left", "top_right", "bottom_left", "bottom_right", "center"]
+                  },
+                  "linkUrl": { "type": "string", "format": "uri" },
+                  "priority": { "type": "integer", "minimum": 1 }
+                },
+                "required": ["type", "position"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "cards": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "maxCardsPerVideo": { "type": "integer", "default": 5 },
+            "defaultCards": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["video", "playlist", "channel", "link"]
+                  },
+                  "timestampPercent": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "When to show card (percentage of video)"
+                  },
+                  "title": { "type": "string" },
+                  "linkUrl": { "type": "string", "format": "uri" },
+                  "customMessage": { "type": "string" }
+                },
+                "required": ["type"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "pinnedComments": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "template": {
+              "type": "string",
+              "description": "Template for pinned comment with placeholders"
+            },
+            "includeWaliinLink": { "type": "boolean", "default": true },
+            "includePremiumCta": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "communityTab": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "postTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["text", "image", "gif", "poll", "video_preview"]
+              }
+            },
+            "pollsEnabled": { "type": "boolean", "default": true },
+            "autoPostOnRelease": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "monetization": {
+      "type": "object",
+      "properties": {
+        "adsEnabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "adSettings": {
+          "type": "object",
+          "properties": {
+            "preRoll": { "type": "boolean", "default": true },
+            "midRoll": { "type": "boolean", "default": true },
+            "midRollMinDurationMinutes": { "type": "integer", "default": 8 },
+            "postRoll": { "type": "boolean", "default": false },
+            "displayAds": { "type": "boolean", "default": true },
+            "overlayAds": { "type": "boolean", "default": true },
+            "shortsAds": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "fanFunding": {
+          "type": "object",
+          "properties": {
+            "superChatEnabled": { "type": "boolean", "default": true },
+            "superStickersEnabled": { "type": "boolean", "default": true },
+            "superThanksEnabled": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "memberships": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "tiers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "tierId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "priceUsd": { "type": "number", "minimum": 0.99 },
+                  "perks": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "badge",
+                        "emoji",
+                        "exclusive_posts",
+                        "early_access",
+                        "members_only_videos",
+                        "behind_scenes",
+                        "monthly_qa",
+                        "credits",
+                        "shoutouts",
+                        "merch_discount"
+                      ]
+                    }
+                  },
+                  "earlyAccessHours": { "type": "integer" }
+                },
+                "required": ["tierId", "name", "priceUsd", "perks"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "shopping": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "storeUrl": { "type": "string", "format": "uri" },
+            "productTagging": { "type": "boolean", "default": false },
+            "productShelf": { "type": "boolean", "default": false }
+          },
+          "additionalProperties": false
+        },
+        "brandConnect": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "sponsorshipTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["integrated", "dedicated", "product_placement", "banner"]
+              }
+            },
+            "disclosureRequired": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "analytics": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "syncEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Sync analytics to SL18 dashboards"
+        },
+        "syncIntervalMinutes": {
+          "type": "integer",
+          "minimum": 15,
+          "default": 60
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "discovery": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["impressions", "ctr", "views", "unique_viewers", "watch_time", "subscriber_gained", "subscriber_lost"]
+              }
+            },
+            "engagement": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["average_view_duration", "average_percentage_viewed", "likes", "dislikes", "comments", "shares", "saves"]
+              }
+            },
+            "monetization": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["estimated_revenue", "rpm", "cpm", "ad_impressions", "monetized_playbacks", "membership_revenue", "super_chat_revenue"]
+              }
+            },
+            "funnel": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["card_clicks", "end_screen_clicks", "description_clicks", "waliin_conversions"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "geographicInsights": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "topCountries": { "type": "integer", "default": 25 },
+            "rpmByRegion": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "reporting": {
+          "type": "object",
+          "properties": {
+            "dailyDashboard": { "type": "boolean", "default": true },
+            "weeklyReport": { "type": "boolean", "default": true },
+            "monthlyReport": { "type": "boolean", "default": true },
+            "alertThresholds": {
+              "type": "object",
+              "properties": {
+                "viewsDropPercent": { "type": "number" },
+                "revenueDropPercent": { "type": "number" },
+                "ctrDropPercent": { "type": "number" },
+                "copyrightClaims": { "type": "integer" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "governance": {
+      "type": "object",
+      "properties": {
+        "culturalSensitivity": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "phase25Integration": { "type": "boolean", "default": true },
+            "blockedCategories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["religious_sensitivity", "political_sensitivity", "social_norms", "regional_taboos"]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "copyright": {
+          "type": "object",
+          "properties": {
+            "contentIdRegistration": { "type": "boolean", "default": true },
+            "claimMonitoring": { "type": "boolean", "default": true },
+            "autoDisputeFalseClaims": { "type": "boolean", "default": false },
+            "licensedContentCheck": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "ageRestrictions": {
+          "type": "object",
+          "properties": {
+            "autoRestrict": { "type": "boolean", "default": true },
+            "ratingMappings": {
+              "type": "object",
+              "properties": {
+                "G": { "type": "string", "default": "none" },
+                "PG": { "type": "string", "default": "none" },
+                "PG-13": { "type": "string", "default": "none" },
+                "TV-14": { "type": "string", "default": "may_restrict" },
+                "TV-MA": { "type": "string", "default": "age_restricted" },
+                "R": { "type": "string", "default": "age_restricted" },
+                "NC-17": { "type": "string", "default": "not_allowed" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "brandConsistency": {
+          "type": "object",
+          "properties": {
+            "channelName": { "type": "string", "default": "Waliin Studio" },
+            "hideSL18Branding": { "type": "boolean", "default": true },
+            "poweredByInAbout": { "type": "boolean", "default": true },
+            "toneGuidelines": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "disclosures": {
+          "type": "object",
+          "properties": {
+            "sponsoredContent": { "type": "boolean", "default": true },
+            "aiGeneratedContent": { "type": "boolean", "default": true },
+            "affiliateLinks": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "airtableIntegration": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "fieldMappings": {
+          "type": "object",
+          "properties": {
+            "youtubeEnabled": { "type": "string", "default": "youtube_enabled" },
+            "youtubeFormat": { "type": "string", "default": "youtube_format" },
+            "youtubeExportReady": { "type": "string", "default": "youtube_export_ready" },
+            "youtubeExportPath": { "type": "string", "default": "youtube_export_path" },
+            "youtubePublishStatus": { "type": "string", "default": "youtube_publish_status" },
+            "youtubeVideoId": { "type": "string", "default": "youtube_video_id" },
+            "youtubeVideoUrl": { "type": "string", "default": "youtube_video_url" },
+            "youtubePublishedAt": { "type": "string", "default": "youtube_published_at" },
+            "youtubeScheduledFor": { "type": "string", "default": "youtube_scheduled_for" },
+            "youtubeTitle": { "type": "string", "default": "youtube_title" },
+            "youtubeDescription": { "type": "string", "default": "youtube_description" },
+            "youtubeTags": { "type": "string", "default": "youtube_tags" },
+            "youtubeThumbnailPath": { "type": "string", "default": "youtube_thumbnail_path" },
+            "youtubeViews": { "type": "string", "default": "youtube_views" },
+            "youtubeWatchHours": { "type": "string", "default": "youtube_watch_hours" },
+            "youtubeRevenue": { "type": "string", "default": "youtube_revenue" },
+            "youtubeNotes": { "type": "string", "default": "youtube_notes" }
+          },
+          "additionalProperties": false
+        },
+        "exportPath": {
+          "type": "string",
+          "default": "exports/youtube/{episodeId}/"
+        },
+        "exportFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "filename": { "type": "string" },
+              "type": { "type": "string", "enum": ["video", "video_short", "thumbnail", "thumbnail_alt", "caption", "subtitles", "metadata"] },
+              "required": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          },
+          "default": [
+            { "filename": "video_youtube.mp4", "type": "video", "required": true },
+            { "filename": "video_youtube_short.mp4", "type": "video_short", "required": false },
+            { "filename": "thumbnail_youtube.jpg", "type": "thumbnail", "required": true },
+            { "filename": "thumbnail_youtube_alt.jpg", "type": "thumbnail_alt", "required": false },
+            { "filename": "caption_youtube.txt", "type": "caption", "required": true },
+            { "filename": "subtitles_en.srt", "type": "subtitles", "required": false },
+            { "filename": "metadata_youtube.json", "type": "metadata", "required": true }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "apiConfiguration": {
+      "type": "object",
+      "properties": {
+        "dataApiVersion": {
+          "type": "string",
+          "default": "v3"
+        },
+        "analyticsApiVersion": {
+          "type": "string",
+          "default": "v2"
+        },
+        "quotaLimits": {
+          "type": "object",
+          "properties": {
+            "dailyQuota": { "type": "integer", "default": 10000 },
+            "videoUploadCost": { "type": "integer", "default": 1600 },
+            "metadataUpdateCost": { "type": "integer", "default": 50 },
+            "thumbnailSetCost": { "type": "integer", "default": 50 }
+          },
+          "additionalProperties": false
+        },
+        "rateLimits": {
+          "type": "object",
+          "properties": {
+            "requestsPerMinute": { "type": "integer", "default": 60 },
+            "uploadsPerDay": { "type": "integer", "default": 6 }
+          },
+          "additionalProperties": false
+        },
+        "webhooks": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "callbackUrl": { "type": "string", "format": "uri" },
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["video_published", "comment_received", "subscriber_milestone", "revenue_threshold", "copyright_claim"]
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "setup_pending", "suspended", "deprecated"],
+      "description": "Integration status"
+    },
+    "statistics": {
+      "type": "object",
+      "properties": {
+        "totalVideos": { "type": "integer" },
+        "totalShorts": { "type": "integer" },
+        "totalViews": { "type": "integer" },
+        "totalWatchHours": { "type": "number" },
+        "totalSubscribers": { "type": "integer" },
+        "totalRevenue": { "type": "number" },
+        "lastVideoPublishedAt": { "type": "string", "format": "date-time" },
+        "lastSyncedAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "integrationId",
+    "version",
+    "channelConfig",
+    "contentPublishing",
+    "status"
+  ],
+  "additionalProperties": false
+}
