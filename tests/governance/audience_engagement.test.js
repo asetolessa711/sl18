@@ -157,8 +157,9 @@ function calculatePollParticipationRate(totalVotes, totalViewers) {
 
 // Calculate engagement score
 function calculateEngagementScore(pollRate, commentRate, reactionRate) {
-  // Weighted average: polls 25%, comments 35%, reactions 40%
-  const score = (pollRate * 0.25) + (commentRate * 5) + (reactionRate * 0.4);
+  // Weighted average: polls 30%, comments 30%, reactions 40%
+  // Comment rate is typically 0-10%, so multiply by 3 to normalize to similar scale
+  const score = (pollRate * 0.3) + (commentRate * 3) + (reactionRate * 0.4);
   return Math.round(score * 10) / 10;
 }
 

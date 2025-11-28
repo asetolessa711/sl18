@@ -554,19 +554,19 @@
     {
       "description": "High engagement - all metrics strong",
       "input": { "pollRate": 45, "commentRate": 8, "reactionRate": 60 },
-      "expectedScore": 75.3,
-      "expectedTier": "high"
+      "expectedScore": 61.5,
+      "expectedTier": "moderate"
     },
     {
       "description": "Viral engagement - exceptional metrics",
       "input": { "pollRate": 65, "commentRate": 12, "reactionRate": 85 },
-      "expectedScore": 110.3,
-      "expectedTier": "viral"
+      "expectedScore": 89.5,
+      "expectedTier": "high"
     },
     {
       "description": "Low engagement - weak metrics",
       "input": { "pollRate": 10, "commentRate": 1, "reactionRate": 15 },
-      "expectedScore": 13.5,
+      "expectedScore": 12.0,
       "expectedTier": "minimal"
     }
   ],
