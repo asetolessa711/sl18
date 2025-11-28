@@ -1,0 +1,480 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WaliinCustomer",
+  "description": "Schema for Waliin Studio customer profiles, accounts, watchlists, and personalization in SL18",
+  "type": "object",
+  "properties": {
+    "customerId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^customer-[a-z0-9-]+$",
+      "description": "Unique customer identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Profile version (semver format)"
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 50,
+          "description": "Customer display name"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Customer email address"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "Customer phone number"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Profile avatar URL"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "description": "Preferred UI language"
+        },
+        "contentLanguages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Preferred content languages"
+        },
+        "subtitleLanguage": {
+          "type": "string",
+          "description": "Default subtitle language"
+        },
+        "country": {
+          "type": "string",
+          "description": "Customer country"
+        },
+        "region": {
+          "type": "string",
+          "description": "Customer region"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "Customer timezone"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of birth for content ratings"
+        },
+        "maturityRating": {
+          "type": "string",
+          "enum": ["kids", "teen", "adult"],
+          "description": "Content maturity setting"
+        }
+      },
+      "required": ["displayName"]
+    },
+    "subscription": {
+      "type": "object",
+      "properties": {
+        "tier": {
+          "type": "string",
+          "enum": ["free", "basic", "standard", "premium", "vip", "family"],
+          "description": "Subscription tier"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "trial", "expired", "cancelled", "paused", "pending"],
+          "description": "Subscription status"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Subscription start date"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Subscription end date"
+        },
+        "autoRenew": {
+          "type": "boolean",
+          "description": "Auto-renewal enabled"
+        },
+        "billingCycle": {
+          "type": "string",
+          "enum": ["monthly", "quarterly", "yearly", "lifetime"],
+          "description": "Billing cycle"
+        },
+        "price": {
+          "type": "object",
+          "properties": {
+            "amount": { "type": "number" },
+            "currency": { "type": "string" }
+          }
+        },
+        "paymentMethod": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string", "enum": ["credit_card", "debit_card", "paypal", "mobile_money", "bank_transfer", "crypto"] },
+            "lastFour": { "type": "string" },
+            "expiryDate": { "type": "string" }
+          }
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["ad_free", "hd_streaming", "4k_streaming", "downloads", "simultaneous_streams", "family_profiles", "early_access", "exclusive_content"]
+          },
+          "description": "Enabled features for tier"
+        },
+        "simultaneousStreams": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Number of simultaneous streams allowed"
+        },
+        "downloadLimit": {
+          "type": "integer",
+          "description": "Monthly download limit"
+        }
+      },
+      "required": ["tier", "status"]
+    },
+    "watchlist": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentId": { "type": "string" },
+              "contentType": { "type": "string", "enum": ["movie", "series", "episode", "short_drama"] },
+              "title": { "type": "string" },
+              "posterUrl": { "type": "string", "format": "uri" },
+              "addedAt": { "type": "string", "format": "date-time" },
+              "priority": { "type": "string", "enum": ["high", "normal", "low"] },
+              "notifyOnRelease": { "type": "boolean" }
+            },
+            "required": ["contentId", "contentType", "addedAt"]
+          },
+          "description": "Watchlist items"
+        },
+        "maxItems": {
+          "type": "integer",
+          "default": 500,
+          "description": "Maximum watchlist items"
+        }
+      },
+      "description": "Customer watchlist"
+    },
+    "favorites": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentId": { "type": "string" },
+              "contentType": { "type": "string" },
+              "title": { "type": "string" },
+              "addedAt": { "type": "string", "format": "date-time" }
+            }
+          },
+          "description": "Favorite content"
+        },
+        "personas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "personaId": { "type": "string" },
+              "name": { "type": "string" },
+              "addedAt": { "type": "string", "format": "date-time" }
+            }
+          },
+          "description": "Favorite personas"
+        },
+        "genres": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Favorite genres"
+        },
+        "creators": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "creatorId": { "type": "string" },
+              "name": { "type": "string" },
+              "addedAt": { "type": "string", "format": "date-time" }
+            }
+          },
+          "description": "Favorite creators"
+        }
+      },
+      "description": "Customer favorites"
+    },
+    "watchHistory": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentId": { "type": "string" },
+              "contentType": { "type": "string" },
+              "title": { "type": "string" },
+              "watchedAt": { "type": "string", "format": "date-time" },
+              "progress": {
+                "type": "object",
+                "properties": {
+                  "percentage": { "type": "number", "minimum": 0, "maximum": 100 },
+                  "position": { "type": "integer", "description": "Position in seconds" },
+                  "duration": { "type": "integer", "description": "Total duration in seconds" },
+                  "completed": { "type": "boolean" }
+                }
+              },
+              "seriesProgress": {
+                "type": "object",
+                "properties": {
+                  "seriesId": { "type": "string" },
+                  "currentSeason": { "type": "integer" },
+                  "currentEpisode": { "type": "integer" },
+                  "episodesWatched": { "type": "integer" },
+                  "totalEpisodes": { "type": "integer" }
+                },
+                "description": "Series watching progress"
+              },
+              "device": { "type": "string" },
+              "quality": { "type": "string" }
+            },
+            "required": ["contentId", "watchedAt"]
+          },
+          "description": "Watch history items"
+        },
+        "continueWatching": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentId": { "type": "string" },
+              "title": { "type": "string" },
+              "posterUrl": { "type": "string", "format": "uri" },
+              "progress": { "type": "number" },
+              "position": { "type": "integer" },
+              "lastWatchedAt": { "type": "string", "format": "date-time" }
+            }
+          },
+          "description": "Continue watching items"
+        },
+        "retentionDays": {
+          "type": "integer",
+          "default": 365,
+          "description": "How long to retain watch history"
+        }
+      },
+      "description": "Watch history"
+    },
+    "downloads": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contentId": { "type": "string" },
+              "title": { "type": "string" },
+              "downloadedAt": { "type": "string", "format": "date-time" },
+              "expiresAt": { "type": "string", "format": "date-time" },
+              "quality": { "type": "string", "enum": ["sd", "hd", "fhd"] },
+              "fileSize": { "type": "integer", "description": "Size in MB" },
+              "device": { "type": "string" },
+              "status": { "type": "string", "enum": ["downloading", "completed", "expired", "error"] }
+            }
+          },
+          "description": "Downloaded content"
+        },
+        "usedStorage": {
+          "type": "integer",
+          "description": "Used storage in MB"
+        },
+        "maxStorage": {
+          "type": "integer",
+          "description": "Max storage in MB"
+        },
+        "monthlyDownloads": {
+          "type": "integer",
+          "description": "Downloads this month"
+        }
+      },
+      "description": "Downloaded content for offline viewing"
+    },
+    "personalization": {
+      "type": "object",
+      "properties": {
+        "recommendations": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "algorithm": { "type": "string", "enum": ["collaborative", "content_based", "hybrid"] },
+            "excludeGenres": { "type": "array", "items": { "type": "string" } },
+            "excludeRatings": { "type": "array", "items": { "type": "string" } },
+            "preferNewReleases": { "type": "boolean" },
+            "preferLocalContent": { "type": "boolean" }
+          },
+          "description": "Recommendation preferences"
+        },
+        "genreAffinities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "genre": { "type": "string" },
+              "affinity": { "type": "number", "minimum": 0, "maximum": 1 },
+              "watchCount": { "type": "integer" },
+              "completionRate": { "type": "number" }
+            }
+          },
+          "description": "Calculated genre affinities"
+        },
+        "personaAffinities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "personaId": { "type": "string" },
+              "affinity": { "type": "number", "minimum": 0, "maximum": 1 },
+              "interactions": { "type": "integer" }
+            }
+          },
+          "description": "Calculated persona affinities"
+        },
+        "watchingPatterns": {
+          "type": "object",
+          "properties": {
+            "preferredDays": { "type": "array", "items": { "type": "string", "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] } },
+            "preferredHours": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 23 } },
+            "bingeWatcher": { "type": "boolean" },
+            "averageSessionLength": { "type": "integer", "description": "Average session in minutes" }
+          },
+          "description": "Watching behavior patterns"
+        }
+      },
+      "description": "Personalization data"
+    },
+    "notifications": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "newReleases": { "type": "boolean" },
+            "watchlistReminders": { "type": "boolean" },
+            "recommendations": { "type": "boolean" },
+            "accountUpdates": { "type": "boolean" },
+            "promotions": { "type": "boolean" }
+          }
+        },
+        "push": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "newEpisodes": { "type": "boolean" },
+            "premieres": { "type": "boolean" },
+            "continueWatching": { "type": "boolean" },
+            "socialActivity": { "type": "boolean" }
+          }
+        },
+        "sms": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "accountAlerts": { "type": "boolean" },
+            "billingReminders": { "type": "boolean" }
+          }
+        }
+      },
+      "description": "Notification preferences"
+    },
+    "devices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "deviceId": { "type": "string" },
+          "deviceName": { "type": "string" },
+          "deviceType": { "type": "string", "enum": ["mobile", "tablet", "desktop", "smart_tv", "streaming_device", "gaming_console"] },
+          "platform": { "type": "string", "enum": ["ios", "android", "web", "roku", "fire_tv", "apple_tv", "android_tv", "samsung_tv", "lg_tv", "playstation", "xbox"] },
+          "lastActive": { "type": "string", "format": "date-time" },
+          "registered": { "type": "string", "format": "date-time" },
+          "downloadEnabled": { "type": "boolean" },
+          "currentlyStreaming": { "type": "boolean" }
+        },
+        "required": ["deviceId", "deviceType", "platform"]
+      },
+      "description": "Registered devices"
+    },
+    "familyProfiles": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "profileId": { "type": "string" },
+              "name": { "type": "string" },
+              "avatarUrl": { "type": "string", "format": "uri" },
+              "isKids": { "type": "boolean" },
+              "maturityRating": { "type": "string", "enum": ["kids", "teen", "adult"] },
+              "pin": { "type": "string", "description": "PIN for profile lock" },
+              "preferredLanguage": { "type": "string" },
+              "createdAt": { "type": "string", "format": "date-time" }
+            },
+            "required": ["profileId", "name"]
+          },
+          "maxItems": 6
+        }
+      },
+      "description": "Family profile management"
+    },
+    "privacy": {
+      "type": "object",
+      "properties": {
+        "dataCollection": { "type": "boolean" },
+        "personalizedAds": { "type": "boolean" },
+        "watchHistoryShared": { "type": "boolean" },
+        "socialActivity": { "type": "boolean" },
+        "analyticsOptIn": { "type": "boolean" },
+        "gdprConsent": { "type": "boolean" },
+        "dataExportRequested": { "type": "string", "format": "date-time" },
+        "deletionRequested": { "type": "string", "format": "date-time" }
+      },
+      "description": "Privacy settings"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "lastLoginAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["active", "suspended", "deleted", "pending_verification"] },
+        "verificationStatus": { "type": "string", "enum": ["unverified", "email_verified", "phone_verified", "fully_verified"] },
+        "source": { "type": "string", "enum": ["web", "mobile_app", "smart_tv", "social_login", "partner"] }
+      },
+      "description": "Account metadata"
+    }
+  },
+  "required": ["customerId", "version", "profile", "subscription"]
+}

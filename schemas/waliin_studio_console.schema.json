@@ -1,0 +1,479 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WaliinStudioConsole",
+  "description": "Schema for Waliin Studio operator/contributor console in SL18 - upload pipeline, QC workflows, analytics dashboards",
+  "type": "object",
+  "properties": {
+    "consoleId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^console-[a-z0-9-]+$",
+      "description": "Unique console configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Console configuration name"
+    },
+    "operatorContext": {
+      "type": "object",
+      "properties": {
+        "operatorId": {
+          "type": "string",
+          "description": "Current operator ID"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["studio_admin", "content_manager", "qc_reviewer", "analytics_viewer", "contributor", "partner", "franchise_owner"],
+          "description": "Operator role"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["upload_content", "review_qc", "approve_content", "publish_content", "view_analytics", "manage_users", "manage_monetization", "manage_localization", "manage_distribution", "admin_settings"]
+          },
+          "description": "Granted permissions"
+        },
+        "franchiseScope": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Franchises operator has access to"
+        }
+      },
+      "required": ["operatorId", "role"]
+    },
+    "uploadPipeline": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "uploadMethods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "methodId": { "type": "string" },
+              "type": { "type": "string", "enum": ["direct_upload", "s3_import", "url_import", "cloud_storage", "ftp_sftp"] },
+              "maxFileSize": { "type": "integer", "description": "Max size in MB" },
+              "allowedFormats": { "type": "array", "items": { "type": "string" } },
+              "enabled": { "type": "boolean" }
+            }
+          },
+          "description": "Available upload methods"
+        },
+        "requiredMetadata": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["title", "synopsis", "genres", "rating", "release_date", "cast", "crew", "poster", "backdrop", "trailer", "subtitles", "audio_tracks", "content_warning"]
+          },
+          "description": "Required metadata for upload"
+        },
+        "autoProcessing": {
+          "type": "object",
+          "properties": {
+            "transcoding": { "type": "boolean" },
+            "thumbnailGeneration": { "type": "boolean" },
+            "trailerExtraction": { "type": "boolean" },
+            "subtitleExtraction": { "type": "boolean" },
+            "qualityAnalysis": { "type": "boolean" },
+            "contentDetection": { "type": "boolean" }
+          },
+          "description": "Automatic processing after upload"
+        },
+        "contentWizard": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "stepId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "type": { "type": "string", "enum": ["file_upload", "metadata_entry", "localization", "cast_crew", "monetization", "distribution", "qc_submission", "preview", "publish"] },
+                  "required": { "type": "boolean" },
+                  "order": { "type": "integer" }
+                }
+              }
+            },
+            "allowDraft": { "type": "boolean" },
+            "allowScheduledPublish": { "type": "boolean" }
+          },
+          "description": "Upload wizard configuration"
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "videoQualityMinimum": { "type": "string", "enum": ["sd", "hd", "fhd", "4k"] },
+            "audioQualityMinimum": { "type": "string", "enum": ["stereo", "5.1", "atmos"] },
+            "aspectRatios": { "type": "array", "items": { "type": "string" } },
+            "durationMinimum": { "type": "integer", "description": "Minimum duration in seconds" },
+            "durationMaximum": { "type": "integer", "description": "Maximum duration in seconds" }
+          },
+          "description": "Content validation rules"
+        }
+      },
+      "description": "Upload pipeline configuration"
+    },
+    "qcWorkflow": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stageId": { "type": "string" },
+              "name": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["technical_qc", "content_review", "cultural_review", "localization_qc", "legal_compliance", "final_approval"]
+              },
+              "automated": { "type": "boolean" },
+              "requiredApprovers": { "type": "integer" },
+              "slaHours": { "type": "integer" },
+              "escalationPath": { "type": "array", "items": { "type": "string" } },
+              "checklistItems": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "itemId": { "type": "string" },
+                    "label": { "type": "string" },
+                    "category": { "type": "string" },
+                    "required": { "type": "boolean" }
+                  }
+                }
+              },
+              "order": { "type": "integer" },
+              "enabled": { "type": "boolean" }
+            },
+            "required": ["stageId", "name", "type"]
+          },
+          "description": "QC workflow stages"
+        },
+        "automatedChecks": {
+          "type": "object",
+          "properties": {
+            "videoQuality": { "type": "boolean" },
+            "audioSync": { "type": "boolean" },
+            "subtitleSync": { "type": "boolean" },
+            "contentWarningDetection": { "type": "boolean" },
+            "duplicationCheck": { "type": "boolean" },
+            "copyrightScan": { "type": "boolean" },
+            "personaConsistency": { "type": "boolean" },
+            "culturalSensitivity": { "type": "boolean" }
+          },
+          "description": "Automated QC checks"
+        },
+        "reviewQueue": {
+          "type": "object",
+          "properties": {
+            "sortBy": { "type": "string", "enum": ["submission_date", "priority", "sla_deadline", "content_type"] },
+            "filters": { "type": "array", "items": { "type": "string" } },
+            "batchActions": { "type": "boolean" },
+            "assignmentMode": { "type": "string", "enum": ["manual", "auto_round_robin", "auto_load_balance", "auto_expertise"] }
+          },
+          "description": "Review queue configuration"
+        },
+        "feedbackTemplates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "templateId": { "type": "string" },
+              "name": { "type": "string" },
+              "category": { "type": "string" },
+              "message": { "type": "string" },
+              "severity": { "type": "string", "enum": ["info", "warning", "error", "critical"] }
+            }
+          },
+          "description": "QC feedback templates"
+        }
+      },
+      "description": "QC workflow configuration"
+    },
+    "contentManagement": {
+      "type": "object",
+      "properties": {
+        "contentLibrary": {
+          "type": "object",
+          "properties": {
+            "viewModes": { "type": "array", "items": { "type": "string", "enum": ["grid", "list", "table", "kanban"] } },
+            "defaultView": { "type": "string" },
+            "filters": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["status", "content_type", "genre", "rating", "release_date", "qc_status", "region", "language"] }
+            },
+            "bulkActions": { "type": "array", "items": { "type": "string", "enum": ["publish", "unpublish", "archive", "delete", "assign_reviewer", "change_status", "export"] } }
+          },
+          "description": "Content library configuration"
+        },
+        "scheduling": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "calendarView": { "type": "boolean" },
+            "releaseWindows": { "type": "boolean" },
+            "premiereSupport": { "type": "boolean" },
+            "episodeScheduling": { "type": "boolean" },
+            "timezoneAware": { "type": "boolean" }
+          },
+          "description": "Content scheduling"
+        },
+        "versionControl": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "trackChanges": { "type": "boolean" },
+            "rollback": { "type": "boolean" },
+            "compareVersions": { "type": "boolean" }
+          },
+          "description": "Version control for content"
+        }
+      },
+      "description": "Content management configuration"
+    },
+    "localizationManagement": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string" },
+              "name": { "type": "string" },
+              "enabled": { "type": "boolean" },
+              "primary": { "type": "boolean" }
+            }
+          },
+          "description": "Supported languages"
+        },
+        "subtitleManagement": {
+          "type": "object",
+          "properties": {
+            "uploadFormats": { "type": "array", "items": { "type": "string", "enum": ["srt", "vtt", "ass", "ssa", "dfxp", "ttml"] } },
+            "autoGeneration": { "type": "boolean" },
+            "aiTranslation": { "type": "boolean" },
+            "qcRequired": { "type": "boolean" },
+            "timingSync": { "type": "boolean" }
+          }
+        },
+        "dubbingManagement": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "voiceSynthesis": { "type": "boolean" },
+            "personaAlignment": { "type": "boolean" },
+            "emotionPreservation": { "type": "boolean" },
+            "lipSyncSupport": { "type": "boolean" }
+          }
+        },
+        "metadataLocalization": {
+          "type": "object",
+          "properties": {
+            "titleTranslation": { "type": "boolean" },
+            "synopsisTranslation": { "type": "boolean" },
+            "taglineTranslation": { "type": "boolean" },
+            "keywordsTranslation": { "type": "boolean" }
+          }
+        }
+      },
+      "description": "Localization management"
+    },
+    "analyticsDashboards": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "dashboards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dashboardId": { "type": "string" },
+              "name": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["overview", "content_performance", "audience_insights", "revenue", "engagement", "retention", "geographic", "device_platform", "qc_metrics", "upload_pipeline"]
+              },
+              "widgets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "widgetId": { "type": "string" },
+                    "type": { "type": "string", "enum": ["kpi_card", "line_chart", "bar_chart", "pie_chart", "table", "map", "funnel", "heatmap", "leaderboard"] },
+                    "title": { "type": "string" },
+                    "metric": { "type": "string" },
+                    "timeRange": { "type": "string" },
+                    "refreshInterval": { "type": "integer" }
+                  }
+                }
+              },
+              "refreshInterval": { "type": "integer" },
+              "exportFormats": { "type": "array", "items": { "type": "string", "enum": ["pdf", "csv", "excel", "json"] } },
+              "enabled": { "type": "boolean" }
+            }
+          },
+          "description": "Available dashboards"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metricId": { "type": "string" },
+              "name": { "type": "string" },
+              "category": { "type": "string", "enum": ["views", "engagement", "revenue", "retention", "quality", "performance"] },
+              "aggregation": { "type": "string", "enum": ["sum", "average", "count", "min", "max", "percentile"] },
+              "unit": { "type": "string" }
+            }
+          },
+          "description": "Available metrics"
+        },
+        "reporting": {
+          "type": "object",
+          "properties": {
+            "scheduledReports": { "type": "boolean" },
+            "customReports": { "type": "boolean" },
+            "emailDelivery": { "type": "boolean" },
+            "slackIntegration": { "type": "boolean" }
+          },
+          "description": "Reporting configuration"
+        }
+      },
+      "description": "Analytics dashboards configuration"
+    },
+    "monetizationControls": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "accessModels": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["free", "ad_supported", "subscription", "tvod", "est", "premium"] },
+          "description": "Available access models"
+        },
+        "pricingManagement": {
+          "type": "object",
+          "properties": {
+            "setContentPrice": { "type": "boolean" },
+            "promotions": { "type": "boolean" },
+            "bundling": { "type": "boolean" },
+            "regionalPricing": { "type": "boolean" }
+          }
+        },
+        "revenueTracking": {
+          "type": "object",
+          "properties": {
+            "realTimeRevenue": { "type": "boolean" },
+            "revenueByContent": { "type": "boolean" },
+            "revenueByRegion": { "type": "boolean" },
+            "payoutTracking": { "type": "boolean" }
+          }
+        },
+        "adManagement": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "adPlacements": { "type": "array", "items": { "type": "string", "enum": ["pre_roll", "mid_roll", "post_roll", "banner", "overlay"] } },
+            "adFrequency": { "type": "boolean" },
+            "adTargeting": { "type": "boolean" }
+          }
+        }
+      },
+      "description": "Monetization controls"
+    },
+    "distributionControls": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "channelId": { "type": "string" },
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["waliin_platform", "partner_platform", "syndication", "social_media", "broadcast"] },
+              "autoPublish": { "type": "boolean" },
+              "enabled": { "type": "boolean" }
+            }
+          },
+          "description": "Distribution channels"
+        },
+        "geoRestrictions": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "defaultPolicy": { "type": "string", "enum": ["allow_all", "block_all", "selected_regions"] },
+            "customRules": { "type": "boolean" }
+          }
+        },
+        "releaseWindows": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "windowTypes": { "type": "array", "items": { "type": "string", "enum": ["theatrical", "premium_vod", "svod", "avod", "free"] } }
+          }
+        }
+      },
+      "description": "Distribution controls"
+    },
+    "notifications": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["in_app", "email", "slack", "webhook", "sms"] },
+          "description": "Notification channels"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "eventType": { "type": "string" },
+              "channels": { "type": "array", "items": { "type": "string" } },
+              "enabled": { "type": "boolean" }
+            }
+          },
+          "description": "Event notification configuration"
+        }
+      },
+      "description": "Notification configuration"
+    },
+    "auditTrail": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "retentionDays": { "type": "integer" },
+        "exportEnabled": { "type": "boolean" },
+        "searchEnabled": { "type": "boolean" },
+        "realTimeView": { "type": "boolean" }
+      },
+      "description": "Audit trail configuration"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["active", "inactive", "maintenance"] }
+      },
+      "description": "Console metadata"
+    }
+  },
+  "required": ["consoleId", "version", "name", "operatorContext", "uploadPipeline", "qcWorkflow", "analyticsDashboards"]
+}

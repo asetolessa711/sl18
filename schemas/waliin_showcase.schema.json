@@ -1,0 +1,494 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WaliinShowcase",
+  "description": "Schema for Waliin Studio showcase/landing pages in SL18 - hero banners, category displays, and content carousels",
+  "type": "object",
+  "properties": {
+    "showcaseId": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "pattern": "^showcase-[a-z0-9-]+$",
+      "description": "Unique showcase configuration identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver format)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "description": "Human-readable showcase page name"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["global", "region", "country", "franchise"],
+          "description": "Showcase scope level"
+        },
+        "regions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Target regions for this showcase"
+        },
+        "countries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Target countries for this showcase"
+        },
+        "languages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Supported languages for showcase content"
+        }
+      },
+      "required": ["level"]
+    },
+    "heroBanner": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable hero banner section"
+        },
+        "rotationMode": {
+          "type": "string",
+          "enum": ["automatic", "manual", "shuffle", "scheduled"],
+          "description": "Banner rotation mode"
+        },
+        "autoRotateInterval": {
+          "type": "integer",
+          "minimum": 3000,
+          "maximum": 30000,
+          "description": "Auto-rotation interval in milliseconds"
+        },
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "slotId": {
+                "type": "string",
+                "description": "Unique slot identifier"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100,
+                "description": "Display priority (lower = higher priority)"
+              },
+              "contentType": {
+                "type": "string",
+                "enum": ["featured_release", "new_release", "trending", "editors_pick", "premiere", "exclusive", "returning_series", "promoted"],
+                "description": "Type of content in this slot"
+              },
+              "contentId": {
+                "type": "string",
+                "description": "Reference to content item"
+              },
+              "displayMode": {
+                "type": "string",
+                "enum": ["poster", "backdrop", "video_teaser", "trailer_autoplay"],
+                "description": "How to display the banner"
+              },
+              "autoplayTrailer": {
+                "type": "boolean",
+                "description": "Enable trailer autoplay on hover/focus"
+              },
+              "muteAutoplay": {
+                "type": "boolean",
+                "description": "Mute autoplay trailers by default"
+              },
+              "callToAction": {
+                "type": "object",
+                "properties": {
+                  "primaryButton": {
+                    "type": "object",
+                    "properties": {
+                      "text": { "type": "string" },
+                      "action": { "type": "string", "enum": ["play", "details", "trailer", "add_to_list", "subscribe"] },
+                      "style": { "type": "string", "enum": ["primary", "secondary", "ghost"] }
+                    }
+                  },
+                  "secondaryButton": {
+                    "type": "object",
+                    "properties": {
+                      "text": { "type": "string" },
+                      "action": { "type": "string", "enum": ["play", "details", "trailer", "add_to_list", "subscribe"] },
+                      "style": { "type": "string", "enum": ["primary", "secondary", "ghost"] }
+                    }
+                  }
+                }
+              },
+              "schedule": {
+                "type": "object",
+                "properties": {
+                  "startDate": { "type": "string", "format": "date-time" },
+                  "endDate": { "type": "string", "format": "date-time" },
+                  "timezone": { "type": "string" }
+                },
+                "description": "Scheduled display window"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["slotId", "contentType"]
+          },
+          "maxItems": 10,
+          "description": "Hero banner slots"
+        }
+      },
+      "required": ["enabled"]
+    },
+    "categoryDisplays": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "description": "Unique category identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Category display name"
+          },
+          "nameLocalized": {
+            "type": "object",
+            "additionalProperties": { "type": "string" },
+            "description": "Localized category names by language code"
+          },
+          "categoryType": {
+            "type": "string",
+            "enum": ["genre", "ranking", "trending", "new_releases", "popular", "region_based", "country_based", "curated", "personalized", "continue_watching", "watchlist", "similar_to", "because_you_watched"],
+            "description": "Type of category"
+          },
+          "genre": {
+            "type": "string",
+            "enum": ["drama", "comedy", "thriller", "romance", "action", "horror", "documentary", "mini_series", "anthology", "musical", "family", "sci_fi", "fantasy", "historical", "slice_of_life"],
+            "description": "Genre filter if categoryType is genre"
+          },
+          "rankingType": {
+            "type": "string",
+            "enum": ["top_10", "top_20", "trending_today", "trending_week", "most_watched", "highest_rated", "most_rewatched"],
+            "description": "Ranking type if categoryType is ranking"
+          },
+          "region": {
+            "type": "string",
+            "description": "Region filter for region_based category"
+          },
+          "country": {
+            "type": "string",
+            "description": "Country filter for country_based category"
+          },
+          "displayLayout": {
+            "type": "string",
+            "enum": ["horizontal_carousel", "vertical_scroll", "grid", "hero_row", "spotlight", "double_row"],
+            "description": "Layout style for this category"
+          },
+          "itemsPerRow": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 10,
+            "description": "Number of items visible per row"
+          },
+          "maxItems": {
+            "type": "integer",
+            "minimum": 5,
+            "maximum": 100,
+            "description": "Maximum items in category"
+          },
+          "cardStyle": {
+            "type": "string",
+            "enum": ["poster", "backdrop", "square", "wide", "numbered", "ranked_badge"],
+            "description": "Card display style"
+          },
+          "showMetadata": {
+            "type": "object",
+            "properties": {
+              "rating": { "type": "boolean" },
+              "year": { "type": "boolean" },
+              "genre": { "type": "boolean" },
+              "duration": { "type": "boolean" },
+              "episodeCount": { "type": "boolean" },
+              "newBadge": { "type": "boolean" },
+              "exclusiveBadge": { "type": "boolean" },
+              "rankNumber": { "type": "boolean" }
+            },
+            "description": "Metadata to display on cards"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Display order on page"
+          },
+          "personalizationEnabled": {
+            "type": "boolean",
+            "description": "Enable personalized ordering within category"
+          },
+          "refreshInterval": {
+            "type": "integer",
+            "minimum": 60,
+            "maximum": 86400,
+            "description": "Content refresh interval in seconds"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["categoryId", "name", "categoryType", "displayLayout"]
+      },
+      "description": "Category display sections"
+    },
+    "navigation": {
+      "type": "object",
+      "properties": {
+        "tabs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tabId": { "type": "string" },
+              "name": { "type": "string" },
+              "nameLocalized": {
+                "type": "object",
+                "additionalProperties": { "type": "string" }
+              },
+              "icon": { "type": "string" },
+              "route": { "type": "string" },
+              "tabType": {
+                "type": "string",
+                "enum": ["home", "categories", "popular", "new_releases", "region", "country", "search", "my_account", "watchlist", "downloads", "settings"]
+              },
+              "enabled": { "type": "boolean" },
+              "sortOrder": { "type": "integer" }
+            },
+            "required": ["tabId", "name", "tabType"]
+          },
+          "description": "Navigation tabs"
+        },
+        "searchBar": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "placeholder": { "type": "string" },
+            "placeholderLocalized": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            },
+            "autocomplete": { "type": "boolean" },
+            "voiceSearch": { "type": "boolean" },
+            "recentSearches": { "type": "boolean" },
+            "trendingSearches": { "type": "boolean" },
+            "filters": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["genre", "year", "region", "country", "persona", "language", "rating", "duration"]
+              }
+            }
+          },
+          "description": "Search bar configuration"
+        }
+      },
+      "description": "Navigation configuration"
+    },
+    "responsiveLayouts": {
+      "type": "object",
+      "properties": {
+        "mobile": {
+          "type": "object",
+          "properties": {
+            "breakpoint": { "type": "integer", "minimum": 320, "maximum": 767 },
+            "columnsGrid": { "type": "integer", "minimum": 2, "maximum": 4 },
+            "carouselItemsVisible": { "type": "integer", "minimum": 2, "maximum": 4 },
+            "heroBannerHeight": { "type": "string" },
+            "cardSize": { "type": "string", "enum": ["small", "medium"] },
+            "touchGestures": { "type": "boolean" },
+            "bottomNavigation": { "type": "boolean" }
+          }
+        },
+        "tablet": {
+          "type": "object",
+          "properties": {
+            "breakpoint": { "type": "integer", "minimum": 768, "maximum": 1024 },
+            "columnsGrid": { "type": "integer", "minimum": 3, "maximum": 6 },
+            "carouselItemsVisible": { "type": "integer", "minimum": 4, "maximum": 6 },
+            "heroBannerHeight": { "type": "string" },
+            "cardSize": { "type": "string", "enum": ["medium", "large"] }
+          }
+        },
+        "desktop": {
+          "type": "object",
+          "properties": {
+            "breakpoint": { "type": "integer", "minimum": 1025, "maximum": 1920 },
+            "columnsGrid": { "type": "integer", "minimum": 5, "maximum": 8 },
+            "carouselItemsVisible": { "type": "integer", "minimum": 5, "maximum": 8 },
+            "heroBannerHeight": { "type": "string" },
+            "cardSize": { "type": "string", "enum": ["medium", "large"] },
+            "sidebarNavigation": { "type": "boolean" }
+          }
+        },
+        "largeDesktop": {
+          "type": "object",
+          "properties": {
+            "breakpoint": { "type": "integer", "minimum": 1921 },
+            "columnsGrid": { "type": "integer", "minimum": 6, "maximum": 12 },
+            "carouselItemsVisible": { "type": "integer", "minimum": 6, "maximum": 10 },
+            "heroBannerHeight": { "type": "string" },
+            "cardSize": { "type": "string", "enum": ["large", "xlarge"] }
+          }
+        }
+      },
+      "description": "Responsive layout configurations"
+    },
+    "studioPromotion": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable studio promotion section"
+        },
+        "studioInfo": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "tagline": { "type": "string" },
+            "mission": { "type": "string" },
+            "creativeVision": { "type": "string" },
+            "brandPositioning": { "type": "string" },
+            "logoUrl": { "type": "string", "format": "uri" },
+            "bannerUrl": { "type": "string", "format": "uri" }
+          },
+          "description": "Studio information"
+        },
+        "upcomingReleases": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "displayCount": { "type": "integer", "minimum": 3, "maximum": 12 },
+            "showCountdown": { "type": "boolean" },
+            "notificationSignup": { "type": "boolean" }
+          },
+          "description": "Upcoming releases calendar"
+        },
+        "behindTheScenes": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "contentTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["production_diary", "interview", "making_of", "bloopers", "cast_spotlight", "director_notes", "set_design", "costume_design"]
+              }
+            },
+            "maxItems": { "type": "integer" }
+          },
+          "description": "Behind-the-scenes content"
+        },
+        "contributorShowcase": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "showCreators": { "type": "boolean" },
+            "showActors": { "type": "boolean" },
+            "showDirectors": { "type": "boolean" },
+            "showPartners": { "type": "boolean" },
+            "maxFeatured": { "type": "integer" }
+          },
+          "description": "Contributor/partner showcase"
+        }
+      },
+      "description": "Studio promotion page configuration"
+    },
+    "seo": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "keywords": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "ogImage": { "type": "string", "format": "uri" },
+        "structuredData": { "type": "boolean" },
+        "canonicalUrl": { "type": "string", "format": "uri" },
+        "localized": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "description": { "type": "string" },
+              "keywords": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      },
+      "description": "SEO configuration"
+    },
+    "analytics": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "trackPageViews": { "type": "boolean" },
+        "trackScrollDepth": { "type": "boolean" },
+        "trackCarouselInteractions": { "type": "boolean" },
+        "trackSearchQueries": { "type": "boolean" },
+        "trackContentClicks": { "type": "boolean" },
+        "heatmaps": { "type": "boolean" },
+        "sessionRecording": { "type": "boolean" }
+      },
+      "description": "Analytics tracking configuration"
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "lazyLoadImages": { "type": "boolean" },
+        "lazyLoadCarousels": { "type": "boolean" },
+        "prefetchNextPage": { "type": "boolean" },
+        "imageOptimization": {
+          "type": "object",
+          "properties": {
+            "webp": { "type": "boolean" },
+            "avif": { "type": "boolean" },
+            "responsiveImages": { "type": "boolean" },
+            "blurPlaceholder": { "type": "boolean" }
+          }
+        },
+        "caching": {
+          "type": "object",
+          "properties": {
+            "categoryTtl": { "type": "integer" },
+            "heroBannerTtl": { "type": "integer" },
+            "searchResultsTtl": { "type": "integer" }
+          }
+        }
+      },
+      "description": "Performance optimizations"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "review", "published", "archived"]
+        }
+      },
+      "description": "Showcase metadata"
+    }
+  },
+  "required": ["showcaseId", "version", "name", "scope", "heroBanner", "categoryDisplays", "navigation"]
+}
