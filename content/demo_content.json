@@ -1,0 +1,73 @@
+[
+  {
+    "id": "creator_demo_clip_001",
+    "title": "Waliin Studio Beta Teaser",
+    "type": "demo_clip",
+    "duration_seconds": 25,
+    "cohort_access": ["creator"],
+    "tags": ["creator_demo"],
+    "limits": {
+      "download_limit": 5,
+      "preview_limit_seconds": 25
+    }
+  },
+  {
+    "id": "creator_brand_asset_001",
+    "title": "Waliin Studio Brand Kit",
+    "type": "brand_asset",
+    "cohort_access": ["creator"],
+    "tags": ["creator_demo"],
+    "limits": {
+      "download_limit": 3,
+      "preview_limit_seconds": 1
+    }
+  },
+  {
+    "id": "customer_short_drama_001",
+    "title": "Pilot Episode: The Signal",
+    "type": "short_drama",
+    "duration_seconds": 300,
+    "cohort_access": ["internal", "closed", "open", "customer"],
+    "tags": ["customer_showcase"],
+    "limits": {
+      "download_limit": 1,
+      "preview_limit_seconds": 90
+    }
+  },
+  {
+    "id": "customer_music_sample_001",
+    "title": "Global Fusion Track",
+    "type": "music",
+    "duration_seconds": 120,
+    "cohort_access": ["internal", "closed", "open", "customer"],
+    "tags": ["customer_showcase"],
+    "limits": {
+      "download_limit": 1,
+      "preview_limit_seconds": 60
+    }
+  },
+  {
+    "id": "customer_music_sample_002",
+    "title": "Local Acoustic Piece",
+    "type": "music",
+    "duration_seconds": 150,
+    "cohort_access": ["internal", "closed", "customer"],
+    "tags": ["customer_showcase"],
+    "limits": {
+      "download_limit": 1,
+      "preview_limit_seconds": 60
+    }
+  },
+  {
+    "id": "customer_comedy_clip_001",
+    "title": "Comedy Sketch: The Meeting",
+    "type": "comedy",
+    "duration_seconds": 180,
+    "cohort_access": ["internal", "closed", "open", "customer"],
+    "tags": ["customer_showcase"],
+    "limits": {
+      "download_limit": 1,
+      "preview_limit_seconds": 60
+    }
+  }
+]
