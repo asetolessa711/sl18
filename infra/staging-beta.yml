@@ -1,0 +1,322 @@
+# Secure Staging Space Configuration
+# Target: beta.waliinstudio.com
+# Purpose: Controlled beta distribution with gated access, TLS, and monitoring
+
+environment:
+  name: staging-beta
+  domain: beta.waliinstudio.com
+  description: "Secure beta testing environment for controlled user distribution"
+
+# DNS Configuration
+dns:
+  type: CNAME  # Alternative: A/AAAA records for direct IP mapping
+  target: staging-lb.waliinstudio.com
+  ttl: 300  # 5 minutes TTL during beta for fast propagation
+  records:
+    - name: beta
+      type: CNAME
+      value: staging-lb.waliinstudio.com
+      ttl: 300
+    - name: api.beta
+      type: CNAME
+      value: staging-lb.waliinstudio.com
+      ttl: 300
+
+# TLS/SSL Configuration
+tls:
+  provider: letsencrypt  # Alternative: cloudflare, acm (AWS), custom_ca
+  certificate:
+    auto_renew: true
+    renew_before_days: 30
+    domains:
+      - beta.waliinstudio.com
+      - api.beta.waliinstudio.com
+  settings:
+    min_version: TLSv1.2
+    preferred_version: TLSv1.3
+    hsts:
+      enabled: true
+      max_age: 31536000  # 1 year in seconds
+      include_subdomains: true
+      preload: true
+    cipher_suites:
+      - TLS_AES_256_GCM_SHA384
+      - TLS_CHACHA20_POLY1305_SHA256
+      - TLS_AES_128_GCM_SHA256
+      - ECDHE-RSA-AES256-GCM-SHA384
+      - ECDHE-RSA-AES128-GCM-SHA256
+
+# CDN/WAF Configuration
+cdn_waf:
+  provider: cloudflare  # Alternative: akamai, aws_cloudfront, azure_frontdoor
+  settings:
+    ssl_mode: full_strict
+    min_tls_version: "1.2"
+    always_use_https: true
+    automatic_https_rewrites: true
+    opportunistic_encryption: true
+  ddos_protection:
+    enabled: true
+    sensitivity: medium
+  bot_protection:
+    enabled: true
+    mode: managed_challenge  # block, challenge, js_challenge, managed_challenge
+  waf:
+    enabled: true
+    ruleset: waf/rules-beta.json
+    mode: block  # log, simulate, block
+
+# Environment Isolation
+isolation:
+  stack:
+    name: staging-beta
+    region: us-east-1
+    availability_zones:
+      - us-east-1a
+      - us-east-1b
+  
+  # Separate resources from production
+  resources:
+    database:
+      type: postgresql
+      version: "15"
+      instance: staging-db-beta
+      separate_from_production: true
+      backup:
+        enabled: true
+        retention_days: 7
+    
+    queue:
+      type: redis
+      version: "7"
+      instance: staging-queue-beta
+      separate_from_production: true
+    
+    storage:
+      type: s3
+      bucket: waliinstudio-beta-assets
+      separate_from_production: true
+      versioning: true
+      encryption: AES256
+    
+    secrets:
+      vault: staging-beta-secrets
+      separate_from_production: true
+      rotation_days: 90
+
+  # Network isolation
+  network:
+    vpc: staging-vpc
+    subnet_type: private
+    nat_gateway: true
+    security_groups:
+      - name: beta-web-sg
+        rules:
+          inbound:
+            # Only allow traffic from CDN/WAF IPs
+            - protocol: tcp
+              port: 443
+              source: cdn_waf_ips  # References CDN provider IP ranges
+            - protocol: tcp
+              port: 80
+              source: cdn_waf_ips
+              description: "Redirect to HTTPS"
+          outbound:
+            - protocol: all
+              destination: 0.0.0.0/0
+      - name: beta-internal-sg
+        rules:
+          inbound:
+            - protocol: tcp
+              port: 5432
+              source: beta-web-sg
+              description: "PostgreSQL from web tier"
+            - protocol: tcp
+              port: 6379
+              source: beta-web-sg
+              description: "Redis from web tier"
+
+# Access Gating
+access_gating:
+  enabled: true
+  
+  # Invite token system
+  invite_tokens:
+    schema: schemas/invite_token.schema.json
+    settings:
+      single_use: true
+      expiry_hours: 72  # 3 days default
+      max_redemptions: 1
+      require_email_verification: true
+  
+  # Cohort-based feature flags
+  cohorts:
+    schema: schemas/cohort_flags.schema.json
+    definitions:
+      internal:
+        name: "Internal"
+        capacity_min: 50
+        capacity_max: 100
+        access_level: full
+        description: "Internal team and stakeholders"
+      closed:
+        name: "Closed Beta"
+        capacity_min: 500
+        capacity_max: 1000
+        access_level: standard
+        description: "Selected external testers"
+      open:
+        name: "Open Beta"
+        capacity_min: 10000
+        capacity_max: 25000
+        access_level: limited
+        description: "Public beta testers"
+  
+  # Rate limits
+  rate_limits:
+    signup:
+      requests_per_minute: 10
+      requests_per_hour: 50
+      enable_captcha: true
+      captcha_provider: hcaptcha  # Alternative: recaptcha, turnstile
+    api:
+      requests_per_minute: 100
+      requests_per_hour: 1000
+      burst_limit: 20
+    token_redemption:
+      requests_per_minute: 5
+      requests_per_hour: 20
+
+# Monitoring & Alerts
+monitoring:
+  enabled: true
+  providers:
+    - prometheus
+    - grafana
+  
+  # Metrics collection
+  metrics:
+    auth_events: true
+    invite_redemption: true
+    cohort_changes: true
+    error_rates: true
+    latency_percentiles: [50, 90, 95, 99]
+  
+  # Logging
+  logging:
+    level: info
+    structured: true
+    retention_days: 30
+    events:
+      - auth_success
+      - auth_failure
+      - token_issued
+      - token_redeemed
+      - token_expired
+      - cohort_assigned
+      - cohort_changed
+      - rate_limit_exceeded
+      - waf_blocked
+  
+  # Alert configuration
+  alerts:
+    critical:
+      channels:
+        - type: slack
+          webhook: "{{SLACK_WEBHOOK_URL}}"
+        - type: pagerduty
+          service_key: "{{PAGERDUTY_SERVICE_KEY}}"
+        - type: sms
+          recipients:
+            - "{{ALERT_PHONE_PRIMARY}}"
+      sla_minutes: 15
+      conditions:
+        - name: high_error_rate
+          metric: error_rate_5xx
+          threshold: 5
+          operator: ">="
+          duration_minutes: 5
+        - name: service_down
+          metric: health_check_failures
+          threshold: 3
+          operator: ">="
+          duration_minutes: 2
+        - name: security_anomaly
+          metric: waf_blocks_per_minute
+          threshold: 100
+          operator: ">="
+          duration_minutes: 1
+        - name: auth_anomaly
+          metric: failed_auth_attempts_per_minute
+          threshold: 50
+          operator: ">="
+          duration_minutes: 5
+    
+    daily_digest:
+      enabled: true
+      schedule: "0 7 * * *"  # 07:00 daily
+      timezone: "Africa/Addis_Ababa"
+      channels:
+        - type: email
+          recipients:
+            - "{{OPS_EMAIL}}"
+            - "{{FOUNDER_EMAIL}}"
+        - type: slack
+          webhook: "{{SLACK_DIGEST_WEBHOOK}}"
+      metrics:
+        - daily_active_users
+        - new_signups
+        - invite_conversions
+        - nps_score
+        - uptime_percentage
+        - error_rate_avg
+        - top_errors
+        - cohort_distribution
+
+# Deployment Configuration
+deployment:
+  strategy: blue_green
+  health_check:
+    path: /health
+    interval_seconds: 30
+    timeout_seconds: 10
+    healthy_threshold: 2
+    unhealthy_threshold: 3
+  rollback:
+    auto_rollback: true
+    failure_threshold: 10  # percent
+    observation_minutes: 10
+  
+  # Container/compute settings
+  compute:
+    type: container  # Alternative: vm, serverless
+    instances:
+      min: 2
+      max: 10
+      desired: 2
+    resources:
+      cpu: "1"
+      memory: "2Gi"
+    auto_scaling:
+      metric: cpu_utilization
+      target: 70
+      scale_up_cooldown: 60
+      scale_down_cooldown: 300
+
+# Secrets Management
+secrets:
+  vault_provider: azure_keyvault  # Alternative: aws_secrets_manager, hashicorp_vault
+  vault_name: waliinstudio-beta-secrets
+  required_secrets:
+    - DATABASE_URL
+    - REDIS_URL
+    - JWT_SECRET
+    - HCAPTCHA_SECRET
+    - SLACK_WEBHOOK_URL
+    - PAGERDUTY_SERVICE_KEY
+  rotation:
+    enabled: true
+    frequency_days: 90
+    auto_rotate:
+      - JWT_SECRET
+      - DATABASE_PASSWORD

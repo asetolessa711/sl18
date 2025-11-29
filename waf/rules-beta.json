@@ -1,0 +1,427 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://beta.waliinstudio.com/schemas/waf-rules-beta.schema.json",
+  "name": "SL18 Beta WAF Rules",
+  "version": "1.0.0",
+  "description": "Web Application Firewall ruleset for beta.waliinstudio.com - SQLi, XSS, and bot mitigation",
+  "provider": "cloudflare",
+  "mode": "block",
+  "enabled": true,
+  "last_updated": "2025-11-28T12:00:00Z",
+  
+  "rule_groups": [
+    {
+      "id": "sqli_protection",
+      "name": "SQL Injection Protection",
+      "enabled": true,
+      "action": "block",
+      "priority": 1,
+      "rules": [
+        {
+          "id": "sqli_001",
+          "name": "Block SQL Keywords in Parameters",
+          "description": "Detect common SQL injection keywords in query parameters",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.uri.query contains \"UNION\" or http.request.uri.query contains \"SELECT\" or http.request.uri.query contains \"INSERT\" or http.request.uri.query contains \"UPDATE\" or http.request.uri.query contains \"DELETE\" or http.request.uri.query contains \"DROP\") and not cf.bot_management.verified_bot",
+          "tags": ["sqli", "owasp-a03"]
+        },
+        {
+          "id": "sqli_002",
+          "name": "Block SQL Comment Injection",
+          "description": "Detect SQL comment patterns used in injection attacks",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.uri.query contains \"--\" or http.request.uri.query contains \"/*\" or http.request.uri.query contains \"*/\") and not cf.bot_management.verified_bot",
+          "tags": ["sqli", "owasp-a03"]
+        },
+        {
+          "id": "sqli_003",
+          "name": "Block SQL Injection in Body",
+          "description": "Detect SQL injection attempts in request body",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.body.raw contains \"' OR '\" or http.request.body.raw contains \"1=1\" or http.request.body.raw contains \"' OR 1=1\" or http.request.body.raw contains \"'; DROP\") and http.request.method in {\"POST\" \"PUT\" \"PATCH\"}",
+          "tags": ["sqli", "owasp-a03"]
+        },
+        {
+          "id": "sqli_004",
+          "name": "Block Encoded SQL Injection",
+          "description": "Detect URL-encoded SQL injection attempts",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.uri.query contains \"%27\" or http.request.uri.query contains \"%22\" or http.request.uri.query contains \"%3B\") and (http.request.uri.query contains \"union\" or http.request.uri.query contains \"select\")",
+          "tags": ["sqli", "owasp-a03", "encoding"]
+        }
+      ]
+    },
+    {
+      "id": "xss_protection",
+      "name": "Cross-Site Scripting Protection",
+      "enabled": true,
+      "action": "block",
+      "priority": 2,
+      "rules": [
+        {
+          "id": "xss_001",
+          "name": "Block Script Tags",
+          "description": "Detect script tag injection attempts",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.uri.query contains \"<script\" or http.request.uri.query contains \"</script>\" or http.request.body.raw contains \"<script\" or http.request.body.raw contains \"</script>\")",
+          "tags": ["xss", "owasp-a03"]
+        },
+        {
+          "id": "xss_002",
+          "name": "Block Event Handlers",
+          "description": "Detect inline event handler injection",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.uri.query matches \"on(load|error|click|mouseover|focus|blur|submit)\\s*=\" or http.request.body.raw matches \"on(load|error|click|mouseover|focus|blur|submit)\\s*=\")",
+          "tags": ["xss", "owasp-a03"]
+        },
+        {
+          "id": "xss_003",
+          "name": "Block JavaScript Protocol",
+          "description": "Detect javascript: protocol injection",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.uri.query contains \"javascript:\" or http.request.body.raw contains \"javascript:\" or http.request.uri.query contains \"vbscript:\")",
+          "tags": ["xss", "owasp-a03"]
+        },
+        {
+          "id": "xss_004",
+          "name": "Block Data URI XSS",
+          "description": "Detect data URI based XSS attempts",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.uri.query contains \"data:text/html\" or http.request.body.raw contains \"data:text/html\")",
+          "tags": ["xss", "owasp-a03"]
+        },
+        {
+          "id": "xss_005",
+          "name": "Block SVG XSS",
+          "description": "Detect SVG-based XSS attempts",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.uri.query contains \"<svg\" and http.request.uri.query contains \"onload\") or (http.request.body.raw contains \"<svg\" and http.request.body.raw contains \"onload\")",
+          "tags": ["xss", "owasp-a03"]
+        }
+      ]
+    },
+    {
+      "id": "bot_mitigation",
+      "name": "Bot Mitigation",
+      "enabled": true,
+      "action": "managed_challenge",
+      "priority": 3,
+      "rules": [
+        {
+          "id": "bot_001",
+          "name": "Block Known Bad Bots",
+          "description": "Block requests from known malicious bot user agents",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.user_agent contains \"sqlmap\" or http.user_agent contains \"nikto\" or http.user_agent contains \"nmap\" or http.user_agent contains \"masscan\" or http.user_agent contains \"zgrab\" or http.user_agent contains \"nuclei\")",
+          "tags": ["bot", "scanner"]
+        },
+        {
+          "id": "bot_002",
+          "name": "Challenge Empty User Agents",
+          "description": "Challenge requests with empty or missing user agents",
+          "enabled": true,
+          "action": "managed_challenge",
+          "log": true,
+          "expression": "(http.user_agent eq \"\" or not http.user_agent) and not cf.bot_management.verified_bot",
+          "tags": ["bot", "suspicious"]
+        },
+        {
+          "id": "bot_003",
+          "name": "Challenge Automated Tools",
+          "description": "Challenge requests from common automation tools",
+          "enabled": true,
+          "action": "managed_challenge",
+          "log": true,
+          "expression": "(http.user_agent contains \"curl\" or http.user_agent contains \"wget\" or http.user_agent contains \"python-requests\" or http.user_agent contains \"axios\" or http.user_agent contains \"node-fetch\") and not any(http.request.headers[\"x-api-key\"][*] ne \"\")",
+          "tags": ["bot", "automation"]
+        },
+        {
+          "id": "bot_004",
+          "name": "Block Headless Browsers",
+          "description": "Detect and block headless browser patterns",
+          "enabled": true,
+          "action": "managed_challenge",
+          "log": true,
+          "expression": "(http.user_agent contains \"HeadlessChrome\" or http.user_agent contains \"PhantomJS\" or http.user_agent contains \"Selenium\")",
+          "tags": ["bot", "headless"]
+        },
+        {
+          "id": "bot_005",
+          "name": "Rate Limit Suspicious IPs",
+          "description": "Apply rate limiting to IPs showing bot-like behavior",
+          "enabled": true,
+          "action": "managed_challenge",
+          "log": true,
+          "expression": "cf.threat_score gt 30",
+          "tags": ["bot", "threat-score"]
+        }
+      ]
+    },
+    {
+      "id": "rate_limiting",
+      "name": "Rate Limiting Rules",
+      "enabled": true,
+      "action": "block",
+      "priority": 4,
+      "rules": [
+        {
+          "id": "rate_001",
+          "name": "Login Rate Limit",
+          "description": "Limit login attempts to prevent brute force",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "rate_limit": {
+            "requests": 5,
+            "period_seconds": 60,
+            "key": "ip",
+            "mitigation_timeout_seconds": 600
+          },
+          "expression": "http.request.uri.path eq \"/api/auth/login\" and http.request.method eq \"POST\"",
+          "tags": ["rate-limit", "auth"]
+        },
+        {
+          "id": "rate_002",
+          "name": "Signup Rate Limit",
+          "description": "Limit signup attempts to prevent abuse",
+          "enabled": true,
+          "action": "managed_challenge",
+          "log": true,
+          "rate_limit": {
+            "requests": 3,
+            "period_seconds": 300,
+            "key": "ip",
+            "mitigation_timeout_seconds": 3600
+          },
+          "expression": "http.request.uri.path eq \"/api/auth/signup\" and http.request.method eq \"POST\"",
+          "tags": ["rate-limit", "signup"]
+        },
+        {
+          "id": "rate_003",
+          "name": "Token Redemption Rate Limit",
+          "description": "Limit invite token redemption attempts",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "rate_limit": {
+            "requests": 5,
+            "period_seconds": 60,
+            "key": "ip",
+            "mitigation_timeout_seconds": 900
+          },
+          "expression": "http.request.uri.path eq \"/api/invite/redeem\" and http.request.method eq \"POST\"",
+          "tags": ["rate-limit", "invite"]
+        },
+        {
+          "id": "rate_004",
+          "name": "API Rate Limit",
+          "description": "General API rate limiting",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "rate_limit": {
+            "requests": 100,
+            "period_seconds": 60,
+            "key": "ip",
+            "mitigation_timeout_seconds": 300
+          },
+          "expression": "http.request.uri.path starts_with \"/api/\" and http.request.method in {\"GET\" \"POST\" \"PUT\" \"PATCH\" \"DELETE\"}",
+          "tags": ["rate-limit", "api"]
+        },
+        {
+          "id": "rate_005",
+          "name": "Password Reset Rate Limit",
+          "description": "Limit password reset requests",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "rate_limit": {
+            "requests": 3,
+            "period_seconds": 3600,
+            "key": "ip",
+            "mitigation_timeout_seconds": 7200
+          },
+          "expression": "http.request.uri.path eq \"/api/auth/reset-password\" and http.request.method eq \"POST\"",
+          "tags": ["rate-limit", "auth"]
+        }
+      ]
+    },
+    {
+      "id": "path_traversal",
+      "name": "Path Traversal Protection",
+      "enabled": true,
+      "action": "block",
+      "priority": 5,
+      "rules": [
+        {
+          "id": "path_001",
+          "name": "Block Directory Traversal",
+          "description": "Detect and block directory traversal attempts",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.uri.path contains \"..\" or http.request.uri.query contains \"..\" or http.request.uri.path contains \"%2e%2e\")",
+          "tags": ["path-traversal", "owasp-a01"]
+        },
+        {
+          "id": "path_002",
+          "name": "Block Sensitive File Access",
+          "description": "Block attempts to access sensitive files",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(http.request.uri.path contains \".env\" or http.request.uri.path contains \".git\" or http.request.uri.path contains \"wp-config\" or http.request.uri.path contains \".htaccess\" or http.request.uri.path contains \"web.config\")",
+          "tags": ["path-traversal", "sensitive-files"]
+        }
+      ]
+    },
+    {
+      "id": "request_validation",
+      "name": "Request Validation",
+      "enabled": true,
+      "action": "block",
+      "priority": 6,
+      "rules": [
+        {
+          "id": "req_001",
+          "name": "Block Oversized Requests",
+          "description": "Block requests with excessive body size",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "http.request.body.size gt 10485760",
+          "tags": ["validation", "dos"]
+        },
+        {
+          "id": "req_002",
+          "name": "Block Invalid Content Types",
+          "description": "Block requests with suspicious content types",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "http.request.method in {\"POST\" \"PUT\" \"PATCH\"} and not any(http.request.headers[\"content-type\"][*] matches \"(application/json|application/x-www-form-urlencoded|multipart/form-data)\")",
+          "tags": ["validation", "content-type"]
+        },
+        {
+          "id": "req_003",
+          "name": "Block HTTP Request Smuggling",
+          "description": "Detect HTTP request smuggling attempts",
+          "enabled": true,
+          "action": "block",
+          "log": true,
+          "expression": "(any(http.request.headers[\"transfer-encoding\"][*] contains \"chunked\") and any(http.request.headers[\"content-length\"][*] ne \"\"))",
+          "tags": ["validation", "smuggling", "owasp-a05"]
+        }
+      ]
+    },
+    {
+      "id": "geo_restrictions",
+      "name": "Geographic Restrictions",
+      "enabled": false,
+      "action": "managed_challenge",
+      "priority": 7,
+      "rules": [
+        {
+          "id": "geo_001",
+          "name": "Challenge High-Risk Countries",
+          "description": "Additional challenge for high-risk geographic regions",
+          "enabled": false,
+          "action": "managed_challenge",
+          "log": true,
+          "expression": "ip.geoip.country in {\"XX\" \"YY\"}",
+          "tags": ["geo", "risk"],
+          "notes": "Enable and configure country codes as needed"
+        }
+      ]
+    }
+  ],
+  
+  "bypass_rules": [
+    {
+      "id": "bypass_001",
+      "name": "Bypass for Verified Bots",
+      "description": "Allow verified search engine bots",
+      "enabled": true,
+      "expression": "cf.bot_management.verified_bot",
+      "priority": 0
+    },
+    {
+      "id": "bypass_002",
+      "name": "Bypass for Health Checks",
+      "description": "Allow health check endpoints",
+      "enabled": true,
+      "expression": "http.request.uri.path eq \"/health\" or http.request.uri.path eq \"/ready\" or http.request.uri.path eq \"/live\"",
+      "priority": 0
+    },
+    {
+      "id": "bypass_003",
+      "name": "Bypass for Internal IPs",
+      "description": "Skip WAF for internal monitoring IPs",
+      "enabled": true,
+      "expression": "ip.src in $internal_monitoring_ips",
+      "priority": 0,
+      "notes": "Define $internal_monitoring_ips in Cloudflare IP Lists"
+    }
+  ],
+  
+  "logging": {
+    "enabled": true,
+    "log_level": "info",
+    "include_headers": ["user-agent", "referer", "x-forwarded-for", "x-real-ip"],
+    "exclude_headers": ["authorization", "cookie", "x-api-key"],
+    "sample_rate": 1.0,
+    "destinations": [
+      {
+        "type": "cloudflare_logs",
+        "enabled": true
+      },
+      {
+        "type": "webhook",
+        "enabled": true,
+        "url": "{{SECURITY_WEBHOOK_URL}}",
+        "events": ["block", "challenge"]
+      }
+    ]
+  },
+  
+  "notifications": {
+    "enabled": true,
+    "thresholds": {
+      "blocks_per_minute": 100,
+      "challenges_per_minute": 500,
+      "unique_ips_blocked_per_hour": 50
+    },
+    "channels": [
+      {
+        "type": "slack",
+        "webhook": "{{SLACK_SECURITY_WEBHOOK}}",
+        "severity": ["critical", "high"]
+      },
+      {
+        "type": "email",
+        "recipients": ["{{SECURITY_EMAIL}}"],
+        "severity": ["critical"]
+      }
+    ]
+  }
+}

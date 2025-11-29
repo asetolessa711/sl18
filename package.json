@@ -5,13 +5,28 @@
     "open": "^10.2.0"
   },
   "name": "sl-18",
-  "version": "1.0.0",
+  "version": "0.1.0-beta.3",
   "description": "This repository scaffold is designed for **Azure DevOps (VSO)** with **GPT‑5 + Codex Preview**. It supports a minimal‑code workflow where automation prepares the script, persona TTS, backing music stem, and CapCut-ready project assets before the clip is finished manually.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "validate:content": "node scripts/validation/validate-content.js",
+    "test": "jest",
+    "test:security": "jest tests/security/",
+    "test:e2e": "jest --runInBand tests/e2e",
+    "test:e2e:cov": "jest --runInBand --coverage tests/e2e",
+    "test:coverage": "jest --runInBand --coverage tests/coverage"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/airtable": "^0.10.0",
+    "@types/jest": "^29.5.11",
+    "@types/supertest": "^6.0.3",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.1.1"
+  }
 }

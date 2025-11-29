@@ -1,0 +1,1178 @@
+/**
+ * Invite Access Security Tests
+ * Tests for invite token validation, expiry, and cohort gating
+ * Target: beta.waliinstudio.com
+ */
+
+const Ajv = require('ajv');
+const addFormats = require('ajv-formats');
+const fs = require('fs');
+const path = require('path');
+
+// Load schemas
+const inviteTokenSchema = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '../../schemas/invite_token.schema.json'), 'utf8')
+);
+const cohortFlagsSchema = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '../../schemas/cohort_flags.schema.json'), 'utf8')
+);
+
+// Initialize AJV with formats support
+const ajv = new Ajv({ allErrors: true, strict: false });
+addFormats(ajv);
+
+describe('Invite Token Schema Validation', () => {
+  let validateInviteToken;
+
+  beforeAll(() => {
+    validateInviteToken = ajv.compile(inviteTokenSchema);
+  });
+
+  describe('Valid Token Structure', () => {
+    test('should validate a complete valid invite token', () => {
+      const validToken = {
+        token: 'inv_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6',
+        cohort_id: 'closed',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true,
+        redeemed: false,
+        redeemed_at: null,
+        redeemed_by: null,
+        max_redemptions: 1,
+        redemption_count: 0,
+        issued_by: 'admin@waliinstudio.com',
+        email_hint: 'tester@example.com',
+        metadata: {
+          campaign: 'beta_launch_2025',
+          source: 'email',
+          notes: 'Early adopter invite'
+        },
+        revoked: false,
+        revoked_at: null,
+        revoked_reason: null
+      };
+
+      const isValid = validateInviteToken(validToken);
+      expect(isValid).toBe(true);
+    });
+
+    test('should validate token with minimal required fields', () => {
+      const minimalToken = {
+        token: 'inv_minimal_token_12345678901234567890',
+        cohort_id: 'internal',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(minimalToken);
+      expect(isValid).toBe(true);
+    });
+
+    test('should accept all valid cohort_id values', () => {
+      const cohorts = ['internal', 'closed', 'open', 'creator', 'customer'];
+      
+      cohorts.forEach(cohort => {
+        const token = {
+          token: 'inv_test_token_12345678901234567890ab',
+          cohort_id: cohort,
+          created_at: '2025-11-28T12:00:00Z',
+          expires_at: '2025-12-01T12:00:00Z',
+          single_use: true
+        };
+        
+        const isValid = validateInviteToken(token);
+        expect(isValid).toBe(true);
+      });
+    });
+
+    test('should accept creator cohort tokens', () => {
+      const token = {
+        token: 'inv_creator_token_12345678901234567890',
+        cohort_id: 'creator',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+    });
+
+    test('should accept customer cohort tokens', () => {
+      const token = {
+        token: 'inv_customer_token_1234567890123456789',
+        cohort_id: 'customer',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+    });
+  });
+
+  describe('Token Expiry Validation', () => {
+    test('should validate token with future expiry date', () => {
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 3);
+      
+      const token = {
+        token: 'inv_future_token_12345678901234567890',
+        cohort_id: 'closed',
+        created_at: new Date().toISOString(),
+        expires_at: futureDate.toISOString(),
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+    });
+
+    test('should accept expired token for schema validation (expiry checked at runtime)', () => {
+      const pastDate = new Date();
+      pastDate.setDate(pastDate.getDate() - 1);
+      
+      const token = {
+        token: 'inv_expired_token_1234567890123456789',
+        cohort_id: 'closed',
+        created_at: '2025-11-25T12:00:00Z',
+        expires_at: pastDate.toISOString(),
+        single_use: true
+      };
+
+      // Schema validates structure, runtime checks expiry
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+    });
+
+    test('should reject invalid date format', () => {
+      const token = {
+        token: 'inv_invalid_date_12345678901234567890',
+        cohort_id: 'closed',
+        created_at: 'invalid-date',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(false);
+    });
+  });
+
+  describe('Single-Use Token Enforcement', () => {
+    test('should validate unredeemed single-use token', () => {
+      const token = {
+        token: 'inv_single_use_12345678901234567890ab',
+        cohort_id: 'closed',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true,
+        redeemed: false,
+        redemption_count: 0,
+        max_redemptions: 1
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+    });
+
+    test('should validate redeemed single-use token', () => {
+      const token = {
+        token: 'inv_redeemed_12345678901234567890abc',
+        cohort_id: 'closed',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true,
+        redeemed: true,
+        redeemed_at: '2025-11-29T10:00:00Z',
+        redeemed_by: 'user@example.com',
+        redemption_count: 1,
+        max_redemptions: 1
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+    });
+
+    test('should validate multi-use token', () => {
+      const token = {
+        token: 'inv_multi_use_12345678901234567890abc',
+        cohort_id: 'open',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: false,
+        redeemed: false,
+        redemption_count: 5,
+        max_redemptions: 100
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+    });
+  });
+
+  describe('Token Revocation', () => {
+    test('should validate revoked token', () => {
+      const token = {
+        token: 'inv_revoked_token_1234567890123456789',
+        cohort_id: 'closed',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true,
+        revoked: true,
+        revoked_at: '2025-11-29T08:00:00Z',
+        revoked_reason: 'Suspected abuse'
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+    });
+  });
+
+  describe('Invalid Token Structures', () => {
+    test('should reject token with missing required fields', () => {
+      const incompleteToken = {
+        token: 'inv_incomplete_token_12345678901234567',
+        cohort_id: 'closed'
+        // missing created_at, expires_at, single_use
+      };
+
+      const isValid = validateInviteToken(incompleteToken);
+      expect(isValid).toBe(false);
+      expect(validateInviteToken.errors).toBeDefined();
+    });
+
+    test('should reject token with invalid cohort_id', () => {
+      const token = {
+        token: 'inv_invalid_cohort_1234567890123456789',
+        cohort_id: 'premium', // Invalid cohort
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(false);
+    });
+
+    test('should reject token with too short token string', () => {
+      const token = {
+        token: 'short', // Less than 32 characters
+        cohort_id: 'closed',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(false);
+    });
+
+    test('should reject token with invalid email format', () => {
+      const token = {
+        token: 'inv_invalid_email_1234567890123456789',
+        cohort_id: 'closed',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true,
+        email_hint: 'not-an-email'
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(false);
+    });
+
+    test('should reject negative redemption_count', () => {
+      const token = {
+        token: 'inv_negative_count_123456789012345678',
+        cohort_id: 'closed',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true,
+        redemption_count: -1
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(false);
+    });
+  });
+});
+
+describe('Cohort Feature Flags Schema Validation', () => {
+  let validateCohortFlags;
+
+  beforeAll(() => {
+    validateCohortFlags = ajv.compile(cohortFlagsSchema);
+  });
+
+  describe('Valid Cohort Structures', () => {
+    test('should validate internal cohort with full access', () => {
+      const internalCohort = {
+        cohort_id: 'internal',
+        name: 'Internal',
+        description: 'Internal team and stakeholders with full access',
+        capacity: {
+          min: 50,
+          max: 100,
+          current: 25,
+          waitlist: 0
+        },
+        access_level: 'full',
+        features: {
+          core_features: {
+            dashboard_access: true,
+            api_access: true,
+            export_data: true,
+            integrations: true
+          },
+          beta_features: {
+            new_ui: true,
+            ai_assistant: true,
+            advanced_analytics: true,
+            collaborative_editing: true
+          },
+          debug_features: {
+            debug_mode: true,
+            feature_preview: true,
+            admin_panel: true,
+            impersonation: true
+          },
+          limits: {
+            api_requests_per_day: 100000,
+            storage_mb: 10000,
+            projects_max: 100,
+            team_members_max: 50
+          }
+        },
+        created_at: '2025-11-28T12:00:00Z',
+        updated_at: '2025-11-28T12:00:00Z',
+        active: true
+      };
+
+      const isValid = validateCohortFlags(internalCohort);
+      expect(isValid).toBe(true);
+    });
+
+    test('should validate closed beta cohort with standard access', () => {
+      const closedCohort = {
+        cohort_id: 'closed',
+        name: 'Closed Beta',
+        description: 'Selected external testers',
+        capacity: {
+          min: 500,
+          max: 1000,
+          current: 150,
+          waitlist: 200
+        },
+        access_level: 'standard',
+        features: {
+          core_features: {
+            dashboard_access: true,
+            api_access: true,
+            export_data: true,
+            integrations: false
+          },
+          beta_features: {
+            new_ui: true,
+            ai_assistant: true
+          },
+          limits: {
+            api_requests_per_day: 10000,
+            storage_mb: 1000
+          }
+        }
+      };
+
+      const isValid = validateCohortFlags(closedCohort);
+      expect(isValid).toBe(true);
+    });
+
+    test('should validate open beta cohort with limited access', () => {
+      const openCohort = {
+        cohort_id: 'open',
+        name: 'Open Beta',
+        description: 'Public beta testers',
+        capacity: {
+          min: 10000,
+          max: 25000
+        },
+        access_level: 'limited',
+        features: {
+          core_features: {
+            dashboard_access: true,
+            api_access: false,
+            export_data: false
+          },
+          limits: {
+            api_requests_per_day: 1000,
+            storage_mb: 100
+          }
+        }
+      };
+
+      const isValid = validateCohortFlags(openCohort);
+      expect(isValid).toBe(true);
+    });
+  });
+
+  describe('Cohort Capacity Validation', () => {
+    test('should validate capacity ranges for internal cohort (50-100)', () => {
+      const cohort = {
+        cohort_id: 'internal',
+        name: 'Internal',
+        capacity: {
+          min: 50,
+          max: 100,
+          current: 75
+        },
+        features: {}
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(true);
+      expect(cohort.capacity.min).toBe(50);
+      expect(cohort.capacity.max).toBe(100);
+    });
+
+    test('should validate capacity ranges for closed cohort (500-1000)', () => {
+      const cohort = {
+        cohort_id: 'closed',
+        name: 'Closed Beta',
+        capacity: {
+          min: 500,
+          max: 1000
+        },
+        features: {}
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(true);
+    });
+
+    test('should validate capacity ranges for open cohort (10000-25000)', () => {
+      const cohort = {
+        cohort_id: 'open',
+        name: 'Open Beta',
+        capacity: {
+          min: 10000,
+          max: 25000
+        },
+        features: {}
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(true);
+    });
+  });
+
+  describe('Feature Flag Gating by Cohort', () => {
+    test('should allow debug features only for internal cohort', () => {
+      const internalCohort = {
+        cohort_id: 'internal',
+        name: 'Internal',
+        capacity: { min: 50, max: 100 },
+        features: {
+          debug_features: {
+            debug_mode: true,
+            admin_panel: true,
+            impersonation: true
+          }
+        }
+      };
+
+      const isValid = validateCohortFlags(internalCohort);
+      expect(isValid).toBe(true);
+    });
+
+    test('should validate feature limits differ by cohort', () => {
+      const internalLimits = {
+        cohort_id: 'internal',
+        name: 'Internal',
+        capacity: { min: 50, max: 100 },
+        features: {
+          limits: {
+            api_requests_per_day: 100000,
+            storage_mb: 10000
+          }
+        }
+      };
+
+      const openLimits = {
+        cohort_id: 'open',
+        name: 'Open',
+        capacity: { min: 10000, max: 25000 },
+        features: {
+          limits: {
+            api_requests_per_day: 1000,
+            storage_mb: 100
+          }
+        }
+      };
+
+      expect(validateCohortFlags(internalLimits)).toBe(true);
+      expect(validateCohortFlags(openLimits)).toBe(true);
+      
+      // Verify internal has higher limits
+      expect(internalLimits.features.limits.api_requests_per_day)
+        .toBeGreaterThan(openLimits.features.limits.api_requests_per_day);
+    });
+  });
+
+  describe('Enrollment Settings', () => {
+    test('should validate enrollment requiring invite', () => {
+      const cohort = {
+        cohort_id: 'closed',
+        name: 'Closed Beta',
+        capacity: { min: 500, max: 1000 },
+        features: {},
+        enrollment: {
+          open: false,
+          requires_invite: true,
+          requires_approval: false
+        }
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(true);
+    });
+
+    test('should validate open enrollment for open cohort', () => {
+      const cohort = {
+        cohort_id: 'open',
+        name: 'Open Beta',
+        capacity: { min: 10000, max: 25000 },
+        features: {},
+        enrollment: {
+          open: true,
+          requires_invite: false,
+          requires_approval: false
+        }
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(true);
+    });
+
+    test('should validate auto-promotion settings', () => {
+      const cohort = {
+        cohort_id: 'closed',
+        name: 'Closed Beta',
+        capacity: { min: 500, max: 1000 },
+        features: {},
+        enrollment: {
+          open: false,
+          requires_invite: true,
+          auto_promote: true,
+          promotion_target: 'open'
+        }
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(true);
+    });
+  });
+
+  describe('Invalid Cohort Structures', () => {
+    test('should reject cohort with missing required fields', () => {
+      const incompleteCohort = {
+        cohort_id: 'closed',
+        name: 'Incomplete'
+        // missing capacity and features
+      };
+
+      const isValid = validateCohortFlags(incompleteCohort);
+      expect(isValid).toBe(false);
+    });
+
+    test('should reject cohort with invalid cohort_id', () => {
+      const cohort = {
+        cohort_id: 'premium', // Invalid
+        name: 'Premium',
+        capacity: { min: 10, max: 50 },
+        features: {}
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(false);
+    });
+
+    test('should accept creator cohort_id', () => {
+      const cohort = {
+        cohort_id: 'creator',
+        cohort_type: 'creator',
+        name: 'Creator Cohort',
+        capacity: { min: 100, max: 500 },
+        features: {}
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(true);
+    });
+
+    test('should accept customer cohort_id', () => {
+      const cohort = {
+        cohort_id: 'customer',
+        cohort_type: 'customer',
+        name: 'Customer Cohort',
+        capacity: { min: 500, max: 5000 },
+        features: {}
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(true);
+    });
+
+    test('should reject cohort with invalid access_level', () => {
+      const cohort = {
+        cohort_id: 'closed',
+        name: 'Closed',
+        capacity: { min: 500, max: 1000 },
+        features: {},
+        access_level: 'premium' // Invalid
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(false);
+    });
+
+    test('should reject negative capacity values', () => {
+      const cohort = {
+        cohort_id: 'closed',
+        name: 'Closed',
+        capacity: { min: -10, max: 1000 },
+        features: {}
+      };
+
+      const isValid = validateCohortFlags(cohort);
+      expect(isValid).toBe(false);
+    });
+  });
+});
+
+describe('Runtime Access Control Logic', () => {
+  // Helper functions simulating runtime behavior
+  
+  function isTokenExpired(token) {
+    const now = new Date();
+    const expiresAt = new Date(token.expires_at);
+    return expiresAt <= now;
+  }
+
+  function isTokenRedeemable(token) {
+    if (token.revoked) return false;
+    if (isTokenExpired(token)) return false;
+    if (token.single_use && token.redeemed) return false;
+    if (token.redemption_count >= token.max_redemptions) return false;
+    return true;
+  }
+
+  function canAccessFeature(cohort, featureCategory, featureName) {
+    if (!cohort.features || !cohort.features[featureCategory]) return false;
+    return cohort.features[featureCategory][featureName] === true;
+  }
+
+  test('should correctly identify expired token', () => {
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 1);
+    
+    const expiredToken = {
+      token: 'inv_expired_12345678901234567890abcd',
+      expires_at: pastDate.toISOString(),
+      single_use: true,
+      redeemed: false,
+      revoked: false,
+      redemption_count: 0,
+      max_redemptions: 1
+    };
+
+    expect(isTokenExpired(expiredToken)).toBe(true);
+    expect(isTokenRedeemable(expiredToken)).toBe(false);
+  });
+
+  test('should correctly identify valid token', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 3);
+    
+    const validToken = {
+      token: 'inv_valid_123456789012345678901234567',
+      expires_at: futureDate.toISOString(),
+      single_use: true,
+      redeemed: false,
+      revoked: false,
+      redemption_count: 0,
+      max_redemptions: 1
+    };
+
+    expect(isTokenExpired(validToken)).toBe(false);
+    expect(isTokenRedeemable(validToken)).toBe(true);
+  });
+
+  test('should reject already redeemed single-use token', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 3);
+    
+    const redeemedToken = {
+      token: 'inv_redeemed_1234567890123456789012345',
+      expires_at: futureDate.toISOString(),
+      single_use: true,
+      redeemed: true,
+      revoked: false,
+      redemption_count: 1,
+      max_redemptions: 1
+    };
+
+    expect(isTokenRedeemable(redeemedToken)).toBe(false);
+  });
+
+  test('should reject revoked token', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 3);
+    
+    const revokedToken = {
+      token: 'inv_revoked_12345678901234567890abcde',
+      expires_at: futureDate.toISOString(),
+      single_use: true,
+      redeemed: false,
+      revoked: true,
+      redemption_count: 0,
+      max_redemptions: 1
+    };
+
+    expect(isTokenRedeemable(revokedToken)).toBe(false);
+  });
+
+  test('should allow multi-use token up to max redemptions', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 3);
+    
+    const multiUseToken = {
+      token: 'inv_multi_use_12345678901234567890abc',
+      expires_at: futureDate.toISOString(),
+      single_use: false,
+      redeemed: false,
+      revoked: false,
+      redemption_count: 5,
+      max_redemptions: 10
+    };
+
+    expect(isTokenRedeemable(multiUseToken)).toBe(true);
+
+    // When max reached
+    multiUseToken.redemption_count = 10;
+    expect(isTokenRedeemable(multiUseToken)).toBe(false);
+  });
+
+  test('should correctly gate feature access by cohort', () => {
+    const internalCohort = {
+      cohort_id: 'internal',
+      features: {
+        debug_features: {
+          debug_mode: true,
+          admin_panel: true
+        },
+        core_features: {
+          api_access: true
+        }
+      }
+    };
+
+    const openCohort = {
+      cohort_id: 'open',
+      features: {
+        debug_features: {
+          debug_mode: false,
+          admin_panel: false
+        },
+        core_features: {
+          api_access: false
+        }
+      }
+    };
+
+    // Internal cohort should have debug access
+    expect(canAccessFeature(internalCohort, 'debug_features', 'debug_mode')).toBe(true);
+    expect(canAccessFeature(internalCohort, 'debug_features', 'admin_panel')).toBe(true);
+    
+    // Open cohort should not have debug access
+    expect(canAccessFeature(openCohort, 'debug_features', 'debug_mode')).toBe(false);
+    expect(canAccessFeature(openCohort, 'debug_features', 'admin_panel')).toBe(false);
+  });
+});
+
+describe('Landing Page Token Form Validation', () => {
+  // Token pattern from landing/app.js and schemas/invite_token.schema.json
+  const TOKEN_PATTERN = /^[A-Za-z0-9_-]{32,64}$/;
+
+  /**
+   * Validate invite token format (mirrors landing/app.js logic)
+   */
+  function validateTokenFormat(token) {
+    if (!token || typeof token !== 'string') {
+      return { valid: false, error: 'Token is required' };
+    }
+
+    token = token.trim();
+
+    if (token.length < 32 || token.length > 64) {
+      return { valid: false, error: 'Token must be 32-64 characters' };
+    }
+
+    if (!TOKEN_PATTERN.test(token)) {
+      return { valid: false, error: 'Token contains invalid characters' };
+    }
+
+    return { valid: true, token };
+  }
+
+  /**
+   * Validate email format (mirrors landing/app.js logic)
+   */
+  function validateEmail(email) {
+    if (!email || typeof email !== 'string') {
+      return { valid: false, error: 'Email is required' };
+    }
+
+    email = email.trim().toLowerCase();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+      return { valid: false, error: 'Invalid email format' };
+    }
+
+    if (email.length > 255) {
+      return { valid: false, error: 'Email is too long' };
+    }
+
+    return { valid: true, email };
+  }
+
+  describe('Token Format Validation', () => {
+    test('should accept valid 32-character token', () => {
+      const result = validateTokenFormat('inv_a1b2c3d4e5f6g7h8i9j0k1l2m3n4');
+      expect(result.valid).toBe(true);
+    });
+
+    test('should accept valid 64-character token', () => {
+      const token = 'inv_' + 'a'.repeat(60);
+      const result = validateTokenFormat(token);
+      expect(result.valid).toBe(true);
+    });
+
+    test('should accept token with underscores and hyphens', () => {
+      const result = validateTokenFormat('inv_test-token_12345678901234567890');
+      expect(result.valid).toBe(true);
+    });
+
+    test('should reject empty token', () => {
+      const result = validateTokenFormat('');
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Token is required');
+    });
+
+    test('should reject null token', () => {
+      const result = validateTokenFormat(null);
+      expect(result.valid).toBe(false);
+    });
+
+    test('should reject token shorter than 32 characters', () => {
+      const result = validateTokenFormat('inv_short');
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Token must be 32-64 characters');
+    });
+
+    test('should reject token longer than 64 characters', () => {
+      const token = 'a'.repeat(65);
+      const result = validateTokenFormat(token);
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Token must be 32-64 characters');
+    });
+
+    test('should reject token with special characters', () => {
+      const result = validateTokenFormat('inv_test!@#$%^&*()123456789012345678901234');
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Token contains invalid characters');
+    });
+
+    test('should reject token with spaces', () => {
+      const result = validateTokenFormat('inv test token 12345678901234567');
+      expect(result.valid).toBe(false);
+    });
+
+    test('should trim whitespace from token', () => {
+      const result = validateTokenFormat('  inv_a1b2c3d4e5f6g7h8i9j0k1l2m3n4  ');
+      expect(result.valid).toBe(true);
+      expect(result.token).toBe('inv_a1b2c3d4e5f6g7h8i9j0k1l2m3n4');
+    });
+  });
+
+  describe('Email Format Validation', () => {
+    test('should accept valid email', () => {
+      const result = validateEmail('user@example.com');
+      expect(result.valid).toBe(true);
+      expect(result.email).toBe('user@example.com');
+    });
+
+    test('should accept email with subdomain', () => {
+      const result = validateEmail('user@mail.example.com');
+      expect(result.valid).toBe(true);
+    });
+
+    test('should accept email with plus sign', () => {
+      const result = validateEmail('user+tag@example.com');
+      expect(result.valid).toBe(true);
+    });
+
+    test('should lowercase email', () => {
+      const result = validateEmail('User@EXAMPLE.COM');
+      expect(result.valid).toBe(true);
+      expect(result.email).toBe('user@example.com');
+    });
+
+    test('should reject empty email', () => {
+      const result = validateEmail('');
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Email is required');
+    });
+
+    test('should reject email without @', () => {
+      const result = validateEmail('userexample.com');
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Invalid email format');
+    });
+
+    test('should reject email without domain', () => {
+      const result = validateEmail('user@');
+      expect(result.valid).toBe(false);
+    });
+
+    test('should reject email without local part', () => {
+      const result = validateEmail('@example.com');
+      expect(result.valid).toBe(false);
+    });
+
+    test('should reject email with spaces', () => {
+      const result = validateEmail('user @example.com');
+      expect(result.valid).toBe(false);
+    });
+
+    test('should reject email longer than 255 characters', () => {
+      const longEmail = 'a'.repeat(250) + '@example.com';
+      const result = validateEmail(longEmail);
+      expect(result.valid).toBe(false);
+      expect(result.error).toBe('Email is too long');
+    });
+  });
+
+  describe('Integration with Schema', () => {
+    test('should align with invite_token.schema.json pattern', () => {
+      // Pattern from schema: ^[A-Za-z0-9_-]{32,64}$
+      const schemaPattern = /^[A-Za-z0-9_-]{32,64}$/;
+      
+      // Test valid tokens against both
+      const validTokens = [
+        'inv_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6',
+        'INV_UPPERCASE_12345678901234567890ab',
+        'inv-with-hyphens-1234567890123456789'
+      ];
+
+      validTokens.forEach(token => {
+        expect(schemaPattern.test(token)).toBe(true);
+        expect(validateTokenFormat(token).valid).toBe(true);
+      });
+    });
+
+    test('should align with email format from schema', () => {
+      // Schema uses format: email (JSON Schema draft-07)
+      const validEmails = [
+        'user@example.com',
+        'test.user@company.org',
+        'beta+tester@waliinstudio.com'
+      ];
+
+      validEmails.forEach(email => {
+        expect(validateEmail(email).valid).toBe(true);
+      });
+    });
+  });
+});
+
+describe('Creator and Customer Cohort Routing', () => {
+  // Initialize AJV validators for this block
+  const Ajv = require('ajv');
+  const addFormats = require('ajv-formats');
+  const fs = require('fs');
+  const path = require('path');
+
+  const inviteTokenSchema = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '../../schemas/invite_token.schema.json'), 'utf8')
+  );
+  const cohortFlagsSchema = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '../../schemas/cohort_flags.schema.json'), 'utf8')
+  );
+
+  const ajv = new Ajv({ allErrors: true, strict: false });
+  addFormats(ajv);
+
+  const validateInviteToken = ajv.compile(inviteTokenSchema);
+  const validateCohortFlags = ajv.compile(cohortFlagsSchema);
+
+  // Test data for Creator cohort
+  const creatorCohort = {
+    cohort_id: 'creator',
+    cohort_type: 'creator',
+    name: 'Creator Cohort',
+    capacity: { min: 100, max: 500 },
+    features: {
+      creator_features: {
+        asset_downloads: true,
+        brand_kit_access: true,
+        posting_instructions: true,
+        content_library_full: false,
+        demo_clips_limit: 10
+      }
+    }
+  };
+
+  // Test data for Customer cohort
+  const customerCohort = {
+    cohort_id: 'customer',
+    cohort_type: 'customer',
+    name: 'Customer Cohort',
+    capacity: { min: 500, max: 5000 },
+    features: {
+      customer_features: {
+        content_showcase: true,
+        library_access: 'curated',
+        feedback_enabled: true,
+        content_preview_limit: 10
+      }
+    }
+  };
+
+  describe('Creator Token Validation', () => {
+    test('should accept valid creator token', () => {
+      const token = {
+        token: 'inv_creator_demo_123456789012345678901',
+        cohort_id: 'creator',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+      expect(token.cohort_id).toBe('creator');
+    });
+
+    test('should validate creator cohort features', () => {
+      const isValid = validateCohortFlags(creatorCohort);
+      expect(isValid).toBe(true);
+      expect(creatorCohort.cohort_type).toBe('creator');
+    });
+
+    test('should have asset download access for creators', () => {
+      expect(creatorCohort.features.creator_features.asset_downloads).toBe(true);
+    });
+
+    test('should have brand kit access for creators', () => {
+      expect(creatorCohort.features.creator_features.brand_kit_access).toBe(true);
+    });
+
+    test('should have posting instructions for creators', () => {
+      expect(creatorCohort.features.creator_features.posting_instructions).toBe(true);
+    });
+
+    test('should not have full content library for creators', () => {
+      expect(creatorCohort.features.creator_features.content_library_full).toBe(false);
+    });
+
+    test('should have demo clips limit for creators', () => {
+      expect(creatorCohort.features.creator_features.demo_clips_limit).toBe(10);
+    });
+  });
+
+  describe('Customer Token Validation', () => {
+    test('should accept valid customer token', () => {
+      const token = {
+        token: 'inv_customer_demo_12345678901234567890',
+        cohort_id: 'customer',
+        created_at: '2025-11-28T12:00:00Z',
+        expires_at: '2025-12-01T12:00:00Z',
+        single_use: true
+      };
+
+      const isValid = validateInviteToken(token);
+      expect(isValid).toBe(true);
+      expect(token.cohort_id).toBe('customer');
+    });
+
+    test('should validate customer cohort features', () => {
+      const isValid = validateCohortFlags(customerCohort);
+      expect(isValid).toBe(true);
+      expect(customerCohort.cohort_type).toBe('customer');
+    });
+
+    test('should have content showcase access for customers', () => {
+      expect(customerCohort.features.customer_features.content_showcase).toBe(true);
+    });
+
+    test('should have curated library access for customers', () => {
+      expect(customerCohort.features.customer_features.library_access).toBe('curated');
+    });
+
+    test('should have feedback enabled for customers', () => {
+      expect(customerCohort.features.customer_features.feedback_enabled).toBe(true);
+    });
+
+    test('should have content preview limit for customers', () => {
+      expect(customerCohort.features.customer_features.content_preview_limit).toBe(10);
+    });
+  });
+
+  describe('Cohort Type Differentiation', () => {
+    test('should differentiate between creator and customer types', () => {
+      expect(creatorCohort.cohort_type).toBe('creator');
+      expect(customerCohort.cohort_type).toBe('customer');
+      expect(creatorCohort.cohort_type).not.toBe(customerCohort.cohort_type);
+    });
+
+    test('should have different feature sets for creator and customer', () => {
+      // Creator has asset downloads, customer doesn't
+      expect(creatorCohort.features.creator_features).toBeDefined();
+      expect(customerCohort.features.customer_features).toBeDefined();
+    });
+
+    test('should have different capacity ranges', () => {
+      // Creator: 100-500, Customer: 500-5000
+      expect(creatorCohort.capacity.max).toBeLessThan(customerCohort.capacity.max);
+    });
+  });
+
+  describe('Token Routing Logic', () => {
+    function routeToCohort(cohortId) {
+      const routes = {
+        'internal': '/dashboard/admin',
+        'closed': '/dashboard',
+        'open': '/dashboard/limited',
+        'creator': '/dashboard/creator',
+        'customer': '/dashboard/customer'
+      };
+      return routes[cohortId] || '/';
+    }
+
+    test('should route creator tokens to creator dashboard', () => {
+      expect(routeToCohort('creator')).toBe('/dashboard/creator');
+    });
+
+    test('should route customer tokens to customer dashboard', () => {
+      expect(routeToCohort('customer')).toBe('/dashboard/customer');
+    });
+
+    test('should route unknown cohorts to home', () => {
+      expect(routeToCohort('unknown')).toBe('/');
+    });
+  });
+});
